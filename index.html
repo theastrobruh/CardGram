@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Trading Card Studio — Reels & TikTok Creator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>3D Card Studio</title>
   <!-- Three.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- OrbitControls CDN -->
@@ -14,80 +14,203 @@
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    :root {
+      --bg-dark: #0b0d13;
+      --panel-bg: #131722;
+      --card-bg: #181e2d;
+      --border-color: #232b3e;
+      --accent: #38bdf8;
+      --accent-gold: #e2b842;
+      --green-btn: #10b981;
     }
     body {
-      background-color: #0b0d13;
+      background-color: var(--bg-dark);
       color: #f1f5f9;
       display: flex;
       height: 100vh;
+      height: 100dvh;
       overflow: hidden;
+      position: relative;
     }
+
+    /* Mobile toggle button */
+    #mobile-toggle-btn {
+      display: none;
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 100;
+      background: rgba(19, 23, 34, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      font-size: 1.2rem;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+
+    /* Cinematic Mode trigger */
+    #btn-cinematic {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      z-index: 90;
+      background: rgba(19, 23, 34, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+    #btn-cinematic:hover {
+      background: #1c2233;
+      border-color: var(--accent);
+      transform: scale(1.03);
+    }
+
+    /* Exit cinematic overlay prompt */
+    #cinematic-exit-tip {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.65);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #cbd5e1;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      z-index: 200;
+      pointer-events: none;
+      animation: fadeInOut 3s forwards;
+    }
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      15% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
     /* Sidebar controls */
     #sidebar {
-      width: 420px;
+      width: 410px;
       min-width: 380px;
-      background: #131722;
-      border-right: 1px solid #232b3e;
+      max-width: 420px;
+      background: var(--panel-bg);
+      border-right: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
       height: 100%;
-      z-index: 10;
+      z-index: 50;
       box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
+
     .header {
-      padding: 24px 24px 16px;
-      border-bottom: 1px solid #232b3e;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
       background: #171c2b;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .header h1 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #ffffff;
+    .header .brand {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .header p {
-      font-size: 0.82rem;
-      color: #94a3b8;
-      margin-top: 4px;
+    .header h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
     }
+    .lang-switcher {
+      display: flex;
+      background: #0f131c;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 2px;
+      gap: 2px;
+    }
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .lang-btn.active {
+      background: var(--accent);
+      color: #0b0d13;
+    }
+
     .scroll-content {
-      padding: 20px 24px;
+      padding: 16px 20px;
       overflow-y: auto;
       flex: 1;
     }
+    .scroll-content::-webkit-scrollbar {
+      width: 6px;
+    }
+    .scroll-content::-webkit-scrollbar-thumb {
+      background: #252e42;
+      border-radius: 3px;
+    }
+
     .section-title {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #e2b842;
-      margin-bottom: 12px;
-      margin-top: 20px;
+      color: var(--accent-gold);
+      margin-bottom: 10px;
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .section-title:first-child {
       margin-top: 0;
     }
+
     /* Upload boxes */
     .upload-group {
       display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 12px;
     }
     .upload-box {
       flex: 1;
       background: #1c2233;
       border: 1px dashed #3b4766;
       border-radius: 10px;
-      padding: 12px;
+      padding: 10px;
       text-align: center;
       cursor: pointer;
       transition: all 0.2s ease;
       position: relative;
     }
     .upload-box:hover {
-      border-color: #38bdf8;
+      border-color: var(--accent);
       background: #20273a;
     }
     .upload-box input {
@@ -95,65 +218,118 @@
     }
     .upload-box img {
       width: 100%;
-      height: 120px;
+      height: 105px;
       object-fit: cover;
       border-radius: 6px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       background: #0f121a;
+      display: block;
     }
     .upload-box span {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: #cbd5e1;
       display: block;
-      font-weight: 500;
+      font-weight: 600;
     }
-    .upload-box small {
-      font-size: 0.7rem;
-      color: #64748b;
-    }
+
     /* Control inputs */
     .control-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 14px;
-      background: #181e2d;
-      padding: 10px 14px;
+      margin-bottom: 10px;
+      background: var(--card-bg);
+      padding: 8px 12px;
       border-radius: 8px;
-      border: 1px solid #232b3e;
+      border: 1px solid var(--border-color);
+      gap: 8px;
     }
     .control-row label {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #e2e8f0;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
     }
-    select, input[type="range"] {
+    .control-row-col {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+    }
+    .control-row-col .header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .slider-val {
+      font-size: 0.75rem;
+      color: var(--accent);
+      font-weight: 600;
+      font-family: monospace;
+    }
+
+    select, input[type="range"], input[type="number"] {
       background: #252e42;
       border: 1px solid #3b4766;
       color: #fff;
-      padding: 6px 10px;
+      padding: 6px 8px;
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       outline: none;
       cursor: pointer;
     }
-    select:focus {
-      border-color: #38bdf8;
+    select:focus, input:focus {
+      border-color: var(--accent);
     }
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      accent-color: var(--accent);
+      padding: 0;
+    }
+
+    .preset-pill-group {
+      display: flex;
+      gap: 5px;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .pill-btn {
+      flex: 1;
+      padding: 5px 6px;
+      font-size: 0.72rem;
+      background: #252e42;
+      border: 1px solid #3b4766;
+      border-radius: 6px;
+      color: #cbd5e1;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .pill-btn.active, .pill-btn:hover {
+      background: var(--accent);
+      color: #0b0d13;
+      font-weight: 700;
+      border-color: var(--accent);
+    }
+
     /* Action footer */
     .footer {
-      padding: 20px 24px;
+      padding: 16px 20px;
       background: #171c2b;
-      border-top: 1px solid #232b3e;
+      border-top: 1px solid var(--border-color);
     }
     .btn-record {
       width: 100%;
-      padding: 14px;
+      padding: 13px;
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: #fff;
       border: none;
       border-radius: 8px;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 700;
       cursor: pointer;
       display: flex;
@@ -175,173 +351,448 @@
     }
     .status-text {
       text-align: center;
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       color: #94a3b8;
-      margin-top: 10px;
+      margin-top: 8px;
     }
-    /* Main viewport */
+
+    /* Main viewport & Frame wrapper */
     #viewport-container {
       flex: 1;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #000;
+      background: #06070a;
       overflow: hidden;
+      padding: 20px;
     }
-    /* Phone frame indicator */
-    .reels-overlay-badge {
+
+    /* The responsive / custom dimension canvas window */
+    #canvas-window-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #232b3e;
+      transition: width 0.25s ease, height 0.25s ease, border-radius 0.2s ease;
+    }
+
+    #canvas-window-wrapper canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* Floating quick controls inside viewport */
+    .viewport-overlay-controls {
       position: absolute;
-      top: 20px;
+      bottom: 20px;
       right: 20px;
+      display: flex;
+      gap: 8px;
+      z-index: 20;
+    }
+    .floating-pill {
       background: rgba(19, 23, 34, 0.85);
       backdrop-filter: blur(8px);
-      border: 1px solid #2d374d;
-      padding: 8px 14px;
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
       border-radius: 20px;
-      font-size: 0.8rem;
-      color: #38bdf8;
-      font-weight: 600;
-      pointer-events: none;
+      font-size: 0.74rem;
+      color: #cbd5e1;
+      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
+      transition: all 0.2s;
     }
-    .pulse-dot {
-      width: 8px;
-      height: 8px;
-      background: #10b981;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #10b981;
+    .floating-pill:hover {
+      background: #252e42;
+      color: #fff;
+      border-color: var(--accent);
     }
-    /* Hidden render canvas for exact 1080x1920 video export */
-    #export-canvas {
-      display: none;
+
+    /* Cinematic Mode Active class */
+    body.cinematic-mode #sidebar,
+    body.cinematic-mode #mobile-toggle-btn,
+    body.cinematic-mode #btn-cinematic,
+    body.cinematic-mode .viewport-overlay-controls {
+      display: none !important;
+    }
+    body.cinematic-mode #viewport-container {
+      padding: 0 !important;
+    }
+    body.cinematic-mode #canvas-window-wrapper {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: 100vw !important;
+      max-height: 100vh !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+
+    /* Mobile Responsive styling */
+    @media (max-width: 860px) {
+      #mobile-toggle-btn {
+        display: flex;
+        align-items: center;
+      }
+      #sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 320px;
+        min-width: 300px;
+        transform: translateX(-100%);
+        z-index: 150;
+      }
+      #sidebar.open {
+        transform: translateX(0);
+        box-shadow: 15px 0 50px rgba(0,0,0,0.8);
+      }
+      #viewport-container {
+        padding: 0;
+      }
+      #canvas-window-wrapper {
+        border-radius: 0;
+        border: none;
+      }
+      .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(4px);
+        z-index: 140;
+      }
+      .sidebar-backdrop.active {
+        display: block;
+      }
     }
   </style>
 </head>
 <body>
 
+  <!-- Backdrop for mobile drawer -->
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <!-- Mobile Toggle Button -->
+  <button id="mobile-toggle-btn" aria-label="Toggle Menu">☰</button>
+
+  <!-- Cinematic Mode Button -->
+  <button id="btn-cinematic" title="Modo Visor Pantalla Completa / Full Screen View">
+    <span>👁️</span> <span data-i18n="cinematic_btn">Visor</span>
+  </button>
+  <div id="cinematic-exit-tip" data-i18n="cinematic_tip">Toca en cualquier lugar para salir</div>
+
   <!-- SIDEBAR CONTROLS -->
   <aside id="sidebar">
     <div class="header">
-      <h1>🎴 3D Card Studio</h1>
-      <p>Generador de videos loop 3D para Reels / TikTok</p>
+      <div class="brand">
+        <h1>🎴 3D Studio</h1>
+      </div>
+      <div class="lang-switcher">
+        <button class="lang-btn active" id="btn-lang-es">ES</button>
+        <button class="lang-btn" id="btn-lang-en">EN</button>
+      </div>
     </div>
 
     <div class="scroll-content">
       <!-- 1. CARTAS -->
-      <div class="section-title">1. Diseños de las Caras</div>
+      <div class="section-title"><span data-i18n="sec_cards">🎨 1. Diseños</span></div>
       <div class="upload-group">
         <label class="upload-box" for="front-file-input">
           <img id="front-preview-img" src="assets/card_front.png" alt="Front Preview">
-          <span>Cara Frontal</span>
-          <small>Clic para subir</small>
+          <span data-i18n="front_cover">🖼️ Frontal</span>
           <input type="file" id="front-file-input" accept="image/*">
         </label>
 
         <label class="upload-box" for="back-file-input">
           <img id="back-preview-img" src="assets/card_back.png" alt="Back Preview">
-          <span>Cara Trasera</span>
-          <small>Clic para subir</small>
+          <span data-i18n="back_cover">🔄 Trasera</span>
           <input type="file" id="back-file-input" accept="image/*">
         </label>
       </div>
 
-      <!-- 2. FONDO Y ESTÉTICA -->
-      <div class="section-title">2. Entorno y Fondo</div>
+      <!-- 2. CANVAS Y DIMENSIONES -->
+      <div class="section-title"><span data-i18n="sec_canvas">📐 2. Dimensiones Canvas</span></div>
+      <div class="control-row control-row-col">
+        <div class="header-line">
+          <label><span data-i18n="canvas_aspect">📱 Formato / Aspecto</span></label>
+        </div>
+        <div class="preset-pill-group">
+          <button class="pill-btn active" data-preset="9:16">9:16 Reels</button>
+          <button class="pill-btn" data-preset="1:1">1:1 Post</button>
+          <button class="pill-btn" data-preset="16:9">16:9 Wide</button>
+          <button class="pill-btn" data-preset="fill" data-i18n="preset_fill">↔️ Ajustar</button>
+        </div>
+      </div>
       <div class="control-row">
-        <label for="select-bg">Color de Fondo:</label>
-        <select id="select-bg">
-          <option value="black" selected>Negro Absoluto (OLED)</option>
-          <option value="dark_studio">Estudio Sutil</option>
-          <option value="gold_luxury">Lujo Dorado</option>
-          <option value="cyber_neon">Cyberpunk Neón</option>
-          <option value="transparent">Transparente</option>
-        </select>
+        <label for="range-canvas-scale"><span data-i18n="canvas_scale">🔍 Tamaño Canvas</span></label>
+        <input type="range" id="range-canvas-scale" min="50" max="100" value="100" step="1">
       </div>
 
-      <!-- 3. DETALLES 3D -->
-      <div class="section-title">3. Detalles de la Carta 3D</div>
+      <!-- 3. CÁMARA Y POSICIÓN -->
+      <div class="section-title"><span data-i18n="sec_camera">🎥 3. Cámara & Posición</span></div>
+      <div class="control-row control-row-col">
+        <div class="header-line">
+          <label for="range-cam-dist"><span data-i18n="cam_dist">📏 Distancia</span></label>
+          <span class="slider-val" id="val-cam-dist">4.6</span>
+        </div>
+        <input type="range" id="range-cam-dist" min="2.2" max="8.0" step="0.1" value="4.6">
+      </div>
+
+      <div class="control-row control-row-col">
+        <div class="header-line">
+          <label for="range-pos-y"><span data-i18n="pos_y">↕️ Posición Vertical</span></label>
+          <span class="slider-val" id="val-pos-y">0.0</span>
+        </div>
+        <input type="range" id="range-pos-y" min="-1.5" max="1.5" step="0.05" value="0.0">
+      </div>
+
+      <!-- 4. DETALLES 3D (Canto, Borde, Brillo) -->
+      <div class="section-title"><span data-i18n="sec_card3d">✨ 4. Canto y Bordes</span></div>
       
       <div class="control-row">
-        <label for="select-corners">Esquinas:</label>
+        <label for="select-corners"><span data-i18n="corners_type">✂️ Esquinas</span></label>
         <select id="select-corners">
-          <option value="rounded" selected>Redondeadas (TCG)</option>
-          <option value="sharp">Rectas Clásicas</option>
+          <option value="rounded" data-i18n="opt_rounded">Redondeadas (TCG)</option>
+          <option value="sharp" data-i18n="opt_sharp">Rectas Clásicas</option>
         </select>
       </div>
 
+      <div class="control-row control-row-col">
+        <div class="header-line">
+          <label for="range-edge-thickness"><span data-i18n="edge_thickness">🧱 Grosor del Canto</span></label>
+          <span class="slider-val" id="val-edge-thick">0.016</span>
+        </div>
+        <input type="range" id="range-edge-thickness" min="0.005" max="0.050" step="0.002" value="0.016">
+      </div>
+
+      <div class="control-row control-row-col">
+        <div class="header-line">
+          <label for="range-bevel-intensity"><span data-i18n="bevel_intensity">💎 Intensidad de Borde</span></label>
+          <span class="slider-val" id="val-bevel-int">0.004</span>
+        </div>
+        <input type="range" id="range-bevel-intensity" min="0.001" max="0.012" step="0.001" value="0.004">
+      </div>
+
       <div class="control-row">
-        <label for="select-edge">Color del Canto:</label>
+        <label for="select-edge"><span data-i18n="edge_color">🎨 Color Canto</span></label>
         <select id="select-edge">
-          <option value="black" selected>Negro Mate</option>
-          <option value="gold_foil">Dorado Metalizado (Foil)</option>
-          <option value="white">Cartulina Blanca</option>
+          <option value="black" data-i18n="opt_black_edge">Negro Mate</option>
+          <option value="gold_foil" data-i18n="opt_gold_edge">Dorado Metalizado (Foil)</option>
+          <option value="silver_foil" data-i18n="opt_silver_edge">Plata Metalizada</option>
+          <option value="white" data-i18n="opt_white_edge">Cartulina Blanca</option>
         </select>
       </div>
 
-      <div class="control-row">
-        <label for="range-gloss">Brillo Reflectante:</label>
+      <div class="control-row control-row-col">
+        <div class="header-line">
+          <label for="range-gloss"><span data-i18n="glossiness">✨ Brillo Reflectante</span></label>
+          <span class="slider-val" id="val-gloss">0.25</span>
+        </div>
         <input type="range" id="range-gloss" min="0.05" max="0.9" step="0.05" value="0.25">
       </div>
 
-      <!-- 4. ANIMACIÓN -->
-      <div class="section-title">4. Parámetros de Video</div>
-      
+      <!-- 5. FONDO Y ANIMACIÓN -->
+      <div class="section-title"><span data-i18n="sec_env">🌌 5. Entorno & Giro</span></div>
       <div class="control-row">
-        <label for="select-speed">Velocidad de Giro:</label>
-        <select id="select-speed">
-          <option value="1">Normal (2 giros en 10s)</option>
-          <option value="0.5">Lento y Elegante (1 giro)</option>
-          <option value="1.5">Rápido y Dinámico</option>
+        <label for="select-bg"><span data-i18n="bg_color">🏞️ Fondo</span></label>
+        <select id="select-bg">
+          <option value="black" data-i18n="bg_black">Negro Absoluto (OLED)</option>
+          <option value="dark_studio" data-i18n="bg_studio">Estudio Sutil</option>
+          <option value="gold_luxury" data-i18n="bg_luxury">Lujo Dorado</option>
+          <option value="cyber_neon" data-i18n="bg_cyber">Cyberpunk Neón</option>
+          <option value="transparent" data-i18n="bg_transparent">Transparente</option>
         </select>
       </div>
 
       <div class="control-row">
-        <label for="toggle-floating">Oscilación Flotante:</label>
+        <label for="select-speed"><span data-i18n="spin_speed">⏱️ Giro</span></label>
+        <select id="select-speed">
+          <option value="1" data-i18n="spd_normal">Normal (2 giros / 10s)</option>
+          <option value="0.5" data-i18n="spd_slow">Lento & Suave (1 giro)</option>
+          <option value="1.5" data-i18n="spd_fast">Rápido Dinámico</option>
+          <option value="0" data-i18n="spd_stop">Pausado (Estático)</option>
+        </select>
+      </div>
+
+      <div class="control-row">
+        <label for="toggle-floating"><span data-i18n="floating">🌊 Oscilación</span></label>
         <select id="toggle-floating">
-          <option value="true" selected>Activada (Orgánica)</option>
-          <option value="false">Fija en el Eje</option>
+          <option value="true" data-i18n="float_on">Activada (Orgánica)</option>
+          <option value="false" data-i18n="float_off">Fija en Eje</option>
         </select>
       </div>
     </div>
 
-    <!-- FOOTER BOTÓN DE EXPORTAR -->
+    <!-- FOOTER EXPORTACIÓN -->
     <div class="footer">
       <button class="btn-record" id="btn-record">
-        <span>🎬</span> EXPORTAR REEL 9:16 (10s)
+        <span>🎬</span> <span id="record-btn-text" data-i18n="export_btn">EXPORTAR REEL 9:16 (10s)</span>
       </button>
-      <div class="status-text" id="status-label">Listo para previsualizar y exportar</div>
+      <div class="status-text" id="status-label" data-i18n="status_ready">Listo para exportar video vertical HD</div>
     </div>
   </aside>
 
   <!-- 3D VIEWPORT -->
   <main id="viewport-container">
-    <div class="reels-overlay-badge">
-      <div class="pulse-dot"></div>
-      9:16 Vertical Loop Preview
+    <div id="canvas-window-wrapper">
+      <!-- Three.js canvas dynamically injected here -->
+    </div>
+
+    <div class="viewport-overlay-controls">
+      <button class="floating-pill" id="btn-reset-cam">
+        <span>🎯</span> <span data-i18n="btn_center">Centrar</span>
+      </button>
     </div>
   </main>
 
   <script>
     // -------------------------------------------------------------------------
+    // I18N DICTIONARY (SPANISH & ENGLISH, MINIMAL TEXT, EMOJI FOCUSED)
+    // -------------------------------------------------------------------------
+    const translations = {
+      es: {
+        sec_cards: "🎨 1. Diseños",
+        front_cover: "🖼️ Frontal",
+        back_cover: "🔄 Trasera",
+        sec_canvas: "📐 2. Dimensiones Canvas",
+        canvas_aspect: "📱 Formato / Aspecto",
+        preset_fill: "↔️ Ajustar",
+        canvas_scale: "🔍 Tamaño Canvas",
+        sec_camera: "🎥 3. Cámara & Posición",
+        cam_dist: "📏 Distancia",
+        pos_y: "↕️ Posición Vertical",
+        sec_card3d: "✨ 4. Canto y Bordes",
+        corners_type: "✂️ Esquinas",
+        opt_rounded: "Redondeadas (TCG)",
+        opt_sharp: "Rectas Clásicas",
+        edge_thickness: "🧱 Grosor del Canto",
+        bevel_intensity: "💎 Intensidad de Borde",
+        edge_color: "🎨 Color Canto",
+        opt_black_edge: "Negro Mate",
+        opt_gold_edge: "Dorado Metalizado (Foil)",
+        opt_silver_edge: "Plata Metalizada",
+        opt_white_edge: "Cartulina Blanca",
+        glossiness: "✨ Brillo Reflectante",
+        sec_env: "🌌 5. Entorno & Giro",
+        bg_color: "🏞️ Fondo",
+        bg_black: "Negro Absoluto (OLED)",
+        bg_studio: "Estudio Sutil",
+        bg_luxury: "Lujo Dorado",
+        bg_cyber: "Cyberpunk Neón",
+        bg_transparent: "Transparente",
+        spin_speed: "⏱️ Giro",
+        spd_normal: "Normal (2 giros / 10s)",
+        spd_slow: "Lento & Suave (1 giro)",
+        spd_fast: "Rápido Dinámico",
+        spd_stop: "Pausado (Estático)",
+        floating: "🌊 Oscilación",
+        float_on: "Activada (Orgánica)",
+        float_off: "Fija en Eje",
+        export_btn: "EXPORTAR REEL 9:16 (10s)",
+        status_ready: "Listo para exportar video vertical HD",
+        status_recording: "Grabando reel vertical 9:16 (1080x1920)...",
+        status_done: "¡Video descargado con éxito!",
+        cinematic_btn: "Visor",
+        cinematic_tip: "Toca en cualquier lugar para salir",
+        btn_center: "Centrar"
+      },
+      en: {
+        sec_cards: "🎨 1. Face Designs",
+        front_cover: "🖼️ Front",
+        back_cover: "🔄 Back",
+        sec_canvas: "📐 2. Canvas Dimensions",
+        canvas_aspect: "📱 Aspect Ratio",
+        preset_fill: "↔️ Stretch",
+        canvas_scale: "🔍 Canvas Size",
+        sec_camera: "🎥 3. Camera & Position",
+        cam_dist: "📏 Distance",
+        pos_y: "↕️ Vertical Position",
+        sec_card3d: "✨ 4. Edge & Borders",
+        corners_type: "✂️ Corners",
+        opt_rounded: "Rounded (TCG)",
+        opt_sharp: "Classic Square",
+        edge_thickness: "🧱 Edge Thickness",
+        bevel_intensity: "💎 Border Intensity",
+        edge_color: "🎨 Edge Color",
+        opt_black_edge: "Matte Black",
+        opt_gold_edge: "Metallic Gold (Foil)",
+        opt_silver_edge: "Metallic Silver",
+        opt_white_edge: "White Cardstock",
+        glossiness: "✨ Gloss / Specular",
+        sec_env: "🌌 5. Environment & Spin",
+        bg_color: "🏞️ Background",
+        bg_black: "True OLED Black",
+        bg_studio: "Subtle Studio",
+        bg_luxury: "Golden Luxury",
+        bg_cyber: "Cyberpunk Neon",
+        bg_transparent: "Transparent",
+        spin_speed: "⏱️ Spin",
+        spd_normal: "Normal (2 spins / 10s)",
+        spd_slow: "Slow & Elegant (1 spin)",
+        spd_fast: "Fast Dynamic",
+        spd_stop: "Paused (Static)",
+        floating: "🌊 Floating Motion",
+        float_on: "Enabled (Organic)",
+        float_off: "Fixed on Axis",
+        export_btn: "EXPORT 9:16 REEL (10s)",
+        status_ready: "Ready to export vertical HD reel",
+        status_recording: "Recording 9:16 vertical video (1080x1920)...",
+        status_done: "Video downloaded successfully!",
+        cinematic_btn: "Cinema",
+        cinematic_tip: "Tap anywhere to exit clean view",
+        btn_center: "Center"
+      }
+    };
+
+    let currentLang = 'es';
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.getElementById('btn-lang-es').classList.toggle('active', lang === 'es');
+      document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
+      
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang] && translations[lang][key]) {
+          el.textContent = translations[lang][key];
+        }
+      });
+    }
+
+    document.getElementById('btn-lang-es').addEventListener('click', () => setLanguage('es'));
+    document.getElementById('btn-lang-en').addEventListener('click', () => setLanguage('en'));
+
+    // -------------------------------------------------------------------------
     // 3D SCENE SETUP WITH THREE.JS
     // -------------------------------------------------------------------------
     const container = document.getElementById('viewport-container');
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000); // Absolute black by default
+    const canvasWrapper = document.getElementById('canvas-window-wrapper');
 
-    const camera = new THREE.PerspectiveCamera(38, container.clientWidth / container.clientHeight, 0.1, 100);
-    camera.position.set(0, 0, 4.6);
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000); // OLED black by default
+
+    // Camera initial configuration
+    let camDistance = 4.6;
+    let cardPosY = 0.0;
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+    camera.position.set(0, 0, camDistance);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
     renderer.outputEncoding = THREE.sRGBEncoding;
-    container.appendChild(renderer.domElement);
+    canvasWrapper.appendChild(renderer.domElement);
 
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -350,7 +801,7 @@
     controls.autoRotate = false;
 
     // Lighting Rig
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
     scene.add(ambientLight);
 
     const keyLight = new THREE.DirectionalLight(0xfff8ee, 1.8);
@@ -366,15 +817,14 @@
     scene.add(rimLight);
 
     // -------------------------------------------------------------------------
-    // PROCEDURAL 3D CARD GENERATOR (WITH ROUNDED CORNERS)
+    // PROCEDURAL CARD WITH SEAMLESS BORDER FIX & CUSTOM BEVEL / THICKNESS
     // -------------------------------------------------------------------------
-    let cardGroup = new THREE.Group();
+    const cardGroup = new THREE.Group();
     scene.add(cardGroup);
 
     const textureLoader = new THREE.TextureLoader();
     let frontTex = textureLoader.load('assets/card_front.png');
     let backTex = textureLoader.load('assets/card_back.png');
-
     frontTex.encoding = THREE.sRGBEncoding;
     backTex.encoding = THREE.sRGBEncoding;
 
@@ -387,7 +837,7 @@
 
     let matBack = new THREE.MeshStandardMaterial({
       map: backTex,
-      roughness: 0.28,
+      roughness: 0.25,
       metalness: 0.05
     });
 
@@ -397,17 +847,30 @@
       metalness: 0.1
     });
 
-    function createCardMesh(isRounded = true) {
-      // Clear existing
-      while(cardGroup.children.length > 0) {
-        cardGroup.remove(cardGroup.children[0]);
+    // Card dimensions & parameters
+    const cardParams = {
+      w: 1.35,
+      h: 1.89,
+      isRounded: true,
+      thickness: 0.016,
+      bevelSize: 0.004
+    };
+
+    function rebuildCard() {
+      // Clear previous meshes
+      while (cardGroup.children.length > 0) {
+        const obj = cardGroup.children[0];
+        if (obj.geometry) obj.geometry.dispose();
+        cardGroup.remove(obj);
       }
 
-      const w = 1.35;
-      const h = 1.89;
-      const radius = isRounded ? 0.09 : 0.0001;
-      const depth = 0.016;
+      const w = cardParams.w;
+      const h = cardParams.h;
+      const radius = cardParams.isRounded ? 0.09 : 0.0001;
+      const depth = cardParams.thickness;
+      const bevel = cardParams.bevelSize;
 
+      // 1. Base 2D Shape with Rounded Corners
       const shape = new THREE.Shape();
       const x = -w / 2;
       const y = -h / 2;
@@ -422,61 +885,85 @@
       shape.lineTo(x, y + radius);
       shape.quadraticCurveTo(x, y, x + radius, y);
 
+      // 2. Extrude Geometry for Edges and Body
       const extrudeSettings = {
         depth: depth,
-        bevelEnabled: true,
-        bevelSegments: 3,
+        bevelEnabled: bevel > 0.0005,
+        bevelSegments: 4,
         steps: 1,
-        bevelSize: 0.004,
-        bevelThickness: 0.004
+        bevelSize: bevel,
+        bevelThickness: bevel
       };
 
       const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
       geometry.center();
 
-      // Fix UV mapping for front and back faces
+      // UV mapping on extruded geometry for seamless texturing
       const pos = geometry.attributes.position;
       const uv = geometry.attributes.uv;
+      const totalHalfDepth = (depth / 2) + (bevel > 0.0005 ? bevel : 0);
+
+      // Total outer bounds including bevel
+      const outerW = w + bevel * 2;
+      const outerH = h + bevel * 2;
 
       for (let i = 0; i < pos.count; i++) {
         const px = pos.getX(i);
         const py = pos.getY(i);
         const pz = pos.getZ(i);
 
-        // Normalize UVs across width & height
-        const u = (px / w) + 0.5;
-        const v = (py / h) + 0.5;
+        // UV normalized to [0, 1]
+        const u = Math.min(Math.max((px / outerW) + 0.5, 0), 1);
+        const v = Math.min(Math.max((py / outerH) + 0.5, 0), 1);
 
-        // Front vs Back vs Edge
-        if (pz > (depth / 2 - 0.005)) {
+        if (pz > 0.001) {
           uv.setXY(i, u, v);
-        } else if (pz < (-depth / 2 + 0.005)) {
-          uv.setXY(i, 1.0 - u, v); // Mirror back
+        } else if (pz < -0.001) {
+          uv.setXY(i, 1.0 - u, v); // Mirror UV for card back
         } else {
           uv.setXY(i, 0.5, 0.5);
         }
       }
       uv.needsUpdate = true;
 
-      // Card mesh with multi-material (0: Front/Back, 1: Edges)
-      const mesh = new THREE.Mesh(geometry, [matFront, matEdge]);
-      cardGroup.add(mesh);
+      // Multi-material: [0: Front/Back, 1: Edge]
+      const cardBody = new THREE.Mesh(geometry, [matFront, matEdge]);
+      cardGroup.add(cardBody);
 
-      // Back cover plane to ensure independent back texture mapping
-      const backPlaneGeo = new THREE.PlaneGeometry(w, h);
-      const backPlane = new THREE.Mesh(backPlaneGeo, matBack);
-      backPlane.position.z = -depth / 2 - 0.0042;
-      backPlane.rotation.y = Math.PI;
-      cardGroup.add(backPlane);
+      // 3. Crisp Face Plates matching the exact card shape (NO SQUARE OVERHANG)
+      // ShapeGeometry ensures corners remain perfectly rounded with zero border cutoff
+      const faceGeo = new THREE.ShapeGeometry(shape, 32);
+      
+      // Calculate normalized UV for face plates
+      const facePos = faceGeo.attributes.position;
+      const faceUV = faceGeo.attributes.uv;
+      for (let i = 0; i < facePos.count; i++) {
+        const px = facePos.getX(i);
+        const py = facePos.getY(i);
+        faceUV.setXY(i, (px / w) + 0.5, (py / h) + 0.5);
+      }
+      faceUV.needsUpdate = true;
 
-      // Front cover plane for crisp texture
-      const frontPlaneGeo = new THREE.PlaneGeometry(w, h);
-      const frontPlane = new THREE.Mesh(frontPlaneGeo, matFront);
-      frontPlane.position.z = depth / 2 + 0.0042;
-      cardGroup.add(frontPlane);
+      // Front Face (slightly offset to eliminate z-fighting and cover the flat face)
+      const frontFace = new THREE.Mesh(faceGeo, matFront);
+      frontFace.position.z = totalHalfDepth + 0.0004;
+      cardGroup.add(frontFace);
+
+      // Back Face
+      const backGeo = faceGeo.clone();
+      const backUV = backGeo.attributes.uv;
+      for (let i = 0; i < backUV.count; i++) {
+        backUV.setX(i, 1.0 - backUV.getX(i));
+      }
+      backUV.needsUpdate = true;
+
+      const backFace = new THREE.Mesh(backGeo, matBack);
+      backFace.position.z = -totalHalfDepth - 0.0004;
+      backFace.rotation.y = Math.PI;
+      cardGroup.add(backFace);
     }
 
-    createCardMesh(true);
+    rebuildCard();
 
     // -------------------------------------------------------------------------
     // ANIMATION & RENDER LOOP
@@ -489,18 +976,17 @@
       requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      // Continuous uniform spin
+      // Spin
       cardGroup.rotation.y = (elapsedTime * 0.6283 * 2 * speedMult);
 
       if (isFloating) {
-        // Organic gentle tilt and bobbing
         cardGroup.rotation.x = Math.sin(elapsedTime * 1.5) * 0.12;
         cardGroup.rotation.z = Math.cos(elapsedTime * 1.2) * 0.05;
-        cardGroup.position.y = Math.sin(elapsedTime * 2.0) * 0.06;
+        cardGroup.position.y = cardPosY + Math.sin(elapsedTime * 2.0) * 0.06;
       } else {
         cardGroup.rotation.x = 0;
         cardGroup.rotation.z = 0;
-        cardGroup.position.y = 0;
+        cardGroup.position.y = cardPosY;
       }
 
       controls.update();
@@ -508,17 +994,161 @@
     }
     animate();
 
-    // Resize handler
-    window.addEventListener('resize', () => {
-      camera.aspect = container.clientWidth / container.clientHeight;
+    // -------------------------------------------------------------------------
+    // DYNAMIC CANVAS SIZING & PRESETS (9:16, 1:1, 16:9, Fill)
+    // -------------------------------------------------------------------------
+    let currentAspectRatio = 9 / 16;
+    let currentScalePercent = 100;
+
+    function resizeCanvas() {
+      const availW = container.clientWidth;
+      const availH = container.clientHeight;
+
+      let targetW, targetH;
+
+      if (document.body.classList.contains('cinematic-mode')) {
+        targetW = window.innerWidth;
+        targetH = window.innerHeight;
+      } else if (currentAspectRatio === 'fill') {
+        targetW = availW * (currentScalePercent / 100);
+        targetH = availH * (currentScalePercent / 100);
+      } else {
+        // Fit within available container bounds keeping target aspect ratio
+        const scaleFactor = (currentScalePercent / 100);
+        const maxW = availW * scaleFactor;
+        const maxH = availH * scaleFactor;
+
+        if (maxW / maxH > currentAspectRatio) {
+          targetH = maxH;
+          targetW = maxH * currentAspectRatio;
+        } else {
+          targetW = maxW;
+          targetH = maxW / currentAspectRatio;
+        }
+      }
+
+      targetW = Math.max(Math.round(targetW), 100);
+      targetH = Math.max(Math.round(targetH), 100);
+
+      canvasWrapper.style.width = `${targetW}px`;
+      canvasWrapper.style.height = `${targetH}px`;
+
+      camera.aspect = targetW / targetH;
       camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setSize(targetW, targetH, false);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    setTimeout(resizeCanvas, 50);
+
+    // Canvas preset buttons
+    document.querySelectorAll('.preset-pill-group .pill-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.preset-pill-group .pill-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const preset = btn.getAttribute('data-preset');
+        if (preset === '9:16') currentAspectRatio = 9 / 16;
+        else if (preset === '1:1') currentAspectRatio = 1.0;
+        else if (preset === '16:9') currentAspectRatio = 16 / 9;
+        else if (preset === 'fill') currentAspectRatio = 'fill';
+
+        resizeCanvas();
+      });
+    });
+
+    // Canvas scale slider
+    const rangeCanvasScale = document.getElementById('range-canvas-scale');
+    rangeCanvasScale.addEventListener('input', (e) => {
+      currentScalePercent = parseInt(e.target.value, 10);
+      resizeCanvas();
     });
 
     // -------------------------------------------------------------------------
-    // UI EVENT HANDLERS & INTERACTIONS
+    // CAMERA & POSITION CONTROLS
     // -------------------------------------------------------------------------
-    // Image uploads
+    const rangeCamDist = document.getElementById('range-cam-dist');
+    const valCamDist = document.getElementById('val-cam-dist');
+    rangeCamDist.addEventListener('input', (e) => {
+      camDistance = parseFloat(e.target.value);
+      valCamDist.textContent = camDistance.toFixed(1);
+      
+      // Update camera distance along current view vector
+      const dir = camera.position.clone().sub(controls.target).normalize();
+      camera.position.copy(controls.target).add(dir.multiplyScalar(camDistance));
+    });
+
+    const rangePosY = document.getElementById('range-pos-y');
+    const valPosY = document.getElementById('val-pos-y');
+    rangePosY.addEventListener('input', (e) => {
+      cardPosY = parseFloat(e.target.value);
+      valPosY.textContent = cardPosY.toFixed(2);
+    });
+
+    document.getElementById('btn-reset-cam').addEventListener('click', () => {
+      controls.target.set(0, 0, 0);
+      camera.position.set(0, 0, camDistance);
+      controls.update();
+    });
+
+    // -------------------------------------------------------------------------
+    // CARD 3D ATTRIBUTES (THICKNESS, BEVEL INTENSITY, GLOSS, CORNERS)
+    // -------------------------------------------------------------------------
+    const rangeEdgeThick = document.getElementById('range-edge-thickness');
+    const valEdgeThick = document.getElementById('val-edge-thick');
+    rangeEdgeThick.addEventListener('input', (e) => {
+      cardParams.thickness = parseFloat(e.target.value);
+      valEdgeThick.textContent = cardParams.thickness.toFixed(3);
+      rebuildCard();
+    });
+
+    const rangeBevelInt = document.getElementById('range-bevel-intensity');
+    const valBevelInt = document.getElementById('val-bevel-int');
+    rangeBevelInt.addEventListener('input', (e) => {
+      cardParams.bevelSize = parseFloat(e.target.value);
+      valBevelInt.textContent = cardParams.bevelSize.toFixed(3);
+      rebuildCard();
+    });
+
+    document.getElementById('select-corners').addEventListener('change', (e) => {
+      cardParams.isRounded = (e.target.value === 'rounded');
+      rebuildCard();
+    });
+
+    document.getElementById('select-edge').addEventListener('change', (e) => {
+      const val = e.target.value;
+      if (val === 'gold_foil') {
+        matEdge.color.setHex(0xd4af37);
+        matEdge.metalness = 0.95;
+        matEdge.roughness = 0.18;
+      } else if (val === 'silver_foil') {
+        matEdge.color.setHex(0xdcdde1);
+        matEdge.metalness = 0.98;
+        matEdge.roughness = 0.15;
+      } else if (val === 'white') {
+        matEdge.color.setHex(0xf5f5f5);
+        matEdge.metalness = 0.0;
+        matEdge.roughness = 0.4;
+      } else {
+        matEdge.color.setHex(0x050505);
+        matEdge.metalness = 0.1;
+        matEdge.roughness = 0.4;
+      }
+      matEdge.needsUpdate = true;
+    });
+
+    const rangeGloss = document.getElementById('range-gloss');
+    const valGloss = document.getElementById('val-gloss');
+    rangeGloss.addEventListener('input', (e) => {
+      const v = parseFloat(e.target.value);
+      valGloss.textContent = v.toFixed(2);
+      matFront.roughness = v;
+      matBack.roughness = v;
+    });
+
+    // -------------------------------------------------------------------------
+    // FILE UPLOADS
+    // -------------------------------------------------------------------------
     const frontInput = document.getElementById('front-file-input');
     const backInput = document.getElementById('back-file-input');
     const frontPreview = document.getElementById('front-preview-img');
@@ -550,11 +1180,13 @@
       }
     });
 
-    // Background style
+    // -------------------------------------------------------------------------
+    // BACKGROUND & ENVIRONMENT
+    // -------------------------------------------------------------------------
     document.getElementById('select-bg').addEventListener('change', (e) => {
       const val = e.target.value;
       if (val === 'black') {
-        scene.background = new THREE.Color(0x000000); // Pure OLED Black
+        scene.background = new THREE.Color(0x000000);
       } else if (val === 'dark_studio') {
         scene.background = new THREE.Color(0x060911);
       } else if (val === 'gold_luxury') {
@@ -566,63 +1198,117 @@
       }
     });
 
-    // Corner style
-    document.getElementById('select-corners').addEventListener('change', (e) => {
-      createCardMesh(e.target.value === 'rounded');
-    });
-
-    // Edge color / foil
-    document.getElementById('select-edge').addEventListener('change', (e) => {
-      const val = e.target.value;
-      if (val === 'gold_foil') {
-        matEdge.color.setHex(0xd4af37);
-        matEdge.metalness = 0.95;
-        matEdge.roughness = 0.2;
-      } else if (val === 'white') {
-        matEdge.color.setHex(0xf5f5f5);
-        matEdge.metalness = 0.0;
-        matEdge.roughness = 0.4;
-      } else {
-        matEdge.color.setHex(0x050505);
-        matEdge.metalness = 0.1;
-        matEdge.roughness = 0.4;
-      }
-      matEdge.needsUpdate = true;
-    });
-
-    // Glossiness slider
-    document.getElementById('range-gloss').addEventListener('input', (e) => {
-      const v = parseFloat(e.target.value);
-      matFront.roughness = v;
-      matBack.roughness = v;
-    });
-
-    // Speed & floating
     document.getElementById('select-speed').addEventListener('change', (e) => {
       speedMult = parseFloat(e.target.value);
     });
+
     document.getElementById('toggle-floating').addEventListener('change', (e) => {
       isFloating = (e.target.value === 'true');
     });
 
     // -------------------------------------------------------------------------
-    // INSTANT 1080x1920 VIDEO EXPORTER (MediaRecorder API)
+    // CINEMATIC VIEWER MODE (FULL SCREEN CLEAN VIEW)
+    // -------------------------------------------------------------------------
+    const btnCinematic = document.getElementById('btn-cinematic');
+    const exitTip = document.getElementById('cinematic-exit-tip');
+
+    function enterCinematic() {
+      document.body.classList.add('cinematic-mode');
+      resizeCanvas();
+      exitTip.style.display = 'block';
+      setTimeout(() => {
+        exitTip.style.display = 'none';
+      }, 3000);
+    }
+
+    function exitCinematic() {
+      if (document.body.classList.contains('cinematic-mode')) {
+        document.body.classList.remove('cinematic-mode');
+        exitTip.style.display = 'none';
+        resizeCanvas();
+      }
+    }
+
+    btnCinematic.addEventListener('click', enterCinematic);
+
+    // Click anywhere on canvas/viewport during cinematic mode to exit
+    container.addEventListener('click', (e) => {
+      if (document.body.classList.contains('cinematic-mode')) {
+        exitCinematic();
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.body.classList.contains('cinematic-mode')) {
+        exitCinematic();
+      }
+    });
+
+    // -------------------------------------------------------------------------
+    // MOBILE DRAWER CONTROLS
+    // -------------------------------------------------------------------------
+    const mobileBtn = document.getElementById('mobile-toggle-btn');
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+
+    function toggleMobileMenu() {
+      const isOpen = sidebar.classList.toggle('open');
+      backdrop.classList.toggle('active', isOpen);
+    }
+
+    mobileBtn.addEventListener('click', toggleMobileMenu);
+    backdrop.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      backdrop.classList.remove('active');
+    });
+
+    // -------------------------------------------------------------------------
+    // GUARANTEED 9:16 VERTICAL HD (1080x1920) VIDEO EXPORT
     // -------------------------------------------------------------------------
     const btnRecord = document.getElementById('btn-record');
+    const recordBtnText = document.getElementById('record-btn-text');
     const statusLabel = document.getElementById('status-label');
 
     btnRecord.addEventListener('click', async () => {
       btnRecord.disabled = true;
-      statusLabel.textContent = 'Grabando animación 9:16 (10 segundos)...';
-      btnRecord.innerHTML = '<span>⏳</span> GRABANDO REEL...';
+      statusLabel.textContent = translations[currentLang].status_recording;
+      recordBtnText.textContent = "⏳ ...";
 
-      // Setup recorder from WebGL canvas stream
-      const stream = renderer.domElement.captureStream(30); // 30 FPS
+      // 1. Create dedicated offscreen 1080x1920 WebGL render canvas
+      const exportCanvas = document.createElement('canvas');
+      exportCanvas.width = 1080;
+      exportCanvas.height = 1920;
+
+      const exportRenderer = new THREE.WebGLRenderer({
+        canvas: exportCanvas,
+        antialias: true,
+        alpha: true,
+        preserveDrawingBuffer: true
+      });
+      exportRenderer.setSize(1080, 1920, false);
+      exportRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+      exportRenderer.toneMappingExposure = 1.15;
+      exportRenderer.outputEncoding = THREE.sRGBEncoding;
+
+      const exportCamera = new THREE.PerspectiveCamera(38, 1080 / 1920, 0.1, 100);
+      exportCamera.position.copy(camera.position);
+      exportCamera.quaternion.copy(camera.quaternion);
+
+      // Adjust camera distance to match vertical aspect ratio seamlessly
+      exportCamera.aspect = 9 / 16;
+      exportCamera.updateProjectionMatrix();
+
+      // 2. Setup high-bitrate MediaRecorder
+      const stream = exportCanvas.captureStream(30); // 30 FPS
+      const mime = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')
+                 ? 'video/mp4'
+                 : MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+                   ? 'video/webm;codecs=vp9'
+                   : 'video/webm';
+
       const recorder = new MediaRecorder(stream, {
-        mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') 
-                  ? 'video/webm;codecs=vp9' 
-                  : 'video/webm',
-        videoBitsPerSecond: 8000000 // 8 Mbps high quality
+        mimeType: mime,
+        videoBitsPerSecond: 12000000 // 12 Mbps pristine quality
       });
 
       const chunks = [];
@@ -630,29 +1316,44 @@
         if (e.data.size > 0) chunks.push(e.data);
       };
 
+      const durationSec = 10;
+      let isExporting = true;
+
       recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'video/webm' });
+        const ext = mime.includes('mp4') ? 'mp4' : 'webm';
+        const blob = new Blob(chunks, { type: mime });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `3D_Card_Reel_${Date.now()}.webm`;
+        a.download = `3D_Card_9x16_${Date.now()}.${ext}`;
         a.click();
 
-        statusLabel.textContent = '¡Video descargado con éxito!';
-        btnRecord.innerHTML = '<span>🎬</span> EXPORTAR REEL 9:16 (10s)';
+        exportRenderer.dispose();
+        statusLabel.textContent = translations[currentLang].status_done;
+        recordBtnText.textContent = translations[currentLang].export_btn;
         btnRecord.disabled = false;
       };
 
+      // 3. Render offscreen frame-by-frame loop during recording
+      function exportRenderLoop() {
+        if (!isExporting) return;
+        exportCamera.position.copy(camera.position);
+        exportCamera.quaternion.copy(camera.quaternion);
+        exportRenderer.render(scene, exportCamera);
+        requestAnimationFrame(exportRenderLoop);
+      }
+      exportRenderLoop();
+
       recorder.start();
 
-      // Record for 10 seconds (seamless loop)
-      let countdown = 10;
-      const interval = setInterval(() => {
-        countdown--;
-        if (countdown > 0) {
-          statusLabel.textContent = `Grabando video... ${countdown}s restantes`;
+      let remaining = durationSec;
+      const timer = setInterval(() => {
+        remaining--;
+        if (remaining > 0) {
+          statusLabel.textContent = `⏳ ${remaining}s...`;
         } else {
-          clearInterval(interval);
+          clearInterval(timer);
+          isExporting = false;
           recorder.stop();
         }
       }, 1000);
