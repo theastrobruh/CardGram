@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TCG:HUB — v0.4.3 · Exportación
+   DeckGram — v0.4.4 · Exportación
    Grabación 9:16 / 1:1 / 16:9 con MediaRecorder y captura PNG.
    ========================================================================== */
 'use strict';
@@ -55,7 +55,7 @@ function cancelExport() {
     try {
       exportRecorder.stop();
     } catch (error) {
-      console.warn('[TCG:HUB] Could not stop recorder', error);
+      console.warn('[DeckGram] Could not stop recorder', error);
     }
   }
 }
@@ -95,7 +95,7 @@ async function exportVideo() {
     try {
       exportRecorder = new MediaRecorder(exportStream, options);
     } catch (error) {
-      console.warn('[TCG:HUB] Falling back to default MediaRecorder options', error);
+      console.warn('[DeckGram] Falling back to default MediaRecorder options', error);
       exportRecorder = new MediaRecorder(exportStream);
     }
 
@@ -104,7 +104,7 @@ async function exportVideo() {
     };
 
     exportRecorder.onerror = (event) => {
-      console.error('[TCG:HUB] MediaRecorder error', event);
+      console.error('[DeckGram] MediaRecorder error', event);
       failed = true;
       try {
         exportRecorder.stop();
@@ -158,7 +158,7 @@ async function exportVideo() {
       }
     }
   } catch (error) {
-    console.error('[TCG:HUB] Export setup failed', error);
+    console.error('[DeckGram] Export setup failed', error);
     failed = true;
   } finally {
     clearInterval(exportTimer);
@@ -169,13 +169,13 @@ async function exportVideo() {
     try {
       if (exportStream) exportStream.getTracks().forEach((track) => track.stop());
     } catch (error) {
-      console.warn('[TCG:HUB] Could not stop stream tracks', error);
+      console.warn('[DeckGram] Could not stop stream tracks', error);
     }
 
     try {
       if (exportRenderer) exportRenderer.dispose();
     } catch (error) {
-      console.warn('[TCG:HUB] Could not dispose export renderer', error);
+      console.warn('[DeckGram] Could not dispose export renderer', error);
     }
 
     exportRenderer = null;
@@ -206,7 +206,7 @@ async function exportVideo() {
 
   downloadBlob(
     blob,
-    `TCG_HUB_v${APP_VERSION}_${size.width}x${size.height}_${fileStamp()}.${extension}`
+    `DeckGram_v${APP_VERSION}_${size.width}x${size.height}_${fileStamp()}.${extension}`
   );
 
   setStatus(t('status_done'), 'success');
@@ -230,12 +230,12 @@ async function exportSnapshot() {
     const blob = await Scene.createSnapshot(size.width, size.height);
     downloadBlob(
       blob,
-      `TCG_HUB_v${APP_VERSION}_${size.width}x${size.height}_${fileStamp()}.png`
+      `DeckGram_v${APP_VERSION}_${size.width}x${size.height}_${fileStamp()}.png`
     );
     setStatus(t('status_png_done'), 'success');
     toast(t('status_png_done'), { type: 'success' });
   } catch (error) {
-    console.error('[TCG:HUB] Snapshot failed', error);
+    console.error('[DeckGram] Snapshot failed', error);
     setStatus(t('status_error'), 'error');
     toast(t('snapshot_error'), { type: 'error' });
   } finally {

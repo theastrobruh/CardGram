@@ -1,7 +1,7 @@
 @echo off
-title TCG:HUB — 3D Studio Server
+title DeckGram — 3D Studio Server
 echo ========================================================
-echo       TCG:HUB — Interactive 3D Card Studio
+echo       DeckGram — Interactive 3D Card Studio
 echo               by theAstroBruh
 echo ========================================================
 echo.

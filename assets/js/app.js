@@ -1,15 +1,15 @@
 /* ==========================================================================
-   TCG:HUB — v0.4.3 · Aplicación
+   DeckGram — v0.4.4 · Aplicación
    Estado, persistencia, presets, cargas, interfaz, accesibilidad e inicio.
    ========================================================================== */
 'use strict';
 
-const APP_VERSION = '0.4.3';
+const APP_VERSION = '0.4.4';
 
 const STORAGE = {
-  settings: 'tcghub.settings.v1',
-  presets: 'tcghub.presets.v2',
-  scenes: 'tcghub.scenes.v1'
+  settings: 'deckgram.settings.v1',
+  presets: 'deckgram.presets.v2',
+  scenes: 'deckgram.scenes.v1'
 };
 
 const MAX_UPLOAD_BYTES = 12 * 1024 * 1024;
@@ -138,10 +138,15 @@ function createIcon(name) {
 const storage = {
   read(key, fallback) {
     try {
-      const raw = localStorage.getItem(key);
+      let raw = localStorage.getItem(key);
+      if (!raw) {
+        // Fallback a claves heredadas previas a DeckGram
+        const legacyKey = key.replace('deckgram.', 'tcghub.');
+        raw = localStorage.getItem(legacyKey);
+      }
       return raw ? JSON.parse(raw) : fallback;
     } catch (error) {
-      console.warn(`[TCG:HUB] No se pudo leer ${key}`, error);
+      console.warn(`[DeckGram] No se pudo leer ${key}`, error);
       return fallback;
     }
   },
@@ -150,7 +155,7 @@ const storage = {
       localStorage.setItem(key, JSON.stringify(value));
       return true;
     } catch (error) {
-      console.warn(`[TCG:HUB] No se pudo guardar ${key}`, error);
+      console.warn(`[DeckGram] No se pudo guardar ${key}`, error);
       return false;
     }
   },
@@ -158,7 +163,7 @@ const storage = {
     try {
       localStorage.removeItem(key);
     } catch (error) {
-      console.warn(`[TCG:HUB] No se pudo borrar ${key}`, error);
+      console.warn(`[DeckGram] No se pudo borrar ${key}`, error);
     }
   }
 };
@@ -1902,6 +1907,8 @@ function setupChrome() {
   }
 
   window.addEventListener('orientationchange', () => setTimeout(scheduleResize, 120));
+  window.addEventListener('deckgram:contextlost', () => toast(t('webgl_lost'), { type: 'warning', duration: 6000 }));
+  window.addEventListener('deckgram:contextrestored', () => toast(t('webgl_restored'), { type: 'success' }));
   window.addEventListener('tcghub:contextlost', () => toast(t('webgl_lost'), { type: 'warning', duration: 6000 }));
   window.addEventListener('tcghub:contextrestored', () => toast(t('webgl_restored'), { type: 'success' }));
 }
@@ -1952,7 +1959,7 @@ function init() {
   }
 
   console.info(
-    `%c TCG:HUB v${APP_VERSION} %c Aqua Glass Studio · by theAstroBruh `,
+    `%c DeckGram v${APP_VERSION} %c Aqua Glass Studio · by theAstroBruh `,
     'background:linear-gradient(135deg,#7cebdd,#2f8fdd);color:#fff;font-weight:800;border-radius:6px 0 0 6px;padding:4px 8px',
     'background:#07333f;color:#b9f2e7;border-radius:0 6px 6px 0;padding:4px 8px'
   );

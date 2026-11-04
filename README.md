@@ -1,19 +1,20 @@
 <div align="center">
 
-# 🎴 TCG:HUB
+# 🎴 DeckGram
 ### *Interactive WebGL 3D Card Showcase & Reel Creator*
 **by theAstroBruh**
 
 [![GitHub Pages](https://img.shields.io/badge/Demo-GitHub%20Pages-brightgreen?style=for-the-badge&logo=github)](https://theastrobruh.github.io/TCG-HUB/)
 [![Three.js](https://img.shields.io/badge/Three.js-r128-black?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/es/docs/Web/JavaScript)
+[![Version](https://img.shields.io/badge/Version-v0.4.4-00d2d3?style=for-the-badge)](https://github.com/theastrobruh/TCG-HUB)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 [![Ko-fi](https://img.shields.io/badge/Thanks-Ko--fi-ff5e5b?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/theastrobruh)
 
 <br/>
 
 <p align="center">
-  <b>Una suite de visualización y animación 3D en tiempo real inspirada en la estética de duelos TCG, diseñada para creadores de cartas coleccionables, artistas y creadores de contenido.</b>
+  <b>La red social visual y estudio 3D en tiempo real para cartas coleccionables, artistas y creadores de contenido.</b>
 </p>
 
 [🎮 Probar Demo en Vivo](https://theastrobruh.github.io/TCG-HUB/) • [✨ Características](#-características) • [⚡ Inicio Rápido](#-inicio-rápido)
@@ -24,7 +25,7 @@
 
 ## 📖 Acerca del Proyecto
 
-**TCG:HUB** permite importar diseños en 2D (anverso y reverso) y transformarlos al instante en una carta tridimensional fotorrealista con cantos ajustables, biseles reflectantes, rotación paramétrica, tomas multicámara y exportación en alta definición a video vertical (9:16) listo para Reels, TikTok y YouTube Shorts.
+**DeckGram** (v0.4.4) permite importar diseños en 2D (anverso y reverso) y transformarlos al instante en una carta tridimensional fotorrealista con cantos ajustables, biseles reflectantes, rotación paramétrica, tomas multicámara y exportación en alta definición a video vertical (9:16) listo para Reels, TikTok y YouTube Shorts.
 
 ---
 
@@ -53,7 +54,7 @@
 ## ⚡ Inicio Rápido
 
 ### Usar en el Navegador (Sin instalación)
-👉 **[Abrir TCG:HUB](https://theastrobruh.github.io/TCG-HUB/)**
+👉 **[Abrir DeckGram](https://theastrobruh.github.io/TCG-HUB/)**
 
 ### Ejecutar Localmente
 
@@ -75,7 +76,7 @@
 
 ## ☕ Apoya el Proyecto
 
-Si TCG:HUB te resulta útil, puedes invitarme un café en Ko-fi. ¡Gracias por el apoyo!
+Si DeckGram te resulta útil, puedes invitarme un café en Ko-fi. ¡Gracias por el apoyo!
 
 [☕ **Thanks · Ko-fi**](https://ko-fi.com/theastrobruh)
 
@@ -88,4 +89,4 @@ Si TCG:HUB te resulta útil, puedes invitarme un café en Ko-fi. ¡Gracias por e
 - **HTML5 & CSS3 Vanilla** — Sin dependencias externas ni compiladores requeridos.
 
 ---
-© 2026 TCG:HUB — by theAstroBruh
+© 2026 DeckGram — by theAstroBruh

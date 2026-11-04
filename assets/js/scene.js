@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TCG:HUB — v0.4.3 · Motor 3D
+   DeckGram — v0.4.4 · Motor 3D
    Escena Three.js, geometría procedural de la carta, materiales, fondos,
    cámara, transiciones y utilidades de exportación.
    ========================================================================== */
@@ -209,7 +209,7 @@ const Scene = (() => {
       animate();
       return true;
     } catch (error) {
-      console.error('[TCG:HUB] WebGL init failed', error);
+      console.error('[DeckGram] WebGL init failed', error);
       ready = false;
       return false;
     }
@@ -644,12 +644,12 @@ const Scene = (() => {
     if (!matFront || !matBack) return;
 
     if (side === 'front' && !frontTexture) {
-      placeholderFront = placeholderFront || createPlaceholderTexture('TCG:HUB', 'FRONT');
+      placeholderFront = placeholderFront || createPlaceholderTexture('DECKGRAM', 'FRONT');
       setSideTexture('front', placeholderFront);
     }
 
     if (side === 'back' && !backTexture) {
-      placeholderBack = placeholderBack || createPlaceholderTexture('TCG:HUB', 'BACK');
+      placeholderBack = placeholderBack || createPlaceholderTexture('DECKGRAM', 'BACK');
       setSideTexture('back', placeholderBack);
     }
   }
@@ -723,7 +723,7 @@ const Scene = (() => {
       setSideTexture(side, texture);
       return true;
     } catch (error) {
-      console.warn(`[TCG:HUB] Texture ${side} failed`, error);
+      console.warn(`[DeckGram] Texture ${side} failed`, error);
       ensurePlaceholder(side);
       return false;
     }
@@ -975,12 +975,12 @@ const Scene = (() => {
   function onContextLost(event) {
     event.preventDefault();
     contextLost = true;
-    window.dispatchEvent(new CustomEvent('tcghub:contextlost'));
+    window.dispatchEvent(new CustomEvent('deckgram:contextlost'));
   }
 
   function onContextRestored() {
     contextLost = false;
-    window.dispatchEvent(new CustomEvent('tcghub:contextrestored'));
+    window.dispatchEvent(new CustomEvent('deckgram:contextrestored'));
   }
 
   function setRenderPaused(paused) {
