@@ -104,6 +104,16 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const even = (value) => Math.max(2, Math.round(value / 2) * 2);
 const uid = () => `p_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 
+/**
+ * Llama a un método de Scene solo si existe. Evita que una versión antigua
+ * cacheada del motor 3D bloquee el arranque de la interfaz.
+ */
+function sceneMethod(name, ...args) {
+  if (typeof Scene === 'undefined' || !Scene) return undefined;
+  if (typeof Scene[name] !== 'function') return undefined;
+  return Scene[name](...args);
+}
+
 function cloneScenes(source) {
   return source.map((scene) => ({
     pos: [...scene.pos],
@@ -928,7 +938,7 @@ async function applyCardImage(side, dataUrl, fileName) {
   updateFullArtToggle();
 
   if (!Scene.isReady()) return;
-  if (side === 'front') Scene.clearFullArt();
+  if (side === 'front') sceneMethod('clearFullArt');
   const ok = await Scene.loadCardImage(side, dataUrl);
   if (token !== uploadTokens[side]) return;
   if (!ok) toast(t('upload_failed'), { type: 'error' });
@@ -1125,7 +1135,7 @@ function syncUI() {
       tilt: state.tilt,
       bg: state.bg
     });
-    Scene.setFullArtEnabled(state.fullArtAnim);
+    sceneMethod('setFullArtEnabled', state.fullArtAnim);
   }
 
   updateFullArtToggle();
@@ -1219,7 +1229,7 @@ function setupControls() {
   if (el.toggleFullArt) {
     el.toggleFullArt.addEventListener('change', () => {
       state.fullArtAnim = el.toggleFullArt.checked;
-      if (Scene.isReady()) Scene.setFullArtEnabled(state.fullArtAnim);
+      if (Scene.isReady()) sceneMethod('setFullArtEnabled', state.fullArtAnim);
       updateFullArtToggle();
       persistSettings();
     });
@@ -1947,6 +1957,14 @@ function init() {
     'background:#07333f;color:#b9f2e7;border-radius:0 6px 6px 0;padding:4px 8px'
   );
 }
+
+/* Red de seguridad: un error de arranque nunca debe dejar el velo de carga eterno. */
+window.addEventListener('error', () => {
+  const veil = document.getElementById('loading-veil');
+  if (!veil || veil.classList.contains('hidden')) return;
+  veil.classList.add('hidden');
+  veil.setAttribute('aria-hidden', 'true');
+});
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init, { once: true });
