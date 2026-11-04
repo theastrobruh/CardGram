@@ -3,7 +3,7 @@
 # 🎴 3D Trading Card Studio
 ### *Interactive WebGL 3D Card Showcase & Content Creator for Reels, TikTok & Shorts*
 
-[![GitHub Pages](https://img.shields.io/badge/Demo-GitHub%20Pages-brightgreen?style=for-the-badge&logo=github)](https://the-astro-bruh.github.io/Card_3D_Webapp/)
+[![GitHub Pages](https://img.shields.io/badge/Demo-GitHub%20Pages-brightgreen?style=for-the-badge&logo=github)](https://theastrobruh.github.io/3D-Card-View/)
 [![Three.js](https://img.shields.io/badge/Three.js-r128-black?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/es/docs/Web/JavaScript)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
@@ -14,7 +14,7 @@
   <b>Una suite de visualización y animación 3D en tiempo real diseñada para creadores de cartas coleccionables (TCG), artistas digitales y creadores de contenido.</b>
 </p>
 
-[🎮 Probar Demo en Vivo](https://the-astro-bruh.github.io/Card_3D_Webapp/) • [✨ Características](#-características) • [⚡ Inicio Rápido](#-inicio-rápido) • [🎥 Modos de Grabación](#-modos-de-grabación)
+[🎮 Probar Demo en Vivo](https://theastrobruh.github.io/3D-Card-View/) • [✨ Características](#-características) • [⚡ Inicio Rápido](#-inicio-rápido) • [🎥 Modos de Grabación](#-modos-de-grabación)
 
 ---
 
@@ -55,14 +55,14 @@ Optimizado con relaciones de aspecto estándar para **TikTok, Instagram Reels y 
 
 ### Usar en el Navegador (Sin instalación)
 Puedes abrir directamente el proyecto en la web:
-👉 **[Abrir 3D Trading Card Studio](https://the-astro-bruh.github.io/Card_3D_Webapp/)**
+👉 **[Abrir 3D Trading Card Studio](https://theastrobruh.github.io/3D-Card-View/)**
 
 ### Ejecutar Localmente
 
 1. **Clonar el repositorio**:
    ```bash
-   git clone https://github.com/the-astro-bruh/Card_3D_Webapp.git
-   cd Card_3D_Webapp
+   git clone https://github.com/theastrobruh/3D-Card-View.git
+   cd 3D-Card-View
    ```
 
 2. **Abrir en local**:
