@@ -2,1978 +2,723 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>TCG:HUB — Duelist 3D Studio</title>
-  <!-- Three.js CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <!-- OrbitControls CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#b6ebea">
+  <meta name="color-scheme" content="light">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="generator" content="TCG:HUB v0.4.2">
+  <meta name="description" content="TCG:HUB — Estudio 3D interactivo para cartas coleccionables. Importa tus diseños, ajusta cantos, biseles y brillo, y exporta reels verticales en HD directamente desde el navegador.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
+  <title>TCG:HUB — Duelist 3D Studio · v0.4.2</title>
 
-    /* -------------------------------------------------------------
-       DUELIST OBSIDIAN & GOLD LUXURY PALETTE
-    ------------------------------------------------------------- */
-    :root {
-      --bg-dark: #07090e;
-      --panel-bg: rgba(13, 17, 26, 0.95);
-      --card-bg: #131926;
-      --card-bg-hover: #1c2436;
-      --gold-primary: #f59e0b;
-      --gold-bright: #fbbf24;
-      --gold-glow: rgba(245, 158, 11, 0.4);
-      --border-dark: #222c3f;
-      --border-gold: #785a28;
-      --border-focus: #f59e0b;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-    }
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='18' y='11' width='28' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2.5'/%3E%3Cpath d='M32 21l2.8 6.8L42 31l-7.2 3.2L32 41l-2.8-6.8L22 31l7.2-3.2z' fill='%232f8fdd'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/css/app.css">
 
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      display: flex;
-      height: 100vh;
-      height: 100dvh;
-      overflow: hidden;
-      position: relative;
-    }
-
-    /* -------------------------------------------------------------
-       DESKTOP & MOBILE SIDEBAR TOGGLE BUTTON (DRAWER COLLAPSE)
-    ------------------------------------------------------------- */
-    #sidebar-toggle-btn {
-      position: fixed;
-      top: 14px;
-      left: 14px;
-      z-index: 100;
-      background: #131926;
-      border: 1px solid var(--border-dark);
-      color: var(--gold-bright);
-      font-size: 1.15rem;
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    #sidebar-toggle-btn:hover {
-      border-color: var(--gold-primary);
-      box-shadow: 0 0 14px var(--gold-glow);
-      transform: scale(1.05);
-    }
-
-    /* When sidebar is collapsed on PC */
-    body.sidebar-collapsed #sidebar {
-      transform: translateX(-100%);
-      margin-right: -410px;
-    }
-
-    /* -------------------------------------------------------------
-       ANIMATED 3D ROTATING CARD LOGO (REPLACES THE ORB)
-    ------------------------------------------------------------- */
-    .brand-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-    }
-    .brand-title-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    /* 3D Spinning Holographic Card Core */
-    .spinning-card-logo-container {
-      width: 24px;
-      height: 32px;
-      perspective: 300px;
-      flex-shrink: 0;
-    }
-    .spinning-card-inner {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      animation: cardLogoSpin 5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-    }
-    .card-face {
-      position: absolute;
-      inset: 0;
-      border-radius: 4px;
-      backface-visibility: hidden;
-      border: 1px solid #fbbf24;
-      box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
-    }
-    .card-face-front {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #78350f 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 900;
-      color: #000;
-    }
-    .card-face-back {
-      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #0f172a 100%);
-      transform: rotateY(180deg);
-      border-color: #818cf8;
-      box-shadow: 0 0 10px rgba(129, 140, 248, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.65rem;
-      color: #c7d2fe;
-    }
-
-    @keyframes cardLogoSpin {
-      0% { transform: rotateY(0deg) rotateZ(-4deg); }
-      50% { transform: rotateY(180deg) rotateZ(4deg); }
-      100% { transform: rotateY(360deg) rotateZ(-4deg); }
-    }
-
-    .header h1 {
-      font-size: 1.15rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      color: #fff;
-    }
-    .header h1 span.gold {
-      color: var(--gold-bright);
-      text-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
-    }
-    .author-credit {
-      font-size: 0.65rem;
-      letter-spacing: 0.05em;
-      color: rgba(148, 163, 184, 0.75);
-      margin-left: 36px;
-      font-weight: 500;
-      font-family: monospace;
-    }
-
-    /* -------------------------------------------------------------
-       CINEMATIC MODE BUTTON (ICON ONLY - EYE)
-    ------------------------------------------------------------- */
-    #btn-cinematic {
-      position: fixed;
-      top: 14px;
-      right: 14px;
-      z-index: 90;
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      background: #131926;
-      border: 1px solid var(--border-dark);
-      color: var(--gold-bright);
-      font-size: 1.15rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    }
-    #btn-cinematic:hover {
-      transform: scale(1.08);
-      border-color: var(--gold-bright);
-      box-shadow: 0 0 14px var(--gold-glow);
-    }
-
-    #cinematic-exit-tip {
-      display: none;
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(13, 17, 26, 0.9);
-      border: 1px solid var(--border-gold);
-      color: var(--gold-bright);
-      padding: 6px 18px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      letter-spacing: 0.05em;
-      z-index: 200;
-      pointer-events: none;
-      animation: fadeInOut 3s forwards;
-    }
-    @keyframes fadeInOut {
-      0% { opacity: 0; }
-      15% { opacity: 1; }
-      80% { opacity: 1; }
-      100% { opacity: 0; }
-    }
-
-    /* -------------------------------------------------------------
-       SIDEBAR & TAB NAVIGATION
-    ------------------------------------------------------------- */
-    #sidebar {
-      width: 410px;
-      min-width: 380px;
-      max-width: 420px;
-      background: var(--panel-bg);
-      border-right: 1px solid var(--border-dark);
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      z-index: 50;
-      box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin-right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .header {
-      padding: 14px 18px 14px 64px; /* Space for the collapse toggle */
-      background: #090c13;
-      border-bottom: 1px solid var(--border-dark);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .lang-switcher {
-      display: flex;
-      background: #07090e;
-      border: 1px solid var(--border-dark);
-      border-radius: 6px;
-      padding: 2px;
-      gap: 2px;
-    }
-    .lang-btn {
-      background: transparent;
-      border: none;
-      color: #94a3b8;
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .lang-btn.active {
-      background: var(--gold-primary);
-      color: #000;
-    }
-
-    /* TABS */
-    .nav-tabs {
-      display: flex;
-      background: #090c13;
-      border-bottom: 2px solid var(--border-dark);
-      padding: 0 8px;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 10px 4px;
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -2px;
-      color: #94a3b8;
-      font-size: 0.76rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      transition: all 0.2s ease;
-    }
-    .tab-btn:hover {
-      color: #fff;
-    }
-    .tab-btn.active {
-      color: var(--gold-bright);
-      border-bottom-color: var(--gold-bright);
-      background: rgba(245, 158, 11, 0.08);
-    }
-
-    .scroll-content {
-      padding: 14px 18px;
-      overflow-y: auto;
-      flex: 1;
-    }
-    .scroll-content::-webkit-scrollbar {
-      width: 6px;
-    }
-    .scroll-content::-webkit-scrollbar-thumb {
-      background: #222c3f;
-      border-radius: 3px;
-    }
-
-    .tab-pane {
-      display: none;
-    }
-    .tab-pane.active {
-      display: block;
-    }
-
-    .section-title {
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--gold-bright);
-      margin-bottom: 10px;
-      margin-top: 14px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .section-title:first-child {
-      margin-top: 0;
-    }
-
-    /* PRESETS QUICK CHIPS */
-    .card-presets-bar {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 12px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-    }
-    .preset-chip {
-      background: #131926;
-      border: 1px solid var(--border-dark);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 0.72rem;
-      color: #e2e8f0;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      white-space: nowrap;
-      transition: all 0.15s ease;
-    }
-    .preset-chip:hover, .preset-chip.active {
-      border-color: var(--gold-bright);
-      color: var(--gold-bright);
-      background: rgba(245, 158, 11, 0.12);
-    }
-    .preset-chip .del-btn {
-      color: #ef4444;
-      font-weight: bold;
-      margin-left: 2px;
-    }
-
-    /* UPLOAD BOXES */
-    .upload-group {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .upload-box {
-      flex: 1;
-      background: #131926;
-      border: 1px dashed var(--border-dark);
-      border-radius: 8px;
-      padding: 8px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      position: relative;
-    }
-    .upload-box:hover {
-      border-color: var(--gold-primary);
-      background: #1c2436;
-    }
-    .upload-box input {
-      display: none;
-    }
-    .upload-box img {
-      width: 100%;
-      height: 105px;
-      object-fit: cover;
-      border-radius: 6px;
-      margin-bottom: 4px;
-      background: #090c13;
-      display: block;
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-    .upload-box span {
-      font-size: 0.74rem;
-      color: #cbd5e1;
-      display: block;
-      font-weight: 600;
-    }
-
-    /* CONTROL ROWS & INPUTS */
-    .control-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      background: var(--card-bg);
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border-dark);
-      gap: 8px;
-      transition: border-color 0.15s ease;
-    }
-    .control-row:hover {
-      border-color: #2e3a52;
-    }
-    .control-row label {
-      font-size: 0.78rem;
-      color: #e2e8f0;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-    }
-    .control-row-col {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 5px;
-    }
-    .control-row-col .header-line {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .slider-val {
-      font-size: 0.74rem;
-      color: var(--gold-bright);
-      font-weight: 700;
-      font-family: monospace;
-    }
-
-    /* POLISHED SLEEK DROPDOWNS & SLIDERS */
-    select {
-      background: #0d121c;
-      border: 1px solid var(--border-dark);
-      color: #f1f5f9;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      outline: none;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    select:focus, select:hover {
-      border-color: var(--gold-primary);
-      box-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
-    }
-    input[type="range"] {
-      width: 100%;
-      height: 5px;
-      accent-color: var(--gold-primary);
-      background: #090c13;
-      border-radius: 3px;
-      outline: none;
-      padding: 0;
-    }
-
-    .preset-pill-group {
-      display: flex;
-      gap: 5px;
-      width: 100%;
-    }
-    .pill-btn {
-      flex: 1;
-      padding: 6px 8px;
-      font-size: 0.72rem;
-      background: #0d121c;
-      border: 1px solid var(--border-dark);
-      border-radius: 6px;
-      color: #cbd5e1;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.15s ease;
-      white-space: nowrap;
-      font-weight: 600;
-    }
-    .pill-btn:hover {
-      border-color: var(--gold-primary);
-      color: #fff;
-    }
-    .pill-btn.active {
-      background: var(--gold-primary);
-      color: #000;
-      font-weight: 700;
-      border-color: var(--gold-primary);
-      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
-    }
-
-    /* SCENE TIMELINE GRID */
-    .scene-timeline-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      margin-top: 4px;
-    }
-    .scene-card {
-      background: #131926;
-      border: 1px solid var(--border-dark);
-      border-radius: 6px;
-      padding: 6px;
-      text-align: center;
-      font-size: 0.72rem;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .scene-card.active {
-      border-color: var(--gold-primary);
-      background: rgba(245, 158, 11, 0.1);
-      box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
-    }
-    .scene-card .scene-label {
-      font-weight: bold;
-      color: var(--gold-bright);
-      margin-bottom: 3px;
-    }
-    .scene-card .btn-set-cam {
-      background: #090c13;
-      border: 1px solid var(--border-dark);
-      border-radius: 4px;
-      color: #cbd5e1;
-      padding: 3px 4px;
-      font-size: 0.65rem;
-      cursor: pointer;
-      margin-top: 3px;
-      width: 100%;
-      transition: all 0.15s;
-    }
-    .scene-card .btn-set-cam:hover {
-      border-color: var(--gold-primary);
-      color: #fff;
-    }
-
-    /* POLISHED EXPORT BUTTON */
-    .footer {
-      padding: 14px 18px;
-      background: #090c13;
-      border-top: 1px solid var(--border-dark);
-    }
-    .btn-record {
-      width: 100%;
-      padding: 13px;
-      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.92rem;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 18px rgba(245, 158, 11, 0.45);
-    }
-    .btn-record:hover {
-      filter: brightness(1.12);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 22px rgba(245, 158, 11, 0.6);
-    }
-    .btn-record:disabled {
-      background: #334155;
-      color: #94a3b8;
-      cursor: not-allowed;
-      box-shadow: none;
-      transform: none;
-    }
-    .status-text {
-      text-align: center;
-      font-size: 0.73rem;
-      color: #94a3b8;
-      margin-top: 7px;
-    }
-
-    /* -------------------------------------------------------------
-       VIEWPORT & CANVAS WRAPPER
-    ------------------------------------------------------------- */
-    #viewport-container {
-      flex: 1;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #040508;
-      overflow: hidden;
-      padding: 16px;
-      transition: all 0.3s ease;
-    }
-
-    #canvas-window-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95);
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid #1f293d;
-      transition: width 0.25s ease, height 0.25s ease, border-radius 0.2s ease;
-    }
-    #canvas-window-wrapper canvas {
-      display: block;
-      width: 100% !important;
-      height: 100% !important;
-    }
-
-    /* -------------------------------------------------------------
-       RADIAL FLOWER FAB MENU
-    ------------------------------------------------------------- */
-    .flower-fab-container {
-      position: absolute;
-      bottom: 24px;
-      right: 24px;
-      z-index: 40;
-    }
-    .flower-main-trigger {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%);
-      border: 2px solid #fde68a;
-      color: #000;
-      font-size: 1.3rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 4px 18px rgba(245, 158, 11, 0.5);
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .flower-main-trigger:hover {
-      transform: scale(1.08);
-      box-shadow: 0 0 22px rgba(245, 158, 11, 0.8);
-    }
-    .flower-fab-container.open .flower-main-trigger {
-      transform: rotate(45deg);
-      background: #ef4444;
-      border-color: #fca5a5;
-      color: #fff;
-    }
-
-    .flower-petals {
-      position: absolute;
-      bottom: 4px;
-      right: 4px;
-      width: 40px;
-      height: 40px;
-      pointer-events: none;
-    }
-    .petal-btn {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #131926;
-      border: 1px solid var(--border-gold);
-      color: var(--gold-bright);
-      font-size: 1.05rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.8);
-      opacity: 0;
-      transform: translate(0, 0) scale(0.4);
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      pointer-events: none;
-    }
-    .petal-btn:hover {
-      background: var(--gold-primary);
-      color: #000;
-      transform: scale(1.15) !important;
-      border-color: #fff;
-      box-shadow: 0 0 15px rgba(245, 158, 11, 0.8);
-    }
-
-    .flower-fab-container.open .petal-btn {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .flower-fab-container.open .petal-1 { transform: translate(0px, -62px) scale(1); transition-delay: 0.02s; }
-    .flower-fab-container.open .petal-2 { transform: translate(-48px, -45px) scale(1); transition-delay: 0.05s; }
-    .flower-fab-container.open .petal-3 { transform: translate(-65px, 0px) scale(1); transition-delay: 0.08s; }
-    .flower-fab-container.open .petal-4 { transform: translate(-48px, 46px) scale(1); transition-delay: 0.11s; }
-    .flower-fab-container.open .petal-5 { transform: translate(44px, -46px) scale(1); transition-delay: 0.14s; }
-
-    .petal-btn::after {
-      content: attr(data-tip);
-      position: absolute;
-      right: 48px;
-      background: #090c13;
-      border: 1px solid var(--border-gold);
-      color: var(--gold-bright);
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 0.7rem;
-      white-space: nowrap;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s;
-    }
-    .petal-btn:hover::after {
-      opacity: 1;
-    }
-
-    /* Cinematic Mode Active */
-    body.cinematic-mode #sidebar,
-    body.cinematic-mode #sidebar-toggle-btn,
-    body.cinematic-mode #btn-cinematic,
-    body.cinematic-mode .flower-fab-container {
-      display: none !important;
-    }
-    body.cinematic-mode #viewport-container {
-      padding: 0 !important;
-    }
-    body.cinematic-mode #canvas-window-wrapper {
-      width: 100vw !important;
-      height: 100vh !important;
-      max-width: 100vw !important;
-      max-height: 100vh !important;
-      border: none !important;
-      border-radius: 0 !important;
-      box-shadow: none !important;
-    }
-
-    /* Responsive Mobile */
-    @media (max-width: 860px) {
-      #sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        width: 320px;
-        min-width: 300px;
-        transform: translateX(-100%);
-        z-index: 150;
-      }
-      #sidebar.open {
-        transform: translateX(0);
-        box-shadow: 15px 0 50px rgba(0,0,0,0.9);
-      }
-      #viewport-container {
-        padding: 0;
-      }
-      #canvas-window-wrapper {
-        border-radius: 0;
-        border: none;
-      }
-      .sidebar-backdrop {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.7);
-        backdrop-filter: blur(4px);
-        z-index: 140;
-      }
-      .sidebar-backdrop.active {
-        display: block;
-      }
-    }
-  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+          integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu"
+          crossorigin="anonymous" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"
+          integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf"
+          crossorigin="anonymous" defer></script>
+  <script src="assets/js/i18n.js" defer></script>
+  <script src="assets/js/scene.js" defer></script>
+  <script src="assets/js/export.js" defer></script>
+  <script src="assets/js/app.js" defer></script>
 </head>
 <body>
 
-  <!-- Backdrop for mobile drawer -->
-  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <!-- ======================================================================
+       Sprite de iconos (SVG inline, sin peticiones extra)
+       ====================================================================== -->
+  <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <symbol id="i-cards" viewBox="0 0 24 24">
+      <rect x="3" y="6" width="12" height="15" rx="2.5"></rect>
+      <path d="M9 3h9.5A2.5 2.5 0 0 1 21 5.5V15"></path>
+    </symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24">
+      <path d="M12 3l1.7 4.9L18.5 9.5l-4.8 1.6L12 16l-1.7-4.9L5.5 9.5l4.8-1.6L12 3z"></path>
+      <path d="M19 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z"></path>
+    </symbol>
+    <symbol id="i-video" viewBox="0 0 24 24">
+      <rect x="2" y="6" width="13" height="12" rx="2.5"></rect>
+      <path d="M15 10.5l6-3.2v9.4l-6-3.2z"></path>
+    </symbol>
+    <symbol id="i-frame" viewBox="0 0 24 24">
+      <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"></path>
+    </symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24">
+      <path d="M12 21a9 9 0 1 1 9-9c0 2.2-1.8 3.4-3.6 3.4h-1.6a2 2 0 0 0-1.5 3.3c.4.5.3 1.2-.2 1.6-.6.5-1.3.7-2.1.7z"></path>
+      <circle cx="7.5" cy="11" r="1"></circle>
+      <circle cx="10" cy="7.5" r="1"></circle>
+      <circle cx="14.5" cy="7.5" r="1"></circle>
+      <circle cx="17" cy="11" r="1"></circle>
+    </symbol>
+    <symbol id="i-save" viewBox="0 0 24 24">
+      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+      <path d="M17 21v-8H7v8M7 3v5h8"></path>
+    </symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <path d="M17 8l-5-5-5 5M12 3v12"></path>
+    </symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24">
+      <path d="M12 2l9 5-9 5-9-5 9-5z"></path>
+      <path d="M3 12l9 5 9-5M3 17l9 5 9-5"></path>
+    </symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+      <circle cx="12" cy="13" r="4"></circle>
+    </symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24">
+      <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"></path>
+    </symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+    </symbol>
+    <symbol id="i-download" viewBox="0 0 24 24">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <path d="M7 10l5 5 5-5M12 15V3"></path>
+    </symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24">
+      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path>
+      <circle cx="12" cy="12" r="3"></circle>
+    </symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24">
+      <path d="M3 6h18M3 12h18M3 18h18"></path>
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24">
+      <path d="M18 6L6 18M6 6l12 12"></path>
+    </symbol>
+    <symbol id="i-target" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <circle cx="12" cy="12" r="5"></circle>
+      <circle cx="12" cy="12" r="1"></circle>
+    </symbol>
+    <symbol id="i-rotate" viewBox="0 0 24 24">
+      <path d="M1 4v6h6"></path>
+      <path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"></path>
+    </symbol>
+    <symbol id="i-level" viewBox="0 0 24 24">
+      <path d="M12 3v18M6 21h12M3 8l4-4 4 4M13 8l4-4 4 4"></path>
+      <path d="M3 8l3 6H0zM21 8l3 6h-6z"></path>
+    </symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24">
+      <path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"></path>
+    </symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24">
+      <path d="M12 21s7-6.4 7-11a7 7 0 1 0-14 0c0 4.6 7 11 7 11z"></path>
+      <circle cx="12" cy="10" r="2.5"></circle>
+    </symbol>
+    <symbol id="i-info" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 16v-4M12 8h.01"></path>
+    </symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24">
+      <path d="M3 2v6h6"></path>
+      <path d="M3.5 13a9 9 0 1 0 2.6-6.4L3 8"></path>
+    </symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24">
+      <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+      <path d="M10 11v6M14 11v6"></path>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="M20 6L9 17l-5-5"></path>
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24">
+      <path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path>
+      <path d="M12 9v4M12 17h.01"></path>
+    </symbol>
+    <symbol id="i-film" viewBox="0 0 24 24">
+      <rect x="2" y="2" width="20" height="20" rx="2.5"></rect>
+      <path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"></path>
+    </symbol>
+    <symbol id="i-image" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="18" height="18" rx="2.5"></rect>
+      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+      <path d="M21 15l-5-5L5 21"></path>
+    </symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"></path>
+    </symbol>
+    <symbol id="i-help" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M9.1 9a3 3 0 1 1 4.6 2.6c-.9.6-1.7 1.3-1.7 2.4M12 17h.01"></path>
+    </symbol>
+    <symbol id="i-play" viewBox="0 0 24 24">
+      <path d="M6 3.5l14 8.5-14 8.5V3.5z"></path>
+    </symbol>
+    <symbol id="i-keyboard" viewBox="0 0 24 24">
+      <rect x="2" y="6" width="20" height="12" rx="2.5"></rect>
+      <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"></path>
+    </symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24">
+      <path d="M6 9l6 6 6-6"></path>
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 7v5l3 2"></path>
+    </symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24">
+      <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"></path>
+    </symbol>
+    <symbol id="i-drag" viewBox="0 0 24 24">
+      <path d="M9 11V6.5a1.5 1.5 0 0 1 3 0V11M12 10.5V5a1.5 1.5 0 0 1 3 0v5.5M15 10.5V7a1.5 1.5 0 0 1 3 0v7a6 6 0 0 1-6 6h-1a5 5 0 0 1-3.6-1.5L4.6 15a1.6 1.6 0 0 1 2.4-2.1L9 15"></path>
+    </symbol>
+  </svg>
 
-  <!-- Unified PC / Mobile Sidebar Toggle Button -->
-  <button id="sidebar-toggle-btn" aria-label="Toggle Sidebar" title="Ocultar / Mostrar Barra Lateral">☰</button>
+  <!-- ======================================================================
+       Fondo decorativo
+       ====================================================================== -->
+  <div class="aero-bg" aria-hidden="true">
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+    <span class="bubble bubble-1"></span>
+    <span class="bubble bubble-2"></span>
+    <span class="bubble bubble-3"></span>
+    <span class="bubble bubble-4"></span>
+    <span class="bubble bubble-5"></span>
+  </div>
 
-  <!-- Cinematic Mode Button (Icon Only) -->
-  <button id="btn-cinematic" title="Modo Pantalla Limpia / Clean View">
-    👁️
+  <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
+
+  <button id="sidebar-toggle-btn" class="icon-btn" type="button" aria-label="Mostrar u ocultar el panel" data-i18n-aria-label="ui_toggle_sidebar" aria-controls="sidebar" aria-expanded="true" title="Mostrar u ocultar el panel" data-i18n-title="ui_toggle_sidebar">
+    <svg class="icon icon-menu" aria-hidden="true"><use href="#i-menu"></use></svg>
+    <svg class="icon icon-close" aria-hidden="true"><use href="#i-close"></use></svg>
   </button>
-  <div id="cinematic-exit-tip" data-i18n="cinematic_tip">Toca en cualquier lugar para salir</div>
 
-  <!-- SIDEBAR (DUELIST THEME + TABS) -->
-  <aside id="sidebar">
-    <div class="header">
-      <div class="brand-wrap">
-        <div class="brand-title-row">
-          <!-- Animated 3D Spinning Holographic Card Logo -->
-          <div class="spinning-card-logo-container" title="TCG 3D Core">
-            <div class="spinning-card-inner">
-              <div class="card-face card-face-front">★</div>
-              <div class="card-face card-face-back">TCG</div>
-            </div>
+  <button id="btn-cinematic" class="icon-btn" type="button" aria-label="Activar modo cinemático" data-i18n-aria-label="ui_cinematic" title="Modo cinemático (C)" data-i18n-title="ui_cinematic_title">
+    <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
+  </button>
+
+  <div id="cinematic-exit-tip" role="status" data-i18n="cinematic_tip">Toca en cualquier lugar o pulsa Esc para salir</div>
+
+  <!-- ======================================================================
+       Panel lateral
+       ====================================================================== -->
+  <aside id="sidebar" aria-label="Panel de control del estudio" data-i18n-aria-label="ui_sidebar">
+    <header class="app-header">
+      <div class="brand">
+        <div class="spinning-card-logo-container" aria-hidden="true" title="TCG 3D Core">
+          <div class="spinning-card-inner">
+            <div class="card-face card-face-front">★</div>
+            <div class="card-face card-face-back">TCG</div>
           </div>
-          <h1>TCG:<span class="gold">HUB</span></h1>
         </div>
-        <div class="author-credit">by: theAstroBruh</div>
+        <div class="brand-copy">
+          <div class="brand-title-row">
+            <h1>TCG:<span>HUB</span></h1>
+            <span class="version-badge" data-version>v0.4.2</span>
+          </div>
+          <div class="author-credit">Duelist 3D Studio · by theAstroBruh</div>
+        </div>
       </div>
-      <div class="lang-switcher">
-        <button class="lang-btn active" id="btn-lang-es">ES</button>
-        <button class="lang-btn" id="btn-lang-en">EN</button>
+      <div class="header-actions">
+        <div class="lang-switcher" role="group" aria-label="Idioma / Language" data-i18n-aria-label="ui_lang_group">
+          <button class="lang-btn active" id="btn-lang-es" type="button" aria-pressed="true" title="Español">ES</button>
+          <button class="lang-btn" id="btn-lang-en" type="button" aria-pressed="false" title="English">EN</button>
+        </div>
+        <button class="icon-btn" id="btn-help" type="button" aria-label="Atajos y ayuda" data-i18n-aria-label="ui_help" title="Atajos y ayuda (?)" data-i18n-title="ui_help_title">
+          <svg class="icon" aria-hidden="true"><use href="#i-help"></use></svg>
+        </button>
+        <button class="icon-btn" id="btn-close-drawer" type="button" aria-label="Cerrar panel" data-i18n-aria-label="ui_close_panel" title="Cerrar panel" data-i18n-title="ui_close_panel">
+          <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+        </button>
       </div>
-    </div>
+    </header>
 
-    <!-- TABS -->
-    <nav class="nav-tabs">
-      <button class="tab-btn active" data-tab="tab-deck"><span data-i18n="tab_deck">🎴 Deck</span></button>
-      <button class="tab-btn" data-tab="tab-3d"><span data-i18n="tab_3d">✨ 3D Forge</span></button>
-      <button class="tab-btn" data-tab="tab-anim"><span data-i18n="tab_anim">🎥 Tomas & Giro</span></button>
-      <button class="tab-btn" data-tab="tab-canvas"><span data-i18n="tab_canvas">📐 Canvas</span></button>
+    <nav class="nav-tabs" role="tablist" aria-label="Secciones del estudio" data-i18n-aria-label="ui_tabs">
+      <button class="tab-btn active" type="button" role="tab" id="tab-btn-deck" data-tab="tab-deck" aria-selected="true" aria-controls="tab-deck" tabindex="0">
+        <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
+        <span data-i18n="tab_deck">Deck</span>
+      </button>
+      <button class="tab-btn" type="button" role="tab" id="tab-btn-3d" data-tab="tab-3d" aria-selected="false" aria-controls="tab-3d" tabindex="-1">
+        <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+        <span data-i18n="tab_3d">Forja 3D</span>
+      </button>
+      <button class="tab-btn" type="button" role="tab" id="tab-btn-anim" data-tab="tab-anim" aria-selected="false" aria-controls="tab-anim" tabindex="-1">
+        <svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg>
+        <span data-i18n="tab_anim">Tomas</span>
+      </button>
+      <button class="tab-btn" type="button" role="tab" id="tab-btn-canvas" data-tab="tab-canvas" aria-selected="false" aria-controls="tab-canvas" tabindex="-1">
+        <svg class="icon" aria-hidden="true"><use href="#i-frame"></use></svg>
+        <span data-i18n="tab_canvas">Lienzo</span>
+      </button>
     </nav>
 
-    <div class="scroll-content">
-      
-      <!-- PESTAÑA 1: DECK & CARTAS -->
-      <div class="tab-pane active" id="tab-deck">
-        <div class="section-title"><span data-i18n="sec_cards">🎨 Diseños & Presets</span></div>
-        <div class="card-presets-bar" id="card-presets-bar">
-          <div class="preset-chip active" id="chip-default">Default TCG</div>
-        </div>
+    <div class="scroll-content" id="scroll-content">
+
+      <!-- ------------------------------------------------------------------
+           Pestaña: Deck
+           ------------------------------------------------------------------ -->
+      <section class="tab-pane active" id="tab-deck" role="tabpanel" aria-labelledby="tab-btn-deck">
+        <h2 class="section-title">
+          <svg class="icon" aria-hidden="true"><use href="#i-palette"></use></svg>
+          <span data-i18n="sec_design">Diseños y presets</span>
+        </h2>
+        <p class="section-hint" data-i18n="sec_design_hint">Elige un preset guardado o carga el anverso y el reverso de tu carta.</p>
+
+        <div class="card-presets-bar" id="card-presets-bar" role="group" aria-label="Presets de cartas" data-i18n-aria-label="ui_presets"></div>
 
         <div class="upload-group">
-          <label class="upload-box" for="front-file-input">
-            <img id="front-preview-img" src="assets/card_front.png" alt="Front Preview">
-            <span data-i18n="front_cover">🖼️ Frontal</span>
-            <input type="file" id="front-file-input" accept="image/*">
+          <label class="upload-box" id="upload-front" for="front-file-input" tabindex="0" role="button" aria-label="Cargar imagen frontal" data-i18n-aria-label="ui_upload_front">
+            <img id="front-preview-img" src="assets/card_front%20-%20base.png" alt="Previsualización del anverso" data-i18n-alt="ui_front_alt">
+            <span class="upload-badge"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg><span data-i18n="front_short">Frontal</span></span>
+            <span class="upload-overlay">
+              <span class="upload-label"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg><span data-i18n="front_cover">Anverso</span></span>
+              <span class="upload-hint" data-i18n="upload_hint">Arrastra o toca para cambiar</span>
+            </span>
+            <input type="file" id="front-file-input" accept="image/png,image/jpeg,image/webp,image/avif" aria-label="Seleccionar imagen frontal" data-i18n-aria-label="ui_select_front">
           </label>
 
-          <label class="upload-box" for="back-file-input">
-            <img id="back-preview-img" src="assets/card_back.png" alt="Back Preview">
-            <span data-i18n="back_cover">🔄 Trasera</span>
-            <input type="file" id="back-file-input" accept="image/*">
+          <label class="upload-box" id="upload-back" for="back-file-input" tabindex="0" role="button" aria-label="Cargar imagen trasera" data-i18n-aria-label="ui_upload_back">
+            <img id="back-preview-img" src="assets/card_back%20-%20base.png" alt="Previsualización del reverso" data-i18n-alt="ui_back_alt">
+            <span class="upload-badge"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg><span data-i18n="back_short">Trasera</span></span>
+            <span class="upload-overlay">
+              <span class="upload-label"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg><span data-i18n="back_cover">Reverso</span></span>
+              <span class="upload-hint" data-i18n="upload_hint">Arrastra o toca para cambiar</span>
+            </span>
+            <input type="file" id="back-file-input" accept="image/png,image/jpeg,image/webp,image/avif" aria-label="Seleccionar imagen trasera" data-i18n-aria-label="ui_select_back">
           </label>
         </div>
 
-        <div class="control-row">
-          <label><span data-i18n="save_card_preset">💾 Guardar Carta Actual</span></label>
-          <button class="pill-btn" id="btn-save-card-preset" style="max-width: 100px;">💾 Guardar</button>
+        <div class="action-row">
+          <button class="btn btn-primary btn-block" id="btn-save-card-preset" type="button">
+            <svg class="icon" aria-hidden="true"><use href="#i-save"></use></svg>
+            <span data-i18n="save_preset">Guardar carta actual</span>
+          </button>
         </div>
-      </div>
+        <div class="action-row">
+          <button class="btn btn-ghost btn-sm btn-block" id="btn-restore-card" type="button">
+            <svg class="icon" aria-hidden="true"><use href="#i-reset"></use></svg>
+            <span data-i18n="restore_default">Restaurar carta por defecto</span>
+          </button>
+        </div>
 
-      <!-- PESTAÑA 2: 3D FORGE (Bordes, Cantos, Brillo) -->
-      <div class="tab-pane" id="tab-3d">
-        <div class="section-title"><span data-i18n="sec_card3d">✨ Canto, Bisel y Brillo</span></div>
-        
+        <h2 class="section-title">
+          <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+          <span data-i18n="sec_tips">Buenas prácticas</span>
+        </h2>
+        <div class="panel">
+          <p class="section-hint" style="margin:0" data-i18n="tips_text">Usa imágenes de al menos 750 × 1050 px. Las cargas se optimizan automáticamente y nunca salen de tu navegador.</p>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------------------
+           Pestaña: 3D
+           ------------------------------------------------------------------ -->
+      <section class="tab-pane" id="tab-3d" role="tabpanel" aria-labelledby="tab-btn-3d">
+        <h2 class="section-title">
+          <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+          <span data-i18n="sec_card3d">Canto, bisel y brillo</span>
+        </h2>
+
         <div class="control-row">
-          <label for="select-corners"><span data-i18n="corners_type">✂️ Esquinas</span></label>
-          <select id="select-corners">
-            <option value="rounded" data-i18n="opt_rounded">Redondeadas (TCG)</option>
-            <option value="sharp" data-i18n="opt_sharp">Rectas Clásicas</option>
-          </select>
+          <label id="label-corners"><svg class="icon" aria-hidden="true"><use href="#i-frame"></use></svg><span data-i18n="corners_type">Esquinas</span></label>
+          <div class="segmented" id="seg-corners" role="group" aria-labelledby="label-corners">
+            <button class="seg-btn active" type="button" data-value="rounded" aria-pressed="true" data-i18n="corners_rounded">Redondeadas</button>
+            <button class="seg-btn" type="button" data-value="sharp" aria-pressed="false" data-i18n="corners_sharp">Rectas</button>
+          </div>
         </div>
 
         <div class="control-row control-row-col">
           <div class="header-line">
-            <label for="range-edge-thickness"><span data-i18n="edge_thickness">🧱 Grosor del Canto</span></label>
-            <span class="slider-val" id="val-edge-thick">0.016</span>
+            <label for="range-edge-thickness"><svg class="icon" aria-hidden="true"><use href="#i-layers"></use></svg><span data-i18n="edge_thickness">Grosor del canto</span></label>
+            <output class="slider-val" id="val-edge-thick" for="range-edge-thickness">0.016</output>
           </div>
-          <input type="range" id="range-edge-thickness" min="0.005" max="0.050" step="0.002" value="0.016">
+          <input type="range" id="range-edge-thickness" min="0.005" max="0.050" step="0.002" value="0.016" aria-label="Grosor del canto" data-i18n-aria-label="edge_thickness">
         </div>
 
         <div class="control-row control-row-col">
           <div class="header-line">
-            <label for="range-bevel-intensity"><span data-i18n="bevel_intensity">💎 Intensidad de Borde</span></label>
-            <span class="slider-val" id="val-bevel-int">0.004</span>
+            <label for="range-bevel-intensity"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg><span data-i18n="bevel_intensity">Intensidad del bisel</span></label>
+            <output class="slider-val" id="val-bevel-int" for="range-bevel-intensity">0.004</output>
           </div>
-          <input type="range" id="range-bevel-intensity" min="0.001" max="0.012" step="0.001" value="0.004">
-        </div>
-
-        <div class="control-row">
-          <label for="select-edge"><span data-i18n="edge_color">🎨 Color Canto</span></label>
-          <select id="select-edge">
-            <option value="black" data-i18n="opt_black_edge">Negro Mate</option>
-            <option value="gold_foil" data-i18n="opt_gold_edge">Dorado Foil (Milenario)</option>
-            <option value="silver_foil" data-i18n="opt_silver_edge">Plata Metalizada</option>
-            <option value="white" data-i18n="opt_white_edge">Cartulina Blanca</option>
-          </select>
+          <input type="range" id="range-bevel-intensity" min="0.001" max="0.012" step="0.001" value="0.004" aria-label="Intensidad del bisel" data-i18n-aria-label="bevel_intensity">
         </div>
 
         <div class="control-row control-row-col">
           <div class="header-line">
-            <label for="range-gloss"><span data-i18n="glossiness">✨ Brillo Reflectante</span></label>
-            <span class="slider-val" id="val-gloss">0.25</span>
+            <label id="label-edge-color"><svg class="icon" aria-hidden="true"><use href="#i-palette"></use></svg><span data-i18n="edge_color">Color del canto</span></label>
           </div>
-          <input type="range" id="range-gloss" min="0.05" max="0.9" step="0.05" value="0.25">
-        </div>
-      </div>
-
-      <!-- PESTAÑA 3: TOMAS, CÁMARA Y GIRO -->
-      <div class="tab-pane" id="tab-anim">
-        <div class="section-title"><span data-i18n="sec_scenes">🎬 Capas de Tomas (Escenas)</span></div>
-        <div class="scene-timeline-grid">
-          <div class="scene-card active" data-scene="1">
-            <div class="scene-label">Toma 1</div>
-            <button class="btn-set-cam" data-set-scene="1">📸 Grabar Pose</button>
+          <div class="swatch-grid" id="edge-swatches" role="group" aria-labelledby="label-edge-color">
+            <button class="swatch active" type="button" data-value="black" aria-pressed="true">
+              <span class="swatch-dot dot-black"></span><span data-i18n="edge_black">Negro</span>
+            </button>
+            <button class="swatch" type="button" data-value="gold" aria-pressed="false">
+              <span class="swatch-dot dot-gold"></span><span data-i18n="edge_gold">Oro</span>
+            </button>
+            <button class="swatch" type="button" data-value="silver" aria-pressed="false">
+              <span class="swatch-dot dot-silver"></span><span data-i18n="edge_silver">Plata</span>
+            </button>
+            <button class="swatch" type="button" data-value="white" aria-pressed="false">
+              <span class="swatch-dot dot-white"></span><span data-i18n="edge_white">Blanco</span>
+            </button>
           </div>
-          <div class="scene-card" data-scene="2">
-            <div class="scene-label">Toma 2</div>
-            <button class="btn-set-cam" data-set-scene="2">📸 Grabar Pose</button>
-          </div>
-          <div class="scene-card" data-scene="3">
-            <div class="scene-label">Toma 3</div>
-            <button class="btn-set-cam" data-set-scene="3">📸 Grabar Pose</button>
-          </div>
-        </div>
-        <div class="preset-pill-group" style="margin-top: 8px;">
-          <button class="pill-btn" id="btn-play-scenes">▶️ Transición 3 Tomas</button>
         </div>
 
-        <div class="section-title"><span data-i18n="sec_camera">🎥 Parámetros de Giro & Posición</span></div>
-        
+        <div class="control-row control-row-col">
+          <div class="header-line">
+            <label for="range-gloss"><svg class="icon" aria-hidden="true"><use href="#i-sun"></use></svg><span data-i18n="glossiness">Brillo reflectante</span></label>
+            <output class="slider-val" id="val-gloss" for="range-gloss">0.25</output>
+          </div>
+          <input type="range" id="range-gloss" min="0.05" max="0.9" step="0.05" value="0.25" aria-label="Brillo reflectante" data-i18n-aria-label="glossiness">
+        </div>
+
+        <div class="action-row">
+          <button class="btn btn-ghost btn-sm btn-block" id="btn-reset-3d" type="button">
+            <svg class="icon" aria-hidden="true"><use href="#i-reset"></use></svg>
+            <span data-i18n="reset_3d">Restaurar acabado 3D</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------------------------
+           Pestaña: Tomas
+           ------------------------------------------------------------------ -->
+      <section class="tab-pane" id="tab-anim" role="tabpanel" aria-labelledby="tab-btn-anim">
+        <h2 class="section-title">
+          <svg class="icon" aria-hidden="true"><use href="#i-film"></use></svg>
+          <span data-i18n="sec_scenes">Capas de tomas</span>
+        </h2>
+        <p class="section-hint" data-i18n="sec_scenes_hint">Mueve la cámara y guarda hasta tres poses. Después reprodúcelas como transición.</p>
+
+        <div class="scene-grid">
+          <div class="scene-card active saved" data-scene="1" role="button" tabindex="0" aria-pressed="true" aria-label="Toma 1" data-i18n-aria-label="scene_1">
+            <span class="scene-saved-dot" aria-hidden="true"></span>
+            <span class="scene-index">01</span>
+            <span class="scene-name" data-i18n="scene_1">Toma 1</span>
+            <button class="scene-save" type="button" data-set-scene="1">
+              <svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg>
+              <span data-i18n="save_pose">Guardar pose</span>
+            </button>
+          </div>
+          <div class="scene-card saved" data-scene="2" role="button" tabindex="0" aria-pressed="false" aria-label="Toma 2" data-i18n-aria-label="scene_2">
+            <span class="scene-saved-dot" aria-hidden="true"></span>
+            <span class="scene-index">02</span>
+            <span class="scene-name" data-i18n="scene_2">Toma 2</span>
+            <button class="scene-save" type="button" data-set-scene="2">
+              <svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg>
+              <span data-i18n="save_pose">Guardar pose</span>
+            </button>
+          </div>
+          <div class="scene-card saved" data-scene="3" role="button" tabindex="0" aria-pressed="false" aria-label="Toma 3" data-i18n-aria-label="scene_3">
+            <span class="scene-saved-dot" aria-hidden="true"></span>
+            <span class="scene-index">03</span>
+            <span class="scene-name" data-i18n="scene_3">Toma 3</span>
+            <button class="scene-save" type="button" data-set-scene="3">
+              <svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg>
+              <span data-i18n="save_pose">Guardar pose</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button class="btn btn-primary btn-block" id="btn-play-scenes" type="button">
+            <svg class="icon" aria-hidden="true"><use href="#i-play"></use></svg>
+            <span data-i18n="play_scenes">Reproducir transición</span>
+          </button>
+        </div>
+
+        <h2 class="section-title">
+          <svg class="icon" aria-hidden="true"><use href="#i-sliders"></use></svg>
+          <span data-i18n="sec_camera">Giro y cámara</span>
+        </h2>
+
         <div class="control-row">
-          <label for="select-speed"><span data-i18n="spin_speed">⏱️ Giro</span></label>
+          <label for="select-speed"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg><span data-i18n="spin_speed">Velocidad</span></label>
           <select id="select-speed">
-            <option value="0" selected data-i18n="spd_stop">Pausado (Estático)</option>
-            <option value="0.5" data-i18n="spd_slow">Lento & Suave (1 giro)</option>
-            <option value="1" data-i18n="spd_normal">Normal (2 giros / 10s)</option>
-            <option value="1.5" data-i18n="spd_medium">Dinámico (3 giros)</option>
-            <option value="2.5" data-i18n="spd_fast">Turbo Rápido</option>
+            <option value="0" data-i18n="spin_static">Pausado</option>
+            <option value="0.5" selected data-i18n="spin_slow">Lento</option>
+            <option value="1" data-i18n="spin_normal">Normal</option>
+            <option value="1.5" data-i18n="spin_dynamic">Dinámico</option>
+            <option value="2.5" data-i18n="spin_turbo">Turbo</option>
           </select>
         </div>
 
         <div class="control-row">
-          <label for="select-spin-dir"><span data-i18n="spin_dir">🔄 Sentido de Giro</span></label>
+          <label for="select-spin-dir"><svg class="icon" aria-hidden="true"><use href="#i-rotate"></use></svg><span data-i18n="spin_dir">Sentido</span></label>
           <select id="select-spin-dir">
-            <option value="1" data-i18n="dir_normal">Horario (Normal)</option>
-            <option value="-1" data-i18n="dir_reverse">Antihorario (Invertido)</option>
+            <option value="1" data-i18n="dir_cw">Horario</option>
+            <option value="-1" data-i18n="dir_ccw">Antihorario</option>
           </select>
         </div>
 
-        <!-- OSCILACIÓN / FLOATING EXPANDIDA CON MÚLTIPLES ESTILOS (POR DEFECTO: ORGANICA) -->
         <div class="control-row">
-          <label for="toggle-floating"><span data-i18n="floating">🌊 Oscilación</span></label>
-          <select id="toggle-floating">
-            <option value="organic" selected data-i18n="float_organic">Activada (Orgánica)</option>
-            <option value="subtle" data-i18n="float_subtle">Sutil & Elegante</option>
-            <option value="breathe" data-i18n="float_breathe">Respiración / Flote</option>
-            <option value="dramatic" data-i18n="float_dramatic">Dinámica / Péndulo</option>
-            <option value="off" data-i18n="float_off">Desactivada (Fija en Eje)</option>
+          <label for="select-floating"><svg class="icon" aria-hidden="true"><use href="#i-level"></use></svg><span data-i18n="floating">Oscilación</span></label>
+          <select id="select-floating">
+            <option value="organic" selected data-i18n="float_organic">Orgánica</option>
+            <option value="subtle" data-i18n="float_subtle">Sutil</option>
+            <option value="breathe" data-i18n="float_breathe">Respiración</option>
+            <option value="dramatic" data-i18n="float_dramatic">Péndulo</option>
+            <option value="off" data-i18n="float_off">Desactivada</option>
           </select>
         </div>
 
         <div class="control-row control-row-col">
           <div class="header-line">
-            <label for="range-cam-dist"><span data-i18n="cam_dist">📏 Distancia Cámara</span></label>
-            <span class="slider-val" id="val-cam-dist">4.6</span>
+            <label for="range-cam-dist"><svg class="icon" aria-hidden="true"><use href="#i-expand"></use></svg><span data-i18n="cam_dist">Distancia de cámara</span></label>
+            <output class="slider-val" id="val-cam-dist" for="range-cam-dist">4.6</output>
           </div>
-          <input type="range" id="range-cam-dist" min="2.0" max="8.0" step="0.1" value="4.6">
+          <input type="range" id="range-cam-dist" min="2" max="8" step="0.1" value="4.6" aria-label="Distancia de cámara" data-i18n-aria-label="cam_dist">
         </div>
 
         <div class="control-row control-row-col">
           <div class="header-line">
-            <label for="range-pos-y"><span data-i18n="pos_y">↕️ Posición Vertical</span></label>
-            <span class="slider-val" id="val-pos-y">0.0</span>
+            <label for="range-pos-y"><svg class="icon" aria-hidden="true"><use href="#i-level"></use></svg><span data-i18n="pos_y">Posición vertical</span></label>
+            <output class="slider-val" id="val-pos-y" for="range-pos-y">0.00</output>
           </div>
-          <input type="range" id="range-pos-y" min="-1.5" max="1.5" step="0.05" value="0.0">
+          <input type="range" id="range-pos-y" min="-1.5" max="1.5" step="0.05" value="0" aria-label="Posición vertical de la carta" data-i18n-aria-label="pos_y">
         </div>
 
         <div class="control-row control-row-col">
           <div class="header-line">
-            <label for="range-tilt-intensity"><span data-i18n="tilt_intensity">📐 Intensidad Inclinación</span></label>
-            <span class="slider-val" id="val-tilt-intensity">1.0</span>
+            <label for="range-tilt-intensity"><svg class="icon" aria-hidden="true"><use href="#i-sliders"></use></svg><span data-i18n="tilt_intensity">Intensidad de inclinación</span></label>
+            <output class="slider-val" id="val-tilt-intensity" for="range-tilt-intensity">1.0</output>
           </div>
-          <input type="range" id="range-tilt-intensity" min="0.0" max="2.5" step="0.1" value="1.0">
+          <input type="range" id="range-tilt-intensity" min="0" max="2.5" step="0.1" value="1" aria-label="Intensidad de inclinación" data-i18n-aria-label="tilt_intensity">
         </div>
-      </div>
 
-      <!-- PESTAÑA 4: CANVAS & ENTORNO -->
-      <div class="tab-pane" id="tab-canvas">
-        <div class="section-title"><span data-i18n="sec_canvas">📐 Dimensiones Canvas</span></div>
-        <div class="control-row control-row-col">
-          <div class="header-line">
-            <label><span data-i18n="canvas_aspect">📱 Formato</span></label>
-          </div>
-          <div class="preset-pill-group">
-            <button class="pill-btn active" data-preset="9:16">9:16 Reels</button>
-            <button class="pill-btn" data-preset="1:1">1:1 Post</button>
-            <button class="pill-btn" data-preset="16:9">16:9 Wide</button>
-            <button class="pill-btn" data-preset="fill" data-i18n="preset_fill">↔️ Ajustar</button>
-          </div>
+        <div class="action-row">
+          <button class="btn btn-ghost btn-sm btn-block" id="btn-reset-camera" type="button">
+            <svg class="icon" aria-hidden="true"><use href="#i-target"></use></svg>
+            <span data-i18n="reset_camera">Centrar cámara</span>
+          </button>
         </div>
+      </section>
+
+      <!-- ------------------------------------------------------------------
+           Pestaña: Lienzo
+           ------------------------------------------------------------------ -->
+      <section class="tab-pane" id="tab-canvas" role="tabpanel" aria-labelledby="tab-btn-canvas">
+        <h2 class="section-title">
+          <svg class="icon" aria-hidden="true"><use href="#i-frame"></use></svg>
+          <span data-i18n="sec_canvas">Formato del lienzo</span>
+        </h2>
+
         <div class="control-row">
-          <label for="range-canvas-scale"><span data-i18n="canvas_scale">🔍 Tamaño Canvas</span></label>
-          <input type="range" id="range-canvas-scale" min="50" max="100" value="100" step="1">
+          <label id="label-aspect"><svg class="icon" aria-hidden="true"><use href="#i-frame"></use></svg><span data-i18n="canvas_aspect">Formato</span></label>
+          <div class="segmented" id="seg-aspect" role="group" aria-labelledby="label-aspect">
+            <button class="seg-btn active" type="button" data-value="9:16" aria-pressed="true">9:16</button>
+            <button class="seg-btn" type="button" data-value="1:1" aria-pressed="false">1:1</button>
+            <button class="seg-btn" type="button" data-value="16:9" aria-pressed="false">16:9</button>
+            <button class="seg-btn" type="button" data-value="fill" aria-pressed="false" data-i18n="aspect_fill">Ajustar</button>
+          </div>
         </div>
 
-        <div class="section-title"><span data-i18n="sec_env">🌌 Fondo & Entorno</span></div>
-        <div class="control-row">
-          <label for="select-bg"><span data-i18n="bg_color">🏞️ Fondo</span></label>
-          <select id="select-bg">
-            <option value="black" data-i18n="bg_black">Negro OLED (Puro)</option>
-            <option value="dark_studio" data-i18n="bg_studio">Estudio Sutil</option>
-            <option value="gold_luxury" data-i18n="bg_luxury">Lujo Dorado Milenario</option>
-            <option value="cyber_neon" data-i18n="bg_cyber">Cyberpunk Neón</option>
-            <option value="transparent" data-i18n="bg_transparent">Transparente</option>
-          </select>
+        <div class="control-row control-row-col">
+          <div class="header-line">
+            <label for="range-canvas-scale"><svg class="icon" aria-hidden="true"><use href="#i-expand"></use></svg><span data-i18n="canvas_scale">Tamaño en pantalla</span></label>
+            <output class="slider-val" id="val-canvas-scale" for="range-canvas-scale">100%</output>
+          </div>
+          <input type="range" id="range-canvas-scale" min="50" max="100" step="1" value="100" aria-label="Tamaño del lienzo en pantalla" data-i18n-aria-label="canvas_scale">
         </div>
-      </div>
+
+        <h2 class="section-title">
+          <svg class="icon" aria-hidden="true"><use href="#i-sun"></use></svg>
+          <span data-i18n="sec_env">Fondo y entorno</span>
+        </h2>
+
+        <div class="bg-grid" id="bg-grid" role="group" aria-label="Fondo del escenario" data-i18n-aria-label="ui_bg_group">
+          <button class="bg-swatch active" type="button" data-value="aqua" aria-pressed="true">
+            <span class="bg-preview bg-preview-aqua"></span><span data-i18n="bg_aqua">Aqua</span>
+          </button>
+          <button class="bg-swatch" type="button" data-value="studio" aria-pressed="false">
+            <span class="bg-preview bg-preview-studio"></span><span data-i18n="bg_studio">Estudio</span>
+          </button>
+          <button class="bg-swatch" type="button" data-value="oled" aria-pressed="false">
+            <span class="bg-preview bg-preview-oled"></span><span data-i18n="bg_oled">OLED</span>
+          </button>
+          <button class="bg-swatch" type="button" data-value="sunset" aria-pressed="false">
+            <span class="bg-preview bg-preview-sunset"></span><span data-i18n="bg_sunset">Atardecer</span>
+          </button>
+          <button class="bg-swatch" type="button" data-value="cyber" aria-pressed="false">
+            <span class="bg-preview bg-preview-cyber"></span><span data-i18n="bg_cyber">Cyber</span>
+          </button>
+          <button class="bg-swatch" type="button" data-value="transparent" aria-pressed="false">
+            <span class="bg-preview bg-preview-transparent"></span><span data-i18n="bg_transparent">Transparente</span>
+          </button>
+        </div>
+
+        <h2 class="section-title">
+          <svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg>
+          <span data-i18n="sec_export">Exportación</span>
+        </h2>
+
+        <div class="control-row">
+          <label id="label-duration"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg><span data-i18n="duration">Duración</span></label>
+          <div class="segmented" id="seg-duration" role="group" aria-labelledby="label-duration">
+            <button class="seg-btn" type="button" data-value="5" aria-pressed="false">5s</button>
+            <button class="seg-btn active" type="button" data-value="10" aria-pressed="true">10s</button>
+            <button class="seg-btn" type="button" data-value="15" aria-pressed="false">15s</button>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <label><svg class="icon" aria-hidden="true"><use href="#i-film"></use></svg><span data-i18n="resolution">Resolución</span></label>
+          <span class="slider-val" id="resolution-label">1080 × 1920</span>
+        </div>
+
+        <div class="action-row">
+          <button class="btn btn-ghost btn-sm btn-block" id="btn-reset-settings" type="button">
+            <svg class="icon" aria-hidden="true"><use href="#i-reset"></use></svg>
+            <span data-i18n="reset_all">Restaurar todos los ajustes</span>
+          </button>
+        </div>
+
+        <p class="section-hint" style="margin-top:10px" data-i18n="privacy_note">Todo se procesa en tu navegador. Tus imágenes y presets se guardan solo en este dispositivo.</p>
+      </section>
 
     </div>
 
-    <!-- FOOTER EXPORTACIÓN -->
-    <div class="footer">
-      <button class="btn-record" id="btn-record">
-        <span>🎬</span> <span id="record-btn-text" data-i18n="export_btn">EXPORTAR REEL 9:16 (10s)</span>
-      </button>
-      <div class="status-text" id="status-label" data-i18n="status_ready">Listo para exportar video vertical HD</div>
-    </div>
+    <footer class="export-footer">
+      <div class="export-meta">
+        <span class="export-meta-chips">
+          <span class="meta-chip"><svg class="icon" aria-hidden="true"><use href="#i-frame"></use></svg><span id="meta-aspect">9:16</span></span>
+          <span class="meta-chip"><svg class="icon" aria-hidden="true"><use href="#i-film"></use></svg><span id="meta-resolution">1080p</span></span>
+        </span>
+        <span class="meta-chip"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg><span id="meta-duration">10s</span></span>
+      </div>
+
+      <div class="export-actions">
+        <button class="btn btn-primary" id="btn-record" type="button">
+          <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>
+          <span id="record-btn-text">Exportar video · 10s</span>
+        </button>
+        <button class="btn" id="btn-snapshot" type="button" aria-label="Capturar fotograma PNG" data-i18n-aria-label="ui_snapshot" title="Capturar PNG (S)" data-i18n-title="ui_snapshot_title">
+          <svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg>
+        </button>
+      </div>
+
+      <div class="export-progress" id="export-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Progreso de exportación" data-i18n-aria-label="ui_export_progress">
+        <div class="export-progress-fill" id="export-progress-fill"></div>
+      </div>
+
+      <div class="status-text" id="status-text" data-state="ready" role="status" aria-live="polite">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="status-label" data-i18n="status_ready">Listo para exportar</span>
+      </div>
+    </footer>
   </aside>
 
-  <!-- 3D VIEWPORT -->
-  <main id="viewport-container">
-    <div id="canvas-window-wrapper">
-      <!-- Three.js canvas dynamically injected here -->
+  <!-- ======================================================================
+       Escenario 3D
+       ====================================================================== -->
+  <main id="viewport-container" aria-label="Escenario 3D de la carta" data-i18n-aria-label="ui_stage">
+    <div class="stage-chips" aria-hidden="true">
+      <span class="stage-chip"><span class="live-dot"></span>LIVE</span>
+      <span class="stage-chip" id="stage-chip-aspect">9:16</span>
+      <span class="stage-chip" id="stage-chip-res">1080p</span>
     </div>
 
-    <!-- RADIAL FLOWER FAB MENU IN BOTTOM RIGHT -->
+    <div id="canvas-window-wrapper" role="img" aria-label="Vista previa 3D interactiva" data-i18n-aria-label="ui_preview"></div>
+
+    <div class="viewport-hint" id="viewport-hint">
+      <svg class="icon" aria-hidden="true"><use href="#i-drag"></use></svg>
+      <span data-i18n="viewport_hint">Arrastra para orbitar · rueda para zoom</span>
+    </div>
+
+    <div id="loading-veil" aria-live="polite">
+      <div class="loading-card">
+        <div class="spinner" aria-hidden="true"></div>
+        <div class="loading-title" id="loading-title" data-i18n="loading_title">Preparando el estudio 3D</div>
+        <div class="loading-text" id="loading-text" data-i18n="loading_text">Cargando texturas, luces y materiales…</div>
+      </div>
+    </div>
+
     <div class="flower-fab-container" id="flower-menu">
       <div class="flower-petals">
-        <button class="petal-btn petal-1" id="petal-center" data-tip="Centrar Cámara" title="Centrar Cámara">🎯</button>
-        <button class="petal-btn petal-2" id="petal-reverse" data-tip="Invertir Giro" title="Invertir Giro">🔁</button>
-        <button class="petal-btn petal-3" id="petal-level" data-tip="Nivelar Inclinación" title="Nivelar Inclinación">⚖️</button>
-        <button class="petal-btn petal-4" id="petal-turbo" data-tip="Alternar Giro Rápido" title="Giro Turbo">⚡</button>
-        <button class="petal-btn petal-5" id="petal-save-pose" data-tip="Guardar Pose de Cámara" title="Guardar Pose">📌</button>
+        <button class="petal-btn petal-1" id="petal-center" type="button" data-tip="Centrar cámara" data-i18n-tip="reset_camera" title="Centrar cámara" data-i18n-title="reset_camera" aria-label="Centrar cámara" data-i18n-aria-label="reset_camera">
+          <svg class="icon" aria-hidden="true"><use href="#i-target"></use></svg>
+        </button>
+        <button class="petal-btn petal-2" id="petal-reverse" type="button" data-tip="Invertir giro" data-i18n-tip="ui_reverse" title="Invertir giro" data-i18n-title="ui_reverse" aria-label="Invertir sentido de giro" data-i18n-aria-label="ui_reverse">
+          <svg class="icon" aria-hidden="true"><use href="#i-rotate"></use></svg>
+        </button>
+        <button class="petal-btn petal-3" id="petal-level" type="button" data-tip="Nivelar inclinación" data-i18n-tip="ui_level" title="Nivelar inclinación" data-i18n-title="ui_level" aria-label="Nivelar inclinación" data-i18n-aria-label="ui_level">
+          <svg class="icon" aria-hidden="true"><use href="#i-level"></use></svg>
+        </button>
+        <button class="petal-btn petal-4" id="petal-turbo" type="button" data-tip="Giro turbo" data-i18n-tip="ui_turbo" title="Giro turbo" data-i18n-title="ui_turbo" aria-label="Alternar giro turbo" data-i18n-aria-label="ui_turbo">
+          <svg class="icon" aria-hidden="true"><use href="#i-bolt"></use></svg>
+        </button>
+        <button class="petal-btn petal-5" id="petal-save-pose" type="button" data-tip="Guardar pose" data-i18n-tip="save_pose" title="Guardar pose en Toma 1" data-i18n-title="save_pose" aria-label="Guardar pose" data-i18n-aria-label="save_pose">
+          <svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>
+        </button>
       </div>
-
-      <button class="flower-main-trigger" id="flower-trigger" title="Opciones Avanzadas">
-        ⚙️
+      <button class="flower-main-trigger" id="flower-trigger" type="button" aria-label="Abrir acciones rápidas" data-i18n-aria-label="ui_quick_actions" aria-expanded="false" aria-controls="flower-menu" title="Acciones rápidas" data-i18n-title="ui_quick_actions_title">
+        <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
       </button>
     </div>
   </main>
 
-  <script>
-    // -------------------------------------------------------------------------
-    // I18N DICTIONARY
-    // -------------------------------------------------------------------------
-    const translations = {
-      es: {
-        tab_deck: "🎴 Deck",
-        tab_3d: "✨ 3D Forge",
-        tab_anim: "🎥 Tomas & Giro",
-        tab_canvas: "📐 Canvas",
-        sec_cards: "🎨 Diseños & Presets",
-        front_cover: "🖼️ Frontal",
-        back_cover: "🔄 Trasera",
-        save_card_preset: "💾 Guardar Carta Actual",
-        sec_scenes: "🎬 Capas de Tomas (Escenas)",
-        sec_canvas: "📐 Dimensiones Canvas",
-        canvas_aspect: "📱 Formato",
-        preset_fill: "↔️ Ajustar",
-        canvas_scale: "🔍 Tamaño Canvas",
-        sec_camera: "🎥 Parámetros de Giro & Posición",
-        cam_dist: "📏 Distancia Cámara",
-        pos_y: "↕️ Posición Vertical",
-        spin_dir: "🔄 Sentido de Giro",
-        dir_normal: "Horario (Normal)",
-        dir_reverse: "Antihorario (Invertido)",
-        tilt_intensity: "📐 Intensidad Inclinación",
-        sec_card3d: "✨ Canto, Bisel y Brillo",
-        corners_type: "✂️ Esquinas",
-        opt_rounded: "Redondeadas (TCG)",
-        opt_sharp: "Rectas Clásicas",
-        edge_thickness: "🧱 Grosor del Canto",
-        bevel_intensity: "💎 Intensidad de Borde",
-        edge_color: "🎨 Color Canto",
-        opt_black_edge: "Negro Mate",
-        opt_gold_edge: "Dorado Foil (Milenario)",
-        opt_silver_edge: "Plata Metalizada",
-        opt_white_edge: "Cartulina Blanca",
-        glossiness: "✨ Brillo Reflectante",
-        sec_env: "🌌 Fondo & Entorno",
-        bg_color: "🏞️ Fondo",
-        bg_black: "Negro OLED (Puro)",
-        bg_studio: "Estudio Sutil",
-        bg_luxury: "Lujo Dorado Milenario",
-        bg_cyber: "Cyberpunk Neón",
-        bg_transparent: "Transparente",
-        spin_speed: "⏱️ Giro",
-        spd_normal: "Normal (2 giros / 10s)",
-        spd_slow: "Lento & Suave (1 giro)",
-        spd_medium: "Dinámico (3 giros)",
-        spd_fast: "Turbo Rápido",
-        spd_stop: "Pausado (Estático)",
-        floating: "🌊 Oscilación",
-        float_organic: "Activada (Orgánica)",
-        float_subtle: "Sutil & Elegante",
-        float_breathe: "Respiración / Flote",
-        float_dramatic: "Dinámica / Péndulo",
-        float_off: "Desactivada (Fija en Eje)",
-        export_btn: "EXPORTAR REEL 9:16 (10s)",
-        status_ready: "Listo para exportar video vertical HD",
-        status_recording: "Grabando reel vertical 9:16 (1080x1920)...",
-        status_done: "¡Video descargado con éxito!",
-        cinematic_tip: "Toca en cualquier lugar para salir"
-      },
-      en: {
-        tab_deck: "🎴 Deck",
-        tab_3d: "✨ 3D Forge",
-        tab_anim: "🎥 Shots & Spin",
-        tab_canvas: "📐 Canvas",
-        sec_cards: "🎨 Designs & Presets",
-        front_cover: "🖼️ Front",
-        back_cover: "🔄 Back",
-        save_card_preset: "💾 Save Current Card",
-        sec_scenes: "🎬 Shot Layers (Scenes)",
-        sec_canvas: "📐 Canvas Dimensions",
-        canvas_aspect: "📱 Aspect Ratio",
-        preset_fill: "↔️ Stretch",
-        canvas_scale: "🔍 Canvas Size",
-        sec_camera: "🎥 Spin & Camera Dynamics",
-        cam_dist: "📏 Camera Distance",
-        pos_y: "↕️ Vertical Position",
-        spin_dir: "🔄 Spin Direction",
-        dir_normal: "Clockwise (Normal)",
-        dir_reverse: "Counter-Clockwise",
-        tilt_intensity: "📐 Tilt Intensity",
-        sec_card3d: "✨ Edge, Bevel & Gloss",
-        corners_type: "✂️ Corners",
-        opt_rounded: "Rounded (TCG)",
-        opt_sharp: "Classic Square",
-        edge_thickness: "🧱 Edge Thickness",
-        bevel_intensity: "💎 Border Intensity",
-        edge_color: "🎨 Edge Color",
-        opt_black_edge: "Matte Black",
-        opt_gold_edge: "Millennium Foil Gold",
-        opt_silver_edge: "Metallic Silver",
-        opt_white_edge: "White Cardstock",
-        glossiness: "✨ Gloss / Specular",
-        sec_env: "🌌 Background & Ambient",
-        bg_color: "🏞️ Background",
-        bg_black: "True OLED Black",
-        bg_studio: "Subtle Studio",
-        bg_luxury: "Golden Millennium Luxury",
-        bg_cyber: "Cyberpunk Neon",
-        bg_transparent: "Transparent",
-        spin_speed: "⏱️ Spin",
-        spd_normal: "Normal (2 spins / 10s)",
-        spd_slow: "Slow & Elegant (1 spin)",
-        spd_medium: "Dynamic (3 spins)",
-        spd_fast: "Turbo Fast",
-        spd_stop: "Paused (Static)",
-        floating: "🌊 Floating Motion",
-        float_organic: "Enabled (Organic)",
-        float_subtle: "Subtle & Gentle",
-        float_breathe: "Breathing / Float",
-        float_dramatic: "Dynamic / Pendulum",
-        float_off: "Disabled (Fixed on Axis)",
-        export_btn: "EXPORT 9:16 REEL (10s)",
-        status_ready: "Ready to export vertical HD reel",
-        status_recording: "Recording 9:16 vertical video (1080x1920)...",
-        status_done: "Video downloaded successfully!",
-        cinematic_tip: "Tap anywhere to exit clean view"
-      }
-    };
-
-    let currentLang = 'es';
-
-    function setLanguage(lang) {
-      currentLang = lang;
-      document.getElementById('btn-lang-es').classList.toggle('active', lang === 'es');
-      document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
-      
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (translations[lang] && translations[lang][key]) {
-          el.textContent = translations[lang][key];
-        }
-      });
-    }
-
-    document.getElementById('btn-lang-es').addEventListener('click', () => setLanguage('es'));
-    document.getElementById('btn-lang-en').addEventListener('click', () => setLanguage('en'));
-
-    // TAB SWITCHING
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-
-        btn.classList.add('active');
-        const targetId = btn.getAttribute('data-tab');
-        document.getElementById(targetId).classList.add('active');
-      });
-    });
-
-    // -------------------------------------------------------------------------
-    // 3D SCENE SETUP WITH THREE.JS
-    // -------------------------------------------------------------------------
-    const container = document.getElementById('viewport-container');
-    const canvasWrapper = document.getElementById('canvas-window-wrapper');
-
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
-
-    let camDistance = 4.6;
-    let cardPosY = 0.0;
-    let spinDir = 1;
-    let tiltMultiplier = 1.0;
-    let floatMode = 'organic'; // BY DEFAULT: ORGANIC ACTIVATED!
-    let speedMult = 0.0; // By default: Paused (Static)
-
-    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-    camera.position.set(0, 0, camDistance);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
-    renderer.outputEncoding = THREE.sRGBEncoding;
-    canvasWrapper.appendChild(renderer.domElement);
-
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.enableZoom = true;
-    controls.autoRotate = false;
-
-    // Lighting Rig
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
-    scene.add(ambientLight);
-
-    const keyLight = new THREE.DirectionalLight(0xfff8ee, 1.8);
-    keyLight.position.set(3, 4, 4);
-    scene.add(keyLight);
-
-    const fillLight = new THREE.DirectionalLight(0xa5b4fc, 0.9);
-    fillLight.position.set(-3, -1, 3);
-    scene.add(fillLight);
-
-    const rimLight = new THREE.DirectionalLight(0xfef08a, 1.5);
-    rimLight.position.set(0, 4, -3);
-    scene.add(rimLight);
-
-    // -------------------------------------------------------------------------
-    // PROCEDURAL CARD GEOMETRY & MATERIALS
-    // -------------------------------------------------------------------------
-    const cardGroup = new THREE.Group();
-    scene.add(cardGroup);
-
-    const textureLoader = new THREE.TextureLoader();
-    let currentFrontSrc = 'assets/card_front.png';
-    let currentBackSrc = 'assets/card_back.png';
-
-    let frontTex = textureLoader.load(currentFrontSrc);
-    let backTex = textureLoader.load(currentBackSrc);
-    frontTex.encoding = THREE.sRGBEncoding;
-    backTex.encoding = THREE.sRGBEncoding;
-
-    let matFront = new THREE.MeshStandardMaterial({
-      map: frontTex,
-      roughness: 0.25,
-      metalness: 0.05
-    });
-
-    let matBack = new THREE.MeshStandardMaterial({
-      map: backTex,
-      roughness: 0.25,
-      metalness: 0.05
-    });
-
-    let matEdge = new THREE.MeshStandardMaterial({
-      color: 0x050505,
-      roughness: 0.4,
-      metalness: 0.1
-    });
-
-    const cardParams = {
-      w: 1.35,
-      h: 1.89,
-      isRounded: true,
-      thickness: 0.016,
-      bevelSize: 0.004
-    };
-
-    function rebuildCard() {
-      while (cardGroup.children.length > 0) {
-        const obj = cardGroup.children[0];
-        if (obj.geometry) obj.geometry.dispose();
-        cardGroup.remove(obj);
-      }
-
-      const w = cardParams.w;
-      const h = cardParams.h;
-      const radius = cardParams.isRounded ? 0.09 : 0.0001;
-      const depth = cardParams.thickness;
-      const bevel = cardParams.bevelSize;
-
-      const shape = new THREE.Shape();
-      const x = -w / 2;
-      const y = -h / 2;
-
-      shape.moveTo(x + radius, y);
-      shape.lineTo(x + w - radius, y);
-      shape.quadraticCurveTo(x + w, y, x + w, y + radius);
-      shape.lineTo(x + w, y + h - radius);
-      shape.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
-      shape.lineTo(x + radius, y + h);
-      shape.quadraticCurveTo(x, y + h, x, y + h - radius);
-      shape.lineTo(x, y + radius);
-      shape.quadraticCurveTo(x, y, x + radius, y);
-
-      const extrudeSettings = {
-        depth: depth,
-        bevelEnabled: bevel > 0.0005,
-        bevelSegments: 4,
-        steps: 1,
-        bevelSize: bevel,
-        bevelThickness: bevel
-      };
-
-      const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-      geometry.center();
-
-      const pos = geometry.attributes.position;
-      const uv = geometry.attributes.uv;
-      const totalHalfDepth = (depth / 2) + (bevel > 0.0005 ? bevel : 0);
-      const outerW = w + bevel * 2;
-      const outerH = h + bevel * 2;
-
-      for (let i = 0; i < pos.count; i++) {
-        const px = pos.getX(i);
-        const py = pos.getY(i);
-        const pz = pos.getZ(i);
-
-        const u = Math.min(Math.max((px / outerW) + 0.5, 0), 1);
-        const v = Math.min(Math.max((py / outerH) + 0.5, 0), 1);
-
-        if (pz > 0.001) {
-          uv.setXY(i, u, v);
-        } else if (pz < -0.001) {
-          uv.setXY(i, 1.0 - u, v);
-        } else {
-          uv.setXY(i, 0.5, 0.5);
-        }
-      }
-      uv.needsUpdate = true;
-
-      const cardBody = new THREE.Mesh(geometry, [matFront, matEdge]);
-      cardGroup.add(cardBody);
-
-      const faceGeo = new THREE.ShapeGeometry(shape, 32);
-      const facePos = faceGeo.attributes.position;
-      const faceUV = faceGeo.attributes.uv;
-      for (let i = 0; i < facePos.count; i++) {
-        const px = facePos.getX(i);
-        const py = facePos.getY(i);
-        faceUV.setXY(i, (px / w) + 0.5, (py / h) + 0.5);
-      }
-      faceUV.needsUpdate = true;
-
-      const frontFace = new THREE.Mesh(faceGeo, matFront);
-      frontFace.position.z = totalHalfDepth + 0.0004;
-      cardGroup.add(frontFace);
-
-      const backGeo = faceGeo.clone();
-      const backUV = backGeo.attributes.uv;
-      for (let i = 0; i < backUV.count; i++) {
-        backUV.setX(i, 1.0 - backUV.getX(i));
-      }
-      backUV.needsUpdate = true;
-
-      const backFace = new THREE.Mesh(backGeo, matBack);
-      backFace.position.z = -totalHalfDepth - 0.0004;
-      backFace.rotation.y = Math.PI;
-      cardGroup.add(backFace);
-    }
-
-    rebuildCard();
-
-    // -------------------------------------------------------------------------
-    // SCENE CAMERA POSES & TRANSITIONS (UP TO 3 SCENES)
-    // -------------------------------------------------------------------------
-    const scenesData = {
-      1: { pos: new THREE.Vector3(0, 0, 4.6), target: new THREE.Vector3(0, 0, 0), cardY: 0 },
-      2: { pos: new THREE.Vector3(1.8, 1.2, 3.2), target: new THREE.Vector3(0, 0.3, 0), cardY: 0.1 },
-      3: { pos: new THREE.Vector3(-1.4, -0.6, 2.6), target: new THREE.Vector3(0, -0.2, 0), cardY: -0.1 }
-    };
-
-    let activeSceneIdx = 1;
-    let isTransitioning = false;
-    let transitionStartTime = 0;
-    let transitionDuration = 1.2;
-    let transStartCam = new THREE.Vector3();
-    let transTargetCam = new THREE.Vector3();
-    let transStartCtrl = new THREE.Vector3();
-    let transTargetCtrl = new THREE.Vector3();
-
-    function applyScene(idx) {
-      activeSceneIdx = idx;
-      document.querySelectorAll('.scene-card').forEach(c => {
-        c.classList.toggle('active', parseInt(c.getAttribute('data-scene')) === idx);
-      });
-
-      const s = scenesData[idx];
-      transStartCam.copy(camera.position);
-      transTargetCam.copy(s.pos);
-      transStartCtrl.copy(controls.target);
-      transTargetCtrl.copy(s.target);
-      cardPosY = s.cardY;
-      document.getElementById('range-pos-y').value = cardPosY;
-      document.getElementById('val-pos-y').textContent = cardPosY.toFixed(2);
-
-      transitionStartTime = performance.now();
-      isTransitioning = true;
-    }
-
-    document.querySelectorAll('.scene-card').forEach(card => {
-      card.addEventListener('click', (e) => {
-        if (e.target.classList.contains('btn-set-cam')) return;
-        const idx = parseInt(card.getAttribute('data-scene'));
-        applyScene(idx);
-      });
-    });
-
-    document.querySelectorAll('.btn-set-cam').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const idx = parseInt(btn.getAttribute('data-set-scene'));
-        scenesData[idx].pos.copy(camera.position);
-        scenesData[idx].target.copy(controls.target);
-        scenesData[idx].cardY = cardPosY;
-        btn.textContent = "✅ Guardado";
-        setTimeout(() => { btn.textContent = "📸 Grabar Pose"; }, 1500);
-      });
-    });
-
-    let isSequencePlaying = false;
-    document.getElementById('btn-play-scenes').addEventListener('click', () => {
-      if (isSequencePlaying) return;
-      isSequencePlaying = true;
-      document.getElementById('btn-play-scenes').textContent = "⏳ Tomas...";
-
-      applyScene(1);
-      setTimeout(() => {
-        applyScene(2);
-        setTimeout(() => {
-          applyScene(3);
-          setTimeout(() => {
-            isSequencePlaying = false;
-            document.getElementById('btn-play-scenes').textContent = "▶️ Transición 3 Tomas";
-          }, 2400);
-        }, 2400);
-      }, 2400);
-    });
-
-    // -------------------------------------------------------------------------
-    // ANIMATION & RENDER LOOP (WITH MULTIPLE OSCILLATION MODES)
-    // -------------------------------------------------------------------------
-    let clock = new THREE.Clock();
-
-    function animate() {
-      requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
-
-      if (isTransitioning) {
-        const progress = Math.min((performance.now() - transitionStartTime) / (transitionDuration * 1000), 1.0);
-        const t = progress * progress * (3 - 2 * progress);
-        camera.position.lerpVectors(transStartCam, transTargetCam, t);
-        controls.target.lerpVectors(transStartCtrl, transTargetCtrl, t);
-        if (progress >= 1.0) isTransitioning = false;
-      }
-
-      // Spin rotation
-      if (speedMult > 0) {
-        cardGroup.rotation.y += (0.018 * speedMult * spinDir);
-      }
-
-      // MULTIPLE FLOATING / OSCILLATION STYLES
-      if (floatMode === 'organic') {
-        // Natural organic floating with gentle tilt and elevation
-        cardGroup.rotation.x = Math.sin(elapsedTime * 1.5) * 0.12 * tiltMultiplier;
-        cardGroup.rotation.z = Math.cos(elapsedTime * 1.2) * 0.05 * tiltMultiplier;
-        cardGroup.position.y = cardPosY + Math.sin(elapsedTime * 2.0) * 0.06;
-      } else if (floatMode === 'subtle') {
-        // Very subtle micro-levitation
-        cardGroup.rotation.x = Math.sin(elapsedTime * 1.0) * 0.04 * tiltMultiplier;
-        cardGroup.rotation.z = Math.cos(elapsedTime * 0.8) * 0.02 * tiltMultiplier;
-        cardGroup.position.y = cardPosY + Math.sin(elapsedTime * 1.2) * 0.025;
-      } else if (floatMode === 'breathe') {
-        // Vertical breathing float without roll
-        cardGroup.rotation.x = Math.sin(elapsedTime * 1.2) * 0.06 * tiltMultiplier;
-        cardGroup.rotation.z = 0;
-        cardGroup.position.y = cardPosY + Math.sin(elapsedTime * 1.6) * 0.09;
-      } else if (floatMode === 'dramatic') {
-        // Strong dynamic pendulum motion
-        cardGroup.rotation.x = Math.sin(elapsedTime * 2.2) * 0.22 * tiltMultiplier;
-        cardGroup.rotation.z = Math.cos(elapsedTime * 1.8) * 0.12 * tiltMultiplier;
-        cardGroup.position.y = cardPosY + Math.sin(elapsedTime * 2.6) * 0.08;
-      } else {
-        // Fixed on axis (off)
-        cardGroup.rotation.x = 0;
-        cardGroup.rotation.z = 0;
-        cardGroup.position.y = cardPosY;
-      }
-
-      controls.update();
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    // -------------------------------------------------------------------------
-    // CARD PRESETS (LOCALSTORAGE)
-    // -------------------------------------------------------------------------
-    let savedCardPresets = JSON.parse(localStorage.getItem('tcg_card_presets') || '[]');
-
-    function renderCardPresets() {
-      const bar = document.getElementById('card-presets-bar');
-      bar.innerHTML = '<div class="preset-chip active" id="chip-default">Default TCG</div>';
-
-      document.getElementById('chip-default').addEventListener('click', () => {
-        document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
-        document.getElementById('chip-default').classList.add('active');
-        loadCardImages('assets/card_front.png', 'assets/card_back.png');
-      });
-
-      savedCardPresets.forEach((p, idx) => {
-        const chip = document.createElement('div');
-        chip.className = 'preset-chip';
-        chip.innerHTML = `<span>${p.name}</span> <span class="del-btn" data-del="${idx}">&times;</span>`;
-
-        chip.addEventListener('click', (e) => {
-          if (e.target.classList.contains('del-btn')) {
-            savedCardPresets.splice(idx, 1);
-            localStorage.setItem('tcg_card_presets', JSON.stringify(savedCardPresets));
-            renderCardPresets();
-            return;
-          }
-          document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
-          chip.classList.add('active');
-          loadCardImages(p.front, p.back);
-        });
-
-        bar.appendChild(chip);
-      });
-    }
-
-    function loadCardImages(frontUrl, backUrl) {
-      document.getElementById('front-preview-img').src = frontUrl;
-      document.getElementById('back-preview-img').src = backUrl;
-
-      textureLoader.load(frontUrl, (t) => {
-        t.encoding = THREE.sRGBEncoding;
-        matFront.map = t;
-        matFront.needsUpdate = true;
-      });
-
-      textureLoader.load(backUrl, (t) => {
-        t.encoding = THREE.sRGBEncoding;
-        matBack.map = t;
-        matBack.needsUpdate = true;
-      });
-    }
-
-    document.getElementById('btn-save-card-preset').addEventListener('click', () => {
-      const name = prompt(currentLang === 'es' ? 'Nombre del Preset de Carta:' : 'Card Preset Name:', `Deck #${savedCardPresets.length + 1}`);
-      if (name) {
-        savedCardPresets.push({
-          name: name.trim(),
-          front: document.getElementById('front-preview-img').src,
-          back: document.getElementById('back-preview-img').src
-        });
-        localStorage.setItem('tcg_card_presets', JSON.stringify(savedCardPresets));
-        renderCardPresets();
-      }
-    });
-
-    renderCardPresets();
-
-    // -------------------------------------------------------------------------
-    // RADIAL FLOWER FAB MENU
-    // -------------------------------------------------------------------------
-    const flowerMenu = document.getElementById('flower-menu');
-    const flowerTrigger = document.getElementById('flower-trigger');
-
-    flowerTrigger.addEventListener('click', (e) => {
-      e.stopPropagation();
-      flowerMenu.classList.toggle('open');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!flowerMenu.contains(e.target)) {
-        flowerMenu.classList.remove('open');
-      }
-    });
-
-    document.getElementById('petal-center').addEventListener('click', () => {
-      controls.target.set(0, 0, 0);
-      camera.position.set(0, 0, camDistance);
-      cardGroup.rotation.set(0, 0, 0);
-      controls.update();
-      flowerMenu.classList.remove('open');
-    });
-
-    document.getElementById('petal-reverse').addEventListener('click', () => {
-      spinDir *= -1;
-      document.getElementById('select-spin-dir').value = spinDir.toString();
-      flowerMenu.classList.remove('open');
-    });
-
-    document.getElementById('petal-level').addEventListener('click', () => {
-      tiltMultiplier = (tiltMultiplier === 0 ? 1.0 : 0.0);
-      document.getElementById('range-tilt-intensity').value = tiltMultiplier;
-      document.getElementById('val-tilt-intensity').textContent = tiltMultiplier.toFixed(1);
-      flowerMenu.classList.remove('open');
-    });
-
-    document.getElementById('petal-turbo').addEventListener('click', () => {
-      speedMult = (speedMult === 0 ? 1.0 : (speedMult === 1.0 ? 2.5 : 0));
-      document.getElementById('select-speed').value = speedMult.toString();
-      flowerMenu.classList.remove('open');
-    });
-
-    document.getElementById('petal-save-pose').addEventListener('click', () => {
-      scenesData[1].pos.copy(camera.position);
-      scenesData[1].target.copy(controls.target);
-      scenesData[1].cardY = cardPosY;
-      alert(currentLang === 'es' ? '¡Pose guardada en Toma 1!' : 'Camera Pose saved to Scene 1!');
-      flowerMenu.classList.remove('open');
-    });
-
-    // -------------------------------------------------------------------------
-    // DYNAMIC CANVAS SIZING
-    // -------------------------------------------------------------------------
-    let currentAspectRatio = 9 / 16;
-    let currentScalePercent = 100;
-
-    function resizeCanvas() {
-      const availW = container.clientWidth;
-      const availH = container.clientHeight;
-
-      let targetW, targetH;
-
-      if (document.body.classList.contains('cinematic-mode')) {
-        targetW = window.innerWidth;
-        targetH = window.innerHeight;
-      } else if (currentAspectRatio === 'fill') {
-        targetW = availW * (currentScalePercent / 100);
-        targetH = availH * (currentScalePercent / 100);
-      } else {
-        const scaleFactor = (currentScalePercent / 100);
-        const maxW = availW * scaleFactor;
-        const maxH = availH * scaleFactor;
-
-        if (maxW / maxH > currentAspectRatio) {
-          targetH = maxH;
-          targetW = maxH * currentAspectRatio;
-        } else {
-          targetW = maxW;
-          targetH = maxW / currentAspectRatio;
-        }
-      }
-
-      targetW = Math.max(Math.round(targetW), 100);
-      targetH = Math.max(Math.round(targetH), 100);
-
-      canvasWrapper.style.width = `${targetW}px`;
-      canvasWrapper.style.height = `${targetH}px`;
-
-      camera.aspect = targetW / targetH;
-      camera.updateProjectionMatrix();
-      renderer.setSize(targetW, targetH, false);
-    }
-
-    window.addEventListener('resize', resizeCanvas);
-    setTimeout(resizeCanvas, 50);
-
-    document.querySelectorAll('.preset-pill-group .pill-btn').forEach(btn => {
-      if (!btn.hasAttribute('data-preset')) return;
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.preset-pill-group .pill-btn[data-preset]').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-
-        const preset = btn.getAttribute('data-preset');
-        if (preset === '9:16') currentAspectRatio = 9 / 16;
-        else if (preset === '1:1') currentAspectRatio = 1.0;
-        else if (preset === '16:9') currentAspectRatio = 16 / 9;
-        else if (preset === 'fill') currentAspectRatio = 'fill';
-
-        resizeCanvas();
-      });
-    });
-
-    document.getElementById('range-canvas-scale').addEventListener('input', (e) => {
-      currentScalePercent = parseInt(e.target.value, 10);
-      resizeCanvas();
-    });
-
-    // -------------------------------------------------------------------------
-    // CAMERA & DYNAMICS CONTROLS
-    // -------------------------------------------------------------------------
-    document.getElementById('range-cam-dist').addEventListener('input', (e) => {
-      camDistance = parseFloat(e.target.value);
-      document.getElementById('val-cam-dist').textContent = camDistance.toFixed(1);
-      const dir = camera.position.clone().sub(controls.target).normalize();
-      camera.position.copy(controls.target).add(dir.multiplyScalar(camDistance));
-    });
-
-    document.getElementById('range-pos-y').addEventListener('input', (e) => {
-      cardPosY = parseFloat(e.target.value);
-      document.getElementById('val-pos-y').textContent = cardPosY.toFixed(2);
-    });
-
-    document.getElementById('select-spin-dir').addEventListener('change', (e) => {
-      spinDir = parseInt(e.target.value);
-    });
-
-    document.getElementById('range-tilt-intensity').addEventListener('input', (e) => {
-      tiltMultiplier = parseFloat(e.target.value);
-      document.getElementById('val-tilt-intensity').textContent = tiltMultiplier.toFixed(1);
-    });
-
-    document.getElementById('toggle-floating').addEventListener('change', (e) => {
-      floatMode = e.target.value;
-    });
-
-    // -------------------------------------------------------------------------
-    // CARD 3D ATTRIBUTES
-    // -------------------------------------------------------------------------
-    document.getElementById('range-edge-thickness').addEventListener('input', (e) => {
-      cardParams.thickness = parseFloat(e.target.value);
-      document.getElementById('val-edge-thick').textContent = cardParams.thickness.toFixed(3);
-      rebuildCard();
-    });
-
-    document.getElementById('range-bevel-intensity').addEventListener('input', (e) => {
-      cardParams.bevelSize = parseFloat(e.target.value);
-      document.getElementById('val-bevel-int').textContent = cardParams.bevelSize.toFixed(3);
-      rebuildCard();
-    });
-
-    document.getElementById('select-corners').addEventListener('change', (e) => {
-      cardParams.isRounded = (e.target.value === 'rounded');
-      rebuildCard();
-    });
-
-    document.getElementById('select-edge').addEventListener('change', (e) => {
-      const val = e.target.value;
-      if (val === 'gold_foil') {
-        matEdge.color.setHex(0xd4af37);
-        matEdge.metalness = 0.95;
-        matEdge.roughness = 0.18;
-      } else if (val === 'silver_foil') {
-        matEdge.color.setHex(0xdcdde1);
-        matEdge.metalness = 0.98;
-        matEdge.roughness = 0.15;
-      } else if (val === 'white') {
-        matEdge.color.setHex(0xf5f5f5);
-        matEdge.metalness = 0.0;
-        matEdge.roughness = 0.4;
-      } else {
-        matEdge.color.setHex(0x050505);
-        matEdge.metalness = 0.1;
-        matEdge.roughness = 0.4;
-      }
-      matEdge.needsUpdate = true;
-    });
-
-    document.getElementById('range-gloss').addEventListener('input', (e) => {
-      const v = parseFloat(e.target.value);
-      document.getElementById('val-gloss').textContent = v.toFixed(2);
-      matFront.roughness = v;
-      matBack.roughness = v;
-    });
-
-    // -------------------------------------------------------------------------
-    // FILE UPLOADS
-    // -------------------------------------------------------------------------
-    document.getElementById('front-file-input').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const url = URL.createObjectURL(file);
-        document.getElementById('front-preview-img').src = url;
-        textureLoader.load(url, (t) => {
-          t.encoding = THREE.sRGBEncoding;
-          matFront.map = t;
-          matFront.needsUpdate = true;
-        });
-      }
-    });
-
-    document.getElementById('back-file-input').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const url = URL.createObjectURL(file);
-        document.getElementById('back-preview-img').src = url;
-        textureLoader.load(url, (t) => {
-          t.encoding = THREE.sRGBEncoding;
-          matBack.map = t;
-          matBack.needsUpdate = true;
-        });
-      }
-    });
-
-    // -------------------------------------------------------------------------
-    // BACKGROUND & ENVIRONMENT
-    // -------------------------------------------------------------------------
-    document.getElementById('select-bg').addEventListener('change', (e) => {
-      const val = e.target.value;
-      if (val === 'black') {
-        scene.background = new THREE.Color(0x000000);
-      } else if (val === 'dark_studio') {
-        scene.background = new THREE.Color(0x060911);
-      } else if (val === 'gold_luxury') {
-        scene.background = new THREE.Color(0x130e06);
-      } else if (val === 'cyber_neon') {
-        scene.background = new THREE.Color(0x040817);
-      } else if (val === 'transparent') {
-        scene.background = null;
-      }
-    });
-
-    document.getElementById('select-speed').addEventListener('change', (e) => {
-      speedMult = parseFloat(e.target.value);
-    });
-
-    // -------------------------------------------------------------------------
-    // CINEMATIC VIEWER MODE
-    // -------------------------------------------------------------------------
-    const btnCinematic = document.getElementById('btn-cinematic');
-    const exitTip = document.getElementById('cinematic-exit-tip');
-
-    function enterCinematic() {
-      document.body.classList.add('cinematic-mode');
-      resizeCanvas();
-      exitTip.style.display = 'block';
-      setTimeout(() => { exitTip.style.display = 'none'; }, 3000);
-    }
-
-    function exitCinematic() {
-      if (document.body.classList.contains('cinematic-mode')) {
-        document.body.classList.remove('cinematic-mode');
-        exitTip.style.display = 'none';
-        resizeCanvas();
-      }
-    }
-
-    btnCinematic.addEventListener('click', enterCinematic);
-
-    container.addEventListener('click', () => {
-      if (document.body.classList.contains('cinematic-mode')) exitCinematic();
-    });
-
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && document.body.classList.contains('cinematic-mode')) exitCinematic();
-    });
-
-    // -------------------------------------------------------------------------
-    // DESKTOP & MOBILE SIDEBAR COLLAPSE TOGGLE
-    // -------------------------------------------------------------------------
-    const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
-    const sidebar = document.getElementById('sidebar');
-    const backdrop = document.getElementById('sidebar-backdrop');
-
-    sidebarToggleBtn.addEventListener('click', () => {
-      if (window.innerWidth > 860) {
-        // Desktop collapse toggle
-        document.body.classList.toggle('sidebar-collapsed');
-        setTimeout(resizeCanvas, 310);
-      } else {
-        // Mobile drawer toggle
-        const isOpen = sidebar.classList.toggle('open');
-        backdrop.classList.toggle('active', isOpen);
-      }
-    });
-
-    backdrop.addEventListener('click', () => {
-      sidebar.classList.remove('open');
-      backdrop.classList.remove('active');
-    });
-
-    // -------------------------------------------------------------------------
-    // 9:16 VERTICAL HD RECORDER
-    // -------------------------------------------------------------------------
-    const btnRecord = document.getElementById('btn-record');
-    const recordBtnText = document.getElementById('record-btn-text');
-    const statusLabel = document.getElementById('status-label');
-
-    btnRecord.addEventListener('click', async () => {
-      btnRecord.disabled = true;
-      statusLabel.textContent = translations[currentLang].status_recording;
-      recordBtnText.textContent = "⏳ ...";
-
-      const exportCanvas = document.createElement('canvas');
-      exportCanvas.width = 1080;
-      exportCanvas.height = 1920;
-
-      const exportRenderer = new THREE.WebGLRenderer({
-        canvas: exportCanvas,
-        antialias: true,
-        alpha: true,
-        preserveDrawingBuffer: true
-      });
-      exportRenderer.setSize(1080, 1920, false);
-      exportRenderer.toneMapping = THREE.ACESFilmicToneMapping;
-      exportRenderer.toneMappingExposure = 1.15;
-      exportRenderer.outputEncoding = THREE.sRGBEncoding;
-
-      const exportCamera = new THREE.PerspectiveCamera(38, 1080 / 1920, 0.1, 100);
-      exportCamera.position.copy(camera.position);
-      exportCamera.quaternion.copy(camera.quaternion);
-      exportCamera.aspect = 9 / 16;
-      exportCamera.updateProjectionMatrix();
-
-      const stream = exportCanvas.captureStream(30);
-      const mime = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')
-                 ? 'video/mp4'
-                 : MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-                   ? 'video/webm;codecs=vp9'
-                   : 'video/webm';
-
-      const recorder = new MediaRecorder(stream, {
-        mimeType: mime,
-        videoBitsPerSecond: 12000000
-      });
-
-      const chunks = [];
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunks.push(e.data);
-      };
-
-      const durationSec = 10;
-      let isExporting = true;
-
-      recorder.onstop = () => {
-        const ext = mime.includes('mp4') ? 'mp4' : 'webm';
-        const blob = new Blob(chunks, { type: mime });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `TCG_HUB_9x16_${Date.now()}.${ext}`;
-        a.click();
-
-        exportRenderer.dispose();
-        statusLabel.textContent = translations[currentLang].status_done;
-        recordBtnText.textContent = translations[currentLang].export_btn;
-        btnRecord.disabled = false;
-      };
-
-      function exportRenderLoop() {
-        if (!isExporting) return;
-        exportCamera.position.copy(camera.position);
-        exportCamera.quaternion.copy(camera.quaternion);
-        exportRenderer.render(scene, exportCamera);
-        requestAnimationFrame(exportRenderLoop);
-      }
-      exportRenderLoop();
-
-      recorder.start();
-
-      let remaining = durationSec;
-      const timer = setInterval(() => {
-        remaining--;
-        if (remaining > 0) {
-          statusLabel.textContent = `⏳ ${remaining}s...`;
-        } else {
-          clearInterval(timer);
-          isExporting = false;
-          recorder.stop();
-        }
-      }, 1000);
-    });
-  </script>
+  <!-- ======================================================================
+       Toasts y diálogos
+       ====================================================================== -->
+  <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="false"></div>
+
+  <dialog id="preset-dialog" aria-labelledby="preset-dialog-title">
+    <form class="dialog-card" id="preset-form" method="dialog" novalidate>
+      <div class="dialog-head">
+        <span class="dialog-icon"><svg class="icon" aria-hidden="true"><use href="#i-save"></use></svg></span>
+        <div>
+          <h2 class="dialog-title" id="preset-dialog-title" data-i18n="preset_dialog_title">Guardar preset de carta</h2>
+          <p class="dialog-desc" id="preset-dialog-desc" data-i18n="preset_dialog_desc">Asigna un nombre para recuperar este anverso y reverso cuando quieras.</p>
+        </div>
+      </div>
+      <label class="dialog-label" for="preset-name-input" data-i18n="preset_name_label">Nombre del preset</label>
+      <input class="dialog-input" id="preset-name-input" name="preset-name" type="text" maxlength="40" autocomplete="off" spellcheck="false" placeholder="Deck #1" data-i18n-placeholder="preset_name_placeholder">
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" id="preset-dialog-cancel" type="button" data-i18n="cancel">Cancelar</button>
+        <button class="btn btn-primary" id="preset-dialog-save" type="submit" data-i18n="save">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title">
+    <form class="dialog-card" method="dialog">
+      <div class="dialog-head">
+        <span class="dialog-icon"><svg class="icon" aria-hidden="true"><use href="#i-alert"></use></svg></span>
+        <div>
+          <h2 class="dialog-title" id="confirm-title">¿Restaurar ajustes?</h2>
+          <p class="dialog-desc" id="confirm-message">Se perderán tus ajustes actuales, pero tus presets de cartas se conservarán.</p>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" id="confirm-cancel" type="submit" value="cancel" data-i18n="cancel">Cancelar</button>
+        <button class="btn btn-primary" id="confirm-ok" type="submit" value="confirm" data-i18n="confirm">Restaurar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="help-dialog" aria-labelledby="help-title">
+    <div class="dialog-card">
+      <div class="dialog-head">
+        <span class="dialog-icon"><svg class="icon" aria-hidden="true"><use href="#i-keyboard"></use></svg></span>
+        <div>
+          <h2 class="dialog-title" id="help-title" data-i18n="help_title">Atajos del estudio</h2>
+          <p class="dialog-desc" data-i18n="help_desc">Todo lo esencial a un teclado de distancia.</p>
+        </div>
+      </div>
+      <div class="shortcut-list">
+        <div class="shortcut-row"><span data-i18n="shortcut_tabs">Cambiar de pestaña</span><span><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd></span></div>
+        <div class="shortcut-row"><span data-i18n="shortcut_cinematic">Modo cinemático</span><kbd>C</kbd></div>
+        <div class="shortcut-row"><span data-i18n="shortcut_record">Exportar video</span><kbd>R</kbd></div>
+        <div class="shortcut-row"><span data-i18n="shortcut_snapshot">Capturar PNG</span><kbd>S</kbd></div>
+        <div class="shortcut-row"><span data-i18n="shortcut_help">Abrir esta ayuda</span><kbd>?</kbd></div>
+        <div class="shortcut-row"><span data-i18n="shortcut_close">Cerrar o salir</span><kbd>Esc</kbd></div>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn btn-primary" id="help-close" type="button" data-i18n="got_it">Entendido</button>
+      </div>
+      <p class="dialog-footer-note" data-i18n="help_note">TCG:HUB v0.4.2 · Hecho con Three.js, Canvas y mucho cariño por theAstroBruh.</p>
+    </div>
+  </dialog>
+
+  <noscript>
+    <div style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#eafaf7;padding:24px;text-align:center;font-family:sans-serif;color:#07333f">
+      <p>TCG:HUB necesita JavaScript para renderizar la carta en 3D. Actívalo y vuelve a cargar la página.</p>
+    </div>
+  </noscript>
 </body>
 </html>
