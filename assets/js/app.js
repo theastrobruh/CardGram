@@ -47,40 +47,55 @@ const DEFAULTS = {
 };
 
 const state = { ...DEFAULTS, lang: 'en', sidebarCollapsed: false };
+
+/* Catálogo segmentado por colecciones (assets/data/cards/catalog.js). */
+const CATALOG = window.DeckGramCatalog || null;
+const CATALOG_CARDS =
+  CATALOG && Array.isArray(CATALOG.cards) && CATALOG.cards.length
+    ? CATALOG.cards
+    : [
+        {
+          id: 'og-set-01',
+          name: 'Shadowblade Kinetic',
+          front: 'assets/data/cards/OG/SET-01/FRONT-01.png',
+          back: 'assets/data/cards/OG/SET-01/BACK-BASE.png',
+          fullArt: null
+        }
+      ];
+
 const DEFAULT_CARD = {
-  front: 'assets/card_front - base.png',
-  back: 'assets/card_back - base.png',
-  fullArt: 'assets/card_front - base (FULL ART).png'
+  id: CATALOG_CARDS[0].id,
+  name: CATALOG_CARDS[0].name,
+  front: CATALOG_CARDS[0].front,
+  back: CATALOG_CARDS[0].back,
+  fullArt: CATALOG_CARDS[0].fullArt || null
 };
-const BUILTIN_PRESETS = [
-  {
-    id: 'builtin-shadowblade',
-    name: 'Shadowblade Kinetic',
-    front: 'assets/card_front - base - ALT-1.png',
-    back: 'assets/card_back - ALT-1.png',
-    builtin: true
-  },
-  {
-    id: 'builtin-volt-striker',
-    name: 'Volt Striker',
-    front: 'assets/card_front - base - ALT-2.png',
-    back: 'assets/card_back - ALT-2.png',
-    builtin: true
-  },
-  {
-    id: 'builtin-aureon',
-    name: 'Aureon, the Golden Maw',
-    front: 'assets/card_front - base - ALT-3.png',
-    back: 'assets/card_back - ALT-3.png',
-    builtin: true
-  }
-];
-const currentCard = { ...DEFAULT_CARD };
+
+const BUILTIN_PRESETS = CATALOG_CARDS.map((card) => ({
+  id: `builtin-${card.id}`,
+  cardId: card.id,
+  name: card.name,
+  front: card.front,
+  back: card.back,
+  fullArt: card.fullArt || null,
+  builtin: true
+}));
+
+/* El panel lateral usa miniaturas; el motor 3D sigue usando el original. */
+const PREVIEW_FRONT = new Map(
+  CATALOG_CARDS.map((card) => [card.front, card.thumbFront || card.front])
+);
+const PREVIEW_BACK = new Map(
+  CATALOG_CARDS.map((card) => [card.back, card.thumbBack || card.back])
+);
+
+const currentCard = { front: DEFAULT_CARD.front, back: DEFAULT_CARD.back, fullArt: DEFAULT_CARD.fullArt };
 const uploadTokens = { front: 0, back: 0 };
 
 let presets = [];
 let scenes = cloneScenes(DEFAULT_SCENES);
-let activePresetId = 'default';
+let activePresetId = BUILTIN_PRESETS[0] ? BUILTIN_PRESETS[0].id : 'default';
+let textureStale = true;
 let activeScene = 1;
 let isSequencePlaying = false;
 let exporting = false;
@@ -168,12 +183,31 @@ const storage = {
   }
 };
 
+/* Rutas anteriores a la estructura por colecciones (v0.4.4). */
+const LEGACY_IMAGE_PATHS = {
+  'assets/card_front - base.png': 'assets/data/cards/OG/SET-01/FRONT-01.png',
+  'assets/card_front - base - ALT-1.png': 'assets/data/cards/OG/SET-01/FRONT-01.png',
+  'assets/card_front - base - ALT-2.png': 'assets/data/cards/OG/SET-02/FRONT-01.png',
+  'assets/card_front - base - ALT-3.png': 'assets/data/cards/OG/SET-03/FRONT-01.png',
+  'assets/card_back - base.png': 'assets/data/cards/OG/SET-01/BACK-BASE.png',
+  'assets/card_back - ALT-1.png': 'assets/data/cards/OG/SET-01/BACK-BASE.png',
+  'assets/card_back - ALT-2.png': 'assets/data/cards/OG/SET-02/BACK-BASE.png',
+  'assets/card_back - ALT-3.png': 'assets/data/cards/OG/SET-03/BACK-BASE.png'
+};
+
 function safeImageUrl(value) {
   if (typeof value !== 'string' || value.length > 8_000_000) return null;
 
   // Normaliza rutas antiguas con espacios codificados (%20) a su forma legible.
   const normalized = value.replace(/%20/gi, ' ');
-  if (/^assets\/[a-z0-9 _().-]+\.(png|jpe?g|webp|avif)$/i.test(normalized)) return normalized;
+  if (LEGACY_IMAGE_PATHS[normalized]) return LEGACY_IMAGE_PATHS[normalized];
+  if (/^assets\/card_front - base \(FULL ART\)\.png$/.test(normalized)) return null;
+  if (
+    /^assets\/[a-z0-9 _().\-/]+\.(png|jpe?g|webp|avif)$/i.test(normalized) &&
+    !normalized.includes('..')
+  ) {
+    return normalized;
+  }
   if (/^data:image\/(png|jpe?g|webp|avif|gif);base64,[a-z0-9+/=]+$/i.test(value)) return value;
   return null;
 }
@@ -454,6 +488,7 @@ function applyLanguage(lang, options = {}) {
   updateFullArtToggle();
   renderPresets();
   if (!exporting) setStatus(t('status_ready'), 'ready');
+  if (typeof refreshHubLocale === 'function') refreshHubLocale();
   if (persist) persistSettings();
 }
 
@@ -676,13 +711,13 @@ function makePresetChip({ name, active, front, back, onSelect, onDelete }) {
     thumbs.setAttribute('aria-hidden', 'true');
 
     const frontThumb = document.createElement('img');
-    frontThumb.src = front;
+    frontThumb.src = PREVIEW_FRONT.get(front) || front;
     frontThumb.alt = '';
     frontThumb.loading = 'lazy';
     frontThumb.decoding = 'async';
 
     const backThumb = document.createElement('img');
-    backThumb.src = back;
+    backThumb.src = PREVIEW_BACK.get(back) || back;
     backThumb.alt = '';
     backThumb.loading = 'lazy';
     backThumb.decoding = 'async';
@@ -718,16 +753,6 @@ function renderPresets() {
   if (!el.presetsBar) return;
   el.presetsBar.replaceChildren();
 
-  el.presetsBar.appendChild(
-    makePresetChip({
-      name: t('default_preset_name'),
-      active: activePresetId === 'default',
-      front: DEFAULT_CARD.front,
-      back: DEFAULT_CARD.back,
-      onSelect: restoreDefaultCard
-    })
-  );
-
   BUILTIN_PRESETS.forEach((preset) => {
     el.presetsBar.appendChild(
       makePresetChip({
@@ -758,20 +783,23 @@ async function applyCardImages(front, back, fullArt) {
   currentCard.front = front;
   currentCard.back = back;
   currentCard.fullArt = fullArt || null;
-  el.frontPreview.src = front;
-  el.backPreview.src = back;
+  textureStale = true;
+  el.frontPreview.src = PREVIEW_FRONT.get(front) || front;
+  el.backPreview.src = PREVIEW_BACK.get(back) || back;
   updateFullArtToggle();
 
   if (!Scene.isReady()) return;
 
   const status = await Scene.loadCardImages(front, back, currentCard.fullArt);
+  textureStale = false;
   if (!status.front || !status.back) {
     toast(t('texture_error'), { type: 'warning', duration: 5000 });
   }
 }
 
 function restoreDefaultCard() {
-  activePresetId = 'default';
+  const builtin = BUILTIN_PRESETS.find((preset) => preset.cardId === DEFAULT_CARD.id);
+  activePresetId = builtin ? builtin.id : 'default';
   renderPresets();
   applyCardImages(DEFAULT_CARD.front, DEFAULT_CARD.back, DEFAULT_CARD.fullArt);
   toast(t('default_restored'), { type: 'success' });
@@ -809,10 +837,13 @@ function deletePreset(id) {
       presets.splice(index, 0, removed);
       if (persistPresets()) {
         renderPresets();
+        if (typeof refreshHubData === 'function') refreshHubData();
         toast(t('preset_restored'), { type: 'success' });
       }
     }
   });
+
+  if (typeof refreshHubData === 'function') refreshHubData();
 }
 
 function saveCurrentPreset(name) {
@@ -846,6 +877,7 @@ function saveCurrentPreset(name) {
 
   activePresetId = preset.id;
   renderPresets();
+  if (typeof refreshHubData === 'function') refreshHubData();
   toast(t('preset_saved', { name: finalName }), { type: 'success' });
   return true;
 }
@@ -1646,6 +1678,8 @@ function fileStamp() {
    -------------------------------------------------------------------------- */
 function setupKeyboard() {
   window.addEventListener('keydown', (event) => {
+    if (document.body.dataset.view !== 'studio') return;
+
     const target = event.target;
     const tagName = target && target.tagName ? target.tagName.toLowerCase() : '';
     const typing = tagName === 'input' || tagName === 'select' || tagName === 'textarea' || (target && target.isContentEditable);
@@ -1945,10 +1979,11 @@ function init() {
     node.textContent = `v${APP_VERSION}`;
   });
 
-  applyLanguage(state.lang, { persist: false });
+  /* El lobby se monta primero y el motor 3D no arranca aquí: se inicializa
+     solo cuando la persona entra al estudio (ver hub.js · openStudio). */
+  if (typeof setupHub === 'function') setupHub();
 
-  const ok = Scene.init();
-  if (!ok) showWebglError();
+  applyLanguage(state.lang, { persist: false });
 
   setupChrome();
   setupControls();
@@ -1967,13 +2002,7 @@ function init() {
 
   scheduleResize();
 
-  if (ok) {
-    Scene.loadCardImages(currentCard.front, currentCard.back, currentCard.fullArt)
-      .then((status) => {
-        if (!status.front || !status.back) toast(t('texture_error'), { type: 'warning', duration: 5000 });
-      })
-      .finally(hideLoading);
-  }
+  if (typeof applyRoute === 'function') applyRoute();
 
   if (location.protocol === 'file:') {
     setTimeout(() => toast(t('file_protocol'), { type: 'warning', duration: 9000 }), 1600);

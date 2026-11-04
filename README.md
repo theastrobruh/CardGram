@@ -1,105 +1,131 @@
-<div align="center">
-
 # 🎴 DeckGram
-### *Interactive WebGL 3D Card Showcase & Reel Creator*
-**by theAstroBruh**
 
-[![GitHub Pages](https://img.shields.io/badge/Demo-GitHub%20Pages-brightgreen?style=for-the-badge&logo=github)](https://theastrobruh.github.io/DeckGram/)
-[![Three.js](https://img.shields.io/badge/Three.js-r128-black?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org/)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![Version](https://img.shields.io/badge/Version-v0.4.4-00d2d3?style=for-the-badge)](https://github.com/theastrobruh/DeckGram)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
-[![Ko-fi](https://img.shields.io/badge/Thanks-Ko--fi-ff5e5b?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/theastrobruh)
+> A real-time WebGL 3D interactive showcase and reel creator for trading card artists, digital collectors, and content creators — no installation required.
 
-<br/>
-
-<p align="center">
-  <b>A real-time 3D interactive showcase and visual social platform for trading card creators, digital artists, and content creators.</b>
-</p>
-
-[🎮 Try Live Demo](https://theastrobruh.github.io/DeckGram/) • [✨ Features](#-key-features) • [⚡ Quick Start](#-quick-start)
+![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)
+![GitHub Pages](https://img.shields.io/badge/Hosted%20on-GitHub%20Pages-222?logo=github&logoColor=white)
+![Three.js](https://img.shields.io/badge/Three.js-r128-black?logo=threedotjs&logoColor=white)
+![Version](https://img.shields.io/badge/Version-v0.4.4-00d2d3)
+![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
 
-</div>
+## ✨ Features
 
-## 📖 About The Project
-
-**DeckGram** (v0.4.4) lets you import 2D card artwork (front and back) and instantly transform it into a photorealistic 3D trading card with customizable edges, reflective bevels, parametric rotation, multi-angle camera shots, and client-side high-definition vertical video export (9:16) tailored for Instagram Reels, TikTok, and YouTube Shorts.
-
----
-
-## ✨ Key Features
+### 🏛️ Immersive Lobby (v0.4.4)
+- **Slow, cinematic entrance** — your favorite card settles in over a soft glass veil before the lobby content
+- **Live stats** — saved cards, catalog collections, collections left to review, decks and rendered exports
+- **My cards** — saved presets plus the full catalog, with favorite selection and one-tap open in the studio
+- **Collections & decks** — collections read from the segmented card folders, plus user-created decks with covers and card lists
+- **Profile** — local avatar upload (square crop), creator name, handle, bio and favorite card
+- **Explore (prepared)** — community feed shell and data adapter ready, disabled until a backend exists
+- **Lazy 3D engine** — no WebGL context on load; the render loop pauses while you are in the lobby
 
 ### 🎴 3D Engine & Card Forge
-- **Accurate Curves & Borders**: Procedural geometry supporting standard TCG rounded corners and adjustable reflective bevels.
-- **Customizable Edges**: Variable thickness with Millennium Foil Gold, Metallic Silver, Matte Black, and White Cardstock finishes.
-- **Specular & Gloss Tuning**: Fine-grained roughness, gloss, and reflection control.
-- **Exposure Control**: Balanced default luminosity with manual exposure slider to prevent artwork blowout.
-- **Animated Full Art Transition**: Base card smoothly transitions between normal artwork and its Full Art variant. Can be toggled on/off in the Deck panel.
+- **Procedural Geometry** — accurate TCG rounded corners and adjustable reflective bevels
+- **Customizable Edges** — variable thickness with Millennium Foil Gold, Metallic Silver, Matte Black, and White Cardstock finishes
+- **Specular & Gloss Tuning** — fine-grained roughness, gloss, and reflection control
+- **Exposure Control** — balanced default luminosity with manual slider to prevent artwork blowout
+- **Full Art Transition** — base card smoothly animates to its Full Art variant; toggle per-card in the Deck panel
 
-### 🎥 Multi-Camera Shots & Motion Dynamics
-- **Up to 3 Scene Keyframes**: Store camera angles, targets, and card elevations with fluid interpolated transitions between takes.
-- **Spin Dynamics**: Adjustable rotation speeds, clockwise/counter-clockwise direction toggle, and tilt leveling.
-- **Draggable Radial FAB Menu**: On-canvas quick shortcuts to center, invert rotation, level tilt, and save poses. The radial fan auto-orients dynamically away from viewport edges.
-- **Cinematic Clean Screen Mode**: Hide all UI chrome with a single click (or pressing <kbd>C</kbd>) for pristine screen captures.
+### 🎥 Camera & Motion
+- **Up to 3 Scene Keyframes** — store camera angles, targets, and card elevations with fluid interpolated transitions
+- **Spin Dynamics** — adjustable rotation speed, clockwise/counter-clockwise toggle, and tilt leveling
+- **Draggable Radial FAB Menu** — on-canvas shortcuts that auto-orient away from viewport edges
+- **Cinematic Clean Screen** — hide all UI chrome instantly for pristine captures
 
-### 💾 Presets & Multilingual Support
-- **Built-in Presets**: Preloaded with the base deck and themed showcases (*Shadowblade Kinetic*, *Volt Striker*, *Aureon, the Golden Maw*) with their respective fronts and backs.
-- **Custom Local Presets**: Save and manage custom combinations of front, back, and Full Art locally in your browser storage.
-- **Multilingual (EN / ES / DE)**: Default English interface with instant on-the-fly switching to Spanish or German.
+### 💾 Presets & i18n
+- **Built-in Presets** — *Shadowblade Kinetic*, *Volt Striker*, *Aureon the Golden Maw*, and the base deck included
+- **Custom Local Presets** — save front/back/Full Art combinations in browser storage
+- **Multilingual (EN / ES / DE)** — instant on-the-fly language switching
+
+### 📤 Export
+- **High-Res PNG Snapshot** — single-frame client-side capture
+- **9:16 Vertical Video** — in-browser MediaStream recording for Instagram Reels, TikTok, and YouTube Shorts; nothing uploaded to any server
 
 ---
 
-## ⚡ Quick Start
+## 🚀 Usage
 
-### Play in Browser (No installation needed)
+### Online
+Open the live site → upload front & back artwork → configure 3D Forge settings → record or snapshot.
+
 👉 **[Open DeckGram](https://theastrobruh.github.io/DeckGram/)**
 
-### Run Locally
+### Local
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/theastrobruh/DeckGram.git
-   cd DeckGram
-   ```
+```bash
+git clone https://github.com/theastrobruh/DeckGram.git
+cd DeckGram
+```
 
-2. **Launch local server**:
-   - **On Windows**: Double-click `Iniciar_Webapp.bat`.
-   - **With Python**:
-     ```bash
-     python -m http.server 8000
-     ```
-     Open `http://localhost:8000` in your web browser.
+| Method | Command |
+|---|---|
+| Windows | Double-click `Iniciar_Webapp.bat` |
+| Python | `python -m http.server 8000` → open `http://localhost:8000` |
 
 ---
 
 ## ⌨️ Keyboard Shortcuts
 
 | Key | Action |
-| :---: | :--- |
-| <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> | Switch studio tabs (Deck, 3D Forge, Shots, Canvas) |
-| <kbd>C</kbd> | Toggle Cinematic Clean Screen Mode |
-| <kbd>R</kbd> | Start / Stop Video Recording |
-| <kbd>S</kbd> | Capture High-Res PNG Snapshot |
-| <kbd>?</kbd> | Open Shortcuts & Help dialog |
-| <kbd>Esc</kbd> | Close dialogs / Exit Cinematic Mode |
+|:---:|:---|
+| `1` `2` `3` `4` | Switch studio tabs (Deck · 3D Forge · Shots · Canvas) |
+| `C` | Toggle Cinematic Clean Screen |
+| `R` | Start / Stop video recording |
+| `S` | Capture high-res PNG snapshot |
+| `?` | Open shortcuts & help dialog |
+| `Esc` | Close dialogs / exit Cinematic Mode |
 
 ---
 
-## ☕ Support the Project
+## 🗂️ Project Structure
 
-If you find DeckGram helpful or inspiring, consider supporting development on Ko-fi. Thank you!
-
-[☕ **Thanks · Ko-fi**](https://ko-fi.com/theastrobruh)
+```
+├── index.html                  # Main app (HTML + Three.js scene entry point)
+├── Iniciar_Webapp.bat          # Windows local server launcher
+├── assets/
+│   ├── css/
+│   │   ├── app.css             # Studio UI styles
+│   │   └── hub.css             # Card Hub styles
+│   ├── js/
+│   │   ├── app.js              # Core studio logic & UI
+│   │   ├── scene.js            # Three.js WebGL scene & card geometry
+│   │   ├── export.js           # PNG snapshot & video recording
+│   │   ├── hub.js              # Card Hub browser
+│   │   ├── i18n.js             # Studio translations (EN/ES/DE)
+│   │   ├── hub-i18n.js         # Hub translations
+│   │   └── community.js        # Community feed adapter (prepared, disabled)
+│   └── data/
+│       └── cards/              # Per-collection folders + catalog.js manifest
+│           ├── thumbs/         # WebP thumbnails used by the lobby
+│           └── tools/          # make-thumbs.py (regenerate thumbnails)
+├── README.md
+├── .gitattributes
+├── .gitignore
+└── .github/
+    └── workflows/
+        └── deploy.yml          # GitHub Actions — auto-deploy to GitHub Pages
+```
 
 ---
 
 ## 🛠️ Built With
 
-- **[Three.js (r128)](https://threejs.org/)** — WebGL 3D rendering engine.
-- **Canvas Capture & MediaStream Recording API** — In-browser hardware video encoding.
-- **HTML5 & Modern CSS3** — Responsive glassmorphic UI without heavyweight bundlers or build steps.
+- **[Three.js (r128)](https://threejs.org/)** — WebGL 3D rendering
+- **Canvas Capture & MediaStream Recording API** — in-browser video encoding
+- **HTML5 & Modern CSS3** — glassmorphic responsive UI with no build step
 
 ---
-© 2026 DeckGram — by theAstroBruh
+
+## ☕ Support
+
+If DeckGram is useful or inspiring to you, consider supporting development on Ko-fi. Thank you!
+
+👉 [**Ko-fi · theAstroBruh**](https://ko-fi.com/theastrobruh)
+
+---
+
+## 📄 License
+
+MIT © 2026 — Free to use and modify.

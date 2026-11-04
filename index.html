@@ -12,7 +12,8 @@
   <title>DeckGram · v0.4.4</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.4.4">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.4.4&rev=13">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.4.4&rev=13">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
           integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu"
@@ -20,12 +21,16 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"
           integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf"
           crossorigin="anonymous" defer></script>
-  <script src="assets/js/i18n.js?v=0.4.4" defer></script>
-  <script src="assets/js/scene.js?v=0.4.4" defer></script>
-  <script src="assets/js/export.js?v=0.4.4" defer></script>
-  <script src="assets/js/app.js?v=0.4.4" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.4.4&rev=13" defer></script>
+  <script src="assets/js/i18n.js?v=0.4.4&rev=13" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.4.4&rev=13" defer></script>
+  <script src="assets/js/community.js?v=0.4.4&rev=13" defer></script>
+  <script src="assets/js/scene.js?v=0.4.4&rev=13" defer></script>
+  <script src="assets/js/export.js?v=0.4.4&rev=13" defer></script>
+  <script src="assets/js/hub.js?v=0.4.4&rev=13" defer></script>
+  <script src="assets/js/app.js?v=0.4.4&rev=13" defer></script>
 </head>
-<body>
+<body data-view="hub">
 
   <!-- ======================================================================
        Sprite de iconos (SVG inline, sin peticiones extra)
@@ -171,6 +176,48 @@
       <path d="M16 9.2h1.6a2.3 2.3 0 0 1 0 4.6H16"></path>
       <path d="M10.2 9.4c-.8-1-2.4-.6-2.4.7 0 1.1 1.5 2.2 2.4 2.8.9-.6 2.4-1.7 2.4-2.8 0-1.3-1.6-1.7-2.4-.7z" fill="currentColor" stroke="none"></path>
     </symbol>
+    <symbol id="i-home" viewBox="0 0 24 24">
+      <path d="M3 10.6L12 3l9 7.6"></path>
+      <path d="M5.4 9.4V21h13.2V9.4"></path>
+      <path d="M9.6 21v-6.2h4.8V21"></path>
+    </symbol>
+    <symbol id="i-star" viewBox="0 0 24 24">
+      <path d="M12 3.2l2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.7l6.1-.9L12 3.2z"></path>
+    </symbol>
+    <symbol id="i-user" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="3.6"></circle>
+      <path d="M4.6 20.4a7.6 7.6 0 0 1 14.8 0"></path>
+    </symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M15.8 8.2l-2.2 5.4-5.4 2.2 2.2-5.4 5.4-2.2z"></path>
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24">
+      <path d="M12 5v14M5 12h14"></path>
+    </symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24">
+      <path d="M19 12H5M12 19l-7-7 7-7"></path>
+    </symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24">
+      <path d="M5 12h14M12 5l7 7-7 7"></path>
+    </symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24">
+      <rect x="3.5" y="3.5" width="7" height="7" rx="2"></rect>
+      <rect x="13.5" y="3.5" width="7" height="7" rx="2"></rect>
+      <rect x="3.5" y="13.5" width="7" height="7" rx="2"></rect>
+      <rect x="13.5" y="13.5" width="7" height="7" rx="2"></rect>
+    </symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24">
+      <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H10l2 2.5h6.5A2.5 2.5 0 0 1 21 10v7.5a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5v-10z"></path>
+    </symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24">
+      <path d="M15.5 3.9l4.6 4.6L8.7 19.9l-5.4 1.4 1.4-5.4L15.5 3.9z"></path>
+      <path d="M13.6 5.8l4.6 4.6"></path>
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="M20 20l-4.2-4.2"></path>
+    </symbol>
   </svg>
 
   <!-- ======================================================================
@@ -187,11 +234,489 @@
     <span class="bubble bubble-5"></span>
   </div>
 
+  <!-- ======================================================================
+       Hub / Lobby
+       Primera pantalla de la app. No inicializa WebGL: el motor 3D solo se
+       enciende al entrar al estudio, lo que mantiene el lobby ligero.
+       ====================================================================== -->
+  <div id="hub" class="hub" aria-label="DeckGram · Lobby" data-i18n-aria-label="hub_aria">
+    <div class="hub-veil" aria-hidden="true"></div>
+
+    <div class="hub-scroll" id="hub-scroll">
+      <div class="hub-shell">
+
+        <header class="hub-topbar">
+          <a class="hub-brand" href="#/home" data-hub-route="home" aria-label="DeckGram · Inicio">
+            <span class="hub-brand-mark" aria-hidden="true">
+              <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
+            </span>
+            <span class="hub-brand-copy">
+              <strong>Deck<span>Gram</span></strong>
+              <span class="version-badge" data-version>v0.4.4</span>
+            </span>
+          </a>
+
+          <nav class="hub-nav" aria-label="Navegación principal" data-i18n-aria-label="hub_nav_aria">
+            <button class="hub-nav-btn active" type="button" data-hub-route="home" aria-current="page">
+              <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>
+              <span data-i18n="hub_nav_home">Inicio</span>
+            </button>
+            <button class="hub-nav-btn" type="button" data-hub-route="library">
+              <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
+              <span data-i18n="hub_nav_library">Mis cartas</span>
+            </button>
+            <button class="hub-nav-btn" type="button" data-hub-route="collections">
+              <svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg>
+              <span data-i18n="hub_nav_collections">Colecciones</span>
+            </button>
+            <button class="hub-nav-btn" type="button" data-hub-route="explore">
+              <svg class="icon" aria-hidden="true"><use href="#i-compass"></use></svg>
+              <span data-i18n="hub_nav_explore">Explorar</span>
+              <span class="hub-nav-soon" aria-hidden="true"></span>
+            </button>
+          </nav>
+
+          <div class="hub-top-actions">
+            <div class="hub-lang" id="hub-lang" role="group" aria-label="Idioma" data-i18n-aria-label="hub_lang_aria">
+              <button class="hub-lang-btn active" type="button" data-hub-lang="en" aria-pressed="true">EN</button>
+              <button class="hub-lang-btn" type="button" data-hub-lang="es" aria-pressed="false">ES</button>
+              <button class="hub-lang-btn" type="button" data-hub-lang="de" aria-pressed="false">DE</button>
+            </div>
+            <button class="hub-profile" type="button" data-hub-route="profile" aria-label="Abrir tu perfil" data-i18n-aria-label="hub_profile_open">
+              <span class="hub-avatar" id="hub-avatar">
+                <span class="hub-avatar-fallback" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg></span>
+                <img id="hub-avatar-img" alt="" width="64" height="64" hidden>
+              </span>
+              <span class="hub-profile-copy">
+                <strong id="hub-profile-name">Card Creator</strong>
+                <small id="hub-profile-handle">@cardcreator</small>
+              </span>
+            </button>
+          </div>
+        </header>
+
+        <main class="hub-main" id="hub-main">
+
+          <!-- ------------------------------------------------------------
+               Inicio
+               ------------------------------------------------------------ -->
+          <section class="hub-panel active" data-hub-panel="home" aria-labelledby="hub-hero-title">
+            <div class="hub-hero">
+              <div class="hub-hero-copy">
+                <span class="hub-kicker">
+                  <span class="hub-kicker-dot" aria-hidden="true"></span>
+                  <span data-i18n="hub_kicker">Tu estudio de cartas</span>
+                </span>
+                <h1 class="hub-title" id="hub-hero-title">
+                  <span class="hub-title-line" data-i18n="hub_hello">Bienvenido de nuevo,</span>
+                  <span class="hub-title-line hub-title-name" id="hub-greeting-name">Card Creator</span>
+                </h1>
+                <p class="hub-lede" data-i18n="hub_lede">Tu carta favorita te está esperando. Entra al estudio cuando quieras: todo se renderiza en tu navegador, sin subir nada.</p>
+                <div class="hub-cta-row">
+                  <button class="btn btn-primary hub-cta" type="button" data-open-studio="deck">
+                    <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+                    <span data-i18n="hub_open_studio">Abrir el estudio</span>
+                  </button>
+                  <button class="btn btn-ghost hub-cta" type="button" data-open-studio="canvas">
+                    <svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg>
+                    <span data-i18n="hub_create_render">Crear un render</span>
+                  </button>
+                </div>
+                <p class="hub-privacy">
+                  <svg class="icon" aria-hidden="true"><use href="#i-save"></use></svg>
+                  <span data-i18n="hub_privacy">Local y privado · tus imágenes no salen de este dispositivo.</span>
+                </p>
+              </div>
+
+              <div class="hub-showcase" id="hub-showcase">
+                <div class="hub-showcase-glow" aria-hidden="true"></div>
+                <div class="hub-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+
+                <div class="hub-card-stage" id="hub-card-stage">
+                  <div class="hub-card-tilt" id="hub-card-tilt">
+                    <button class="hub-card" id="hub-card" type="button" aria-pressed="false" aria-label="Girar la carta" data-i18n-aria-label="hub_card_flip" title="Girar la carta" data-i18n-title="hub_card_flip">
+                      <span class="hub-card-inner">
+                        <span class="hub-card-face hub-card-front">
+                          <img id="hub-card-front" src="assets/data/cards/OG/SET-01/thumbs/FRONT-01.webp" alt="" width="750" height="1050" decoding="async" fetchpriority="high">
+                        </span>
+                        <span class="hub-card-face hub-card-back">
+                          <img id="hub-card-back" src="assets/data/cards/OG/SET-01/thumbs/BACK-BASE.webp" alt="" width="750" height="1050" decoding="async">
+                        </span>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="hub-card-meta">
+                  <span class="hub-card-eyebrow">
+                    <svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg>
+                    <span data-i18n="hub_favorite_label">Tu carta favorita</span>
+                  </span>
+                  <h2 class="hub-card-name" id="hub-card-name">Shadowblade Kinetic</h2>
+                  <p class="hub-card-sub" id="hub-card-sub">OG Collection · SET-01</p>
+                  <div class="hub-card-chips" id="hub-card-chips"></div>
+                  <button class="hub-card-link" type="button" data-hub-route="library">
+                    <span data-i18n="hub_change_favorite">Cambiar favorita</span>
+                    <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <section class="hub-stats" id="hub-stats" aria-label="Estadísticas de tu colección" data-i18n-aria-label="hub_stats_label">
+              <button class="hub-stat" type="button" data-hub-route="library">
+                <span class="hub-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg></span>
+                <span class="hub-stat-value" id="stat-cards">0</span>
+                <span class="hub-stat-label" data-i18n="hub_stat_cards">Cartas guardadas</span>
+                <span class="hub-stat-sub" id="stat-cards-sub"></span>
+              </button>
+              <button class="hub-stat" type="button" data-hub-route="collections">
+                <span class="hub-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg></span>
+                <span class="hub-stat-value" id="stat-collections">0</span>
+                <span class="hub-stat-label" data-i18n="hub_stat_collections">Colecciones</span>
+                <span class="hub-stat-sub" id="stat-collections-sub"></span>
+              </button>
+              <button class="hub-stat" type="button" data-hub-route="collections">
+                <span class="hub-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-compass"></use></svg></span>
+                <span class="hub-stat-value" id="stat-review">0</span>
+                <span class="hub-stat-label" data-i18n="hub_stat_review">Por revisar</span>
+                <span class="hub-stat-sub" id="stat-review-sub"></span>
+              </button>
+              <button class="hub-stat" type="button" data-hub-route="collections">
+                <span class="hub-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-layers"></use></svg></span>
+                <span class="hub-stat-value" id="stat-decks">0</span>
+                <span class="hub-stat-label" data-i18n="hub_stat_decks">Tus decks</span>
+                <span class="hub-stat-sub" id="stat-decks-sub"></span>
+              </button>
+              <button class="hub-stat" type="button" data-open-studio="canvas">
+                <span class="hub-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg></span>
+                <span class="hub-stat-value" id="stat-renders">0</span>
+                <span class="hub-stat-label" data-i18n="hub_stat_renders">Renders</span>
+                <span class="hub-stat-sub" data-i18n="hub_stat_renders_sub">exportados</span>
+              </button>
+            </section>
+
+            <section class="hub-section" aria-labelledby="hub-studio-title">
+              <div class="hub-section-head">
+                <div>
+                  <h2 id="hub-studio-title" data-i18n="hub_section_studio">Tu estudio</h2>
+                  <p data-i18n="hub_section_studio_hint">Todo lo que puedes hacer sin salir del lobby.</p>
+                </div>
+              </div>
+              <div class="hub-tiles">
+                <button class="hub-tile hub-tile-primary" type="button" data-open-studio="deck">
+                  <span class="hub-tile-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span>
+                  <span class="hub-tile-title" data-i18n="hub_tile_editor">Editor 3D</span>
+                  <span class="hub-tile-desc" data-i18n="hub_tile_editor_desc">Ajusta canto, bisel, brillo y cámara de tu carta.</span>
+                  <span class="hub-tile-cta" data-i18n="hub_tile_open">Entrar</span>
+                </button>
+                <button class="hub-tile" type="button" data-open-studio="canvas">
+                  <span class="hub-tile-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg></span>
+                  <span class="hub-tile-title" data-i18n="hub_tile_render">Creador de renders</span>
+                  <span class="hub-tile-desc" data-i18n="hub_tile_render_desc">Prepara el lienzo y exporta video vertical en HD.</span>
+                  <span class="hub-tile-cta" data-i18n="hub_tile_open">Entrar</span>
+                </button>
+                <button class="hub-tile" type="button" data-hub-route="library">
+                  <span class="hub-tile-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg></span>
+                  <span class="hub-tile-title" data-i18n="hub_tile_library">Mis cartas</span>
+                  <span class="hub-tile-desc" data-i18n="hub_tile_library_desc">Tus diseños guardados y el catálogo completo.</span>
+                  <span class="hub-tile-cta" data-i18n="hub_tile_open">Entrar</span>
+                </button>
+                <button class="hub-tile" type="button" data-hub-route="collections">
+                  <span class="hub-tile-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg></span>
+                  <span class="hub-tile-title" data-i18n="hub_tile_collections">Colecciones y decks</span>
+                  <span class="hub-tile-desc" data-i18n="hub_tile_collections_desc">Agrupa cartas por colección o crea tus propios decks.</span>
+                  <span class="hub-tile-cta" data-i18n="hub_tile_open">Entrar</span>
+                </button>
+              </div>
+            </section>
+
+            <section class="hub-section" aria-labelledby="hub-collections-title">
+              <div class="hub-section-head hub-section-head-row">
+                <div>
+                  <h2 id="hub-collections-title" data-i18n="hub_section_collections">Colecciones</h2>
+                  <p data-i18n="hub_section_collections_hint">Cada colección es una carpeta del catálogo, lista para abrir en el estudio.</p>
+                </div>
+                <button class="hub-text-btn" type="button" data-hub-route="collections">
+                  <span data-i18n="hub_see_all">Ver todas</span>
+                  <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                </button>
+              </div>
+              <div class="hub-collection-rail" id="hub-collection-rail"></div>
+            </section>
+          </section>
+
+          <!-- ------------------------------------------------------------
+               Mis cartas
+               ------------------------------------------------------------ -->
+          <section class="hub-panel" data-hub-panel="library" aria-labelledby="library-title" hidden>
+            <header class="hub-view-head">
+              <button class="hub-back" type="button" data-hub-route="home" aria-label="Volver al inicio" data-i18n-aria-label="hub_back_home">
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+              </button>
+              <div class="hub-view-copy">
+                <h1 id="library-title" data-i18n="library_title">Mis cartas</h1>
+                <p data-i18n="library_lede">Tus diseños guardados y todas las cartas del catálogo en un solo lugar.</p>
+              </div>
+              <span class="hub-count-pill" id="library-count">0</span>
+            </header>
+
+            <div class="hub-seg" id="library-tabs" role="tablist" aria-label="Filtrar la biblioteca" data-i18n-aria-label="library_filter_aria">
+              <button class="hub-seg-btn active" type="button" role="tab" aria-selected="true" data-library-tab="all" data-i18n="library_tab_all">Todas</button>
+              <button class="hub-seg-btn" type="button" role="tab" aria-selected="false" data-library-tab="saved" data-i18n="library_tab_saved">Guardadas</button>
+              <button class="hub-seg-btn" type="button" role="tab" aria-selected="false" data-library-tab="catalog" data-i18n="library_tab_catalog">Catálogo</button>
+            </div>
+
+            <div class="hub-card-grid" id="library-grid"></div>
+
+            <div class="hub-empty" id="library-empty" hidden>
+              <span class="hub-empty-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg></span>
+              <h2 id="library-empty-title"></h2>
+              <p id="library-empty-desc"></p>
+              <button class="btn btn-primary btn-sm" type="button" data-open-studio="deck" id="library-empty-action" data-i18n="library_go_save">Guardar una carta</button>
+            </div>
+          </section>
+
+          <!-- ------------------------------------------------------------
+               Colecciones y decks
+               ------------------------------------------------------------ -->
+          <section class="hub-panel" data-hub-panel="collections" aria-labelledby="collections-title" hidden>
+            <header class="hub-view-head">
+              <button class="hub-back" id="collections-view-back" type="button" data-hub-route="home" aria-label="Volver al inicio" data-i18n-aria-label="hub_back_home">
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+              </button>
+              <div class="hub-view-copy">
+                <h1 id="collections-title" data-i18n="collections_title">Colecciones y decks</h1>
+                <p data-i18n="collections_lede">Explora el catálogo o junta tus cartas favoritas en un deck propio.</p>
+              </div>
+              <button class="btn btn-primary btn-sm" type="button" id="btn-new-deck">
+                <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
+                <span data-i18n="collections_new_deck">Nuevo deck</span>
+              </button>
+            </header>
+
+            <div id="collections-overview">
+              <section class="hub-section" aria-labelledby="collections-catalog-title">
+                <div class="hub-section-head">
+                  <div>
+                    <h2 id="collections-catalog-title" data-i18n="collections_catalog">Del catálogo</h2>
+                    <p data-i18n="collections_catalog_hint">Colecciones disponibles en la carpeta de cartas de esta versión.</p>
+                  </div>
+                </div>
+                <div class="hub-collection-grid" id="collections-grid"></div>
+              </section>
+
+              <section class="hub-section" aria-labelledby="collections-yours-title">
+                <div class="hub-section-head hub-section-head-row">
+                  <div>
+                    <h2 id="collections-yours-title" data-i18n="collections_yours">Tus decks</h2>
+                    <p data-i18n="collections_yours_hint">Agrupaciones personales para preparar un render o una serie.</p>
+                  </div>
+                  <button class="hub-text-btn" type="button" id="btn-new-deck-2">
+                    <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
+                    <span data-i18n="collections_new_deck_short">Crear deck</span>
+                  </button>
+                </div>
+                <div class="hub-deck-grid" id="decks-grid"></div>
+                <div class="hub-empty" id="decks-empty" hidden>
+                  <span class="hub-empty-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-layers"></use></svg></span>
+                  <h2 data-i18n="collections_empty_decks">Todavía no tienes decks</h2>
+                  <p data-i18n="collections_empty_decks_desc">Crea un deck para reunir las cartas de una serie o de una idea.</p>
+                  <button class="btn btn-primary btn-sm" type="button" data-new-deck data-i18n="collections_new_deck_short">Crear deck</button>
+                </div>
+              </section>
+            </div>
+
+            <div id="collection-detail" hidden>
+              <button class="hub-back-inline" type="button" data-collection-back>
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+                <span data-i18n="collections_back">Volver a colecciones</span>
+              </button>
+              <div class="hub-detail-head" id="collection-detail-head"></div>
+              <p class="hub-detail-hint" id="collection-detail-hint" data-i18n="collections_detail_hint">Abre cualquier carta en el estudio o marca tu favorita.</p>
+              <div class="hub-card-grid" id="collection-detail-grid"></div>
+            </div>
+
+            <div id="deck-detail" hidden>
+              <button class="hub-back-inline" type="button" data-deck-back>
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+                <span data-i18n="collections_back">Volver a colecciones</span>
+              </button>
+              <div class="deck-detail" id="deck-detail-body"></div>
+            </div>
+          </section>
+
+          <!-- ------------------------------------------------------------
+               Explorar (preparado, función futura)
+               ------------------------------------------------------------ -->
+          <section class="hub-panel" data-hub-panel="explore" aria-labelledby="explore-title" hidden>
+            <header class="hub-view-head">
+              <button class="hub-back" type="button" data-hub-route="home" aria-label="Volver al inicio" data-i18n-aria-label="hub_back_home">
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+              </button>
+              <div class="hub-view-copy">
+                <h1 id="explore-title" data-i18n="explore_title">Explorar</h1>
+                <p data-i18n="explore_lede">El escaparate de cartas y decks creados por otras personas.</p>
+              </div>
+              <span class="hub-soon-pill"><span class="hub-soon-dot" aria-hidden="true"></span><span data-i18n="explore_soon">Próximamente</span></span>
+            </header>
+
+            <div class="hub-soon">
+              <span class="hub-soon-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-compass"></use></svg></span>
+              <div class="hub-soon-copy">
+                <h2 data-i18n="explore_soon_title">La comunidad está tomando forma</h2>
+                <p data-i18n="explore_soon_desc">Estamos preparando el feed público para descubrir cartas de otros creadores, con me gusta, guardados y perfiles. El diseño ya está listo; la red llega en la próxima actualización.</p>
+              </div>
+              <ul class="hub-soon-list">
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg><span data-i18n="explore_feature_cards">Cartas de otros creadores</span></li>
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg><span data-i18n="explore_feature_decks">Decks destacados</span></li>
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg><span data-i18n="explore_feature_creators">Perfiles de creadores</span></li>
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg><span data-i18n="explore_feature_publish">Publicar tus cartas</span></li>
+              </ul>
+            </div>
+
+            <div class="explore-toolbar" aria-hidden="true">
+              <div class="explore-search">
+                <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+                <span data-i18n="explore_search_placeholder">Buscar cartas, creadores o colecciones</span>
+              </div>
+              <div class="hub-seg hub-seg-static">
+                <span class="hub-seg-btn active" data-i18n="explore_filter_all">Todo</span>
+                <span class="hub-seg-btn" data-i18n="explore_filter_trending">Tendencia</span>
+                <span class="hub-seg-btn" data-i18n="explore_filter_new">Reciente</span>
+              </div>
+            </div>
+
+            <div class="hub-section-head hub-section-head-row">
+              <div>
+                <h2 data-i18n="explore_preview_label">Vista previa</h2>
+                <p data-i18n="explore_preview_hint">Así se verá el feed público. Mientras tanto, puedes abrir estas cartas en tu estudio.</p>
+              </div>
+              <span class="hub-soon-pill hub-soon-pill-soft" data-i18n="explore_coming">Muy pronto</span>
+            </div>
+            <div class="hub-card-grid hub-preview-grid" id="explore-preview"></div>
+          </section>
+
+          <!-- ------------------------------------------------------------
+               Perfil
+               ------------------------------------------------------------ -->
+          <section class="hub-panel" data-hub-panel="profile" aria-labelledby="profile-title" hidden>
+            <header class="hub-view-head">
+              <button class="hub-back" type="button" data-hub-route="home" aria-label="Volver al inicio" data-i18n-aria-label="hub_back_home">
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+              </button>
+              <div class="hub-view-copy">
+                <h1 id="profile-title" data-i18n="profile_title">Tu perfil</h1>
+                <p data-i18n="profile_lede">Así te verás en el lobby y, más adelante, en la comunidad.</p>
+              </div>
+            </header>
+
+            <div class="profile-layout">
+              <form class="profile-panel" id="profile-form" novalidate>
+                <div class="profile-avatar-row">
+                  <span class="profile-avatar" id="profile-avatar">
+                    <span class="profile-avatar-fallback" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg></span>
+                    <img id="profile-avatar-img" alt="" width="128" height="128" hidden>
+                  </span>
+                  <div class="profile-avatar-copy">
+                    <strong data-i18n="profile_avatar">Avatar</strong>
+                    <p data-i18n="profile_avatar_hint">PNG, JPG o WebP. Se recorta en cuadrado y se guarda en este dispositivo.</p>
+                    <div class="profile-avatar-actions">
+                      <button class="btn btn-soft btn-sm" type="button" id="btn-avatar-upload" data-i18n="profile_upload">Subir avatar</button>
+                      <button class="btn btn-ghost btn-sm" type="button" id="btn-avatar-remove" data-i18n="profile_remove_avatar">Quitar</button>
+                    </div>
+                  </div>
+                  <input type="file" id="avatar-file-input" accept="image/png,image/jpeg,image/webp,image/avif" hidden aria-label="Subir avatar" data-i18n-aria-label="profile_upload">
+                </div>
+
+                <div class="profile-fields">
+                  <label class="field">
+                    <span class="field-label" data-i18n="profile_name">Nombre</span>
+                    <input type="text" id="profile-name" maxlength="32" autocomplete="nickname" spellcheck="false" placeholder="Tu nombre de creador" data-i18n-placeholder="profile_name_placeholder">
+                  </label>
+                  <label class="field">
+                    <span class="field-label" data-i18n="profile_handle">Usuario</span>
+                    <span class="input-prefix">
+                      <span aria-hidden="true">@</span>
+                      <input type="text" id="profile-handle" maxlength="24" autocomplete="username" spellcheck="false" inputmode="latin" placeholder="tuusuario" data-i18n-placeholder="profile_handle_placeholder">
+                    </span>
+                  </label>
+                  <label class="field field-full">
+                    <span class="field-label" data-i18n="profile_bio">Sobre ti</span>
+                    <textarea id="profile-bio" rows="3" maxlength="160" placeholder="Qué tipo de cartas haces, tu estilo o tu próximo proyecto." data-i18n-placeholder="profile_bio_placeholder"></textarea>
+                    <span class="field-count" id="profile-bio-count">0/160</span>
+                  </label>
+                  <label class="field field-full">
+                    <span class="field-label" data-i18n="profile_favorite">Carta favorita</span>
+                    <select id="profile-favorite"></select>
+                    <span class="field-hint" data-i18n="profile_favorite_hint">Es la carta que te recibe en el lobby.</span>
+                  </label>
+                </div>
+
+                <div class="profile-actions">
+                  <button class="btn btn-primary" type="submit" id="profile-save">
+                    <svg class="icon" aria-hidden="true"><use href="#i-save"></use></svg>
+                    <span data-i18n="profile_save">Guardar perfil</span>
+                  </button>
+                </div>
+              </form>
+
+              <aside class="profile-side" aria-labelledby="profile-summary-title">
+                <h2 id="profile-summary-title" data-i18n="profile_summary">Resumen</h2>
+                <dl class="profile-stat-list">
+                  <div><dt data-i18n="profile_summary_cards">Cartas guardadas</dt><dd id="profile-stat-cards">0</dd></div>
+                  <div><dt data-i18n="profile_summary_decks">Decks creados</dt><dd id="profile-stat-decks">0</dd></div>
+                  <div><dt data-i18n="profile_summary_renders">Renders exportados</dt><dd id="profile-stat-renders">0</dd></div>
+                </dl>
+                <p class="profile-member" id="profile-member-since"></p>
+                <p class="profile-note" data-i18n="profile_local_note">Tu perfil se guarda solo en este navegador. La cuenta pública llegará con la comunidad.</p>
+              </aside>
+            </div>
+          </section>
+
+        </main>
+
+        <footer class="hub-footer">
+          <span>DeckGram <span data-version>v0.4.4</span> · by theAstroBruh</span>
+          <span class="hub-footer-dot" aria-hidden="true"></span>
+          <span data-i18n="profile_local_note">Tu perfil se guarda solo en este navegador. La cuenta pública llegará con la comunidad.</span>
+        </footer>
+      </div>
+    </div>
+
+    <nav class="hub-mobile-nav" aria-label="Navegación principal" data-i18n-aria-label="hub_nav_aria">
+      <button class="hub-mobile-btn active" type="button" data-hub-route="home">
+        <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>
+        <span data-i18n="hub_nav_home">Inicio</span>
+      </button>
+      <button class="hub-mobile-btn" type="button" data-hub-route="library">
+        <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
+        <span data-i18n="hub_nav_library">Mis cartas</span>
+      </button>
+      <button class="hub-mobile-btn" type="button" data-hub-route="collections">
+        <svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg>
+        <span data-i18n="hub_nav_collections">Colecciones</span>
+      </button>
+      <button class="hub-mobile-btn" type="button" data-hub-route="explore">
+        <svg class="icon" aria-hidden="true"><use href="#i-compass"></use></svg>
+        <span data-i18n="hub_nav_explore">Explorar</span>
+      </button>
+      <button class="hub-mobile-btn" type="button" data-hub-route="profile">
+        <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+        <span data-i18n="hub_nav_profile">Perfil</span>
+      </button>
+    </nav>
+  </div>
+
   <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
 
   <button id="sidebar-toggle-btn" class="icon-btn" type="button" aria-label="Mostrar u ocultar el panel" data-i18n-aria-label="ui_toggle_sidebar" aria-controls="sidebar" aria-expanded="true" title="Mostrar u ocultar el panel" data-i18n-title="ui_toggle_sidebar">
     <svg class="icon icon-menu" aria-hidden="true"><use href="#i-menu"></use></svg>
     <svg class="icon icon-close" aria-hidden="true"><use href="#i-close"></use></svg>
+  </button>
+
+  <button id="btn-home-hub-floating" class="icon-btn" type="button" aria-label="Volver al lobby" data-i18n-aria-label="hub_back_studio" title="Volver al lobby" data-i18n-title="hub_back_studio">
+    <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>
   </button>
 
   <button id="btn-cinematic" class="icon-btn" type="button" aria-label="Activar modo cinemático" data-i18n-aria-label="ui_cinematic" title="Modo cinemático (C)" data-i18n-title="ui_cinematic_title">
@@ -253,6 +778,9 @@
         </div>
       </div>
       <div class="header-actions">
+        <button class="icon-btn" id="btn-home-hub" type="button" aria-label="Volver al lobby" data-i18n-aria-label="hub_back_studio" title="Volver al lobby" data-i18n-title="hub_back_studio">
+          <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>
+        </button>
         <div class="lang-menu" id="lang-menu">
           <button class="icon-btn lang-trigger" id="btn-lang" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="lang-dropdown" aria-label="Language" data-i18n-aria-label="ui_lang_group" title="Language" data-i18n-title="ui_lang_group">
             <svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg>
@@ -328,7 +856,7 @@
 
         <div class="upload-group">
           <label class="upload-box" id="upload-front" for="front-file-input" tabindex="0" role="button">
-            <img id="front-preview-img" src="assets/card_front%20-%20base.png" alt="Previsualización del anverso" data-i18n-alt="ui_front_alt">
+            <img id="front-preview-img" src="assets/data/cards/OG/SET-01/thumbs/FRONT-01.webp" alt="Previsualización del anverso" data-i18n-alt="ui_front_alt">
             <span class="upload-badge"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg><span data-i18n="front_short">Frontal</span></span>
             <span class="upload-overlay">
               <span class="upload-label"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg><span data-i18n="front_cover">Anverso</span></span>
@@ -338,7 +866,7 @@
           </label>
 
           <label class="upload-box" id="upload-back" for="back-file-input" tabindex="0" role="button">
-            <img id="back-preview-img" src="assets/card_back%20-%20base.png" alt="Previsualización del reverso" data-i18n-alt="ui_back_alt">
+            <img id="back-preview-img" src="assets/data/cards/OG/SET-01/thumbs/BACK-BASE.webp" alt="Previsualización del reverso" data-i18n-alt="ui_back_alt">
             <span class="upload-badge"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg><span data-i18n="back_short">Trasera</span></span>
             <span class="upload-overlay">
               <span class="upload-label"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg><span data-i18n="back_cover">Reverso</span></span>
@@ -765,6 +1293,28 @@
       <div class="dialog-actions">
         <button class="btn btn-ghost" id="confirm-cancel" type="submit" value="cancel" data-i18n="cancel">Cancelar</button>
         <button class="btn btn-primary" id="confirm-ok" type="submit" value="confirm" data-i18n="confirm">Restaurar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="deck-dialog" aria-labelledby="deck-dialog-title">
+    <form class="dialog-card deck-form" id="deck-form" method="dialog" novalidate>
+      <div class="dialog-head">
+        <span class="dialog-icon"><svg class="icon" aria-hidden="true"><use href="#i-layers"></use></svg></span>
+        <div>
+          <h2 class="dialog-title" id="deck-dialog-title" data-i18n="deck_dialog_title">Crear un deck</h2>
+          <p class="dialog-desc" id="deck-dialog-desc" data-i18n="deck_dialog_desc">Dale un nombre y una portada. Después podrás añadir cartas del catálogo.</p>
+        </div>
+      </div>
+      <label class="dialog-label" for="deck-name" data-i18n="deck_name">Nombre del deck</label>
+      <input class="dialog-input" id="deck-name" name="deck-name" type="text" maxlength="48" autocomplete="off" spellcheck="false" placeholder="Mi primera serie" data-i18n-placeholder="deck_name_placeholder">
+      <label class="dialog-label deck-desc-label" for="deck-desc" data-i18n="deck_desc">Descripción</label>
+      <textarea class="dialog-input dialog-textarea" id="deck-desc" name="deck-desc" rows="2" maxlength="120" placeholder="Una idea, un tema o un objetivo para este deck." data-i18n-placeholder="deck_desc_placeholder"></textarea>
+      <span class="dialog-label" id="deck-cover-label" data-i18n="deck_cover">Portada</span>
+      <div class="deck-cover-options" id="deck-cover-options" role="radiogroup" aria-labelledby="deck-cover-label"></div>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" id="deck-dialog-cancel" type="button" data-i18n="cancel">Cancelar</button>
+        <button class="btn btn-primary" id="deck-dialog-create" type="submit" data-i18n="deck_create">Crear deck</button>
       </div>
     </form>
   </dialog>

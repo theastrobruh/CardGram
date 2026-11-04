@@ -211,6 +211,7 @@ async function exportVideo() {
 
   setStatus(t('status_done'), 'success');
   toast(t('status_done'), { type: 'success' });
+  window.dispatchEvent(new CustomEvent('deckgram:exported', { detail: { kind: 'video' } }));
   exportRecorder = null;
 }
 
@@ -234,6 +235,7 @@ async function exportSnapshot() {
     );
     setStatus(t('status_png_done'), 'success');
     toast(t('status_png_done'), { type: 'success' });
+    window.dispatchEvent(new CustomEvent('deckgram:exported', { detail: { kind: 'snapshot' } }));
   } catch (error) {
     console.error('[DeckGram] Snapshot failed', error);
     setStatus(t('status_error'), 'error');

@@ -95,6 +95,7 @@ const Scene = (() => {
 
   let ready = false;
   let renderPaused = false;
+  let animationId = 0;
   let contextLost = false;
   let clock = null;
   let floatTime = 0;
@@ -771,7 +772,7 @@ const Scene = (() => {
      Bucle de render
      ------------------------------------------------------------------------ */
   function animate() {
-    requestAnimationFrame(animate);
+    animationId = requestAnimationFrame(animate);
     if (!ready) return;
 
     const delta = Math.min(clock.getDelta(), 0.05);
@@ -984,16 +985,47 @@ const Scene = (() => {
   }
 
   function setRenderPaused(paused) {
-    renderPaused = Boolean(paused);
+    const next = Boolean(paused);
+
+    /* En el hub no se reanuda el bucle: el estudio está oculto. Evita que el
+       final de una exportación vuelva a encender el render tras salir. */
+    if (
+      !next &&
+      document.body &&
+      document.body.dataset.view &&
+      document.body.dataset.view !== 'studio'
+    ) {
+      return;
+    }
+
+    if (renderPaused === next) return;
+    renderPaused = next;
+
+    if (next) {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = 0;
+      }
+      return;
+    }
+
+    if (!ready || animationId) return;
+    if (clock) clock.getDelta();
+    animate();
   }
 
   function isReady() {
     return ready;
   }
 
+  function isRenderPaused() {
+    return renderPaused;
+  }
+
   return {
     init,
     isReady,
+    isRenderPaused,
     applySettings,
     applyPose,
     getPose,
