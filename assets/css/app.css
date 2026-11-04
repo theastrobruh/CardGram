@@ -500,34 +500,92 @@ body.sidebar-collapsed #sidebar {
 }
 
 /* Selector de idioma */
-.lang-switcher {
+.lang-menu {
+  position: relative;
+  z-index: 80;
+}
+
+.lang-trigger {
+  width: 32px;
+  height: 32px;
+  border-radius: 11px;
+}
+
+.lang-trigger .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.lang-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 90;
   display: flex;
+  flex-direction: column;
   gap: 2px;
-  padding: 3px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.38);
-  border: 1px solid var(--stroke-soft);
-  box-shadow: var(--inset-hi);
+  min-width: 156px;
+  padding: 5px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.98);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
-.lang-btn {
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  color: var(--muted-strong);
-  transition: all 0.2s ease;
+.lang-dropdown[hidden] {
+  display: none;
 }
 
-.lang-btn:hover {
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 9px;
+  border-radius: 9px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: left;
+  color: var(--ink-soft);
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+.lang-option:hover,
+.lang-option:focus-visible {
+  background: rgba(47, 143, 221, 0.1);
   color: var(--ink);
 }
 
-.lang-btn.active {
+.lang-option.active {
+  color: #ffffff;
+  background: var(--accent);
+  box-shadow: 0 4px 12px rgba(47, 143, 221, 0.3);
+}
+
+.lang-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  padding: 2px 5px;
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
   color: #0a6b78;
-  background: #fff;
-  box-shadow: 0 2px 7px rgba(8, 62, 82, 0.14);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.lang-option.active .lang-code {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.lang-name {
+  flex: 1;
 }
 
 /* Navegación por pestañas */
@@ -747,6 +805,110 @@ body.sidebar-collapsed #sidebar {
   font-size: 0.62rem;
   color: var(--muted);
   margin-top: 1px;
+}
+
+/* Interruptor Full Art */
+.fullart-row {
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.fullart-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.fullart-copy label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.fullart-hint {
+  font-size: 0.6rem;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
+.fullart-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.fullart-state {
+  min-width: 26px;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-align: right;
+  color: #0a6b78;
+}
+
+.fullart-row.is-disabled {
+  opacity: 0.56;
+}
+
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.switch-track {
+  position: relative;
+  width: 44px;
+  height: 25px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: rgba(7, 51, 63, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  box-shadow: var(--inset-lo);
+  transition: background 0.24s ease;
+}
+
+.switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(6, 55, 74, 0.28);
+  transition: transform 0.26s var(--ease-bounce);
+}
+
+.switch input:checked + .switch-track {
+  background: linear-gradient(135deg, #7cebdd 0%, #2f8fdd 100%);
+}
+
+.switch input:checked + .switch-track .switch-thumb {
+  transform: translateX(19px);
+}
+
+.switch input:focus-visible + .switch-track {
+  outline: 2px solid var(--aqua-deep);
+  outline-offset: 3px;
+}
+
+.switch input:disabled + .switch-track {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Selects */
@@ -1043,19 +1205,53 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .preset-chip-main {
-  padding: 6px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px 5px 6px;
   font-size: 0.66rem;
   font-weight: 700;
   color: var(--ink-soft);
   white-space: nowrap;
-  max-width: 130px;
+  max-width: 190px;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .preset-chip.active .preset-chip-main {
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(6, 60, 80, 0.25);
+}
+
+.preset-thumbs {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+.preset-thumbs img {
+  width: 22px;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  box-shadow: 0 2px 6px rgba(6, 55, 74, 0.2);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.preset-thumbs img + img {
+  margin-left: -9px;
+  transform: rotate(6deg);
+}
+
+.preset-chip.active .preset-thumbs img {
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 8px rgba(4, 48, 64, 0.28);
+}
+
+.preset-chip-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .preset-chip-del {
@@ -1544,6 +1740,62 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: 0 0 0 3px rgba(26, 168, 143, 0.16);
 }
 
+/* Botón de agradecimiento / Ko-fi */
+.kofi-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 8px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #8a2b2b;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: var(--inset-hi);
+  transition: background 0.22s ease, color 0.22s ease, transform 0.22s var(--ease), box-shadow 0.22s ease;
+}
+
+.kofi-btn .icon {
+  width: 16px;
+  height: 16px;
+  color: #ff5e5b;
+  transition: color 0.22s ease;
+}
+
+.kofi-label {
+  color: #8a2b2b;
+  font-weight: 800;
+  transition: color 0.22s ease;
+}
+
+.kofi-heart {
+  margin-left: 2px;
+  color: #ff5e5b;
+  transition: color 0.22s ease;
+}
+
+.kofi-btn:hover,
+.kofi-btn:focus-visible {
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff7a76 0%, #ff5e5b 100%);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(255, 94, 91, 0.34);
+}
+
+.kofi-btn:hover .icon,
+.kofi-btn:hover .kofi-label,
+.kofi-btn:hover .kofi-heart,
+.kofi-btn:focus-visible .icon,
+.kofi-btn:focus-visible .kofi-label,
+.kofi-btn:focus-visible .kofi-heart {
+  color: #ffffff;
+}
+
 @keyframes pulseDot {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(0.78); }
@@ -1704,12 +1956,22 @@ input[type="range"]::-moz-range-thumb {
    12. Menú radial
    -------------------------------------------------------------------------- */
 .flower-fab-container {
+  --petal-dir-x: -1;
+  --petal-dir-y: -1;
   position: absolute;
   right: 26px;
   bottom: 26px;
   z-index: 40;
   width: 54px;
   height: 54px;
+}
+
+.flower-fab-container.petals-right {
+  --petal-dir-x: 1;
+}
+
+.flower-fab-container.petals-down {
+  --petal-dir-y: 1;
 }
 
 .flower-main-trigger {
@@ -1728,6 +1990,8 @@ input[type="range"]::-moz-range-thumb {
     0 10px 24px rgba(47, 143, 221, 0.4),
     0 0 0 5px rgba(255, 255, 255, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  cursor: grab;
+  touch-action: none;
   transition: transform 0.35s var(--ease-bounce), box-shadow 0.25s ease, background 0.25s ease;
 }
 
@@ -1752,6 +2016,15 @@ input[type="range"]::-moz-range-thumb {
 
 .flower-fab-container.open .flower-main-trigger .icon {
   transform: rotate(135deg);
+}
+
+.flower-fab-container.dragging .flower-main-trigger {
+  cursor: grabbing;
+  transform: scale(1.05);
+  box-shadow:
+    0 16px 32px rgba(47, 143, 221, 0.5),
+    0 0 0 7px rgba(255, 255, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .flower-petals {
@@ -1787,11 +2060,12 @@ input[type="range"]::-moz-range-thumb {
   height: 18px;
 }
 
-.petal-btn:hover {
+.petal-btn:hover,
+.petal-btn:focus-visible {
   color: #ffffff;
   background: var(--accent);
   border-color: rgba(255, 255, 255, 0.6);
-  transform: scale(1.12) !important;
+  box-shadow: 0 12px 24px rgba(47, 143, 221, 0.42), var(--inset-hi);
 }
 
 .flower-fab-container.open .petal-btn {
@@ -1799,11 +2073,12 @@ input[type="range"]::-moz-range-thumb {
   pointer-events: auto;
 }
 
-.flower-fab-container.open .petal-1 { transform: translate(0, -66px) scale(1); transition-delay: 0.02s; }
-.flower-fab-container.open .petal-2 { transform: translate(-52px, -48px) scale(1); transition-delay: 0.05s; }
-.flower-fab-container.open .petal-3 { transform: translate(-68px, 0) scale(1); transition-delay: 0.08s; }
-.flower-fab-container.open .petal-4 { transform: translate(-52px, 50px) scale(1); transition-delay: 0.11s; }
-.flower-fab-container.open .petal-5 { transform: translate(48px, -50px) scale(1); transition-delay: 0.14s; }
+/* Abanico de cuarto de círculo; se voltea según la posición del FAB. */
+.flower-fab-container.open .petal-1 { transform: translate(calc(100px * var(--petal-dir-x)), 0) scale(1); transition-delay: 0.02s; }
+.flower-fab-container.open .petal-2 { transform: translate(calc(92px * var(--petal-dir-x)), calc(38px * var(--petal-dir-y))) scale(1); transition-delay: 0.05s; }
+.flower-fab-container.open .petal-3 { transform: translate(calc(71px * var(--petal-dir-x)), calc(71px * var(--petal-dir-y))) scale(1); transition-delay: 0.08s; }
+.flower-fab-container.open .petal-4 { transform: translate(calc(38px * var(--petal-dir-x)), calc(92px * var(--petal-dir-y))) scale(1); transition-delay: 0.11s; }
+.flower-fab-container.open .petal-5 { transform: translate(0, calc(100px * var(--petal-dir-y))) scale(1); transition-delay: 0.14s; }
 
 .petal-btn::after {
   content: attr(data-tip);
@@ -1827,6 +2102,16 @@ input[type="range"]::-moz-range-thumb {
 
 .petal-btn:hover::after {
   opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.flower-fab-container.petals-right .petal-btn::after {
+  right: auto;
+  left: calc(100% + 10px);
+  transform: translateY(-50%) translateX(-4px);
+}
+
+.flower-fab-container.petals-right .petal-btn:hover::after {
   transform: translateY(-50%) translateX(0);
 }
 

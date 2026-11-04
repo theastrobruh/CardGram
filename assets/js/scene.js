@@ -15,6 +15,7 @@ const Scene = (() => {
     bevel: 0.004,
     edgeColor: 'black',
     gloss: 0.25,
+    exposure: 0.9,
     speed: 0.5,
     spinDir: 1,
     float: 'organic',
@@ -76,8 +77,21 @@ const Scene = (() => {
 
   let frontTexture = null;
   let backTexture = null;
+  let fullArtTexture = null;
   let placeholderFront = null;
   let placeholderBack = null;
+
+  const FULLART_CYCLE = 10;
+  const FULLART_FADE = 1.5;
+  const fullArtUniforms = {
+    uFullArtMap: { value: null },
+    uFullArtMix: { value: 0 },
+    uHasFullArt: { value: 0 }
+  };
+  let fullArtEnabled = true;
+  let fullArtHasTexture = false;
+  let fullArtMix = 0;
+  let fullArtClock = 0;
 
   let ready = false;
   let renderPaused = false;
@@ -128,7 +142,7 @@ const Scene = (() => {
       });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.1;
+      renderer.toneMappingExposure = settings.exposure;
       renderer.outputEncoding = THREE.sRGBEncoding;
       renderer.setClearColor(0x000000, 0);
       wrapper.appendChild(renderer.domElement);
@@ -155,14 +169,14 @@ const Scene = (() => {
         color: 0xffffff,
         roughness: settings.gloss,
         metalness: 0.04,
-        envMapIntensity: 0.8
+        envMapIntensity: 0.55
       });
 
       matBack = new THREE.MeshStandardMaterial({
         color: 0xffffff,
         roughness: settings.gloss,
         metalness: 0.04,
-        envMapIntensity: 0.8
+        envMapIntensity: 0.55
       });
 
       matEdge = new THREE.MeshStandardMaterial({
@@ -171,6 +185,12 @@ const Scene = (() => {
         metalness: EDGE_COLORS.black.metalness,
         envMapIntensity: 1.35
       });
+
+      setupFullArtShader();
+
+      // El shader del anverso necesita un mapa válido antes de compilarse.
+      ensurePlaceholder('front');
+      ensurePlaceholder('back');
 
       transStartCam = new THREE.Vector3();
       transTargetCam = new THREE.Vector3();
@@ -196,18 +216,18 @@ const Scene = (() => {
   }
 
   function buildLighting() {
-    const ambient = new THREE.AmbientLight(0xffffff, 0.48);
+    const ambient = new THREE.AmbientLight(0xffffff, 0.4);
     scene.add(ambient);
 
-    const key = new THREE.DirectionalLight(0xfff8ee, 1.55);
+    const key = new THREE.DirectionalLight(0xfff8ee, 1.2);
     key.position.set(3, 4, 4);
     scene.add(key);
 
-    const fill = new THREE.DirectionalLight(0xbcd7ff, 0.72);
+    const fill = new THREE.DirectionalLight(0xbcd7ff, 0.55);
     fill.position.set(-3, -1, 3);
     scene.add(fill);
 
-    const rim = new THREE.DirectionalLight(0xd8fff9, 1.15);
+    const rim = new THREE.DirectionalLight(0xd8fff9, 0.9);
     rim.position.set(0, 4, -3);
     scene.add(rim);
   }
@@ -258,6 +278,7 @@ const Scene = (() => {
     }
 
     if (next.gloss !== undefined) setGloss(settings.gloss);
+    if (next.exposure !== undefined) setExposure(settings.exposure);
     if (next.edgeColor !== undefined) applyEdgeColor(settings.edgeColor);
     if (next.bg !== undefined) applyBackground(settings.bg);
 
@@ -283,6 +304,12 @@ const Scene = (() => {
     settings.gloss = value;
     if (matFront) matFront.roughness = value;
     if (matBack) matBack.roughness = value;
+  }
+
+  function setExposure(value) {
+    const exposure = clampNumber(Number(value) || DEFAULTS.exposure, 0.4, 1.4);
+    settings.exposure = exposure;
+    if (renderer) renderer.toneMappingExposure = exposure;
   }
 
   function applyEdgeColor(key) {
@@ -472,6 +499,106 @@ const Scene = (() => {
   /* ------------------------------------------------------------------------
      Texturas de carta
      ------------------------------------------------------------------------ */
+  function setupFullArtShader() {
+    if (!matFront) return;
+
+    matFront.onBeforeCompile = (shader) => {
+      shader.uniforms.uFullArtMap = fullArtUniforms.uFullArtMap;
+      shader.uniforms.uFullArtMix = fullArtUniforms.uFullArtMix;
+      shader.uniforms.uHasFullArt = fullArtUniforms.uHasFullArt;
+
+      shader.fragmentShader = shader.fragmentShader
+        .replace(
+          '#include <common>',
+          [
+            '#include <common>',
+            'uniform sampler2D uFullArtMap;',
+            'uniform float uFullArtMix;',
+            'uniform float uHasFullArt;'
+          ].join('\n')
+        )
+        .replace(
+          '#include <map_fragment>',
+          [
+            '#ifdef USE_MAP',
+            '  vec4 texelColor = texture2D( map, vUv );',
+            '  texelColor = mapTexelToLinear( texelColor );',
+            '  if ( uHasFullArt > 0.5 ) {',
+            '    vec4 fullArtColor = texture2D( uFullArtMap, vUv );',
+            '    fullArtColor = mapTexelToLinear( fullArtColor );',
+            '    texelColor = mix( texelColor, fullArtColor, clamp( uFullArtMix, 0.0, 1.0 ) );',
+            '  }',
+            '  diffuseColor *= texelColor;',
+            '#endif'
+          ].join('\n')
+        );
+    };
+
+    matFront.needsUpdate = true;
+  }
+
+  function setFullArtTexture(texture) {
+    if (fullArtTexture && fullArtTexture !== texture) {
+      fullArtTexture.dispose();
+    }
+
+    fullArtTexture = texture || null;
+    fullArtHasTexture = Boolean(texture);
+    fullArtUniforms.uFullArtMap.value = texture || null;
+    fullArtUniforms.uHasFullArt.value = fullArtHasTexture ? 1 : 0;
+
+    if (!fullArtHasTexture) {
+      fullArtMix = 0;
+      fullArtClock = 0;
+      fullArtUniforms.uFullArtMix.value = 0;
+    }
+  }
+
+  function clearFullArt() {
+    setFullArtTexture(null);
+  }
+
+  function setFullArtEnabled(enabled) {
+    fullArtEnabled = Boolean(enabled);
+    fullArtClock = 0;
+    if (!fullArtEnabled) {
+      fullArtMix = 0;
+      fullArtUniforms.uFullArtMix.value = 0;
+    }
+  }
+
+  function smoothStep(value) {
+    const t = clampNumber(value, 0, 1);
+    return t * t * (3 - 2 * t);
+  }
+
+  function updateFullArtAnimation(delta) {
+    if (!fullArtEnabled || !fullArtHasTexture) {
+      if (fullArtMix !== 0) {
+        fullArtMix = 0;
+        fullArtUniforms.uFullArtMix.value = 0;
+      }
+      return;
+    }
+
+    fullArtClock = (fullArtClock + delta) % FULLART_CYCLE;
+
+    const fadeInStart = 3.5;
+    const fadeOutStart = 7.5;
+    let mix = 0;
+
+    if (fullArtClock >= fadeInStart && fullArtClock < fadeInStart + FULLART_FADE) {
+      mix = smoothStep((fullArtClock - fadeInStart) / FULLART_FADE);
+    } else if (fullArtClock >= fadeInStart + FULLART_FADE && fullArtClock < fadeOutStart) {
+      mix = 1;
+    } else if (fullArtClock >= fadeOutStart && fullArtClock < fadeOutStart + FULLART_FADE) {
+      mix = 1 - smoothStep((fullArtClock - fadeOutStart) / FULLART_FADE);
+    }
+
+    fullArtMix = mix;
+    fullArtUniforms.uFullArtMix.value = mix;
+  }
+
   function loadTexture(url) {
     return new Promise((resolve, reject) => {
       const loader = new THREE.TextureLoader();
@@ -559,9 +686,12 @@ const Scene = (() => {
     return texture;
   }
 
-  async function loadCardImages(frontUrl, backUrl) {
-    const results = await Promise.allSettled([loadTexture(frontUrl), loadTexture(backUrl)]);
-    const status = { front: false, back: false };
+  async function loadCardImages(frontUrl, backUrl, fullArtUrl) {
+    const jobs = [loadTexture(frontUrl), loadTexture(backUrl)];
+    if (fullArtUrl) jobs.push(loadTexture(fullArtUrl));
+
+    const results = await Promise.allSettled(jobs);
+    const status = { front: false, back: false, fullArt: false };
 
     if (results[0].status === 'fulfilled') {
       setSideTexture('front', results[0].value);
@@ -575,6 +705,13 @@ const Scene = (() => {
       status.back = true;
     } else {
       ensurePlaceholder('back');
+    }
+
+    if (fullArtUrl && results[2] && results[2].status === 'fulfilled') {
+      setFullArtTexture(results[2].value);
+      status.fullArt = true;
+    } else {
+      clearFullArt();
     }
 
     return status;
@@ -652,6 +789,7 @@ const Scene = (() => {
       cardGroup.rotation.y += delta * 1.1 * settings.speed * settings.spinDir;
     }
 
+    updateFullArtAnimation(delta);
     applyFloatMotion(floatTime);
     controls.update();
 
@@ -862,6 +1000,9 @@ const Scene = (() => {
     centerCamera,
     loadCardImages,
     loadCardImage,
+    setFullArtEnabled,
+    clearFullArt,
+    hasFullArt: () => fullArtHasTexture,
     rebuildCard,
     resize,
     setRenderPaused,

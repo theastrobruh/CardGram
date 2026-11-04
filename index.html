@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="light">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="generator" content="TCG:HUB v0.4.2">
-  <meta name="description" content="TCG:HUB — Estudio 3D interactivo para cartas coleccionables. Importa tus diseños, ajusta cantos, biseles y brillo, y exporta reels verticales en HD directamente desde el navegador.">
+  <meta name="description" content="TCG:HUB — Interactive 3D studio for trading cards. Import your designs, fine-tune edges, bevels and gloss, and export vertical HD reels right from your browser.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
   <title>TCG:HUB — Duelist 3D Studio · v0.4.2</title>
 
@@ -166,6 +166,11 @@
     <symbol id="i-drag" viewBox="0 0 24 24">
       <path d="M9 11V6.5a1.5 1.5 0 0 1 3 0V11M12 10.5V5a1.5 1.5 0 0 1 3 0v5.5M15 10.5V7a1.5 1.5 0 0 1 3 0v7a6 6 0 0 1-6 6h-1a5 5 0 0 1-3.6-1.5L4.6 15a1.6 1.6 0 0 1 2.4-2.1L9 15"></path>
     </symbol>
+    <symbol id="i-kofi" viewBox="0 0 24 24">
+      <path d="M4.5 8h11.5v6.5A4.5 4.5 0 0 1 11.5 19H9a4.5 4.5 0 0 1-4.5-4.5V8z"></path>
+      <path d="M16 9.2h1.6a2.3 2.3 0 0 1 0 4.6H16"></path>
+      <path d="M10.2 9.4c-.8-1-2.4-.6-2.4.7 0 1.1 1.5 2.2 2.4 2.8.9-.6 2.4-1.7 2.4-2.8 0-1.3-1.6-1.7-2.4-.7z" fill="currentColor" stroke="none"></path>
+    </symbol>
   </svg>
 
   <!-- ======================================================================
@@ -216,9 +221,21 @@
         </div>
       </div>
       <div class="header-actions">
-        <div class="lang-switcher" role="group" aria-label="Idioma / Language" data-i18n-aria-label="ui_lang_group">
-          <button class="lang-btn active" id="btn-lang-es" type="button" aria-pressed="true" title="Español">ES</button>
-          <button class="lang-btn" id="btn-lang-en" type="button" aria-pressed="false" title="English">EN</button>
+        <div class="lang-menu" id="lang-menu">
+          <button class="icon-btn lang-trigger" id="btn-lang" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="lang-dropdown" aria-label="Language" data-i18n-aria-label="ui_lang_group" title="Language" data-i18n-title="ui_lang_group">
+            <svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg>
+          </button>
+          <div class="lang-dropdown" id="lang-dropdown" role="menu" aria-labelledby="btn-lang" hidden>
+            <button class="lang-option active" type="button" role="menuitemradio" data-lang="en" aria-checked="true">
+              <span class="lang-code">EN</span><span class="lang-name">English</span>
+            </button>
+            <button class="lang-option" type="button" role="menuitemradio" data-lang="es" aria-checked="false">
+              <span class="lang-code">ES</span><span class="lang-name">Español</span>
+            </button>
+            <button class="lang-option" type="button" role="menuitemradio" data-lang="de" aria-checked="false">
+              <span class="lang-code">DE</span><span class="lang-name">Deutsch</span>
+            </button>
+          </div>
         </div>
         <button class="icon-btn" id="btn-help" type="button" aria-label="Atajos y ayuda" data-i18n-aria-label="ui_help" title="Atajos y ayuda (?)" data-i18n-title="ui_help_title">
           <svg class="icon" aria-hidden="true"><use href="#i-help"></use></svg>
@@ -262,8 +279,23 @@
 
         <div class="card-presets-bar" id="card-presets-bar" role="group" aria-label="Presets de cartas" data-i18n-aria-label="ui_presets"></div>
 
+        <div class="control-row fullart-row" id="fullart-row">
+          <div class="fullart-copy">
+            <label for="toggle-fullart" data-i18n="fullart_title">Full Art animado</label>
+            <span class="fullart-hint" data-i18n="fullart_hint">Alterna entre el arte normal y el Full Art de la carta base.</span>
+          </div>
+          <div class="fullart-control">
+            <span class="fullart-state" id="fullart-state">ON</span>
+            <label class="switch" for="toggle-fullart">
+              <input type="checkbox" id="toggle-fullart" checked>
+              <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+              <span class="sr-only" data-i18n="fullart_toggle">Activar o desactivar la animación Full Art</span>
+            </label>
+          </div>
+        </div>
+
         <div class="upload-group">
-          <label class="upload-box" id="upload-front" for="front-file-input" tabindex="0" role="button" aria-label="Cargar imagen frontal" data-i18n-aria-label="ui_upload_front">
+          <label class="upload-box" id="upload-front" for="front-file-input" tabindex="0" role="button">
             <img id="front-preview-img" src="assets/card_front%20-%20base.png" alt="Previsualización del anverso" data-i18n-alt="ui_front_alt">
             <span class="upload-badge"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg><span data-i18n="front_short">Frontal</span></span>
             <span class="upload-overlay">
@@ -273,7 +305,7 @@
             <input type="file" id="front-file-input" accept="image/png,image/jpeg,image/webp,image/avif" aria-label="Seleccionar imagen frontal" data-i18n-aria-label="ui_select_front">
           </label>
 
-          <label class="upload-box" id="upload-back" for="back-file-input" tabindex="0" role="button" aria-label="Cargar imagen trasera" data-i18n-aria-label="ui_upload_back">
+          <label class="upload-box" id="upload-back" for="back-file-input" tabindex="0" role="button">
             <img id="back-preview-img" src="assets/card_back%20-%20base.png" alt="Previsualización del reverso" data-i18n-alt="ui_back_alt">
             <span class="upload-badge"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg><span data-i18n="back_short">Trasera</span></span>
             <span class="upload-overlay">
@@ -365,6 +397,15 @@
             <output class="slider-val" id="val-gloss" for="range-gloss">0.25</output>
           </div>
           <input type="range" id="range-gloss" min="0.05" max="0.9" step="0.05" value="0.25" aria-label="Brillo reflectante" data-i18n-aria-label="glossiness">
+        </div>
+
+        <div class="control-row control-row-col">
+          <div class="header-line">
+            <label for="range-exposure"><svg class="icon" aria-hidden="true"><use href="#i-sun"></use></svg><span data-i18n="exposure">Luminosidad</span></label>
+            <output class="slider-val" id="val-exposure" for="range-exposure">0.90</output>
+          </div>
+          <input type="range" id="range-exposure" min="0.4" max="1.4" step="0.05" value="0.9" aria-label="Luminosidad de la carta" data-i18n-aria-label="exposure">
+          <p class="control-note" data-i18n="exposure_hint">Baja este valor si los diseños se ven demasiado claros.</p>
         </div>
 
         <div class="action-row">
@@ -600,6 +641,11 @@
         <span class="status-dot" aria-hidden="true"></span>
         <span id="status-label" data-i18n="status_ready">Listo para exportar</span>
       </div>
+
+      <a class="kofi-btn" href="https://ko-fi.com/theastrobruh" target="_blank" rel="noopener noreferrer" title="Invítame un café en Ko-fi" data-i18n-title="ui_kofi_title">
+        <svg class="icon" aria-hidden="true"><use href="#i-kofi"></use></svg>
+        <span class="kofi-label">Thank you<span class="kofi-heart" aria-hidden="true">♥</span></span>
+      </a>
     </footer>
   </aside>
 

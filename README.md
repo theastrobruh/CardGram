@@ -8,6 +8,7 @@
 [![Three.js](https://img.shields.io/badge/Three.js-r128-black?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/es/docs/Web/JavaScript)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![Ko-fi](https://img.shields.io/badge/Thanks-Ko--fi-ff5e5b?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/theastrobruh)
 
 <br/>
 
@@ -33,16 +34,19 @@
 - **Bordes y Curvatura Exacta**: Modelado procedural con soporte de esquinas redondeadas (TCG) y bisel reflectante ajustable.
 - **Cantos Personalizables**: Grosor regulable y acabados en Oro Foil Milenario, Plata Metalizada, Negro Mate y Cartulina Blanca.
 - **Acabado Especular**: Control milimétrico de rugosidad y brillo reflectante.
+- **Luminosidad Ajustable**: Exposición más contenida por defecto y control manual para evitar que los diseños se vean demasiado claros.
+- **Full Art Animado**: La carta base alterna suavemente entre el arte normal y su versión Full Art. La animación se puede activar o desactivar desde el panel Deck.
 
 ### 🎥 Tomas Multicámara & Animación
 - **Capas de hasta 3 Escenas**: Guarda poses de cámara clave y reproduce transiciones fluidas de una toma a otra.
 - **Dinámica de Giro**: Velocidades ajustables, inversión de sentido horario/antihorario y nivelación de inclinación.
-- **Menú en Flor Radial**: Accesos rápidos en pantalla para centrar, invertir giro, nivelar y guardar poses al instante.
+- **Menú en Flor Radial**: Accesos rápidos en pantalla para centrar, invertir giro, nivelar y guardar poses al instante. Arrastra el botón para moverlo y el abanico se orienta solo para no salirse del lienzo.
 - **Modo Visor Cinemático (Clean Screen)**: Oculta toda la interfaz con un clic para grabaciones de pantalla directas y limpias.
 
 ### 💾 Presets y Bilingüe
-- **Gestor de Presets**: Guarda combinaciones de anverso y reverso localmente en el navegador para intercambios rápidos.
-- **Bilingüe (ES / EN)**: Interfaz intuitiva y minimalista en español e inglés.
+- **Presets Integrados**: Incluye la carta base y los decks Shadowblade Kinetic, Volt Striker y Aureon, the Golden Maw con sus anversos y reversos.
+- **Presets Personalizados**: Guarda combinaciones de anverso, reverso y Full Art localmente en el navegador. Cada preset muestra miniaturas de sus dos caras.
+- **Multilingüe (EN / ES / DE)**: Interfaz minimalista en inglés por defecto, con cambio instantáneo a español o alemán desde el botón de mundo.
 
 ---
 
@@ -66,6 +70,14 @@
      python -m http.server 8000
      ```
      Accede en tu navegador a `http://localhost:8000`.
+
+---
+
+## ☕ Apoya el Proyecto
+
+Si TCG:HUB te resulta útil, puedes invitarme un café en Ko-fi. ¡Gracias por el apoyo!
+
+[☕ **Thanks · Ko-fi**](https://ko-fi.com/theastrobruh)
 
 ---
 

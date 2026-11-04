@@ -30,6 +30,7 @@ const DEFAULTS = {
   bevel: 0.004,
   edgeColor: 'black',
   gloss: 0.25,
+  exposure: 0.9,
   speed: 0.5,
   spinDir: 1,
   float: 'organic',
@@ -39,14 +40,41 @@ const DEFAULTS = {
   aspect: '9:16',
   scale: 100,
   bg: 'aqua',
-  duration: 10
+  duration: 10,
+  fullArtAnim: true,
+  fabX: null,
+  fabY: null
 };
 
-const state = { ...DEFAULTS, lang: 'es', sidebarCollapsed: false };
+const state = { ...DEFAULTS, lang: 'en', sidebarCollapsed: false };
 const DEFAULT_CARD = {
   front: 'assets/card_front - base.png',
-  back: 'assets/card_back - base.png'
+  back: 'assets/card_back - base.png',
+  fullArt: 'assets/card_front - base (FULL ART).png'
 };
+const BUILTIN_PRESETS = [
+  {
+    id: 'builtin-shadowblade',
+    name: 'Shadowblade Kinetic',
+    front: 'assets/card_front - base - ALT-1.png',
+    back: 'assets/card_back - ALT-1.png',
+    builtin: true
+  },
+  {
+    id: 'builtin-volt-striker',
+    name: 'Volt Striker',
+    front: 'assets/card_front - base - ALT-2.png',
+    back: 'assets/card_back - ALT-2.png',
+    builtin: true
+  },
+  {
+    id: 'builtin-aureon',
+    name: 'Aureon, the Golden Maw',
+    front: 'assets/card_front - base - ALT-3.png',
+    back: 'assets/card_back - ALT-3.png',
+    builtin: true
+  }
+];
 const currentCard = { ...DEFAULT_CARD };
 const uploadTokens = { front: 0, back: 0 };
 
@@ -62,6 +90,7 @@ let resizeRaf = 0;
 let cinematicTipTimer = 0;
 let storageWarned = false;
 let settingsTimer = 0;
+let fabDragged = false;
 
 const el = {};
 
@@ -129,13 +158,13 @@ function safeImageUrl(value) {
 
   // Normaliza rutas antiguas con espacios codificados (%20) a su forma legible.
   const normalized = value.replace(/%20/gi, ' ');
-  if (/^assets\/[a-z0-9 _.-]+\.(png|jpe?g|webp|avif)$/i.test(normalized)) return normalized;
+  if (/^assets\/[a-z0-9 _().-]+\.(png|jpe?g|webp|avif)$/i.test(normalized)) return normalized;
   if (/^data:image\/(png|jpe?g|webp|avif|gif);base64,[a-z0-9+/=]+$/i.test(value)) return value;
   return null;
 }
 
 function sanitizeSettings(raw) {
-  const result = { ...DEFAULTS, lang: 'es', sidebarCollapsed: false };
+  const result = { ...DEFAULTS, lang: 'en', sidebarCollapsed: false };
   if (!raw || typeof raw !== 'object') return result;
 
   const number = (value, min, max, fallback) => {
@@ -148,6 +177,7 @@ function sanitizeSettings(raw) {
   result.bevel = number(raw.bevel, 0.001, 0.012, DEFAULTS.bevel);
   result.edgeColor = ['black', 'gold', 'silver', 'white'].includes(raw.edgeColor) ? raw.edgeColor : DEFAULTS.edgeColor;
   result.gloss = number(raw.gloss, 0.05, 0.9, DEFAULTS.gloss);
+  result.exposure = number(raw.exposure, 0.4, 1.4, DEFAULTS.exposure);
   result.speed = [0, 0.5, 1, 1.5, 2.5].includes(Number(raw.speed)) ? Number(raw.speed) : DEFAULTS.speed;
   result.spinDir = Number(raw.spinDir) === -1 ? -1 : 1;
   result.float = ['organic', 'subtle', 'breathe', 'dramatic', 'off'].includes(raw.float) ? raw.float : DEFAULTS.float;
@@ -158,7 +188,10 @@ function sanitizeSettings(raw) {
   result.scale = number(raw.scale, 50, 100, DEFAULTS.scale);
   result.bg = ['aqua', 'studio', 'oled', 'sunset', 'cyber', 'transparent'].includes(raw.bg) ? raw.bg : DEFAULTS.bg;
   result.duration = [5, 10, 15].includes(Number(raw.duration)) ? Number(raw.duration) : DEFAULTS.duration;
-  result.lang = raw.lang === 'en' ? 'en' : 'es';
+  result.fullArtAnim = raw.fullArtAnim !== false;
+  result.fabX = Number.isFinite(Number(raw.fabX)) ? clamp(Number(raw.fabX), 0, 10000) : null;
+  result.fabY = Number.isFinite(Number(raw.fabY)) ? clamp(Number(raw.fabY), 0, 10000) : null;
+  result.lang = ['es', 'de'].includes(raw.lang) ? raw.lang : 'en';
   result.sidebarCollapsed = Boolean(raw.sidebarCollapsed);
   return result;
 }
@@ -173,6 +206,7 @@ function sanitizePresets(raw) {
       if (!item || typeof item !== 'object') return null;
       const front = safeImageUrl(item.front);
       const back = safeImageUrl(item.back);
+      const fullArt = safeImageUrl(item.fullArt);
       if (!front || !back) return null;
 
       let name = String(item.name || '').trim().slice(0, MAX_PRESET_NAME);
@@ -187,6 +221,7 @@ function sanitizePresets(raw) {
         name,
         front,
         back,
+        fullArt: fullArt || null,
         createdAt: Number.isFinite(Number(item.createdAt)) ? Number(item.createdAt) : Date.now()
       };
     })
@@ -231,6 +266,7 @@ function serializableState() {
     bevel: state.bevel,
     edgeColor: state.edgeColor,
     gloss: state.gloss,
+    exposure: state.exposure,
     speed: state.speed,
     spinDir: state.spinDir,
     float: state.float,
@@ -241,6 +277,9 @@ function serializableState() {
     scale: state.scale,
     bg: state.bg,
     duration: state.duration,
+    fullArtAnim: state.fullArtAnim,
+    fabX: state.fabX,
+    fabY: state.fabY,
     lang: currentLang,
     sidebarCollapsed: state.sidebarCollapsed
   };
@@ -360,7 +399,7 @@ function openHelp() {
    -------------------------------------------------------------------------- */
 function applyLanguage(lang, options = {}) {
   const { persist = true } = options;
-  currentLang = lang === 'en' ? 'en' : 'es';
+  currentLang = ['en', 'es', 'de'].includes(lang) ? lang : 'en';
   state.lang = currentLang;
   document.documentElement.lang = currentLang;
 
@@ -390,14 +429,69 @@ function applyLanguage(lang, options = {}) {
     node.dataset.tip = t(node.getAttribute('data-i18n-tip'));
   });
 
-  el.btnLangEs.classList.toggle('active', currentLang === 'es');
-  el.btnLangEs.setAttribute('aria-pressed', String(currentLang === 'es'));
-  el.btnLangEn.classList.toggle('active', currentLang === 'en');
-  el.btnLangEn.setAttribute('aria-pressed', String(currentLang === 'en'));
+  $$('.lang-option').forEach((option) => {
+    const active = option.getAttribute('data-lang') === currentLang;
+    option.classList.toggle('active', active);
+    option.setAttribute('aria-checked', String(active));
+  });
 
   updateExportLabel();
+  updateFullArtToggle();
+  renderPresets();
   if (!exporting) setStatus(t('status_ready'), 'ready');
   if (persist) persistSettings();
+}
+
+function setLangMenu(open) {
+  if (!el.langDropdown || !el.langTrigger) return;
+
+  el.langDropdown.hidden = !open;
+  el.langTrigger.setAttribute('aria-expanded', String(open));
+
+  if (open) {
+    const active = el.langOptions.find((option) => option.classList.contains('active')) || el.langOptions[0];
+    if (active) setTimeout(() => active.focus(), 0);
+  }
+}
+
+function setupLangMenu() {
+  if (!el.langMenu || !el.langTrigger || !el.langDropdown) return;
+
+  el.langTrigger.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setLangMenu(el.langDropdown.hidden);
+  });
+
+  el.langOptions.forEach((option) => {
+    option.addEventListener('click', () => {
+      applyLanguage(option.getAttribute('data-lang'));
+      setLangMenu(false);
+      el.langTrigger.focus();
+    });
+  });
+
+  el.langDropdown.addEventListener('keydown', (event) => {
+    const options = el.langOptions;
+    const index = options.indexOf(document.activeElement);
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const direction = event.key === 'ArrowDown' ? 1 : -1;
+      const next = (index + direction + options.length) % options.length;
+      options[next].focus();
+    } else if (event.key === 'Home' || event.key === 'End') {
+      event.preventDefault();
+      options[event.key === 'Home' ? 0 : options.length - 1].focus();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      setLangMenu(false);
+      el.langTrigger.focus();
+    }
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!el.langMenu.contains(event.target)) setLangMenu(false);
+  });
 }
 
 /* --------------------------------------------------------------------------
@@ -549,17 +643,42 @@ async function playSequence() {
 /* --------------------------------------------------------------------------
    Presets
    -------------------------------------------------------------------------- */
-function makePresetChip({ name, active, onSelect, onDelete }) {
+function makePresetChip({ name, active, front, back, onSelect, onDelete }) {
   const chip = document.createElement('div');
   chip.className = `preset-chip${active ? ' active' : ''}`;
 
   const main = document.createElement('button');
   main.type = 'button';
   main.className = 'preset-chip-main';
-  main.textContent = name;
   main.title = name;
   main.setAttribute('aria-pressed', String(active));
   main.addEventListener('click', onSelect);
+
+  if (front && back) {
+    const thumbs = document.createElement('span');
+    thumbs.className = 'preset-thumbs';
+    thumbs.setAttribute('aria-hidden', 'true');
+
+    const frontThumb = document.createElement('img');
+    frontThumb.src = front;
+    frontThumb.alt = '';
+    frontThumb.loading = 'lazy';
+    frontThumb.decoding = 'async';
+
+    const backThumb = document.createElement('img');
+    backThumb.src = back;
+    backThumb.alt = '';
+    backThumb.loading = 'lazy';
+    backThumb.decoding = 'async';
+
+    thumbs.append(frontThumb, backThumb);
+    main.appendChild(thumbs);
+  }
+
+  const label = document.createElement('span');
+  label.className = 'preset-chip-label';
+  label.textContent = name;
+  main.appendChild(label);
 
   chip.appendChild(main);
 
@@ -587,15 +706,31 @@ function renderPresets() {
     makePresetChip({
       name: t('default_preset_name'),
       active: activePresetId === 'default',
+      front: DEFAULT_CARD.front,
+      back: DEFAULT_CARD.back,
       onSelect: restoreDefaultCard
     })
   );
+
+  BUILTIN_PRESETS.forEach((preset) => {
+    el.presetsBar.appendChild(
+      makePresetChip({
+        name: preset.name,
+        active: activePresetId === preset.id,
+        front: preset.front,
+        back: preset.back,
+        onSelect: () => loadPreset(preset)
+      })
+    );
+  });
 
   presets.forEach((preset) => {
     el.presetsBar.appendChild(
       makePresetChip({
         name: preset.name,
         active: activePresetId === preset.id,
+        front: preset.front,
+        back: preset.back,
         onSelect: () => loadPreset(preset),
         onDelete: () => deletePreset(preset.id)
       })
@@ -603,15 +738,17 @@ function renderPresets() {
   });
 }
 
-async function applyCardImages(front, back) {
+async function applyCardImages(front, back, fullArt) {
   currentCard.front = front;
   currentCard.back = back;
+  currentCard.fullArt = fullArt || null;
   el.frontPreview.src = front;
   el.backPreview.src = back;
+  updateFullArtToggle();
 
   if (!Scene.isReady()) return;
 
-  const status = await Scene.loadCardImages(front, back);
+  const status = await Scene.loadCardImages(front, back, currentCard.fullArt);
   if (!status.front || !status.back) {
     toast(t('texture_error'), { type: 'warning', duration: 5000 });
   }
@@ -620,14 +757,14 @@ async function applyCardImages(front, back) {
 function restoreDefaultCard() {
   activePresetId = 'default';
   renderPresets();
-  applyCardImages(DEFAULT_CARD.front, DEFAULT_CARD.back);
+  applyCardImages(DEFAULT_CARD.front, DEFAULT_CARD.back, DEFAULT_CARD.fullArt);
   toast(t('default_restored'), { type: 'success' });
 }
 
 function loadPreset(preset) {
   activePresetId = preset.id;
   renderPresets();
-  applyCardImages(preset.front, preset.back);
+  applyCardImages(preset.front, preset.back, preset.fullArt);
   toast(t('preset_loaded', { name: preset.name }), { type: 'success' });
 }
 
@@ -681,6 +818,7 @@ function saveCurrentPreset(name) {
     name: finalName,
     front: currentCard.front,
     back: currentCard.back,
+    fullArt: currentCard.fullArt || null,
     createdAt: Date.now()
   };
 
@@ -784,10 +922,13 @@ async function applyCardImage(side, dataUrl, fileName) {
   preview.src = dataUrl;
   preview.alt = `${t(side === 'front' ? 'front_cover' : 'back_cover')}${fileName ? ` — ${fileName}` : ''}`;
   currentCard[side] = dataUrl;
+  if (side === 'front') currentCard.fullArt = null;
   activePresetId = null;
   renderPresets();
+  updateFullArtToggle();
 
   if (!Scene.isReady()) return;
+  if (side === 'front') Scene.clearFullArt();
   const ok = await Scene.loadCardImage(side, dataUrl);
   if (token !== uploadTokens[side]) return;
   if (!ok) toast(t('upload_failed'), { type: 'error' });
@@ -931,6 +1072,23 @@ function bindRange(input, output, key, formatter, onChange) {
   });
 }
 
+function updateFullArtToggle() {
+  if (!el.toggleFullArt) return;
+
+  const available = Boolean(currentCard.fullArt);
+  el.toggleFullArt.disabled = !available;
+  el.toggleFullArt.checked = available && Boolean(state.fullArtAnim);
+
+  if (el.fullArtRow) el.fullArtRow.classList.toggle('is-disabled', !available);
+  if (el.fullArtState) {
+    el.fullArtState.textContent = available
+      ? state.fullArtAnim
+        ? t('fullart_on')
+        : t('fullart_off')
+      : t('fullart_unavailable');
+  }
+}
+
 function syncUI() {
   setSegmented('seg-corners', state.corners);
   setSegmented('seg-aspect', state.aspect);
@@ -941,6 +1099,7 @@ function syncUI() {
   setRange(el.rangeEdgeThickness, el.valEdgeThick, state.edgeThickness, (value) => value.toFixed(3));
   setRange(el.rangeBevel, el.valBevelInt, state.bevel, (value) => value.toFixed(3));
   setRange(el.rangeGloss, el.valGloss, state.gloss, (value) => value.toFixed(2));
+  setRange(el.rangeExposure, el.valExposure, state.exposure, (value) => value.toFixed(2));
   setRange(el.rangeCamDist, el.valCamDist, state.camDistance, (value) => value.toFixed(1));
   setRange(el.rangePosY, el.valPosY, state.posY, (value) => value.toFixed(2));
   setRange(el.rangeTilt, el.valTilt, state.tilt, (value) => value.toFixed(1));
@@ -957,6 +1116,7 @@ function syncUI() {
       bevel: state.bevel,
       edgeColor: state.edgeColor,
       gloss: state.gloss,
+      exposure: state.exposure,
       speed: state.speed,
       spinDir: state.spinDir,
       float: state.float,
@@ -965,8 +1125,10 @@ function syncUI() {
       tilt: state.tilt,
       bg: state.bg
     });
+    Scene.setFullArtEnabled(state.fullArtAnim);
   }
 
+  updateFullArtToggle();
   scheduleResize();
   updateExportLabel();
 }
@@ -994,6 +1156,10 @@ function setupControls() {
 
   bindRange(el.rangeGloss, el.valGloss, 'gloss', (value) => value.toFixed(2), (value) => {
     if (Scene.isReady()) Scene.applySettings({ gloss: value });
+  });
+
+  bindRange(el.rangeExposure, el.valExposure, 'exposure', (value) => value.toFixed(2), (value) => {
+    if (Scene.isReady()) Scene.applySettings({ exposure: value });
   });
 
   el.selectSpeed.addEventListener('change', () => {
@@ -1050,6 +1216,15 @@ function setupControls() {
     persistSettings();
   });
 
+  if (el.toggleFullArt) {
+    el.toggleFullArt.addEventListener('change', () => {
+      state.fullArtAnim = el.toggleFullArt.checked;
+      if (Scene.isReady()) Scene.setFullArtEnabled(state.fullArtAnim);
+      updateFullArtToggle();
+      persistSettings();
+    });
+  }
+
   el.btnReset3d.addEventListener('click', reset3D);
   el.btnResetCamera.addEventListener('click', resetCamera);
   el.btnResetSettings.addEventListener('click', resetAllSettings);
@@ -1093,6 +1268,10 @@ function setFlower(open) {
 function setupFlower() {
   el.flowerTrigger.addEventListener('click', (event) => {
     event.stopPropagation();
+    if (fabDragged) {
+      fabDragged = false;
+      return;
+    }
     setFlower(!el.flowerMenu.classList.contains('open'));
   });
 
@@ -1144,6 +1323,144 @@ function setupFlower() {
   });
 }
 
+function fabBounds() {
+  const width = (el.viewport && el.viewport.clientWidth) || window.innerWidth;
+  const height = (el.viewport && el.viewport.clientHeight) || window.innerHeight;
+  const size = (el.flowerMenu && el.flowerMenu.offsetWidth) || 54;
+  const margin = 10;
+
+  return {
+    width,
+    height,
+    size,
+    margin,
+    maxX: Math.max(margin, width - size - margin),
+    maxY: Math.max(margin, height - size - margin)
+  };
+}
+
+function updateFabOrientation(x, y) {
+  if (!el.flowerMenu) return;
+  const bounds = fabBounds();
+  el.flowerMenu.classList.toggle('petals-right', x < bounds.width / 2);
+  el.flowerMenu.classList.toggle('petals-down', y < bounds.height / 2);
+}
+
+function applyFabPosition() {
+  if (!el.flowerMenu) return;
+
+  if (!Number.isFinite(state.fabX) || !Number.isFinite(state.fabY)) {
+    el.flowerMenu.style.left = '';
+    el.flowerMenu.style.top = '';
+    el.flowerMenu.style.right = '';
+    el.flowerMenu.style.bottom = '';
+    el.flowerMenu.classList.remove('petals-right', 'petals-down');
+    return;
+  }
+
+  const bounds = fabBounds();
+  const x = clamp(state.fabX, bounds.margin, bounds.maxX);
+  const y = clamp(state.fabY, bounds.margin, bounds.maxY);
+
+  state.fabX = x;
+  state.fabY = y;
+  el.flowerMenu.style.left = `${x}px`;
+  el.flowerMenu.style.top = `${y}px`;
+  el.flowerMenu.style.right = 'auto';
+  el.flowerMenu.style.bottom = 'auto';
+  updateFabOrientation(x, y);
+}
+
+function setupFabDrag() {
+  if (!el.flowerMenu || !el.flowerTrigger || !el.viewport) return;
+
+  const trigger = el.flowerTrigger;
+  const menu = el.flowerMenu;
+  let drag = null;
+
+  trigger.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+    const menuRect = menu.getBoundingClientRect();
+    drag = {
+      id: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      offsetX: event.clientX - menuRect.left,
+      offsetY: event.clientY - menuRect.top,
+      moved: false
+    };
+
+    menu.classList.add('dragging');
+    try {
+      trigger.setPointerCapture(event.pointerId);
+    } catch (error) {
+      /* Captura de puntero no disponible en algunos navegadores. */
+    }
+  });
+
+  trigger.addEventListener('pointermove', (event) => {
+    if (!drag || event.pointerId !== drag.id) return;
+
+    const dx = event.clientX - drag.startX;
+    const dy = event.clientY - drag.startY;
+    if (!drag.moved && Math.hypot(dx, dy) < 5) return;
+
+    drag.moved = true;
+    event.preventDefault();
+
+    const bounds = fabBounds();
+    const viewportRect = el.viewport.getBoundingClientRect();
+    const x = clamp(
+      event.clientX - viewportRect.left - drag.offsetX,
+      bounds.margin,
+      bounds.maxX
+    );
+    const y = clamp(
+      event.clientY - viewportRect.top - drag.offsetY,
+      bounds.margin,
+      bounds.maxY
+    );
+
+    state.fabX = x;
+    state.fabY = y;
+    menu.style.left = `${x}px`;
+    menu.style.top = `${y}px`;
+    menu.style.right = 'auto';
+    menu.style.bottom = 'auto';
+    updateFabOrientation(x, y);
+  });
+
+  const finishDrag = (event) => {
+    if (!drag || event.pointerId !== drag.id) return;
+
+    const moved = drag.moved;
+    drag = null;
+    menu.classList.remove('dragging');
+
+    try {
+      trigger.releasePointerCapture(event.pointerId);
+    } catch (error) {
+      /* La captura ya pudo haberse liberado. */
+    }
+
+    if (!moved) return;
+
+    fabDragged = true;
+    setTimeout(() => {
+      fabDragged = false;
+    }, 360);
+    persistSettings();
+  };
+
+  trigger.addEventListener('pointerup', finishDrag);
+  trigger.addEventListener('pointercancel', finishDrag);
+  trigger.addEventListener('lostpointercapture', (event) => {
+    if (!drag) return;
+    finishDrag(event);
+  });
+}
+
 /* --------------------------------------------------------------------------
    Reinicios
    -------------------------------------------------------------------------- */
@@ -1153,6 +1470,7 @@ function reset3D() {
   state.bevel = DEFAULTS.bevel;
   state.edgeColor = DEFAULTS.edgeColor;
   state.gloss = DEFAULTS.gloss;
+  state.exposure = DEFAULTS.exposure;
   syncUI();
   persistSettings();
   toast(t('reset_3d_done'), { type: 'success' });
@@ -1186,6 +1504,7 @@ async function resetAllSettings() {
   activeScene = 1;
   syncUI();
   setActiveScene(1);
+  applyFabPosition();
   persistSettings();
   persistScenes();
   toast(t('reset_all_done'), { type: 'success' });
@@ -1209,6 +1528,7 @@ function resizeCanvas() {
     cinematic: document.body.classList.contains('cinematic-mode')
   });
   if (size) updateStageChips(size.width, size.height);
+  applyFabPosition();
 }
 
 function getStageRatio() {
@@ -1322,6 +1642,12 @@ function setupKeyboard() {
         cancelExport();
         return;
       }
+      if (el.langDropdown && !el.langDropdown.hidden) {
+        event.preventDefault();
+        setLangMenu(false);
+        el.langTrigger.focus();
+        return;
+      }
       if (el.flowerMenu.classList.contains('open')) {
         setFlower(false);
         return;
@@ -1366,8 +1692,10 @@ function cacheDom() {
   el.navTabs = $('.nav-tabs');
   el.scrollContent = $('#scroll-content');
 
-  el.btnLangEs = $('#btn-lang-es');
-  el.btnLangEn = $('#btn-lang-en');
+  el.langMenu = $('#lang-menu');
+  el.langTrigger = $('#btn-lang');
+  el.langDropdown = $('#lang-dropdown');
+  el.langOptions = $$('.lang-option');
   el.btnHelp = $('#btn-help');
   el.helpDialog = $('#help-dialog');
   el.helpClose = $('#help-close');
@@ -1381,6 +1709,9 @@ function cacheDom() {
   el.backPreview = $('#back-preview-img');
   el.btnSaveCardPreset = $('#btn-save-card-preset');
   el.btnRestoreCard = $('#btn-restore-card');
+  el.fullArtRow = $('#fullart-row');
+  el.toggleFullArt = $('#toggle-fullart');
+  el.fullArtState = $('#fullart-state');
 
   el.rangeEdgeThickness = $('#range-edge-thickness');
   el.valEdgeThick = $('#val-edge-thick');
@@ -1388,6 +1719,8 @@ function cacheDom() {
   el.valBevelInt = $('#val-bevel-int');
   el.rangeGloss = $('#range-gloss');
   el.valGloss = $('#val-gloss');
+  el.rangeExposure = $('#range-exposure');
+  el.valExposure = $('#val-exposure');
 
   el.selectSpeed = $('#select-speed');
   el.selectSpinDir = $('#select-spin-dir');
@@ -1510,8 +1843,7 @@ function setupChrome() {
   el.viewport.addEventListener('wheel', () => el.viewportHint.classList.add('hidden'), { passive: true });
   setTimeout(() => el.viewportHint.classList.add('hidden'), 9000);
 
-  el.btnLangEs.addEventListener('click', () => applyLanguage('es'));
-  el.btnLangEn.addEventListener('click', () => applyLanguage('en'));
+  setupLangMenu();
   el.btnHelp.addEventListener('click', openHelp);
   el.helpClose.addEventListener('click', () => el.helpDialog.close());
 
@@ -1584,6 +1916,7 @@ function init() {
   setupControls();
   setupScenes();
   setupFlower();
+  setupFabDrag();
   setupUploads();
   setupKeyboard();
 
@@ -1597,7 +1930,7 @@ function init() {
   scheduleResize();
 
   if (ok) {
-    Scene.loadCardImages(currentCard.front, currentCard.back)
+    Scene.loadCardImages(currentCard.front, currentCard.back, currentCard.fullArt)
       .then((status) => {
         if (!status.front || !status.back) toast(t('texture_error'), { type: 'warning', duration: 5000 });
       })
