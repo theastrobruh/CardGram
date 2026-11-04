@@ -85,4 +85,4 @@ Run this before claiming a CardGram-style UI is done. Take screenshots; do not j
 5. One alternate panel (Library or Collections).
 6. One variant theme, if used.
 
-Compare against `assets/screens/` side by side. If the silhouette and light feel different, fix tokens before adding detail.
+Compare against the running app side by side. If the silhouette and light feel different, fix tokens before adding detail.

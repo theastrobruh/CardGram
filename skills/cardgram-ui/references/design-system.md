@@ -1,6 +1,6 @@
 # Design system — Aqua Glass Studio
 
-Source of truth: `assets/css/app.css` §1–3 and `assets/css/hub.css` §2–3. The starter encodes the same values in `assets/starter/css/tokens.css`.
+Source of truth: `assets/css/app.css` §1–3 and `assets/css/hub.css` §2–3.
 
 ## 1. Character
 

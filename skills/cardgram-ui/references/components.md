@@ -1,6 +1,6 @@
 # Components
 
-Every recipe assumes the tokens in `design-system.md`. Prefer the starter's class names so a future agent can recognize the system.
+Every recipe assumes the tokens in `design-system.md`. Prefer the existing class names in `index.html` and the CSS so the next agent can recognize the system.
 
 ## 1. Buttons
 
@@ -104,7 +104,7 @@ The hero card is a 3D object with a front and back:
 - Entrance: 2.1 s from translateY 52 px / scale .82 / blur 14 px.
 - Metadata sits below: eyebrow, name, collection, chips, text link.
 
-For the card art itself use a real image with `object-fit: cover`. In the starter, the art is CSS/SVG so no copyrighted assets ship with the skill.
+For the card art itself use the existing artwork or a real image with `object-fit: cover`. Keep the 5:7 ratio and the existing `assets/data/cards/` structure.
 
 ## 7. Sliders
 

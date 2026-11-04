@@ -88,7 +88,7 @@ Rules:
 6. Keep the idle animation on `.card`, not `.card-inner`, so it composes with the flip.
 7. Add a synthetic shine as a `::after` on the front, `mix-blend-mode: screen`, clipped by the face radius.
 
-The starter implements 1–6 in `assets/starter/js/demo.js`.
+The current implementation is in `assets/js/hub.js` (`setupShowcaseTilt`) and `assets/css/hub.css` §6.
 
 ## 5. Three.js handoff
 

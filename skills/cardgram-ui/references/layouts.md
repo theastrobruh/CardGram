@@ -1,10 +1,9 @@
 # Layouts
 
-Reference screenshots live in `assets/screens/`. Open them when a dimension is ambiguous.
+Use the running app as the visual reference. Open it locally with `Iniciar_Webapp.bat` or `python -m http.server 8000`.
 
 ## 1. Hub — the lobby
 
-![Hub desktop](../assets/screens/hub-home-desktop.png)
 
 ### Anatomy
 
@@ -67,13 +66,10 @@ Responsive:
 - **Explore**: preview shell; deliberately disabled, gradient “soon” dot, no fake live data.
 - **Profile**: two-column editor + sticky profile summary; one column under 980 px.
 
-![Library](../assets/screens/hub-library-desktop.png)
 
-![Collections](../assets/screens/hub-collections-desktop.png)
 
 ### Mobile hub
 
-![Hub mobile](../assets/screens/hub-home-mobile.png)
 
 - One column, 390 px reference width.
 - Topbar: brand left, language + avatar right. No center nav.
@@ -83,7 +79,6 @@ Responsive:
 
 ## 2. Studio — the editor
 
-![Studio deck](../assets/screens/studio-deck-desktop.png)
 
 ### Anatomy
 
@@ -120,15 +115,11 @@ body[data-view="studio"]
 - At ≤860 px: sidebar becomes a fixed off-canvas drawer `min(88vw,380px)`, stage fills 100dvh, chips stay top-center.
 - At ≤560 px: stage is edge-to-edge with 0 radius; chips hidden; FAB 16 px from edges.
 
-![3D Forge](../assets/screens/studio-forge-desktop.png)
 
-![Shots](../assets/screens/studio-shots-desktop.png)
 
-![Canvas](../assets/screens/studio-canvas-desktop.png)
 
 ### Mobile studio
 
-![Studio mobile](../assets/screens/studio-mobile.png)
 
 Only the stage remains visible. The menu button top-left opens the sidebar; home and cinematic eye float top-right. The card is the entire experience.
 
