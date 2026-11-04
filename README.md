@@ -1,9 +1,10 @@
 <div align="center">
 
-# 🎴 3D Trading Card Studio
-### *Interactive WebGL 3D Card Showcase & Content Creator for Reels, TikTok & Shorts*
+# 🎴 TCG:HUB
+### *Interactive WebGL 3D Card Showcase & Reel Creator*
+**by theAstroBruh**
 
-[![GitHub Pages](https://img.shields.io/badge/Demo-GitHub%20Pages-brightgreen?style=for-the-badge&logo=github)](https://theastrobruh.github.io/3D-Card-View/)
+[![GitHub Pages](https://img.shields.io/badge/Demo-GitHub%20Pages-brightgreen?style=for-the-badge&logo=github)](https://theastrobruh.github.io/TCG-HUB/)
 [![Three.js](https://img.shields.io/badge/Three.js-r128-black?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/es/docs/Web/JavaScript)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
@@ -11,10 +12,10 @@
 <br/>
 
 <p align="center">
-  <b>Una suite de visualización y animación 3D en tiempo real diseñada para creadores de cartas coleccionables (TCG), artistas digitales y creadores de contenido.</b>
+  <b>Una suite de visualización y animación 3D en tiempo real inspirada en la estética de duelos TCG, diseñada para creadores de cartas coleccionables, artistas y creadores de contenido.</b>
 </p>
 
-[🎮 Probar Demo en Vivo](https://theastrobruh.github.io/3D-Card-View/) • [✨ Características](#-características) • [⚡ Inicio Rápido](#-inicio-rápido) • [🎥 Modos de Grabación](#-modos-de-grabación)
+[🎮 Probar Demo en Vivo](https://theastrobruh.github.io/TCG-HUB/) • [✨ Características](#-características) • [⚡ Inicio Rápido](#-inicio-rápido)
 
 ---
 
@@ -22,47 +23,40 @@
 
 ## 📖 Acerca del Proyecto
 
-**3D Trading Card Studio** permite importar diseños en 2D (anverso y reverso) y transformarlos al instante en una carta tridimensional fotorrealista con efectos holográficos avanzados, reflejos metálicos, texturas de relieve (*bump maps*) y animaciones cinemáticas listas para exportar a video (.webm) o capturas fotográficas en alta resolución (.png).
-
-Optimizado con relaciones de aspecto estándar para **TikTok, Instagram Reels y YouTube Shorts (9:16)**, así como formatos cuadrados (**1:1**) y apaisados (**16:9**).
+**TCG:HUB** permite importar diseños en 2D (anverso y reverso) y transformarlos al instante en una carta tridimensional fotorrealista con cantos ajustables, biseles reflectantes, rotación paramétrica, tomas multicámara y exportación en alta definición a video vertical (9:16) listo para Reels, TikTok y YouTube Shorts.
 
 ---
 
-## ✨ Características
+## ✨ Características Principales
 
-### 🌈 Shaders y Efectos Holográficos
-- **Efecto Arcoíris Dinámico (*Rainbow Foil*)**: Reflejos iridiscentes calculados según el ángulo de visión de la cámara.
-- **Partículas Glitter / Sparkles**: Destellos estelares sobre la superficie al mover la carta o la iluminación.
-- **Bordes Metálicos Personalizables**: Selector de color, rugosidad (*roughness*) y reflectividad metálica (*metalness*) para simular oro, plata o acabados neón.
-- **Relieve Físico 3D & Curvatura**: Simulación sutil del grosor y curvatura natural de una carta física real.
+### 🎴 Motor 3D & Forge de Cartas
+- **Bordes y Curvatura Exacta**: Modelado procedural con soporte de esquinas redondeadas (TCG) y bisel reflectante ajustable.
+- **Cantos Personalizables**: Grosor regulable y acabados en Oro Foil Milenario, Plata Metalizada, Negro Mate y Cartulina Blanca.
+- **Acabado Especular**: Control milimétrico de rugosidad y brillo reflectante.
 
-### 🎬 Modos de Animación Preestablecidos
-| Animación | Descripción |
-| :--- | :--- |
-| **Showcase 360°** | Giro continuo y suave ideal para vitrinas virtuales y presentaciones. |
-| **Holo Tilt** | Balanceo suave en múltiples ejes para destacar los brillos y foils holográficos. |
-| **Dramatic Flip** | Giro de impacto diseñado para transiciones y vídeos de revelación (*Card Reveal*). |
-| **Floating Idle** | Levitación fluida y sutil para estética de cartas míticas o legendarias. |
+### 🎥 Tomas Multicámara & Animación
+- **Capas de hasta 3 Escenas**: Guarda poses de cámara clave y reproduce transiciones fluidas de una toma a otra.
+- **Dinámica de Giro**: Velocidades ajustables, inversión de sentido horario/antihorario y nivelación de inclinación.
+- **Menú en Flor Radial**: Accesos rápidos en pantalla para centrar, invertir giro, nivelar y guardar poses al instante.
+- **Modo Visor Cinemático (Clean Screen)**: Oculta toda la interfaz con un clic para grabaciones de pantalla directas y limpias.
 
-### 📹 Estudio de Grabación Integrado
-- **Exportación Directa a Video**: Graba clips de vídeo con la **MediaStream Recording API** sin marcas de agua ni software externo.
-- **Captura Instantánea en HD**: Exporta imágenes nítidas de la carta en cualquier pose.
-- **Controles de Entorno**: Fondos personalizables (gradientes de estudio, negro profundo, verde croma para composición).
+### 💾 Presets y Bilingüe
+- **Gestor de Presets**: Guarda combinaciones de anverso y reverso localmente en el navegador para intercambios rápidos.
+- **Bilingüe (ES / EN)**: Interfaz intuitiva y minimalista en español e inglés.
 
 ---
 
 ## ⚡ Inicio Rápido
 
 ### Usar en el Navegador (Sin instalación)
-Puedes abrir directamente el proyecto en la web:
-👉 **[Abrir 3D Trading Card Studio](https://theastrobruh.github.io/3D-Card-View/)**
+👉 **[Abrir TCG:HUB](https://theastrobruh.github.io/TCG-HUB/)**
 
 ### Ejecutar Localmente
 
 1. **Clonar el repositorio**:
    ```bash
-   git clone https://github.com/theastrobruh/3D-Card-View.git
-   cd 3D-Card-View
+   git clone https://github.com/theastrobruh/TCG-HUB.git
+   cd TCG-HUB
    ```
 
 2. **Abrir en local**:
@@ -72,32 +66,14 @@ Puedes abrir directamente el proyecto en la web:
      python -m http.server 8000
      ```
      Accede en tu navegador a `http://localhost:8000`.
-   - **Con Node / npx**:
-     ```bash
-     npx serve .
-     ```
 
 ---
 
 ## 🛠️ Tecnologías
 
-- **[Three.js (r128)](https://threejs.org/)** — Motor de renderizado 3D y WebGL.
-- **Canvas Capture & MediaStream API** — Procesamiento y captura de vídeo en el navegador.
-- **HTML5 & CSS3 Vanilla** — Interfaz limpia, responsiva y sin dependencias pesadas.
+- **[Three.js (r128)](https://threejs.org/)** — Motor 3D y WebGL.
+- **Canvas Capture & MediaStream Recording API** — Render y codificación de video en el cliente.
+- **HTML5 & CSS3 Vanilla** — Sin dependencias externas ni compiladores requeridos.
 
 ---
-
-## 🤝 Contribuciones
-
-Las contribuciones, sugerencias e informes de errores son bienvenidos:
-1. Haz un Fork del proyecto.
-2. Crea tu rama de características (`git checkout -b feature/NuevaCaracteristica`).
-3. Confirma tus cambios (`git commit -m 'Añadir nueva característica'`).
-4. Haz Push a la rama (`git push origin feature/NuevaCaracteristica`).
-5. Abre un **Pull Request**.
-
----
-
-<div align="center">
-  <sub>Desarrollado con ❤️ para artistas, coleccionistas y creadores de contenido.</sub>
-</div>
+© 2026 TCG:HUB — by theAstroBruh
