@@ -1,0 +1,367 @@
+/* ==========================================================================
+   CardGram UI — optional theme overrides
+   Activate with <html data-theme="sunset|cyber|oled">.
+   Keep the layout and component CSS untouched.
+   ========================================================================== */
+
+[data-theme="sunset"] {
+  --ink: #3d2433;
+  --ink-soft: #67424f;
+  --muted: #8c6a72;
+  --muted-strong: #714e5b;
+  --title: #3d2433;
+  --label: #9d3f62;
+  --label-soft: #8d3457;
+  --aqua: #ff9a8b;
+  --aqua-deep: #c85a7a;
+  --sky: #b58be8;
+  --sky-deep: #8b62c9;
+  --mint: #ffe0c7;
+
+  --accent: linear-gradient(135deg, #ffd3a5 0%, #ff9a8b 44%, #c86dd7 100%);
+  --accent-hover: linear-gradient(135deg, #ffe0b8 0%, #ffab9d 44%, #d47de2 100%);
+
+  --glass: rgba(255, 250, 248, 0.46);
+  --glass-strong: rgba(255, 250, 248, 0.70);
+  --glass-soft: rgba(255, 250, 248, 0.30);
+  --stroke: rgba(255, 255, 255, 0.78);
+  --stroke-soft: rgba(255, 255, 255, 0.52);
+
+  --shadow-xl: 0 34px 80px rgba(92, 38, 67, 0.24);
+  --shadow-lg: 0 22px 54px rgba(92, 38, 67, 0.16);
+  --shadow-md: 0 10px 26px rgba(92, 38, 67, 0.11);
+  --shadow-sm: 0 4px 12px rgba(92, 38, 67, 0.09);
+  --inset-hi: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --inset-lo: inset 0 -1px 0 rgba(92, 38, 67, 0.06);
+}
+
+[data-theme="sunset"] body {
+  background-color: #ffe0d0;
+  background-image:
+    radial-gradient(1100px 760px at 8% -6%, #fff6e8 0%, rgba(255, 246, 232, 0) 58%),
+    radial-gradient(1000px 720px at 96% 4%, #ffd8e8 0%, rgba(255, 216, 232, 0) 55%),
+    radial-gradient(900px 760px at 46% 112%, #e7d4ff 0%, rgba(231, 212, 255, 0) 62%),
+    linear-gradient(152deg, #fff1d6 0%, #ffd7d0 46%, #e6c9f4 100%);
+}
+
+[data-theme="cyber"] {
+  --ink: #e9fbff;
+  --ink-soft: #b7d9e8;
+  --muted: #7ea6bd;
+  --muted-strong: #9fc4d6;
+  --title: #f2fbff;
+  --label: #7ff5ec;
+  --label-soft: #8ef7ee;
+  --aqua: #4fffe1;
+  --aqua-deep: #28d7ff;
+  --sky: #8a7dff;
+  --sky-deep: #6a5cff;
+  --mint: #b9fff4;
+
+  --glass: rgba(10, 32, 54, 0.46);
+  --glass-strong: rgba(12, 40, 66, 0.70);
+  --glass-soft: rgba(10, 32, 54, 0.30);
+  --glass-row: rgba(15, 44, 70, 0.44);
+  --stroke: rgba(120, 240, 255, 0.28);
+  --stroke-soft: rgba(120, 240, 255, 0.16);
+  --stroke-ink: rgba(79, 255, 225, 0.24);
+
+  --accent: linear-gradient(135deg, #4fffe1 0%, #28d7ff 46%, #8a7dff 100%);
+  --accent-hover: linear-gradient(135deg, #7affea 0%, #56e4ff 46%, #a49aff 100%);
+
+  --shadow-xl: 0 34px 80px rgba(0, 8, 24, 0.55);
+  --shadow-lg: 0 22px 54px rgba(0, 8, 24, 0.40);
+  --shadow-md: 0 10px 26px rgba(0, 8, 24, 0.30);
+  --shadow-sm: 0 4px 12px rgba(0, 8, 24, 0.24);
+  --inset-hi: inset 0 1px 0 rgba(180, 255, 255, 0.20);
+  --inset-lo: inset 0 -1px 0 rgba(0, 0, 0, 0.24);
+}
+
+[data-theme="cyber"] body {
+  background-color: #071426;
+  background-image:
+    radial-gradient(900px 700px at 10% -10%, rgba(40, 215, 255, 0.28), transparent 60%),
+    radial-gradient(900px 700px at 96% 6%, rgba(138, 125, 255, 0.22), transparent 58%),
+    radial-gradient(800px 700px at 50% 116%, rgba(79, 255, 225, 0.14), transparent 62%),
+    linear-gradient(150deg, #06111f 0%, #0a1f35 52%, #101a3a 100%);
+}
+
+[data-theme="cyber"] .glass-panel {
+  background:
+    linear-gradient(158deg, rgba(12, 40, 66, 0.72), rgba(10, 32, 54, 0.46)),
+    radial-gradient(120% 80% at 0% 0%, rgba(79, 255, 225, 0.12), transparent 62%);
+  border-color: rgba(120, 240, 255, 0.16);
+}
+
+[data-theme="cyber"] .hub-topbar {
+  background: rgba(6, 22, 38, 0.9);
+  box-shadow: 0 1px 0 rgba(120, 240, 255, 0.12), 0 10px 30px rgba(0, 0, 0, 0.28);
+}
+
+[data-theme="cyber"] .hub-nav,
+[data-theme="cyber"] .lang-switch,
+[data-theme="cyber"] .profile-pill,
+[data-theme="cyber"] .segmented,
+[data-theme="cyber"] .nav-tabs,
+[data-theme="cyber"] .control-row,
+[data-theme="cyber"] .stat-tile,
+[data-theme="cyber"] .media-card,
+[data-theme="cyber"] .collection-card,
+[data-theme="cyber"] .panel {
+  background: rgba(12, 40, 66, 0.5);
+  border-color: rgba(120, 240, 255, 0.14);
+}
+
+[data-theme="cyber"] .hub-nav-btn.active,
+[data-theme="cyber"] .seg-btn.active,
+[data-theme="cyber"] .tab-btn.active,
+[data-theme="cyber"] .mobile-btn.active {
+  background: linear-gradient(165deg, rgba(79, 255, 225, 0.18), rgba(40, 215, 255, 0.08));
+  color: var(--ink);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.28), var(--inset-hi);
+}
+
+[data-theme="cyber"] #sidebar {
+  background: linear-gradient(165deg, rgba(10, 32, 54, 0.86), rgba(7, 22, 38, 0.70));
+  border-color: rgba(120, 240, 255, 0.2);
+}
+
+[data-theme="cyber"] .stage {
+  background: linear-gradient(160deg, #0b2238 0%, #123b5c 50%, #1b2b63 100%);
+  border-color: rgba(120, 240, 255, 0.24);
+}
+
+[data-theme="cyber"] .stage-chip,
+[data-theme="cyber"] .viewport-hint,
+[data-theme="cyber"] .icon-btn,
+[data-theme="cyber"] .explorer-arrow,
+[data-theme="cyber"] .back-btn {
+  background: rgba(12, 40, 66, 0.72);
+  border-color: rgba(120, 240, 255, 0.2);
+  color: var(--ink-soft);
+}
+
+[data-theme="cyber"] .field input,
+[data-theme="cyber"] .field textarea,
+[data-theme="cyber"] select {
+  background-color: rgba(12, 40, 66, 0.72);
+  color: var(--ink);
+  border-color: rgba(120, 240, 255, 0.18);
+}
+
+[data-theme="cyber"] .orb {
+  opacity: 0.35;
+}
+
+[data-theme="cyber"] .bubble {
+  opacity: 0.3;
+  border-color: rgba(120, 240, 255, 0.28);
+}
+
+[data-theme="oled"] {
+  --ink: #f2fbff;
+  --ink-soft: #b9cdd6;
+  --muted: #7f98a4;
+  --muted-strong: #a4bbc5;
+  --title: #f2fbff;
+  --label: #8fe9df;
+  --label-soft: #a5f0e8;
+  --aqua: #2ec4b6;
+  --aqua-deep: #5ee6d8;
+  --sky: #4aa8e0;
+  --sky-deep: #78bff0;
+
+  --glass: rgba(255, 255, 255, 0.06);
+  --glass-strong: rgba(255, 255, 255, 0.10);
+  --glass-soft: rgba(255, 255, 255, 0.04);
+  --glass-row: rgba(255, 255, 255, 0.055);
+  --stroke: rgba(255, 255, 255, 0.12);
+  --stroke-soft: rgba(255, 255, 255, 0.08);
+  --stroke-ink: rgba(46, 196, 182, 0.24);
+
+  --shadow-xl: 0 34px 80px rgba(0, 0, 0, 0.60);
+  --shadow-lg: 0 22px 54px rgba(0, 0, 0, 0.48);
+  --shadow-md: 0 10px 26px rgba(0, 0, 0, 0.38);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.30);
+  --inset-hi: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  --inset-lo: inset 0 -1px 0 rgba(0, 0, 0, 0.30);
+}
+
+[data-theme="oled"] body {
+  background-color: #03070b;
+  background-image:
+    radial-gradient(900px 640px at 12% -8%, rgba(46, 196, 182, 0.16), transparent 60%),
+    radial-gradient(800px 600px at 92% 4%, rgba(74, 168, 224, 0.12), transparent 58%),
+    linear-gradient(160deg, #03070b 0%, #071018 55%, #000 100%);
+}
+
+[data-theme="oled"] .glass-panel,
+[data-theme="oled"] .hub-nav,
+[data-theme="oled"] .lang-switch,
+[data-theme="oled"] .profile-pill,
+[data-theme="oled"] .segmented,
+[data-theme="oled"] .nav-tabs,
+[data-theme="oled"] .control-row,
+[data-theme="oled"] .stat-tile,
+[data-theme="oled"] .media-card,
+[data-theme="oled"] .collection-card,
+[data-theme="oled"] .panel {
+  background: rgba(255, 255, 255, 0.055);
+  border-color: rgba(255, 255, 255, 0.10);
+}
+
+[data-theme="oled"] .hub-topbar {
+  background: rgba(3, 7, 11, 0.9);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="oled"] #sidebar {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
+  border-color: rgba(255, 255, 255, 0.10);
+}
+
+[data-theme="oled"] .hub-nav-btn.active,
+[data-theme="oled"] .seg-btn.active,
+[data-theme="oled"] .tab-btn.active,
+[data-theme="oled"] .mobile-btn.active {
+  background: rgba(255, 255, 255, 0.10);
+  color: var(--ink);
+}
+
+[data-theme="oled"] .stage {
+  background: linear-gradient(160deg, #0a141c 0%, #0c1b26 50%, #000 100%);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="oled"] .field input,
+[data-theme="oled"] .field textarea,
+[data-theme="oled"] select {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--ink);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="oled"] .orb {
+  opacity: 0.22;
+}
+
+[data-theme="oled"] .bubble {
+  opacity: 0.2;
+}
+
+/* --------------------------------------------------------------------------
+   Dark-theme surface corrections
+   Light glass components need a dark counterpart, or their light label text
+   disappears. This block is shared by both dark directions.
+   -------------------------------------------------------------------------- */
+
+:is([data-theme="cyber"], [data-theme="oled"]) :is(
+  .version-badge,
+  .chip,
+  .kicker,
+  .count-pill,
+  .meta-chip,
+  .stage-chip,
+  .preset,
+  .upload-tile,
+  .scene-card,
+  .bg-swatch,
+  .slider-val,
+  .stat-icon,
+  .avatar,
+  .btn-ghost,
+  .btn-soft,
+  .fav-star,
+  .hub-mobile-nav,
+  .export-footer,
+  .icon-btn,
+  .back-btn,
+  .explorer-arrow,
+  .edit-btn,
+  #btn-snapshot,
+  .viewport-hint,
+  .upload-tile .tag
+) {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.13);
+  color: var(--ink-soft);
+}
+
+:is([data-theme="cyber"], [data-theme="oled"]) :is(
+  .chip,
+  .count-pill,
+  .meta-chip,
+  .stage-chip,
+  .kicker
+) {
+  color: var(--label);
+}
+
+:is([data-theme="cyber"], [data-theme="oled"]) .chip {
+  background: rgba(5, 18, 30, 0.62);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+:is([data-theme="cyber"], [data-theme="oled"]) .chip strong {
+  color: var(--ink);
+}
+
+:is([data-theme="cyber"], [data-theme="oled"]) .version-badge {
+  color: var(--label);
+}
+
+:is([data-theme="cyber"], [data-theme="oled"]) .preset.active {
+  background: var(--accent);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #052b35;
+}
+
+:is([data-theme="cyber"], [data-theme="oled"]) :is(
+  .stat-tile,
+  .control-row,
+  .hub-nav-btn,
+  .seg-btn,
+  .text-link,
+  .explorer-arrow,
+  .edit-btn,
+  .preset,
+  .upload-tile,
+  .scene-card,
+  .bg-swatch
+):hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+:is([data-theme="cyber"], [data-theme="oled"]) .export-footer {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.08));
+  border-top-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.3);
+}
+
+:is([data-theme="cyber"], [data-theme="oled"]) .hub-mobile-nav {
+  background: rgba(10, 25, 38, 0.88);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45), var(--inset-hi);
+}
+
+:is([data-theme="cyber"], [data-theme="oled"]) .mobile-btn.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--label);
+}
+
+:is([data-theme="cyber"], [data-theme="oled"]) .avatar {
+  color: var(--label);
+}
+
+:is([data-theme="cyber"], [data-theme="oled"]) .btn-ghost:hover,
+:is([data-theme="cyber"], [data-theme="oled"]) .btn-soft:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--ink);
+}
+
+:is([data-theme="cyber"], [data-theme="oled"]) .fav-star.is-active {
+  background: rgba(255, 196, 92, 0.18);
+  color: #ffd479;
+}
+

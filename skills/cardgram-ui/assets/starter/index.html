@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#b6ebea">
+  <meta name="color-scheme" content="light">
+  <title>CardGram UI — Aqua Glass starter</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/aqua-ui.css">
+  <link rel="stylesheet" href="css/themes.css">
+</head>
+<body data-view="hub">
+
+  <!-- ======================================================================
+       Icon sprite — 24x24 line icons, stroke via currentColor
+       ====================================================================== -->
+  <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-cards" viewBox="0 0 24 24">
+      <rect x="3" y="6" width="12" height="15" rx="2.5"></rect>
+      <path d="M9 3h9.5A2.5 2.5 0 0 1 21 5.5V15"></path>
+    </symbol>
+    <symbol id="i-home" viewBox="0 0 24 24">
+      <path d="M3 10.6L12 3l9 7.6"></path>
+      <path d="M5.4 9.4V21h13.2V9.4"></path>
+      <path d="M9.6 21v-6.2h4.8V21"></path>
+    </symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24">
+      <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H10l2 2.5h6.5A2.5 2.5 0 0 1 21 10v7.5a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5v-10z"></path>
+    </symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M15.8 8.2l-2.2 5.4-5.4 2.2 2.2-5.4 5.4-2.2z"></path>
+    </symbol>
+    <symbol id="i-user" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="3.6"></circle>
+      <path d="M4.6 20.4a7.6 7.6 0 0 1 14.8 0"></path>
+    </symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"></path>
+    </symbol>
+    <symbol id="i-star" viewBox="0 0 24 24">
+      <path d="M12 3.2l2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.7l6.1-.9L12 3.2z"></path>
+    </symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24">
+      <path d="M5 12h14M12 5l7 7-7 7"></path>
+    </symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24">
+      <path d="M19 12H5M12 19l-7-7 7-7"></path>
+    </symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24">
+      <path d="M12 3l1.7 4.9L18.5 9.5l-4.8 1.6L12 16l-1.7-4.9L5.5 9.5l4.8-1.6L12 3z"></path>
+      <path d="M19 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z"></path>
+    </symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <path d="M17 8l-5-5-5 5M12 3v12"></path>
+    </symbol>
+    <symbol id="i-save" viewBox="0 0 24 24">
+      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+      <path d="M17 21v-8H7v8M7 3v5h8"></path>
+    </symbol>
+    <symbol id="i-video" viewBox="0 0 24 24">
+      <rect x="2" y="6" width="13" height="12" rx="2.5"></rect>
+      <path d="M15 10.5l6-3.2v9.4l-6-3.2z"></path>
+    </symbol>
+    <symbol id="i-frame" viewBox="0 0 24 24">
+      <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"></path>
+    </symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+      <circle cx="12" cy="13" r="4"></circle>
+    </symbol>
+    <symbol id="i-help" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M9.1 9a3 3 0 1 1 4.6 2.6c-.9.6-1.7 1.3-1.7 2.4M12 17h.01"></path>
+    </symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24">
+      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path>
+      <circle cx="12" cy="12" r="3"></circle>
+    </symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24">
+      <path d="M3 6h18M3 12h18M3 18h18"></path>
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24">
+      <path d="M18 6L6 18M6 6l12 12"></path>
+    </symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24">
+      <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"></path>
+    </symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+    </symbol>
+    <symbol id="i-level" viewBox="0 0 24 24">
+      <path d="M12 3v18M6 21h12M3 8l4-4 4 4M13 8l4-4 4 4"></path>
+      <path d="M3 8l3 6H0zM21 8l3 6h-6z"></path>
+    </symbol>
+    <symbol id="i-target" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <circle cx="12" cy="12" r="5"></circle>
+      <circle cx="12" cy="12" r="1"></circle>
+    </symbol>
+    <symbol id="i-rotate" viewBox="0 0 24 24">
+      <path d="M1 4v6h6"></path>
+      <path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"></path>
+    </symbol>
+    <symbol id="i-play" viewBox="0 0 24 24">
+      <path d="M6 3.5l14 8.5-14 8.5V3.5z"></path>
+    </symbol>
+    <symbol id="i-download" viewBox="0 0 24 24">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <path d="M7 10l5 5 5-5M12 15V3"></path>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="M20 6L9 17l-5-5"></path>
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24">
+      <path d="M12 5v14M5 12h14"></path>
+    </symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24">
+      <rect x="3.5" y="3.5" width="7" height="7" rx="2"></rect>
+      <rect x="13.5" y="3.5" width="7" height="7" rx="2"></rect>
+      <rect x="3.5" y="13.5" width="7" height="7" rx="2"></rect>
+      <rect x="13.5" y="13.5" width="7" height="7" rx="2"></rect>
+    </symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24">
+      <path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"></path>
+    </symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24">
+      <path d="M12 21s7-6.4 7-11a7 7 0 1 0-14 0c0 4.6 7 11 7 11z"></path>
+      <circle cx="12" cy="10" r="2.5"></circle>
+    </symbol>
+    <symbol id="i-info" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 16v-4M12 8h.01"></path>
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="M20 20l-4.2-4.2"></path>
+    </symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24">
+      <path d="M15.5 3.9l4.6 4.6L8.7 19.9l-5.4 1.4 1.4-5.4L15.5 3.9z"></path>
+      <path d="M13.6 5.8l4.6 4.6"></path>
+    </symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24">
+      <path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"></path>
+    </symbol>
+    <symbol id="i-drag" viewBox="0 0 24 24">
+      <path d="M9 11V6.5a1.5 1.5 0 0 1 3 0V11M12 10.5V5a1.5 1.5 0 0 1 3 0v5.5M15 10.5V7a1.5 1.5 0 0 1 3 0v7a6 6 0 0 1-6 6h-1a5 5 0 0 1-3.6-1.5L4.6 15a1.6 1.6 0 0 1 2.4-2.1L9 15"></path>
+    </symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24">
+      <path d="M12 2l9 5-9 5-9-5 9-5z"></path>
+      <path d="M3 12l9 5 9-5M3 17l9 5 9-5"></path>
+    </symbol>
+  </svg>
+
+  <!-- ======================================================================
+       Ambient light
+       ====================================================================== -->
+  <div class="aero-bg" aria-hidden="true">
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+    <span class="bubble bubble-1"></span>
+    <span class="bubble bubble-2"></span>
+    <span class="bubble bubble-3"></span>
+    <span class="bubble bubble-4"></span>
+    <span class="bubble bubble-5"></span>
+  </div>
+
+  <!-- ======================================================================
+       HUB
+       ====================================================================== -->
+  <section class="hub" data-shell="hub" aria-label="CardGram lobby">
+    <div class="hub-scroll">
+      <div class="hub-shell">
+
+        <header class="hub-topbar">
+          <a class="brand" href="#" aria-label="CardGram home" data-panel-link="home">
+            <span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#i-cards"></use></svg></span>
+            <span class="brand-copy"><strong>Card<span class="gradient-text">Gram</span></strong><span class="version-badge">v0.4.4</span></span>
+          </a>
+
+          <nav class="hub-nav" aria-label="Main navigation">
+            <button class="hub-nav-btn active" type="button" data-panel-link="home" aria-current="page">
+              <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg><span>Home</span>
+            </button>
+            <button class="hub-nav-btn" type="button" data-panel-link="library">
+              <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg><span>My cards</span>
+            </button>
+            <button class="hub-nav-btn" type="button" data-panel-link="collections">
+              <svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg><span>Collections</span>
+            </button>
+            <button class="hub-nav-btn" type="button" data-panel-link="explore">
+              <svg class="icon" aria-hidden="true"><use href="#i-compass"></use></svg><span>Explore</span><span class="nav-soon" aria-hidden="true"></span>
+            </button>
+          </nav>
+
+          <div class="hub-top-actions">
+            <div class="lang-switch" role="group" aria-label="Language">
+              <button class="lang-btn active" type="button" aria-pressed="true">EN</button>
+              <button class="lang-btn" type="button" aria-pressed="false">ES</button>
+              <button class="lang-btn" type="button" aria-pressed="false">DE</button>
+            </div>
+            <button class="profile-pill" type="button" data-panel-link="profile" aria-label="Open profile">
+              <span class="avatar" aria-hidden="true"><svg class="icon"><use href="#i-user"></use></svg></span>
+              <span class="profile-copy"><strong>Nova Vale</strong><small>@novavale</small></span>
+            </button>
+          </div>
+        </header>
+
+        <main class="hub-main">
+
+          <!-- HOME ------------------------------------------------------- -->
+          <section class="hub-panel active" data-panel="home" aria-labelledby="home-title">
+            <h1 class="sr-only" id="home-title">CardGram home</h1>
+
+            <div class="hub-dashboard">
+
+              <aside class="glass-panel player-panel" aria-labelledby="player-name">
+                <div class="player-head">
+                  <span class="avatar player-avatar" aria-hidden="true"><svg class="icon"><use href="#i-user"></use></svg></span>
+                  <div class="player-identity">
+                    <span class="eyebrow"><span class="live-dot"></span>Player</span>
+                    <h2 class="player-name" id="player-name">Nova Vale</h2>
+                    <span class="player-handle">@novavale</span>
+                  </div>
+                  <button class="edit-btn" type="button" data-panel-link="profile" aria-label="Edit profile">
+                    <svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg>
+                  </button>
+                </div>
+
+                <p class="player-since">Member since November 2026</p>
+                <div class="player-divider" aria-hidden="true"></div>
+
+                <div class="stats-head"><span>Collection data</span><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg></div>
+
+                <div class="player-stats">
+                  <button class="stat-tile" type="button" data-panel-link="library">
+                    <span class="stat-icon" aria-hidden="true"><svg class="icon"><use href="#i-cards"></use></svg></span>
+                    <span class="stat-value">12</span><span class="stat-label">Saved cards</span><span class="stat-sub">4 in catalog</span>
+                  </button>
+                  <button class="stat-tile" type="button" data-panel-link="collections">
+                    <span class="stat-icon" aria-hidden="true"><svg class="icon"><use href="#i-folder"></use></svg></span>
+                    <span class="stat-value">4</span><span class="stat-label">Collections</span><span class="stat-sub">12 cards</span>
+                  </button>
+                  <button class="stat-tile" type="button" data-panel-link="collections">
+                    <span class="stat-icon" aria-hidden="true"><svg class="icon"><use href="#i-compass"></use></svg></span>
+                    <span class="stat-value">3</span><span class="stat-label">To review</span><span class="stat-sub">2 to discover</span>
+                  </button>
+                  <button class="stat-tile" type="button" data-panel-link="collections">
+                    <span class="stat-icon" aria-hidden="true"><svg class="icon"><use href="#i-layers"></use></svg></span>
+                    <span class="stat-value">2</span><span class="stat-label">Your decks</span><span class="stat-sub">9 cards</span>
+                  </button>
+                  <button class="stat-tile stat-tile--wide" type="button" data-view-link="studio">
+                    <span class="stat-icon" aria-hidden="true"><svg class="icon"><use href="#i-video"></use></svg></span>
+                    <span class="stat-value">8</span><span class="stat-label">Renders</span><span class="stat-sub">exported</span>
+                  </button>
+                </div>
+
+                <div class="player-actions player-actions--desktop">
+                  <button class="btn btn-primary btn-block" type="button" data-view-link="studio">
+                    <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>Open the studio
+                  </button>
+                  <button class="btn btn-ghost btn-block" type="button" data-view-link="studio">
+                    <svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg>Create a render
+                  </button>
+                </div>
+
+                <p class="player-privacy player-privacy--desktop">
+                  <svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>
+                  Local and private · your images never leave this device.
+                </p>
+              </aside>
+
+              <section class="favorite" aria-labelledby="favorite-name">
+                <div class="favorite-head">
+                  <span class="kicker"><span class="live-dot"></span>Your favorite card</span>
+                  <span class="kicker-rule" aria-hidden="true"></span>
+                </div>
+
+                <div class="showcase" data-tilt>
+                  <span class="showcase-glow" aria-hidden="true"></span>
+                  <span class="orbit" aria-hidden="true"><span></span><span></span><span></span></span>
+
+                  <div class="card-stage">
+                    <div class="card-tilt">
+                      <button class="tcg" type="button" data-flip aria-pressed="false" aria-label="Flip the card">
+                        <span class="tcg-inner">
+                          <span class="tcg-face tcg-front">
+                            <img src="assets/shadowblade-front.webp" alt="Shadowblade Kinetic card front">
+                          </span>
+                          <span class="tcg-face tcg-back">
+                            <img src="assets/shadowblade-back.webp" alt="Shadowblade Kinetic card back">
+                          </span>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="card-meta">
+                    <span class="card-eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg>Featured</span>
+                    <h2 class="card-name" id="favorite-name">Shadowblade Kinetic</h2>
+                    <p class="card-sub">OG Collection · SET-01</p>
+                    <div class="card-chips">
+                      <span class="chip">Rare</span><span class="chip">Human — Rogue</span>
+                      <span class="chip">STR <strong>5</strong></span><span class="chip">AGI <strong>9</strong></span><span class="chip">INT <strong>5</strong></span>
+                    </div>
+                    <div class="card-actions">
+                      <button class="text-link" type="button" data-panel-link="library">Change favorite <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg></button>
+                    </div>
+                  </div>
+
+                  <div class="mobile-cta">
+                    <button class="btn btn-primary btn-block" type="button" data-view-link="studio">
+                      <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>Open the studio
+                    </button>
+                    <p class="player-privacy">
+                      <svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>
+                      Local and private · your images never leave this device.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              <aside class="glass-panel explorer-panel" aria-labelledby="explorer-title">
+                <div class="explorer-head">
+                  <div>
+                    <span class="eyebrow"><span class="live-dot live-dot--sky"></span>Collection</span>
+                    <h2 id="explorer-title">Card explorer</h2>
+                    <p>Browse the collection and pick your next favorite.</p>
+                  </div>
+                  <div class="explorer-arrows">
+                    <button class="explorer-arrow" type="button" aria-label="Previous cards"><svg class="icon"><use href="#i-arrow-left"></use></svg></button>
+                    <button class="explorer-arrow" type="button" aria-label="Next cards"><svg class="icon"><use href="#i-arrow-right"></use></svg></button>
+                  </div>
+                </div>
+
+                <div class="segmented explorer-filters" data-seg role="tablist" aria-label="Card filters">
+                  <button class="seg-btn active" type="button" role="tab" aria-selected="true">All</button>
+                  <button class="seg-btn" type="button" role="tab" aria-selected="false">OG</button>
+                  <button class="seg-btn" type="button" role="tab" aria-selected="false">YGO</button>
+                </div>
+
+                <div class="explorer-rail">
+                  <button class="mini-card" type="button">
+                    <span class="mini-card-art"><img src="assets/shadowblade-front.webp" alt=""></span>
+                    <span class="mini-card-name">Shadowblade Kinetic</span>
+                    <span class="mini-card-sub">OG · SET-01 · Rare</span>
+                  </button>
+                  <button class="mini-card" type="button">
+                    <span class="mini-card-art"><img src="assets/volt.webp" alt=""></span>
+                    <span class="mini-card-name">Volt Striker</span>
+                    <span class="mini-card-sub">OG · SET-02 · Rare</span>
+                  </button>
+                  <button class="mini-card" type="button">
+                    <span class="mini-card-art"><img src="assets/aureon.webp" alt=""></span>
+                    <span class="mini-card-name">Aureon, the Golden Maw</span>
+                    <span class="mini-card-sub">OG · SET-03 · Rare</span>
+                  </button>
+                </div>
+
+                <p class="explorer-hint">★ Tap a card to make it your favorite.</p>
+
+                <div class="quick-menu">
+                  <div class="stats-head"><span>Quick menu</span></div>
+                  <button class="quick-row" type="button" data-panel-link="library">
+                    <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg><span>View library</span>
+                    <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                  </button>
+                  <button class="quick-row" type="button" data-panel-link="collections">
+                    <svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg><span>Collections</span>
+                    <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                  </button>
+                  <button class="quick-row" type="button" data-panel-link="profile">
+                    <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg><span>My profile</span>
+                    <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                  </button>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <!-- LIBRARY ---------------------------------------------------- -->
+          <section class="hub-panel" data-panel="library" aria-labelledby="library-title" hidden>
+            <div class="hub-view-head">
+              <button class="back-btn" type="button" data-panel-link="home" aria-label="Back home"><svg class="icon"><use href="#i-arrow-left"></use></svg></button>
+              <div class="hub-view-copy">
+                <h1 id="library-title">My cards</h1>
+                <p>Your saved designs and every catalog card in one place.</p>
+              </div>
+              <span class="count-pill">12 cards</span>
+            </div>
+
+            <div class="segmented segmented--inline" data-seg role="tablist" aria-label="Library filters">
+              <button class="seg-btn active" type="button" role="tab" aria-selected="true">All</button>
+              <button class="seg-btn" type="button" role="tab" aria-selected="false">Saved</button>
+              <button class="seg-btn" type="button" role="tab" aria-selected="false">Catalog</button>
+            </div>
+
+            <div class="card-grid" style="margin-top:16px">
+              <article class="media-card">
+                <div class="media-thumb"><img src="assets/shadowblade-front.webp" alt="Shadowblade Kinetic"><button class="fav-star is-active" type="button" aria-label="Favorite Shadowblade Kinetic"><svg class="icon"><use href="#i-star"></use></svg></button></div>
+                <div class="media-body"><h3>Shadowblade Kinetic</h3><p>OG Collection · SET-01</p></div>
+                <button class="btn btn-primary btn-sm" type="button" data-view-link="studio">Open</button>
+              </article>
+              <article class="media-card">
+                <div class="media-thumb"><img src="assets/volt.webp" alt="Volt Striker"><button class="fav-star" type="button" aria-label="Favorite Volt Striker"><svg class="icon"><use href="#i-star"></use></svg></button></div>
+                <div class="media-body"><h3>Volt Striker</h3><p>OG Collection · SET-02</p></div>
+                <button class="btn btn-primary btn-sm" type="button" data-view-link="studio">Open</button>
+              </article>
+              <article class="media-card">
+                <div class="media-thumb"><img src="assets/aureon.webp" alt="Aureon, the Golden Maw"><button class="fav-star" type="button" aria-label="Favorite Aureon"><svg class="icon"><use href="#i-star"></use></svg></button></div>
+                <div class="media-body"><h3>Aureon, the Golden Maw</h3><p>OG Collection · SET-03</p></div>
+                <button class="btn btn-primary btn-sm" type="button" data-view-link="studio">Open</button>
+              </article>
+              <article class="media-card">
+                <div class="media-thumb"><img src="assets/dark-magician.webp" alt="Dark Magician Girl"><button class="fav-star" type="button" aria-label="Favorite Dark Magician Girl"><svg class="icon"><use href="#i-star"></use></svg></button></div>
+                <div class="media-body"><h3>Dark Magician Girl</h3><p>Yu-Gi-Oh! · DMG-01</p></div>
+                <button class="btn btn-primary btn-sm" type="button" data-view-link="studio">Open</button>
+              </article>
+            </div>
+          </section>
+
+          <!-- COLLECTIONS ------------------------------------------------ -->
+          <section class="hub-panel" data-panel="collections" aria-labelledby="collections-title" hidden>
+            <div class="hub-view-head">
+              <button class="back-btn" type="button" data-panel-link="home" aria-label="Back home"><svg class="icon"><use href="#i-arrow-left"></use></svg></button>
+              <div class="hub-view-copy">
+                <h1 id="collections-title">Collections &amp; decks</h1>
+                <p>Browse the catalog or gather your favorite cards into a deck.</p>
+              </div>
+              <button class="btn btn-primary" type="button"><svg class="icon"><use href="#i-plus"></use></svg>New deck</button>
+            </div>
+
+            <h2 class="stats-head" style="margin:8px 2px 10px">From the catalog</h2>
+            <div class="collection-grid">
+              <button class="collection-card" type="button">
+                <span class="collection-art"><img src="assets/shadowblade-front.webp" alt=""></span>
+                <span class="collection-body"><h3>OG Collection</h3><p>The original designs that started CardGram.</p><span class="collection-meta">3 cards <span class="badge-new">NEW</span></span></span>
+              </button>
+              <button class="collection-card" type="button">
+                <span class="collection-art"><img src="assets/dark-magician.webp" alt=""></span>
+                <span class="collection-body"><h3>Yu-Gi-Oh!</h3><p>High-gloss fan art with a Full Art variant.</p><span class="collection-meta">1 card <span class="badge-new">NEW</span></span></span>
+              </button>
+            </div>
+
+            <div class="stats-head" style="margin:22px 2px 10px"><span>Your decks</span><span style="margin-left:auto;color:var(--aqua-deep)">+ Create deck</span></div>
+            <div class="empty-state">
+              <span class="empty-icon"><svg class="icon"><use href="#i-layers"></use></svg></span>
+              <h3>No decks yet</h3>
+              <p>Create a deck to gather the cards of a series or an idea.</p>
+              <button class="btn btn-primary" type="button">Create deck</button>
+            </div>
+          </section>
+
+          <!-- EXPLORE ---------------------------------------------------- -->
+          <section class="hub-panel" data-panel="explore" aria-labelledby="explore-title" hidden>
+            <div class="hub-view-head">
+              <button class="back-btn" type="button" data-panel-link="home" aria-label="Back home"><svg class="icon"><use href="#i-arrow-left"></use></svg></button>
+              <div class="hub-view-copy">
+                <h1 id="explore-title">Explore</h1>
+                <p>A community feed for cards, artists and collections.</p>
+              </div>
+              <span class="count-pill">Coming soon</span>
+            </div>
+            <div class="empty-state" style="margin-top:24px">
+              <span class="empty-icon"><svg class="icon"><use href="#i-compass"></use></svg></span>
+              <h3>The public feed is warming up</h3>
+              <p>This shell and its data adapter are ready. It stays disabled until a backend exists.</p>
+            </div>
+          </section>
+
+          <!-- PROFILE ---------------------------------------------------- -->
+          <section class="hub-panel" data-panel="profile" aria-labelledby="profile-title" hidden>
+            <div class="hub-view-head">
+              <button class="back-btn" type="button" data-panel-link="home" aria-label="Back home"><svg class="icon"><use href="#i-arrow-left"></use></svg></button>
+              <div class="hub-view-copy">
+                <h1 id="profile-title">Your profile</h1>
+                <p>This information is stored only in this browser.</p>
+              </div>
+            </div>
+
+            <div class="profile-layout">
+              <div class="glass-panel profile-form">
+                <div class="form-grid">
+                  <div class="field"><label for="profile-name">Creator name</label><input id="profile-name" value="Nova Vale" maxlength="32"></div>
+                  <div class="field"><label for="profile-handle">Handle</label><input id="profile-handle" value="@novavale" maxlength="24"></div>
+                  <div class="field field--wide"><label for="profile-bio">Bio</label><textarea id="profile-bio" maxlength="160">Card artist, collector and occasional render wizard.</textarea></div>
+                  <div class="field"><label for="profile-favorite">Favorite card</label><select id="profile-favorite"><option>Shadowblade Kinetic</option><option>Volt Striker</option><option>Aureon, the Golden Maw</option></select></div>
+                  <div class="field"><label for="profile-contact">Contact</label><input id="profile-contact" value="hello@novavale.studio"></div>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:14px">
+                  <button class="btn btn-primary" type="button">Save profile</button>
+                  <button class="btn btn-ghost" type="button" data-panel-link="home">Cancel</button>
+                </div>
+              </div>
+
+              <aside class="glass-panel profile-preview" aria-label="Profile preview">
+                <span class="avatar" aria-hidden="true"><svg class="icon"><use href="#i-user"></use></svg></span>
+                <h3>Nova Vale</h3>
+                <p>@novavale</p>
+                <p style="margin-top:10px">Card artist, collector and occasional render wizard.</p>
+                <div class="card-chips"><span class="chip">12 saved</span><span class="chip">4 collections</span><span class="chip">2 decks</span></div>
+              </aside>
+            </div>
+          </section>
+
+        </main>
+
+        <footer class="hub-footer">
+          <span>CardGram v0.4.4 · by theAstroBruh</span>
+          <span>Your profile is stored only in this browser.</span>
+        </footer>
+      </div>
+    </div>
+
+    <nav class="hub-mobile-nav" aria-label="Mobile navigation">
+      <button class="mobile-btn active" type="button" data-panel-link="home"><svg class="icon"><use href="#i-home"></use></svg>Home</button>
+      <button class="mobile-btn" type="button" data-panel-link="library"><svg class="icon"><use href="#i-cards"></use></svg>My cards</button>
+      <button class="mobile-btn" type="button" data-panel-link="collections"><svg class="icon"><use href="#i-folder"></use></svg>Collections</button>
+      <button class="mobile-btn" type="button" data-panel-link="explore"><svg class="icon"><use href="#i-compass"></use></svg>Explore</button>
+      <button class="mobile-btn" type="button" data-panel-link="profile"><svg class="icon"><use href="#i-user"></use></svg>Profile</button>
+    </nav>
+  </section>
+
+  <!-- ======================================================================
+       STUDIO
+       ====================================================================== -->
+  <section class="studio" data-shell="studio" aria-label="CardGram studio">
+    <button class="icon-btn sidebar-toggle" type="button" data-drawer-open aria-label="Open control panel">
+      <svg class="icon"><use href="#i-menu"></use></svg>
+    </button>
+    <div class="drawer-backdrop" data-drawer-close></div>
+
+    <aside id="sidebar" aria-label="Studio control panel">
+      <header class="app-header">
+        <div class="brand studio-brand">
+          <span class="brand-mark" aria-hidden="true"><svg class="icon"><use href="#i-cards"></use></svg></span>
+          <span class="brand-copy"><strong>Card<span class="gradient-text">Gram</span></strong><small>by theAstroBruh</small></span>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" type="button" data-view-link="hub" aria-label="Back to lobby"><svg class="icon"><use href="#i-home"></use></svg></button>
+          <button class="icon-btn" type="button" aria-label="Language"><svg class="icon"><use href="#i-globe"></use></svg></button>
+          <button class="icon-btn" type="button" aria-label="Help"><svg class="icon"><use href="#i-help"></use></svg></button>
+        </div>
+      </header>
+
+      <nav class="nav-tabs" role="tablist" aria-label="Studio sections">
+        <button class="tab-btn active" type="button" role="tab" id="tab-deck" data-tab="deck" aria-selected="true" aria-controls="pane-deck" tabindex="0">
+          <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg><span>Deck</span>
+        </button>
+        <button class="tab-btn" type="button" role="tab" id="tab-forge" data-tab="forge" aria-selected="false" aria-controls="pane-forge" tabindex="-1">
+          <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg><span>3D Forge</span>
+        </button>
+        <button class="tab-btn" type="button" role="tab" id="tab-shots" data-tab="shots" aria-selected="false" aria-controls="pane-shots" tabindex="-1">
+          <svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg><span>Shots</span>
+        </button>
+        <button class="tab-btn" type="button" role="tab" id="tab-canvas" data-tab="canvas" aria-selected="false" aria-controls="pane-canvas" tabindex="-1">
+          <svg class="icon" aria-hidden="true"><use href="#i-frame"></use></svg><span>Canvas</span>
+        </button>
+      </nav>
+
+      <div class="scroll-content">
+
+        <!-- DECK -->
+        <section class="tab-pane active" id="pane-deck" role="tabpanel" aria-labelledby="tab-deck">
+          <h2 class="section-title"><svg class="icon"><use href="#i-sparkles"></use></svg><span>Designs &amp; presets</span></h2>
+          <p class="section-hint">Pick a saved preset or load the front and back of your card.</p>
+
+          <div class="preset-strip" role="group" aria-label="Card presets">
+            <button class="preset active" type="button"><img src="assets/shadowblade-front.webp" alt="">Shadowblade</button>
+            <button class="preset" type="button"><img src="assets/volt.webp" alt="">Volt Striker</button>
+            <button class="preset" type="button"><img src="assets/aureon.webp" alt="">Aureon</button>
+            <button class="preset" type="button"><img src="assets/dark-magician.webp" alt="">Dark Magician</button>
+          </div>
+
+          <div class="control-row">
+            <div>
+              <label for="fullart">Animated Full Art</label>
+              <p class="control-note">Cycles between the base art and the Full Art variant.</p>
+            </div>
+            <span class="switch"><input id="fullart" type="checkbox" checked><span class="switch-track"><span class="switch-thumb"></span></span></span>
+          </div>
+
+          <div class="upload-grid">
+            <button class="upload-tile" type="button">
+              <span class="tag">Front</span>
+              <span class="thumb"><img src="assets/shadowblade-front.webp" alt="Current card front"></span>
+              <strong>Front side</strong><small>Drag or tap to change</small>
+            </button>
+            <button class="upload-tile" type="button">
+              <span class="tag">Back</span>
+              <span class="thumb"><img src="assets/shadowblade-back.webp" alt="Current card back"></span>
+              <strong>Back side</strong><small>Drag or tap to change</small>
+            </button>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:7px;margin-top:10px">
+            <button class="btn btn-primary btn-block" type="button"><svg class="icon"><use href="#i-save"></use></svg>Save current card</button>
+            <button class="btn btn-ghost btn-block" type="button"><svg class="icon"><use href="#i-rotate"></use></svg>Restore default card</button>
+          </div>
+
+          <h2 class="section-title"><svg class="icon"><use href="#i-info"></use></svg><span>Best practices</span></h2>
+          <p class="section-hint">Use 750×1050 art with the subject clear of the safe corners. WebP keeps uploads light.</p>
+        </section>
+
+        <!-- FORGE -->
+        <section class="tab-pane" id="pane-forge" role="tabpanel" aria-labelledby="tab-forge" hidden>
+          <h2 class="section-title"><svg class="icon"><use href="#i-sparkles"></use></svg><span>Edge, bevel &amp; gloss</span></h2>
+
+          <div class="control-row">
+            <label><svg class="icon"><use href="#i-frame"></use></svg>Corners</label>
+            <div class="segmented" data-seg>
+              <button class="seg-btn active" type="button">Rounded</button>
+              <button class="seg-btn" type="button">Square</button>
+            </div>
+          </div>
+
+          <div class="control-row control-row--col">
+            <div class="header-line"><label><svg class="icon"><use href="#i-layers"></use></svg>Edge thickness</label><span class="slider-val" data-output="thickness">0.016</span></div>
+            <input type="range" min="0" max="0.06" step="0.001" value="0.016" data-range="thickness">
+          </div>
+
+          <div class="control-row control-row--col">
+            <div class="header-line"><label><svg class="icon"><use href="#i-sparkles"></use></svg>Bevel intensity</label><span class="slider-val" data-output="bevel">0.004</span></div>
+            <input type="range" min="0" max="0.02" step="0.001" value="0.004" data-range="bevel">
+          </div>
+
+          <div class="control-row">
+            <label><svg class="icon"><use href="#i-sun"></use></svg>Edge color</label>
+            <div style="display:flex;gap:5px">
+              <button class="swatch-dot" style="background:linear-gradient(145deg,#3a4550,#0a0d10 70%)" aria-label="Black edge"></button>
+              <button class="swatch-dot" style="background:linear-gradient(145deg,#ffe9a3,#d4af37 48%,#8a6416)" aria-label="Gold edge"></button>
+              <button class="swatch-dot" style="background:linear-gradient(145deg,#fff,#c9ced8 48%,#7d8592)" aria-label="Silver edge"></button>
+              <button class="swatch-dot" style="background:linear-gradient(145deg,#fff,#f1f3ef 60%,#d7dcd3)" aria-label="White edge"></button>
+            </div>
+          </div>
+
+          <div class="control-row control-row--col">
+            <div class="header-line"><label><svg class="icon"><use href="#i-sun"></use></svg>Reflective gloss</label><span class="slider-val" data-output="gloss">0.25</span></div>
+            <input type="range" min="0" max="1" step="0.01" value="0.25" data-range="gloss">
+          </div>
+
+          <div class="control-row control-row--col">
+            <div class="header-line"><label><svg class="icon"><use href="#i-bolt"></use></svg>Card brightness</label><span class="slider-val" data-output="exposure">0.90</span></div>
+            <input type="range" min="0.4" max="1.4" step="0.01" value="0.9" data-range="exposure">
+            <p class="control-note">Lower this value if the artwork looks washed out.</p>
+          </div>
+
+          <button class="btn btn-ghost btn-block" type="button"><svg class="icon"><use href="#i-rotate"></use></svg>Reset 3D finish</button>
+        </section>
+
+        <!-- SHOTS -->
+        <section class="tab-pane" id="pane-shots" role="tabpanel" aria-labelledby="tab-shots" hidden>
+          <h2 class="section-title"><svg class="icon"><use href="#i-video"></use></svg><span>Shot layers</span></h2>
+          <p class="section-hint">Move the camera and save up to three poses. Then play them back as a transition.</p>
+
+          <div class="scene-grid">
+            <button class="scene-card active" type="button"><span class="scene-index">01</span><span class="scene-name">Shot 1</span><span class="scene-save">Save pose</span></button>
+            <button class="scene-card" type="button"><span class="scene-index">02</span><span class="scene-name">Shot 2</span><span class="scene-save">Save pose</span></button>
+            <button class="scene-card" type="button"><span class="scene-index">03</span><span class="scene-name">Shot 3</span><span class="scene-save">Save pose</span></button>
+          </div>
+
+          <button class="btn btn-primary btn-block" type="button" style="margin-top:8px"><svg class="icon"><use href="#i-play"></use></svg>Play transition</button>
+
+          <h2 class="section-title"><svg class="icon"><use href="#i-sliders"></use></svg><span>Spin &amp; camera</span></h2>
+          <div class="control-row"><label><svg class="icon"><use href="#i-clock"></use></svg>Speed</label><select><option>Slow</option><option>Medium</option><option>Fast</option></select></div>
+          <div class="control-row"><label><svg class="icon"><use href="#i-rotate"></use></svg>Direction</label><select><option>Clockwise</option><option>Counter-clockwise</option></select></div>
+          <div class="control-row"><label><svg class="icon"><use href="#i-level"></use></svg>Floating motion</label><select><option>Organic</option><option>Calm</option><option>None</option></select></div>
+
+          <div class="control-row control-row--col">
+            <div class="header-line"><label><svg class="icon"><use href="#i-expand"></use></svg>Camera distance</label><span class="slider-val" data-output="distance">4.6</span></div>
+            <input type="range" min="2" max="9" step="0.1" value="4.6" data-range="distance">
+          </div>
+        </section>
+
+        <!-- CANVAS -->
+        <section class="tab-pane" id="pane-canvas" role="tabpanel" aria-labelledby="tab-canvas" hidden>
+          <h2 class="section-title"><svg class="icon"><use href="#i-frame"></use></svg><span>Canvas format</span></h2>
+          <div class="control-row">
+            <label><svg class="icon"><use href="#i-frame"></use></svg>Aspect ratio</label>
+            <div class="segmented" data-seg>
+              <button class="seg-btn active" type="button">9:16</button>
+              <button class="seg-btn" type="button">1:1</button>
+              <button class="seg-btn" type="button">16:9</button>
+            </div>
+          </div>
+
+          <div class="control-row control-row--col">
+            <div class="header-line"><label><svg class="icon"><use href="#i-expand"></use></svg>On-screen size</label><span class="slider-val" data-output="scale">100%</span></div>
+            <input type="range" min="60" max="140" step="1" value="100" data-range="scale" data-suffix="%">
+          </div>
+
+          <h2 class="section-title"><svg class="icon"><use href="#i-sun"></use></svg><span>Background &amp; environment</span></h2>
+          <div class="bg-grid">
+            <button class="bg-swatch active" type="button"><span class="bg-preview bg-aqua"></span><span>Aqua</span></button>
+            <button class="bg-swatch" type="button"><span class="bg-preview bg-studio"></span><span>Studio</span></button>
+            <button class="bg-swatch" type="button"><span class="bg-preview bg-oled"></span><span>OLED</span></button>
+            <button class="bg-swatch" type="button"><span class="bg-preview bg-sunset"></span><span>Sunset</span></button>
+            <button class="bg-swatch" type="button"><span class="bg-preview bg-cyber"></span><span>Cyber</span></button>
+            <button class="bg-swatch" type="button"><span class="bg-preview bg-transparent"></span><span>Transparent</span></button>
+          </div>
+
+          <h2 class="section-title"><svg class="icon"><use href="#i-download"></use></svg><span>Export</span></h2>
+          <div class="control-row"><label><svg class="icon"><use href="#i-clock"></use></svg>Duration</label><div class="segmented" data-seg><button class="seg-btn" type="button">5s</button><button class="seg-btn active" type="button">10s</button><button class="seg-btn" type="button">15s</button></div></div>
+          <div class="control-row"><label><svg class="icon"><use href="#i-grid"></use></svg>Resolution</label><span class="slider-val">1080 × 1920</span></div>
+        </section>
+      </div>
+
+      <footer class="export-footer">
+        <div class="export-meta">
+          <div class="meta-chips">
+            <span class="meta-chip"><svg class="icon"><use href="#i-frame"></use></svg>9:16</span>
+            <span class="meta-chip"><svg class="icon"><use href="#i-grid"></use></svg>1080p</span>
+          </div>
+          <span class="meta-chip"><svg class="icon"><use href="#i-clock"></use></svg>10s</span>
+        </div>
+        <div class="export-actions">
+          <button class="btn btn-primary" id="btn-record" type="button"><svg class="icon"><use href="#i-download"></use></svg>Export video · 10s</button>
+          <button class="btn" id="btn-snapshot" type="button" aria-label="Take a snapshot"><svg class="icon"><use href="#i-camera"></use></svg></button>
+        </div>
+        <p class="status-text"><span class="status-dot"></span>Ready to export</p>
+      </footer>
+    </aside>
+
+    <main class="viewport" aria-label="3D card stage">
+      <div class="stage-chips" aria-hidden="true">
+        <span class="stage-chip"><span class="live-dot"></span>LIVE</span>
+        <span class="stage-chip">9:16</span>
+        <span class="stage-chip">HD</span>
+      </div>
+
+      <div class="stage">
+        <div class="card-stage card-stage--wide" data-tilt>
+          <div class="card-tilt">
+            <button class="tcg" type="button" data-flip aria-pressed="false" aria-label="Flip the card">
+              <span class="tcg-inner">
+                <span class="tcg-face tcg-front"><img src="assets/shadowblade-front.webp" alt="Shadowblade Kinetic card front"></span>
+                <span class="tcg-face tcg-back"><img src="assets/shadowblade-back.webp" alt="Shadowblade Kinetic card back"></span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <p class="viewport-hint"><svg class="icon"><use href="#i-drag"></use></svg>Drag to orbit · click the card to flip</p>
+
+      <div class="fab-wrap" id="fab-wrap">
+        <div class="fab-menu">
+          <button class="fab-item" type="button" aria-label="Center camera"><svg class="icon"><use href="#i-target"></use></svg></button>
+          <button class="fab-item" type="button" aria-label="Reverse spin"><svg class="icon"><use href="#i-rotate"></use></svg></button>
+          <button class="fab-item" type="button" aria-label="Level tilt"><svg class="icon"><use href="#i-level"></use></svg></button>
+        </div>
+        <button class="fab" type="button" aria-label="Stage shortcuts" aria-expanded="false" data-fab><svg class="icon"><use href="#i-sparkles"></use></svg></button>
+      </div>
+    </main>
+
+    <button class="icon-btn" type="button" data-view-link="hub" aria-label="Exit studio" style="position:fixed;top:20px;right:20px;z-index:120">
+      <svg class="icon"><use href="#i-eye"></use></svg>
+    </button>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
+    <span id="toast-text">Demo: export is disabled in the starter.</span>
+  </div>
+
+  <script src="js/demo.js"></script>
+</body>
+</html>
