@@ -1,67 +1,103 @@
-# 3D Trading Card Studio — Reels & TikTok Creator 🎴✨
+<div align="center">
 
-Una aplicación web interactiva en 3D para visualizar, personalizar y grabar cartas coleccionables estilizadas (estilo Pokémon, Magic, anime o custom cards), orientada a la creación de contenido vertical para TikTok, Instagram Reels y YouTube Shorts.
+# 🎴 3D Trading Card Studio
+### *Interactive WebGL 3D Card Showcase & Content Creator for Reels, TikTok & Shorts*
 
-## 🚀 Demo en Vivo
-Puedes probar la aplicación directamente en GitHub Pages:
-> **URL**: `https://<tu-usuario-o-organizacion>.github.io/<nombre-del-repo>/`
+[![GitHub Pages](https://img.shields.io/badge/Demo-GitHub%20Pages-brightgreen?style=for-the-badge&logo=github)](https://the-astro-bruh.github.io/Card_3D_Webapp/)
+[![Three.js](https://img.shields.io/badge/Three.js-r128-black?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/es/docs/Web/JavaScript)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
----
+<br/>
 
-## ✨ Características Principales
+<p align="center">
+  <b>Una suite de visualización y animación 3D en tiempo real diseñada para creadores de cartas coleccionables (TCG), artistas digitales y creadores de contenido.</b>
+</p>
 
-- **Render 3D en Tiempo Real**: Construido con **Three.js** y **OrbitControls** con soporte para sombras suaves e iluminación cinematográfica dual.
-- **Efectos Holográficos / Foil**:
-  - Efecto arcoíris reflectivo dinámico según la inclinación de la cámara.
-  - Efecto de destellos (*glitter/sparkles*) reflectantes.
-  - Opciones de relieve 3D (*bump mapping*) y curvatura sutil para realismo de carta física.
-- **Borde Metálico / Foil**: Ajuste de color del borde, rugosidad y metalicidad (acabados oro, plata, cromo o neón).
-- **Formatos de Grabación Directa**:
-  - Vertical 9:16 (1080x1920) ideal para Reels / TikToks / Shorts.
-  - Cuadrado 1:1 (1080x1080) para feeds.
-  - Horizontal 16:9 (1920x1080) para landscape.
-- **Animaciones Predefinidas**:
-  - Giro 360 continuo (*Showcase Loop*).
-  - Efecto de balanceo e inclinación (*Holo Tilt*).
-  - Giro de Revelación con impacto (*Dramatic Flip*).
-  - Efecto flotante suave (*Floating Idle*).
-- **Exportación en Video y Captura HD**:
-  - Grabación directa en formato `.webm` lista para descargar y editar.
-  - Captura de fotos en alta resolución en formato `.png`.
-- **Carga de Diseños Propios**: Sube fácilmente tu frontal y reverso personalizados directamente desde la interfaz.
+[🎮 Probar Demo en Vivo](https://the-astro-bruh.github.io/Card_3D_Webapp/) • [✨ Características](#-características) • [⚡ Inicio Rápido](#-inicio-rápido) • [🎥 Modos de Grabación](#-modos-de-grabación)
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+</div>
 
-- **HTML5 / CSS3 / JavaScript (Vanilla Moderno)**
-- **[Three.js (r128)](https://threejs.org/)** — Motor 3D WebGL.
-- **MediaStream Recording API & Canvas Capture** — Grabación directa de video en el navegador.
+## 📖 Acerca del Proyecto
+
+**3D Trading Card Studio** permite importar diseños en 2D (anverso y reverso) y transformarlos al instante en una carta tridimensional fotorrealista con efectos holográficos avanzados, reflejos metálicos, texturas de relieve (*bump maps*) y animaciones cinemáticas listas para exportar a video (.webm) o capturas fotográficas en alta resolución (.png).
+
+Optimizado con relaciones de aspecto estándar para **TikTok, Instagram Reels y YouTube Shorts (9:16)**, así como formatos cuadrados (**1:1**) y apaisados (**16:9**).
 
 ---
 
-## 💻 Uso Local
+## ✨ Características
 
-Si prefieres ejecutarlo localmente:
+### 🌈 Shaders y Efectos Holográficos
+- **Efecto Arcoíris Dinámico (*Rainbow Foil*)**: Reflejos iridiscentes calculados según el ángulo de visión de la cámara.
+- **Partículas Glitter / Sparkles**: Destellos estelares sobre la superficie al mover la carta o la iluminación.
+- **Bordes Metálicos Personalizables**: Selector de color, rugosidad (*roughness*) y reflectividad metálica (*metalness*) para simular oro, plata o acabados neón.
+- **Relieve Físico 3D & Curvatura**: Simulación sutil del grosor y curvatura natural de una carta física real.
 
-1. **Opción rápida (Windows)**:
-   - Haz doble clic en el archivo `Iniciar_Webapp.bat`. Se abrirá un servidor local en tu navegador predeterminado.
-2. **Con Python**:
+### 🎬 Modos de Animación Preestablecidos
+| Animación | Descripción |
+| :--- | :--- |
+| **Showcase 360°** | Giro continuo y suave ideal para vitrinas virtuales y presentaciones. |
+| **Holo Tilt** | Balanceo suave en múltiples ejes para destacar los brillos y foils holográficos. |
+| **Dramatic Flip** | Giro de impacto diseñado para transiciones y vídeos de revelación (*Card Reveal*). |
+| **Floating Idle** | Levitación fluida y sutil para estética de cartas míticas o legendarias. |
+
+### 📹 Estudio de Grabación Integrado
+- **Exportación Directa a Video**: Graba clips de vídeo con la **MediaStream Recording API** sin marcas de agua ni software externo.
+- **Captura Instantánea en HD**: Exporta imágenes nítidas de la carta en cualquier pose.
+- **Controles de Entorno**: Fondos personalizables (gradientes de estudio, negro profundo, verde croma para composición).
+
+---
+
+## ⚡ Inicio Rápido
+
+### Usar en el Navegador (Sin instalación)
+Puedes abrir directamente el proyecto en la web:
+👉 **[Abrir 3D Trading Card Studio](https://the-astro-bruh.github.io/Card_3D_Webapp/)**
+
+### Ejecutar Localmente
+
+1. **Clonar el repositorio**:
    ```bash
-   python -m http.server 8000
+   git clone https://github.com/the-astro-bruh/Card_3D_Webapp.git
+   cd Card_3D_Webapp
    ```
-   Abre en tu navegador: `http://localhost:8000`
-3. **Con Node.js / npx**:
-   ```bash
-   npx serve .
-   ```
+
+2. **Abrir en local**:
+   - **En Windows**: Haz doble clic sobre `Iniciar_Webapp.bat`.
+   - **Con Python**:
+     ```bash
+     python -m http.server 8000
+     ```
+     Accede en tu navegador a `http://localhost:8000`.
+   - **Con Node / npx**:
+     ```bash
+     npx serve .
+     ```
 
 ---
 
-## 🌐 Publicación en GitHub Pages
+## 🛠️ Tecnologías
 
-1. Ve a los **Settings** (Configuración) de tu repositorio en GitHub.
-2. En la sección lateral izquierda, haz clic en **Pages**.
-3. En **Build and deployment > Source**, selecciona `Deploy from a branch`.
-4. En **Branch**, selecciona la rama `main` (o `master`) y la carpeta `/ (root)`.
-5. Haz clic en **Save**. En unos minutos tu webapp estará disponible en internet.
+- **[Three.js (r128)](https://threejs.org/)** — Motor de renderizado 3D y WebGL.
+- **Canvas Capture & MediaStream API** — Procesamiento y captura de vídeo en el navegador.
+- **HTML5 & CSS3 Vanilla** — Interfaz limpia, responsiva y sin dependencias pesadas.
+
+---
+
+## 🤝 Contribuciones
+
+Las contribuciones, sugerencias e informes de errores son bienvenidos:
+1. Haz un Fork del proyecto.
+2. Crea tu rama de características (`git checkout -b feature/NuevaCaracteristica`).
+3. Confirma tus cambios (`git commit -m 'Añadir nueva característica'`).
+4. Haz Push a la rama (`git push origin feature/NuevaCaracteristica`).
+5. Abre un **Pull Request**.
+
+---
+
+<div align="center">
+  <sub>Desarrollado con ❤️ para artistas, coleccionistas y creadores de contenido.</sub>
+</div>
