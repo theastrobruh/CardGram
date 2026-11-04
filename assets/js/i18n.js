@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TCG:HUB — v0.4.2 · Capa de idioma
+   TCG:HUB — v0.4.3 · Capa de idioma
    Diccionario ES/EN + utilidades de traducción.
    ========================================================================== */
 'use strict';
@@ -203,7 +203,7 @@ const I18N = {
     shortcut_help: 'Abrir esta ayuda',
     shortcut_close: 'Cerrar o salir',
     got_it: 'Entendido',
-    help_note: 'TCG:HUB v0.4.2 · Hecho con Three.js, Canvas y mucho cariño por theAstroBruh.'
+    help_note: 'TCG:HUB v0.4.3 · Hecho con Three.js, Canvas y mucho cariño por theAstroBruh.'
   },
 
   en: {
@@ -398,7 +398,7 @@ const I18N = {
     shortcut_help: 'Open this help',
     shortcut_close: 'Close or exit',
     got_it: 'Got it',
-    help_note: 'TCG:HUB v0.4.2 · Made with Three.js, Canvas and care by theAstroBruh.'
+    help_note: 'TCG:HUB v0.4.3 · Made with Three.js, Canvas and care by theAstroBruh.'
   },
 
   de: {
@@ -593,7 +593,7 @@ const I18N = {
     shortcut_help: 'Diese Hilfe öffnen',
     shortcut_close: 'Schließen oder beenden',
     got_it: 'Verstanden',
-    help_note: 'TCG:HUB v0.4.2 · Mit Three.js, Canvas und Liebe von theAstroBruh.'
+    help_note: 'TCG:HUB v0.4.3 · Mit Three.js, Canvas und Liebe von theAstroBruh.'
   }
 };
 

@@ -1,10 +1,10 @@
 /* ==========================================================================
-   TCG:HUB — v0.4.2 · Aplicación
+   TCG:HUB — v0.4.3 · Aplicación
    Estado, persistencia, presets, cargas, interfaz, accesibilidad e inicio.
    ========================================================================== */
 'use strict';
 
-const APP_VERSION = '0.4.2';
+const APP_VERSION = '0.4.3';
 
 const STORAGE = {
   settings: 'tcghub.settings.v1',

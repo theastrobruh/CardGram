@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TCG:HUB — v0.4.2 · Motor 3D
+   TCG:HUB — v0.4.3 · Motor 3D
    Escena Three.js, geometría procedural de la carta, materiales, fondos,
    cámara, transiciones y utilidades de exportación.
    ========================================================================== */
