@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Trading Card Studio — Reels & TikTok Creator</title>
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- OrbitControls CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #0b0d13;
+      color: #f1f5f9;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    /* Sidebar controls */
+    #sidebar {
+      width: 420px;
+      min-width: 380px;
+      background: #131722;
+      border-right: 1px solid #232b3e;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 10;
+      box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+    .header {
+      padding: 24px 24px 16px;
+      border-bottom: 1px solid #232b3e;
+      background: #171c2b;
+    }
+    .header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .header p {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+    .scroll-content {
+      padding: 20px 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #e2b842;
+      margin-bottom: 12px;
+      margin-top: 20px;
+    }
+    .section-title:first-child {
+      margin-top: 0;
+    }
+    /* Upload boxes */
+    .upload-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .upload-box {
+      flex: 1;
+      background: #1c2233;
+      border: 1px dashed #3b4766;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .upload-box:hover {
+      border-color: #38bdf8;
+      background: #20273a;
+    }
+    .upload-box input {
+      display: none;
+    }
+    .upload-box img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      background: #0f121a;
+    }
+    .upload-box span {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      display: block;
+      font-weight: 500;
+    }
+    .upload-box small {
+      font-size: 0.7rem;
+      color: #64748b;
+    }
+    /* Control inputs */
+    .control-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      background: #181e2d;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid #232b3e;
+    }
+    .control-row label {
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      font-weight: 500;
+    }
+    select, input[type="range"] {
+      background: #252e42;
+      border: 1px solid #3b4766;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      outline: none;
+      cursor: pointer;
+    }
+    select:focus {
+      border-color: #38bdf8;
+    }
+    /* Action footer */
+    .footer {
+      padding: 20px 24px;
+      background: #171c2b;
+      border-top: 1px solid #232b3e;
+    }
+    .btn-record {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+    }
+    .btn-record:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+    .btn-record:disabled {
+      background: #475569;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    .status-text {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #94a3b8;
+      margin-top: 10px;
+    }
+    /* Main viewport */
+    #viewport-container {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      overflow: hidden;
+    }
+    /* Phone frame indicator */
+    .reels-overlay-badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(19, 23, 34, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid #2d374d;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: #38bdf8;
+      font-weight: 600;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #10b981;
+    }
+    /* Hidden render canvas for exact 1080x1920 video export */
+    #export-canvas {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR CONTROLS -->
+  <aside id="sidebar">
+    <div class="header">
+      <h1>🎴 3D Card Studio</h1>
+      <p>Generador de videos loop 3D para Reels / TikTok</p>
+    </div>
+
+    <div class="scroll-content">
+      <!-- 1. CARTAS -->
+      <div class="section-title">1. Diseños de las Caras</div>
+      <div class="upload-group">
+        <label class="upload-box" for="front-file-input">
+          <img id="front-preview-img" src="assets/card_front.png" alt="Front Preview">
+          <span>Cara Frontal</span>
+          <small>Clic para subir</small>
+          <input type="file" id="front-file-input" accept="image/*">
+        </label>
+
+        <label class="upload-box" for="back-file-input">
+          <img id="back-preview-img" src="assets/card_back.png" alt="Back Preview">
+          <span>Cara Trasera</span>
+          <small>Clic para subir</small>
+          <input type="file" id="back-file-input" accept="image/*">
+        </label>
+      </div>
+
+      <!-- 2. FONDO Y ESTÉTICA -->
+      <div class="section-title">2. Entorno y Fondo</div>
+      <div class="control-row">
+        <label for="select-bg">Color de Fondo:</label>
+        <select id="select-bg">
+          <option value="black" selected>Negro Absoluto (OLED)</option>
+          <option value="dark_studio">Estudio Sutil</option>
+          <option value="gold_luxury">Lujo Dorado</option>
+          <option value="cyber_neon">Cyberpunk Neón</option>
+          <option value="transparent">Transparente</option>
+        </select>
+      </div>
+
+      <!-- 3. DETALLES 3D -->
+      <div class="section-title">3. Detalles de la Carta 3D</div>
+      
+      <div class="control-row">
+        <label for="select-corners">Esquinas:</label>
+        <select id="select-corners">
+          <option value="rounded" selected>Redondeadas (TCG)</option>
+          <option value="sharp">Rectas Clásicas</option>
+        </select>
+      </div>
+
+      <div class="control-row">
+        <label for="select-edge">Color del Canto:</label>
+        <select id="select-edge">
+          <option value="black" selected>Negro Mate</option>
+          <option value="gold_foil">Dorado Metalizado (Foil)</option>
+          <option value="white">Cartulina Blanca</option>
+        </select>
+      </div>
+
+      <div class="control-row">
+        <label for="range-gloss">Brillo Reflectante:</label>
+        <input type="range" id="range-gloss" min="0.05" max="0.9" step="0.05" value="0.25">
+      </div>
+
+      <!-- 4. ANIMACIÓN -->
+      <div class="section-title">4. Parámetros de Video</div>
+      
+      <div class="control-row">
+        <label for="select-speed">Velocidad de Giro:</label>
+        <select id="select-speed">
+          <option value="1">Normal (2 giros en 10s)</option>
+          <option value="0.5">Lento y Elegante (1 giro)</option>
+          <option value="1.5">Rápido y Dinámico</option>
+        </select>
+      </div>
+
+      <div class="control-row">
+        <label for="toggle-floating">Oscilación Flotante:</label>
+        <select id="toggle-floating">
+          <option value="true" selected>Activada (Orgánica)</option>
+          <option value="false">Fija en el Eje</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- FOOTER BOTÓN DE EXPORTAR -->
+    <div class="footer">
+      <button class="btn-record" id="btn-record">
+        <span>🎬</span> EXPORTAR REEL 9:16 (10s)
+      </button>
+      <div class="status-text" id="status-label">Listo para previsualizar y exportar</div>
+    </div>
+  </aside>
+
+  <!-- 3D VIEWPORT -->
+  <main id="viewport-container">
+    <div class="reels-overlay-badge">
+      <div class="pulse-dot"></div>
+      9:16 Vertical Loop Preview
+    </div>
+  </main>
+
+  <script>
+    // -------------------------------------------------------------------------
+    // 3D SCENE SETUP WITH THREE.JS
+    // -------------------------------------------------------------------------
+    const container = document.getElementById('viewport-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000); // Absolute black by default
+
+    const camera = new THREE.PerspectiveCamera(38, container.clientWidth / container.clientHeight, 0.1, 100);
+    camera.position.set(0, 0, 4.6);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    container.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.enableZoom = true;
+    controls.autoRotate = false;
+
+    // Lighting Rig
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(ambientLight);
+
+    const keyLight = new THREE.DirectionalLight(0xfff8ee, 1.8);
+    keyLight.position.set(3, 3, 4);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0x88bbff, 0.9);
+    fillLight.position.set(-3, -1, 3);
+    scene.add(fillLight);
+
+    const rimLight = new THREE.DirectionalLight(0xffe0a0, 1.6);
+    rimLight.position.set(0, 4, -3);
+    scene.add(rimLight);
+
+    // -------------------------------------------------------------------------
+    // PROCEDURAL 3D CARD GENERATOR (WITH ROUNDED CORNERS)
+    // -------------------------------------------------------------------------
+    let cardGroup = new THREE.Group();
+    scene.add(cardGroup);
+
+    const textureLoader = new THREE.TextureLoader();
+    let frontTex = textureLoader.load('assets/card_front.png');
+    let backTex = textureLoader.load('assets/card_back.png');
+
+    frontTex.encoding = THREE.sRGBEncoding;
+    backTex.encoding = THREE.sRGBEncoding;
+
+    // Materials
+    let matFront = new THREE.MeshStandardMaterial({
+      map: frontTex,
+      roughness: 0.25,
+      metalness: 0.05
+    });
+
+    let matBack = new THREE.MeshStandardMaterial({
+      map: backTex,
+      roughness: 0.28,
+      metalness: 0.05
+    });
+
+    let matEdge = new THREE.MeshStandardMaterial({
+      color: 0x050505,
+      roughness: 0.4,
+      metalness: 0.1
+    });
+
+    function createCardMesh(isRounded = true) {
+      // Clear existing
+      while(cardGroup.children.length > 0) {
+        cardGroup.remove(cardGroup.children[0]);
+      }
+
+      const w = 1.35;
+      const h = 1.89;
+      const radius = isRounded ? 0.09 : 0.0001;
+      const depth = 0.016;
+
+      const shape = new THREE.Shape();
+      const x = -w / 2;
+      const y = -h / 2;
+
+      shape.moveTo(x + radius, y);
+      shape.lineTo(x + w - radius, y);
+      shape.quadraticCurveTo(x + w, y, x + w, y + radius);
+      shape.lineTo(x + w, y + h - radius);
+      shape.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+      shape.lineTo(x + radius, y + h);
+      shape.quadraticCurveTo(x, y + h, x, y + h - radius);
+      shape.lineTo(x, y + radius);
+      shape.quadraticCurveTo(x, y, x + radius, y);
+
+      const extrudeSettings = {
+        depth: depth,
+        bevelEnabled: true,
+        bevelSegments: 3,
+        steps: 1,
+        bevelSize: 0.004,
+        bevelThickness: 0.004
+      };
+
+      const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+      geometry.center();
+
+      // Fix UV mapping for front and back faces
+      const pos = geometry.attributes.position;
+      const uv = geometry.attributes.uv;
+
+      for (let i = 0; i < pos.count; i++) {
+        const px = pos.getX(i);
+        const py = pos.getY(i);
+        const pz = pos.getZ(i);
+
+        // Normalize UVs across width & height
+        const u = (px / w) + 0.5;
+        const v = (py / h) + 0.5;
+
+        // Front vs Back vs Edge
+        if (pz > (depth / 2 - 0.005)) {
+          uv.setXY(i, u, v);
+        } else if (pz < (-depth / 2 + 0.005)) {
+          uv.setXY(i, 1.0 - u, v); // Mirror back
+        } else {
+          uv.setXY(i, 0.5, 0.5);
+        }
+      }
+      uv.needsUpdate = true;
+
+      // Card mesh with multi-material (0: Front/Back, 1: Edges)
+      const mesh = new THREE.Mesh(geometry, [matFront, matEdge]);
+      cardGroup.add(mesh);
+
+      // Back cover plane to ensure independent back texture mapping
+      const backPlaneGeo = new THREE.PlaneGeometry(w, h);
+      const backPlane = new THREE.Mesh(backPlaneGeo, matBack);
+      backPlane.position.z = -depth / 2 - 0.0042;
+      backPlane.rotation.y = Math.PI;
+      cardGroup.add(backPlane);
+
+      // Front cover plane for crisp texture
+      const frontPlaneGeo = new THREE.PlaneGeometry(w, h);
+      const frontPlane = new THREE.Mesh(frontPlaneGeo, matFront);
+      frontPlane.position.z = depth / 2 + 0.0042;
+      cardGroup.add(frontPlane);
+    }
+
+    createCardMesh(true);
+
+    // -------------------------------------------------------------------------
+    // ANIMATION & RENDER LOOP
+    // -------------------------------------------------------------------------
+    let clock = new THREE.Clock();
+    let isFloating = true;
+    let speedMult = 1.0;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsedTime = clock.getElapsedTime();
+
+      // Continuous uniform spin
+      cardGroup.rotation.y = (elapsedTime * 0.6283 * 2 * speedMult);
+
+      if (isFloating) {
+        // Organic gentle tilt and bobbing
+        cardGroup.rotation.x = Math.sin(elapsedTime * 1.5) * 0.12;
+        cardGroup.rotation.z = Math.cos(elapsedTime * 1.2) * 0.05;
+        cardGroup.position.y = Math.sin(elapsedTime * 2.0) * 0.06;
+      } else {
+        cardGroup.rotation.x = 0;
+        cardGroup.rotation.z = 0;
+        cardGroup.position.y = 0;
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Resize handler
+    window.addEventListener('resize', () => {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+
+    // -------------------------------------------------------------------------
+    // UI EVENT HANDLERS & INTERACTIONS
+    // -------------------------------------------------------------------------
+    // Image uploads
+    const frontInput = document.getElementById('front-file-input');
+    const backInput = document.getElementById('back-file-input');
+    const frontPreview = document.getElementById('front-preview-img');
+    const backPreview = document.getElementById('back-preview-img');
+
+    frontInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        frontPreview.src = url;
+        textureLoader.load(url, (t) => {
+          t.encoding = THREE.sRGBEncoding;
+          matFront.map = t;
+          matFront.needsUpdate = true;
+        });
+      }
+    });
+
+    backInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        backPreview.src = url;
+        textureLoader.load(url, (t) => {
+          t.encoding = THREE.sRGBEncoding;
+          matBack.map = t;
+          matBack.needsUpdate = true;
+        });
+      }
+    });
+
+    // Background style
+    document.getElementById('select-bg').addEventListener('change', (e) => {
+      const val = e.target.value;
+      if (val === 'black') {
+        scene.background = new THREE.Color(0x000000); // Pure OLED Black
+      } else if (val === 'dark_studio') {
+        scene.background = new THREE.Color(0x060911);
+      } else if (val === 'gold_luxury') {
+        scene.background = new THREE.Color(0x130e06);
+      } else if (val === 'cyber_neon') {
+        scene.background = new THREE.Color(0x040817);
+      } else if (val === 'transparent') {
+        scene.background = null;
+      }
+    });
+
+    // Corner style
+    document.getElementById('select-corners').addEventListener('change', (e) => {
+      createCardMesh(e.target.value === 'rounded');
+    });
+
+    // Edge color / foil
+    document.getElementById('select-edge').addEventListener('change', (e) => {
+      const val = e.target.value;
+      if (val === 'gold_foil') {
+        matEdge.color.setHex(0xd4af37);
+        matEdge.metalness = 0.95;
+        matEdge.roughness = 0.2;
+      } else if (val === 'white') {
+        matEdge.color.setHex(0xf5f5f5);
+        matEdge.metalness = 0.0;
+        matEdge.roughness = 0.4;
+      } else {
+        matEdge.color.setHex(0x050505);
+        matEdge.metalness = 0.1;
+        matEdge.roughness = 0.4;
+      }
+      matEdge.needsUpdate = true;
+    });
+
+    // Glossiness slider
+    document.getElementById('range-gloss').addEventListener('input', (e) => {
+      const v = parseFloat(e.target.value);
+      matFront.roughness = v;
+      matBack.roughness = v;
+    });
+
+    // Speed & floating
+    document.getElementById('select-speed').addEventListener('change', (e) => {
+      speedMult = parseFloat(e.target.value);
+    });
+    document.getElementById('toggle-floating').addEventListener('change', (e) => {
+      isFloating = (e.target.value === 'true');
+    });
+
+    // -------------------------------------------------------------------------
+    // INSTANT 1080x1920 VIDEO EXPORTER (MediaRecorder API)
+    // -------------------------------------------------------------------------
+    const btnRecord = document.getElementById('btn-record');
+    const statusLabel = document.getElementById('status-label');
+
+    btnRecord.addEventListener('click', async () => {
+      btnRecord.disabled = true;
+      statusLabel.textContent = 'Grabando animación 9:16 (10 segundos)...';
+      btnRecord.innerHTML = '<span>⏳</span> GRABANDO REEL...';
+
+      // Setup recorder from WebGL canvas stream
+      const stream = renderer.domElement.captureStream(30); // 30 FPS
+      const recorder = new MediaRecorder(stream, {
+        mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') 
+                  ? 'video/webm;codecs=vp9' 
+                  : 'video/webm',
+        videoBitsPerSecond: 8000000 // 8 Mbps high quality
+      });
+
+      const chunks = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `3D_Card_Reel_${Date.now()}.webm`;
+        a.click();
+
+        statusLabel.textContent = '¡Video descargado con éxito!';
+        btnRecord.innerHTML = '<span>🎬</span> EXPORTAR REEL 9:16 (10s)';
+        btnRecord.disabled = false;
+      };
+
+      recorder.start();
+
+      // Record for 10 seconds (seamless loop)
+      let countdown = 10;
+      const interval = setInterval(() => {
+        countdown--;
+        if (countdown > 0) {
+          statusLabel.textContent = `Grabando video... ${countdown}s restantes`;
+        } else {
+          clearInterval(interval);
+          recorder.stop();
+        }
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
