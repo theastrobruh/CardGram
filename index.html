@@ -13,32 +13,31 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Trebuchet MS", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
 
     /* -------------------------------------------------------------
-       YU-GI-OH / DUEL INTERFACE THEME
-       Obsidian, Egyptian Gold, Dark Magician Purple & Millennial Cyan
+       DUELIST OBSIDIAN & GOLD LUXURY PALETTE
     ------------------------------------------------------------- */
     :root {
-      --duel-bg: #07090e;
-      --duel-panel: #0d111a;
-      --duel-card-bg: #141a26;
+      --bg-dark: #07090e;
+      --panel-bg: rgba(13, 17, 26, 0.95);
+      --card-bg: #131926;
+      --card-bg-hover: #1c2436;
       --gold-primary: #f59e0b;
       --gold-bright: #fbbf24;
-      --gold-glow: rgba(245, 158, 11, 0.45);
+      --gold-glow: rgba(245, 158, 11, 0.4);
+      --border-dark: #222c3f;
       --border-gold: #785a28;
-      --border-duel: #2a354d;
-      --cyan-orb: #06b6d4;
-      --purple-accent: #8b5cf6;
-      --text-main: #f1f5f9;
+      --border-focus: #f59e0b;
+      --text-main: #f8fafc;
       --text-muted: #94a3b8;
     }
 
     body {
-      background-color: var(--duel-bg);
+      background-color: var(--bg-dark);
       color: var(--text-main);
       display: flex;
       height: 100vh;
@@ -47,25 +46,42 @@
       position: relative;
     }
 
-    /* Mobile toggle button */
-    #mobile-toggle-btn {
-      display: none;
+    /* -------------------------------------------------------------
+       DESKTOP & MOBILE SIDEBAR TOGGLE BUTTON (DRAWER COLLAPSE)
+    ------------------------------------------------------------- */
+    #sidebar-toggle-btn {
       position: fixed;
       top: 14px;
       left: 14px;
       z-index: 100;
-      background: linear-gradient(135deg, #1e293b, #0f172a);
-      border: 1px solid var(--gold-primary);
+      background: #131926;
+      border: 1px solid var(--border-dark);
       color: var(--gold-bright);
-      font-size: 1.2rem;
-      padding: 8px 12px;
-      border-radius: 8px;
+      font-size: 1.15rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #sidebar-toggle-btn:hover {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 14px var(--gold-glow);
+      transform: scale(1.05);
+    }
+
+    /* When sidebar is collapsed on PC */
+    body.sidebar-collapsed #sidebar {
+      transform: translateX(-100%);
+      margin-right: -410px;
     }
 
     /* -------------------------------------------------------------
-       COSMIC BREATHING LOGO (UNIVERSE & RESPIRATION LOOP)
+       ANIMATED 3D ROTATING CARD LOGO (REPLACES THE ORB)
     ------------------------------------------------------------- */
     .brand-wrap {
       display: flex;
@@ -75,42 +91,56 @@
     .brand-title-row {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
-    .cosmic-orb-logo {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      position: relative;
-      background: radial-gradient(circle at 35% 30%, #fef08a 0%, #f59e0b 40%, #7c2d12 80%, #030712 100%);
-      box-shadow: 0 0 12px var(--gold-glow);
-      animation: cosmicBreathe 4s ease-in-out infinite;
+    /* 3D Spinning Holographic Card Core */
+    .spinning-card-logo-container {
+      width: 24px;
+      height: 32px;
+      perspective: 300px;
       flex-shrink: 0;
     }
-    .cosmic-orb-logo::before {
-      content: "";
+    .spinning-card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      animation: cardLogoSpin 5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+    }
+    .card-face {
       position: absolute;
-      inset: -3px;
-      border-radius: 50%;
-      border: 1px dashed rgba(251, 191, 36, 0.6);
-      animation: cosmicOrbit 10s linear infinite;
+      inset: 0;
+      border-radius: 4px;
+      backface-visibility: hidden;
+      border: 1px solid #fbbf24;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
     }
-    @keyframes cosmicBreathe {
-      0%, 100% {
-        transform: scale(0.92);
-        box-shadow: 0 0 8px rgba(245, 158, 11, 0.4), 0 0 16px rgba(139, 92, 246, 0.25);
-        filter: brightness(0.95);
-      }
-      50% {
-        transform: scale(1.08);
-        box-shadow: 0 0 18px rgba(245, 158, 11, 0.9), 0 0 28px rgba(217, 119, 6, 0.7);
-        filter: brightness(1.2);
-      }
+    .card-face-front {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #78350f 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 900;
+      color: #000;
     }
-    @keyframes cosmicOrbit {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .card-face-back {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #0f172a 100%);
+      transform: rotateY(180deg);
+      border-color: #818cf8;
+      box-shadow: 0 0 10px rgba(129, 140, 248, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      color: #c7d2fe;
+    }
+
+    @keyframes cardLogoSpin {
+      0% { transform: rotateY(0deg) rotateZ(-4deg); }
+      50% { transform: rotateY(180deg) rotateZ(4deg); }
+      100% { transform: rotateY(360deg) rotateZ(-4deg); }
     }
 
     .header h1 {
@@ -118,13 +148,10 @@
       font-weight: 800;
       letter-spacing: 0.08em;
       color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 4px;
     }
     .header h1 span.gold {
       color: var(--gold-bright);
-      text-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+      text-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
     }
     .author-credit {
       font-size: 0.65rem;
@@ -136,19 +163,18 @@
     }
 
     /* -------------------------------------------------------------
-       CINEMATIC MODE BUTTON (CLEAN ICON ONLY)
+       CINEMATIC MODE BUTTON (ICON ONLY - EYE)
     ------------------------------------------------------------- */
     #btn-cinematic {
       position: fixed;
       top: 14px;
       right: 14px;
       z-index: 90;
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 10px;
-      background: rgba(13, 17, 26, 0.85);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border-gold);
+      background: #131926;
+      border: 1px solid var(--border-dark);
       color: var(--gold-bright);
       font-size: 1.15rem;
       cursor: pointer;
@@ -161,7 +187,7 @@
     #btn-cinematic:hover {
       transform: scale(1.08);
       border-color: var(--gold-bright);
-      box-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+      box-shadow: 0 0 14px var(--gold-glow);
     }
 
     #cinematic-exit-tip {
@@ -170,7 +196,7 @@
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(13, 17, 26, 0.85);
+      background: rgba(13, 17, 26, 0.9);
       border: 1px solid var(--border-gold);
       color: var(--gold-bright);
       padding: 6px 18px;
@@ -189,26 +215,26 @@
     }
 
     /* -------------------------------------------------------------
-       SIDEBAR & TABBED HIGH-USABILITY NAVIGATION
+       SIDEBAR & TAB NAVIGATION
     ------------------------------------------------------------- */
     #sidebar {
       width: 410px;
       min-width: 380px;
       max-width: 420px;
-      background: var(--duel-panel);
-      border-right: 1px solid var(--border-duel);
+      background: var(--panel-bg);
+      border-right: 1px solid var(--border-dark);
       display: flex;
       flex-direction: column;
       height: 100%;
       z-index: 50;
       box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin-right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .header {
-      padding: 14px 18px;
+      padding: 14px 18px 14px 64px; /* Space for the collapse toggle */
       background: #090c13;
-      border-bottom: 1px solid var(--border-duel);
+      border-bottom: 1px solid var(--border-dark);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -217,7 +243,7 @@
     .lang-switcher {
       display: flex;
       background: #07090e;
-      border: 1px solid var(--border-duel);
+      border: 1px solid var(--border-dark);
       border-radius: 6px;
       padding: 2px;
       gap: 2px;
@@ -238,11 +264,11 @@
       color: #000;
     }
 
-    /* YU-GI-OH STYLE TABS HEADER (Deck / 3D Forge / Camera) */
+    /* TABS */
     .nav-tabs {
       display: flex;
       background: #090c13;
-      border-bottom: 2px solid var(--border-duel);
+      border-bottom: 2px solid var(--border-dark);
       padding: 0 8px;
     }
     .tab-btn {
@@ -268,7 +294,7 @@
     .tab-btn.active {
       color: var(--gold-bright);
       border-bottom-color: var(--gold-bright);
-      background: rgba(245, 158, 11, 0.06);
+      background: rgba(245, 158, 11, 0.08);
     }
 
     .scroll-content {
@@ -280,7 +306,7 @@
       width: 6px;
     }
     .scroll-content::-webkit-scrollbar-thumb {
-      background: #2a354d;
+      background: #222c3f;
       border-radius: 3px;
     }
 
@@ -307,7 +333,7 @@
       margin-top: 0;
     }
 
-    /* Preset Chips */
+    /* PRESETS QUICK CHIPS */
     .card-presets-bar {
       display: flex;
       gap: 6px;
@@ -316,8 +342,8 @@
       padding-bottom: 4px;
     }
     .preset-chip {
-      background: #141a26;
-      border: 1px solid var(--border-duel);
+      background: #131926;
+      border: 1px solid var(--border-dark);
       border-radius: 6px;
       padding: 4px 10px;
       font-size: 0.72rem;
@@ -340,7 +366,7 @@
       margin-left: 2px;
     }
 
-    /* Upload boxes */
+    /* UPLOAD BOXES */
     .upload-group {
       display: flex;
       gap: 10px;
@@ -348,8 +374,8 @@
     }
     .upload-box {
       flex: 1;
-      background: #141a26;
-      border: 1px dashed var(--border-duel);
+      background: #131926;
+      border: 1px dashed var(--border-dark);
       border-radius: 8px;
       padding: 8px;
       text-align: center;
@@ -359,7 +385,7 @@
     }
     .upload-box:hover {
       border-color: var(--gold-primary);
-      background: #1a2233;
+      background: #1c2436;
     }
     .upload-box input {
       display: none;
@@ -381,17 +407,21 @@
       font-weight: 600;
     }
 
-    /* Control Rows */
+    /* CONTROL ROWS & INPUTS */
     .control-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 8px;
-      background: var(--duel-card-bg);
+      background: var(--card-bg);
       padding: 8px 12px;
-      border-radius: 6px;
-      border: 1px solid var(--border-duel);
+      border-radius: 8px;
+      border: 1px solid var(--border-dark);
       gap: 8px;
+      transition: border-color 0.15s ease;
+    }
+    .control-row:hover {
+      border-color: #2e3a52;
     }
     .control-row label {
       font-size: 0.78rem;
@@ -419,23 +449,29 @@
       font-family: monospace;
     }
 
-    select, input[type="range"] {
-      background: #090c13;
-      border: 1px solid var(--border-duel);
-      color: #fff;
-      padding: 6px 8px;
-      border-radius: 5px;
+    /* POLISHED SLEEK DROPDOWNS & SLIDERS */
+    select {
+      background: #0d121c;
+      border: 1px solid var(--border-dark);
+      color: #f1f5f9;
+      padding: 6px 10px;
+      border-radius: 6px;
       font-size: 0.78rem;
       outline: none;
       cursor: pointer;
+      transition: all 0.15s ease;
     }
-    select:focus {
+    select:focus, select:hover {
       border-color: var(--gold-primary);
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
     }
     input[type="range"] {
       width: 100%;
       height: 5px;
       accent-color: var(--gold-primary);
+      background: #090c13;
+      border-radius: 3px;
+      outline: none;
       padding: 0;
     }
 
@@ -446,25 +482,31 @@
     }
     .pill-btn {
       flex: 1;
-      padding: 5px 6px;
+      padding: 6px 8px;
       font-size: 0.72rem;
-      background: #141a26;
-      border: 1px solid var(--border-duel);
-      border-radius: 5px;
+      background: #0d121c;
+      border: 1px solid var(--border-dark);
+      border-radius: 6px;
       color: #cbd5e1;
       cursor: pointer;
       text-align: center;
       transition: all 0.15s ease;
       white-space: nowrap;
+      font-weight: 600;
     }
-    .pill-btn.active, .pill-btn:hover {
+    .pill-btn:hover {
+      border-color: var(--gold-primary);
+      color: #fff;
+    }
+    .pill-btn.active {
       background: var(--gold-primary);
       color: #000;
       font-weight: 700;
       border-color: var(--gold-primary);
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
     }
 
-    /* Scene Timeline Grid */
+    /* SCENE TIMELINE GRID */
     .scene-timeline-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -472,8 +514,8 @@
       margin-top: 4px;
     }
     .scene-card {
-      background: #141a26;
-      border: 1px solid var(--border-duel);
+      background: #131926;
+      border: 1px solid var(--border-dark);
       border-radius: 6px;
       padding: 6px;
       text-align: center;
@@ -493,46 +535,49 @@
     }
     .scene-card .btn-set-cam {
       background: #090c13;
-      border: 1px solid var(--border-duel);
+      border: 1px solid var(--border-dark);
       border-radius: 4px;
       color: #cbd5e1;
-      padding: 2px 4px;
+      padding: 3px 4px;
       font-size: 0.65rem;
       cursor: pointer;
       margin-top: 3px;
       width: 100%;
+      transition: all 0.15s;
     }
     .scene-card .btn-set-cam:hover {
       border-color: var(--gold-primary);
       color: #fff;
     }
 
-    /* Export Footer with Golden Egyptian Accents */
+    /* POLISHED EXPORT BUTTON */
     .footer {
       padding: 14px 18px;
       background: #090c13;
-      border-top: 1px solid var(--border-duel);
+      border-top: 1px solid var(--border-dark);
     }
     .btn-record {
       width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      padding: 13px;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
       color: #000;
-      border: 1px solid #fbbf24;
-      border-radius: 6px;
+      border: none;
+      border-radius: 8px;
       font-size: 0.92rem;
       font-weight: 800;
+      letter-spacing: 0.04em;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+      box-shadow: 0 4px 18px rgba(245, 158, 11, 0.45);
     }
     .btn-record:hover {
-      filter: brightness(1.1);
+      filter: brightness(1.12);
       transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(245, 158, 11, 0.6);
     }
     .btn-record:disabled {
       background: #334155;
@@ -540,7 +585,6 @@
       cursor: not-allowed;
       box-shadow: none;
       transform: none;
-      border-color: #475569;
     }
     .status-text {
       text-align: center;
@@ -550,7 +594,7 @@
     }
 
     /* -------------------------------------------------------------
-       MAIN VIEWPORT
+       VIEWPORT & CANVAS WRAPPER
     ------------------------------------------------------------- */
     #viewport-container {
       flex: 1;
@@ -561,6 +605,7 @@
       background: #040508;
       overflow: hidden;
       padding: 16px;
+      transition: all 0.3s ease;
     }
 
     #canvas-window-wrapper {
@@ -593,8 +638,8 @@
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
-      border: 2px solid #fbbf24;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 60%, #d97706 100%);
+      border: 2px solid #fde68a;
       color: #000;
       font-size: 1.3rem;
       display: flex;
@@ -628,7 +673,7 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: #141a26;
+      background: #131926;
       border: 1px solid var(--border-gold);
       color: var(--gold-bright);
       font-size: 1.05rem;
@@ -681,7 +726,7 @@
 
     /* Cinematic Mode Active */
     body.cinematic-mode #sidebar,
-    body.cinematic-mode #mobile-toggle-btn,
+    body.cinematic-mode #sidebar-toggle-btn,
     body.cinematic-mode #btn-cinematic,
     body.cinematic-mode .flower-fab-container {
       display: none !important;
@@ -699,12 +744,8 @@
       box-shadow: none !important;
     }
 
-    /* Mobile */
+    /* Responsive Mobile */
     @media (max-width: 860px) {
-      #mobile-toggle-btn {
-        display: flex;
-        align-items: center;
-      }
       #sidebar {
         position: fixed;
         top: 0;
@@ -745,8 +786,8 @@
   <!-- Backdrop for mobile drawer -->
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
-  <!-- Mobile Toggle Button -->
-  <button id="mobile-toggle-btn" aria-label="Toggle Menu">☰</button>
+  <!-- Unified PC / Mobile Sidebar Toggle Button -->
+  <button id="sidebar-toggle-btn" aria-label="Toggle Sidebar" title="Ocultar / Mostrar Barra Lateral">☰</button>
 
   <!-- Cinematic Mode Button (Icon Only) -->
   <button id="btn-cinematic" title="Modo Pantalla Limpia / Clean View">
@@ -754,12 +795,18 @@
   </button>
   <div id="cinematic-exit-tip" data-i18n="cinematic_tip">Toca en cualquier lugar para salir</div>
 
-  <!-- SIDEBAR (DUEL THEME + TAB NAVIGATION) -->
+  <!-- SIDEBAR (DUELIST THEME + TABS) -->
   <aside id="sidebar">
     <div class="header">
       <div class="brand-wrap">
         <div class="brand-title-row">
-          <div class="cosmic-orb-logo" title="Universe Core"></div>
+          <!-- Animated 3D Spinning Holographic Card Logo -->
+          <div class="spinning-card-logo-container" title="TCG 3D Core">
+            <div class="spinning-card-inner">
+              <div class="card-face card-face-front">★</div>
+              <div class="card-face card-face-back">TCG</div>
+            </div>
+          </div>
           <h1>TCG:<span class="gold">HUB</span></h1>
         </div>
         <div class="author-credit">by: theAstroBruh</div>
@@ -770,7 +817,7 @@
       </div>
     </div>
 
-    <!-- TABS DE NAVEGACIÓN ORGANIZADA -->
+    <!-- TABS -->
     <nav class="nav-tabs">
       <button class="tab-btn active" data-tab="tab-deck"><span data-i18n="tab_deck">🎴 Deck</span></button>
       <button class="tab-btn" data-tab="tab-3d"><span data-i18n="tab_3d">✨ 3D Forge</span></button>
@@ -881,9 +928,10 @@
           <label for="select-speed"><span data-i18n="spin_speed">⏱️ Giro</span></label>
           <select id="select-speed">
             <option value="0" selected data-i18n="spd_stop">Pausado (Estático)</option>
-            <option value="1" data-i18n="spd_normal">Normal (2 giros / 10s)</option>
             <option value="0.5" data-i18n="spd_slow">Lento & Suave (1 giro)</option>
-            <option value="2.0" data-i18n="spd_fast">Rápido Dinámico</option>
+            <option value="1" data-i18n="spd_normal">Normal (2 giros / 10s)</option>
+            <option value="1.5" data-i18n="spd_medium">Dinámico (3 giros)</option>
+            <option value="2.5" data-i18n="spd_fast">Turbo Rápido</option>
           </select>
         </div>
 
@@ -892,6 +940,18 @@
           <select id="select-spin-dir">
             <option value="1" data-i18n="dir_normal">Horario (Normal)</option>
             <option value="-1" data-i18n="dir_reverse">Antihorario (Invertido)</option>
+          </select>
+        </div>
+
+        <!-- OSCILACIÓN / FLOATING EXPANDIDA CON MÚLTIPLES ESTILOS (POR DEFECTO: ORGANICA) -->
+        <div class="control-row">
+          <label for="toggle-floating"><span data-i18n="floating">🌊 Oscilación</span></label>
+          <select id="toggle-floating">
+            <option value="organic" selected data-i18n="float_organic">Activada (Orgánica)</option>
+            <option value="subtle" data-i18n="float_subtle">Sutil & Elegante</option>
+            <option value="breathe" data-i18n="float_breathe">Respiración / Flote</option>
+            <option value="dramatic" data-i18n="float_dramatic">Dinámica / Péndulo</option>
+            <option value="off" data-i18n="float_off">Desactivada (Fija en Eje)</option>
           </select>
         </div>
 
@@ -917,14 +977,6 @@
             <span class="slider-val" id="val-tilt-intensity">1.0</span>
           </div>
           <input type="range" id="range-tilt-intensity" min="0.0" max="2.5" step="0.1" value="1.0">
-        </div>
-
-        <div class="control-row">
-          <label for="toggle-floating"><span data-i18n="floating">🌊 Oscilación</span></label>
-          <select id="toggle-floating">
-            <option value="true" data-i18n="float_on">Activada (Orgánica)</option>
-            <option value="false" selected data-i18n="float_off">Fija en Eje</option>
-          </select>
         </div>
       </div>
 
@@ -1041,11 +1093,15 @@
         spin_speed: "⏱️ Giro",
         spd_normal: "Normal (2 giros / 10s)",
         spd_slow: "Lento & Suave (1 giro)",
-        spd_fast: "Rápido Dinámico",
+        spd_medium: "Dinámico (3 giros)",
+        spd_fast: "Turbo Rápido",
         spd_stop: "Pausado (Estático)",
         floating: "🌊 Oscilación",
-        float_on: "Activada (Orgánica)",
-        float_off: "Fija en Eje",
+        float_organic: "Activada (Orgánica)",
+        float_subtle: "Sutil & Elegante",
+        float_breathe: "Respiración / Flote",
+        float_dramatic: "Dinámica / Péndulo",
+        float_off: "Desactivada (Fija en Eje)",
         export_btn: "EXPORTAR REEL 9:16 (10s)",
         status_ready: "Listo para exportar video vertical HD",
         status_recording: "Grabando reel vertical 9:16 (1080x1920)...",
@@ -1095,11 +1151,15 @@
         spin_speed: "⏱️ Spin",
         spd_normal: "Normal (2 spins / 10s)",
         spd_slow: "Slow & Elegant (1 spin)",
-        spd_fast: "Fast Dynamic",
+        spd_medium: "Dynamic (3 spins)",
+        spd_fast: "Turbo Fast",
         spd_stop: "Paused (Static)",
         floating: "🌊 Floating Motion",
-        float_on: "Enabled (Organic)",
-        float_off: "Fixed on Axis",
+        float_organic: "Enabled (Organic)",
+        float_subtle: "Subtle & Gentle",
+        float_breathe: "Breathing / Float",
+        float_dramatic: "Dynamic / Pendulum",
+        float_off: "Disabled (Fixed on Axis)",
         export_btn: "EXPORT 9:16 REEL (10s)",
         status_ready: "Ready to export vertical HD reel",
         status_recording: "Recording 9:16 vertical video (1080x1920)...",
@@ -1126,7 +1186,7 @@
     document.getElementById('btn-lang-es').addEventListener('click', () => setLanguage('es'));
     document.getElementById('btn-lang-en').addEventListener('click', () => setLanguage('en'));
 
-    // TAB SWITCHING LOGIC
+    // TAB SWITCHING
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -1151,8 +1211,8 @@
     let cardPosY = 0.0;
     let spinDir = 1;
     let tiltMultiplier = 1.0;
-    let isFloating = false; // Default fixed
-    let speedMult = 0.0; // DEFAULT: Paused (Static) as requested!
+    let floatMode = 'organic'; // BY DEFAULT: ORGANIC ACTIVATED!
+    let speedMult = 0.0; // By default: Paused (Static)
 
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
     camera.position.set(0, 0, camDistance);
@@ -1170,7 +1230,7 @@
     controls.enableZoom = true;
     controls.autoRotate = false;
 
-    // Crisp, Pure Lighting (No scanlines, no chromatic aberration)
+    // Lighting Rig
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
     scene.add(ambientLight);
 
@@ -1399,7 +1459,7 @@
     });
 
     // -------------------------------------------------------------------------
-    // ANIMATION & RENDER LOOP
+    // ANIMATION & RENDER LOOP (WITH MULTIPLE OSCILLATION MODES)
     // -------------------------------------------------------------------------
     let clock = new THREE.Clock();
 
@@ -1415,16 +1475,34 @@
         if (progress >= 1.0) isTransitioning = false;
       }
 
-      // Spin rotation (Default is 0: Paused/Static!)
+      // Spin rotation
       if (speedMult > 0) {
         cardGroup.rotation.y += (0.018 * speedMult * spinDir);
       }
 
-      if (isFloating) {
+      // MULTIPLE FLOATING / OSCILLATION STYLES
+      if (floatMode === 'organic') {
+        // Natural organic floating with gentle tilt and elevation
         cardGroup.rotation.x = Math.sin(elapsedTime * 1.5) * 0.12 * tiltMultiplier;
         cardGroup.rotation.z = Math.cos(elapsedTime * 1.2) * 0.05 * tiltMultiplier;
         cardGroup.position.y = cardPosY + Math.sin(elapsedTime * 2.0) * 0.06;
+      } else if (floatMode === 'subtle') {
+        // Very subtle micro-levitation
+        cardGroup.rotation.x = Math.sin(elapsedTime * 1.0) * 0.04 * tiltMultiplier;
+        cardGroup.rotation.z = Math.cos(elapsedTime * 0.8) * 0.02 * tiltMultiplier;
+        cardGroup.position.y = cardPosY + Math.sin(elapsedTime * 1.2) * 0.025;
+      } else if (floatMode === 'breathe') {
+        // Vertical breathing float without roll
+        cardGroup.rotation.x = Math.sin(elapsedTime * 1.2) * 0.06 * tiltMultiplier;
+        cardGroup.rotation.z = 0;
+        cardGroup.position.y = cardPosY + Math.sin(elapsedTime * 1.6) * 0.09;
+      } else if (floatMode === 'dramatic') {
+        // Strong dynamic pendulum motion
+        cardGroup.rotation.x = Math.sin(elapsedTime * 2.2) * 0.22 * tiltMultiplier;
+        cardGroup.rotation.z = Math.cos(elapsedTime * 1.8) * 0.12 * tiltMultiplier;
+        cardGroup.position.y = cardPosY + Math.sin(elapsedTime * 2.6) * 0.08;
       } else {
+        // Fixed on axis (off)
         cardGroup.rotation.x = 0;
         cardGroup.rotation.z = 0;
         cardGroup.position.y = cardPosY;
@@ -1542,7 +1620,7 @@
     });
 
     document.getElementById('petal-turbo').addEventListener('click', () => {
-      speedMult = (speedMult === 0 ? 1.0 : (speedMult === 1.0 ? 2.0 : 0));
+      speedMult = (speedMult === 0 ? 1.0 : (speedMult === 1.0 ? 2.5 : 0));
       document.getElementById('select-speed').value = speedMult.toString();
       flowerMenu.classList.remove('open');
     });
@@ -1646,6 +1724,10 @@
       document.getElementById('val-tilt-intensity').textContent = tiltMultiplier.toFixed(1);
     });
 
+    document.getElementById('toggle-floating').addEventListener('change', (e) => {
+      floatMode = e.target.value;
+    });
+
     // -------------------------------------------------------------------------
     // CARD 3D ATTRIBUTES
     // -------------------------------------------------------------------------
@@ -1746,10 +1828,6 @@
       speedMult = parseFloat(e.target.value);
     });
 
-    document.getElementById('toggle-floating').addEventListener('change', (e) => {
-      isFloating = (e.target.value === 'true');
-    });
-
     // -------------------------------------------------------------------------
     // CINEMATIC VIEWER MODE
     // -------------------------------------------------------------------------
@@ -1781,15 +1859,25 @@
       if (e.key === 'Escape' && document.body.classList.contains('cinematic-mode')) exitCinematic();
     });
 
-    // Mobile Drawer
-    const mobileBtn = document.getElementById('mobile-toggle-btn');
+    // -------------------------------------------------------------------------
+    // DESKTOP & MOBILE SIDEBAR COLLAPSE TOGGLE
+    // -------------------------------------------------------------------------
+    const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
     const sidebar = document.getElementById('sidebar');
     const backdrop = document.getElementById('sidebar-backdrop');
 
-    mobileBtn.addEventListener('click', () => {
-      const isOpen = sidebar.classList.toggle('open');
-      backdrop.classList.toggle('active', isOpen);
+    sidebarToggleBtn.addEventListener('click', () => {
+      if (window.innerWidth > 860) {
+        // Desktop collapse toggle
+        document.body.classList.toggle('sidebar-collapsed');
+        setTimeout(resizeCanvas, 310);
+      } else {
+        // Mobile drawer toggle
+        const isOpen = sidebar.classList.toggle('open');
+        backdrop.classList.toggle('active', isOpen);
+      }
     });
+
     backdrop.addEventListener('click', () => {
       sidebar.classList.remove('open');
       backdrop.classList.remove('active');
