@@ -11,7 +11,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
   <title>DeckGram · v0.4.4</title>
 
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='18' y='11' width='28' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2.5'/%3E%3Cpath d='M32 21l2.8 6.8L42 31l-7.2 3.2L32 41l-2.8-6.8L22 31l7.2-3.2z' fill='%232f8fdd'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="assets/css/app.css?v=0.4.4">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
@@ -206,10 +206,38 @@
   <aside id="sidebar" aria-label="Panel de control del estudio" data-i18n-aria-label="ui_sidebar">
     <header class="app-header">
       <div class="brand">
-        <div class="spinning-card-logo-container" aria-hidden="true" title="DeckGram 3D Core">
+        <div class="spinning-card-logo-container" aria-hidden="true" title="DeckGram">
           <div class="spinning-card-inner">
-            <div class="card-face card-face-front">★</div>
-            <div class="card-face card-face-back">DG</div>
+            <div class="card-face card-face-front" title="3D Canvas Mesh">
+              <svg class="logo-face-svg" viewBox="0 0 24 24" fill="none">
+                <!-- 3D Perspective Canvas / Wireframe Ground Mesh -->
+                <path d="M2 19L6 5h12l4 14H2z" stroke="#ffffff" stroke-width="1.4" opacity="0.95" stroke-linejoin="round"></path>
+                <path d="M4 14.5h16" stroke="#ffffff" stroke-width="1.1" opacity="0.85"></path>
+                <path d="M5 10h14" stroke="#ffffff" stroke-width="1.1" opacity="0.85"></path>
+                <path d="M10 5l-2.4 14" stroke="#ffffff" stroke-width="1.1" opacity="0.9"></path>
+                <path d="M14 5l2.4 14" stroke="#ffffff" stroke-width="1.1" opacity="0.9"></path>
+                <circle cx="12" cy="10" r="1.3" fill="#ffffff"></circle>
+              </svg>
+            </div>
+            <div class="card-face card-face-back" title="Saturn Deck">
+              <svg class="logo-face-svg" viewBox="0 0 24 24" fill="none">
+                <!-- Saturn Ring (Behind Body) -->
+                <path d="M2.5 14.8C3.8 11.2 9.5 8.2 16.2 9.8" stroke="#7cebdd" stroke-width="1.8" stroke-linecap="round" transform="rotate(-24 12 12)"></path>
+                <!-- Planet Body Sphere -->
+                <circle cx="12" cy="12" r="5.6" fill="url(#saturn-grad)"></circle>
+                <!-- Saturn Ring (Front Crossing Body) -->
+                <path d="M21.5 9.2C20.2 12.8 14.5 15.8 7.8 14.2" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" transform="rotate(-24 12 12)"></path>
+                <!-- Subtle Atmosphere Ring Highlight -->
+                <ellipse cx="12" cy="12" rx="9.8" ry="3.1" stroke="rgba(255,255,255,0.3)" stroke-width="0.8" transform="rotate(-24 12 12)"></ellipse>
+                <defs>
+                  <linearGradient id="saturn-grad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#7cebdd"></stop>
+                    <stop offset="45%" stop-color="#3cc9d8"></stop>
+                    <stop offset="100%" stop-color="#07333f"></stop>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
           </div>
         </div>
         <div class="brand-copy">
