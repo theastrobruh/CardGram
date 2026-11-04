@@ -12,8 +12,8 @@
   <title>CardGram · v0.4.4</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.4.4&rev=18">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.4.4&rev=18">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.4.4&rev=19">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.4.4&rev=19">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
           integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu"
@@ -21,14 +21,14 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"
           integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf"
           crossorigin="anonymous" defer></script>
-  <script src="assets/data/cards/catalog.js?v=0.4.4&rev=18" defer></script>
-  <script src="assets/js/i18n.js?v=0.4.4&rev=18" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.4.4&rev=18" defer></script>
-  <script src="assets/js/community.js?v=0.4.4&rev=18" defer></script>
-  <script src="assets/js/scene.js?v=0.4.4&rev=18" defer></script>
-  <script src="assets/js/export.js?v=0.4.4&rev=18" defer></script>
-  <script src="assets/js/hub.js?v=0.4.4&rev=18" defer></script>
-  <script src="assets/js/app.js?v=0.4.4&rev=18" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.4.4&rev=19" defer></script>
+  <script src="assets/js/i18n.js?v=0.4.4&rev=19" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.4.4&rev=19" defer></script>
+  <script src="assets/js/community.js?v=0.4.4&rev=19" defer></script>
+  <script src="assets/js/scene.js?v=0.4.4&rev=19" defer></script>
+  <script src="assets/js/export.js?v=0.4.4&rev=19" defer></script>
+  <script src="assets/js/hub.js?v=0.4.4&rev=19" defer></script>
+  <script src="assets/js/app.js?v=0.4.4&rev=19" defer></script>
 </head>
 <body data-view="hub">
 
@@ -300,150 +300,188 @@
           <!-- ------------------------------------------------------------
                Inicio
                ------------------------------------------------------------ -->
-          <section class="hub-panel active" data-hub-panel="home" aria-labelledby="hub-hero-title">
-            <div class="hub-hero">
-              <div class="hub-hero-copy">
-                <span class="hub-kicker">
-                  <span class="hub-kicker-dot" aria-hidden="true"></span>
-                  <span data-i18n="hub_kicker">Tu estudio de cartas</span>
-                </span>
-                <h1 class="hub-title" id="hub-hero-title">
-                  <span class="hub-title-line" data-i18n="hub_hello">Bienvenido de nuevo,</span>
-                  <span class="hub-title-line hub-title-name" id="hub-greeting-name">Card Creator</span>
-                </h1>
-                <p class="hub-lede" data-i18n="hub_lede">Tu carta favorita te está esperando. Entra al estudio cuando quieras: todo se renderiza en tu navegador, sin subir nada.</p>
-                <div class="hub-cta-row">
-                  <button class="btn btn-primary hub-cta" type="button" data-open-studio="deck">
+          <section class="hub-panel active hub-home-panel" data-hub-panel="home" aria-labelledby="hub-home-title">
+            <h1 class="sr-only" id="hub-home-title" data-i18n="hub_home_title">Inicio de CardGram</h1>
+
+            <div class="hub-dashboard">
+              <!-- Panel de jugador y datos de colección -->
+              <aside class="hub-player-panel" aria-labelledby="hub-player-name">
+                <div class="hub-player-head">
+                  <span class="hub-player-avatar" id="hub-player-avatar">
+                    <span class="hub-avatar-fallback" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg></span>
+                    <img id="hub-player-avatar-img" alt="" width="96" height="96" hidden>
+                  </span>
+                  <div class="hub-player-identity">
+                    <span class="hub-panel-eyebrow"><span class="hub-live-dot" aria-hidden="true"></span><span data-i18n="hub_player_label">Jugador</span></span>
+                    <h2 class="hub-player-name" id="hub-player-name">Card Creator</h2>
+                    <span class="hub-player-handle" id="hub-player-handle">@cardcreator</span>
+                  </div>
+                  <button class="hub-player-edit" type="button" data-hub-route="profile" aria-label="Editar perfil" data-i18n-aria-label="hub_player_edit" title="Editar perfil" data-i18n-title="hub_player_edit">
+                    <svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg>
+                  </button>
+                </div>
+
+                <p class="hub-player-bio" id="hub-player-bio" hidden></p>
+                <p class="hub-player-since" id="hub-player-since"></p>
+
+                <div class="hub-player-divider" aria-hidden="true"></div>
+
+                <div class="hub-player-stats-head">
+                  <span data-i18n="hub_player_stats_label">Datos de colección</span>
+                  <svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>
+                </div>
+
+                <div class="hub-player-stats">
+                  <button class="hub-player-stat" type="button" data-hub-route="library">
+                    <span class="hub-player-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg></span>
+                    <span class="hub-player-stat-value" id="stat-cards">0</span>
+                    <span class="hub-player-stat-label" data-i18n="hub_stat_cards">Cartas guardadas</span>
+                    <span class="hub-player-stat-sub" id="stat-cards-sub"></span>
+                  </button>
+                  <button class="hub-player-stat" type="button" data-hub-route="collections">
+                    <span class="hub-player-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg></span>
+                    <span class="hub-player-stat-value" id="stat-collections">0</span>
+                    <span class="hub-player-stat-label" data-i18n="hub_stat_collections">Colecciones</span>
+                    <span class="hub-player-stat-sub" id="stat-collections-sub"></span>
+                  </button>
+                  <button class="hub-player-stat" type="button" data-hub-route="collections">
+                    <span class="hub-player-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-compass"></use></svg></span>
+                    <span class="hub-player-stat-value" id="stat-review">0</span>
+                    <span class="hub-player-stat-label" data-i18n="hub_stat_review">Por revisar</span>
+                    <span class="hub-player-stat-sub" id="stat-review-sub"></span>
+                  </button>
+                  <button class="hub-player-stat" type="button" data-hub-route="collections">
+                    <span class="hub-player-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-layers"></use></svg></span>
+                    <span class="hub-player-stat-value" id="stat-decks">0</span>
+                    <span class="hub-player-stat-label" data-i18n="hub_stat_decks">Tus decks</span>
+                    <span class="hub-player-stat-sub" id="stat-decks-sub"></span>
+                  </button>
+                  <button class="hub-player-stat hub-player-stat-wide" type="button" data-open-studio="canvas">
+                    <span class="hub-player-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg></span>
+                    <span class="hub-player-stat-value" id="stat-renders">0</span>
+                    <span class="hub-player-stat-label" data-i18n="hub_stat_renders">Renders</span>
+                    <span class="hub-player-stat-sub" data-i18n="hub_stat_renders_sub">exportados</span>
+                  </button>
+                </div>
+
+                <div class="hub-player-actions">
+                  <button class="btn btn-primary hub-player-cta" type="button" data-open-studio="deck">
                     <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
                     <span data-i18n="hub_open_studio">Abrir el estudio</span>
                   </button>
-                  <button class="btn btn-ghost hub-cta" type="button" data-open-studio="canvas">
+                  <button class="btn btn-ghost hub-player-secondary" type="button" data-open-studio="canvas">
                     <svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg>
                     <span data-i18n="hub_create_render">Crear un render</span>
                   </button>
                 </div>
-                <p class="hub-privacy">
+
+                <p class="hub-player-privacy">
                   <svg class="icon" aria-hidden="true"><use href="#i-save"></use></svg>
                   <span data-i18n="hub_privacy">Local y privado · tus imágenes no salen de este dispositivo.</span>
                 </p>
-              </div>
+              </aside>
 
-              <div class="hub-showcase" id="hub-showcase">
-                <div class="hub-showcase-glow" aria-hidden="true"></div>
-                <div class="hub-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
-
-                <div class="hub-card-stage" id="hub-card-stage">
-                  <div class="hub-card-tilt" id="hub-card-tilt">
-                    <button class="hub-card" id="hub-card" type="button" aria-pressed="false" aria-label="Girar la carta" data-i18n-aria-label="hub_card_flip" title="Girar la carta" data-i18n-title="hub_card_flip">
-                      <span class="hub-card-inner">
-                        <span class="hub-card-face hub-card-front">
-                          <img id="hub-card-front" src="assets/data/cards/OG/SET-01/thumbs/FRONT-01.webp" alt="" width="750" height="1050" decoding="async" fetchpriority="high">
-                        </span>
-                        <span class="hub-card-face hub-card-back">
-                          <img id="hub-card-back" src="assets/data/cards/OG/SET-01/thumbs/BACK-BASE.webp" alt="" width="750" height="1050" decoding="async">
-                        </span>
-                      </span>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="hub-card-meta">
-                  <span class="hub-card-eyebrow">
-                    <svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg>
+              <!-- Carta favorita -->
+              <div class="hub-favorite">
+                <div class="hub-favorite-head">
+                  <span class="hub-favorite-kicker">
+                    <span class="hub-live-dot" aria-hidden="true"></span>
                     <span data-i18n="hub_favorite_label">Tu carta favorita</span>
                   </span>
-                  <h2 class="hub-card-name" id="hub-card-name">Shadowblade Kinetic</h2>
-                  <p class="hub-card-sub" id="hub-card-sub">OG Collection · SET-01</p>
-                  <div class="hub-card-chips" id="hub-card-chips"></div>
-                  <button class="hub-card-link" type="button" data-hub-route="library">
-                    <span data-i18n="hub_change_favorite">Cambiar favorita</span>
+                  <span class="hub-favorite-ornament" aria-hidden="true"></span>
+                </div>
+
+                <div class="hub-showcase" id="hub-showcase">
+                  <div class="hub-showcase-glow" aria-hidden="true"></div>
+                  <div class="hub-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+
+                  <div class="hub-card-stage" id="hub-card-stage">
+                    <div class="hub-card-tilt" id="hub-card-tilt">
+                      <button class="hub-card" id="hub-card" type="button" aria-pressed="false" aria-label="Girar la carta" data-i18n-aria-label="hub_card_flip" title="Girar la carta" data-i18n-title="hub_card_flip">
+                        <span class="hub-card-inner">
+                          <span class="hub-card-face hub-card-front">
+                            <img id="hub-card-front" src="assets/data/cards/OG/SET-01/thumbs/FRONT-01.webp" alt="" width="750" height="1050" decoding="async" fetchpriority="high">
+                          </span>
+                          <span class="hub-card-face hub-card-back">
+                            <img id="hub-card-back" src="assets/data/cards/OG/SET-01/thumbs/BACK-BASE.webp" alt="" width="750" height="1050" decoding="async">
+                          </span>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="hub-card-meta">
+                    <h2 class="hub-card-name" id="hub-card-name" aria-live="polite">Shadowblade Kinetic</h2>
+                    <p class="hub-card-sub" id="hub-card-sub">OG Collection · SET-01</p>
+                    <div class="hub-card-chips" id="hub-card-chips"></div>
+                    <div class="hub-card-actions">
+                      <button class="btn btn-primary hub-card-open" type="button" data-open-favorite>
+                        <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+                        <span data-i18n="hub_open_studio">Abrir el estudio</span>
+                      </button>
+                      <button class="hub-card-link" type="button" data-hub-route="library">
+                        <span data-i18n="hub_change_favorite">Cambiar favorita</span>
+                        <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Explorador de cartas -->
+              <aside class="hub-explorer-panel" aria-labelledby="hub-explorer-title">
+                <header class="hub-explorer-head">
+                  <div>
+                    <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky" aria-hidden="true"></span><span data-i18n="hub_explorer_kicker">Colección</span></span>
+                    <h2 id="hub-explorer-title" data-i18n="hub_explorer_title">Explorador de cartas</h2>
+                    <p data-i18n="hub_explorer_lede">Desliza la colección y elige tu próxima favorita.</p>
+                  </div>
+                  <div class="hub-explorer-nav">
+                    <button class="hub-explorer-arrow" type="button" data-explorer-nav="-1" aria-label="Cartas anteriores" data-i18n-aria-label="hub_explorer_prev" title="Cartas anteriores" data-i18n-title="hub_explorer_prev">
+                      <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+                    </button>
+                    <button class="hub-explorer-arrow" type="button" data-explorer-nav="1" aria-label="Cartas siguientes" data-i18n-aria-label="hub_explorer_next" title="Cartas siguientes" data-i18n-title="hub_explorer_next">
+                      <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                    </button>
+                  </div>
+                </header>
+
+                <div class="hub-explorer-filters" id="hub-explorer-filters" role="group" aria-label="Filtrar por colección" data-i18n-aria-label="hub_explorer_filter_aria"></div>
+
+                <div class="hub-explorer-viewport">
+                  <div class="hub-explorer-track" id="hub-explorer-track" tabindex="0" aria-label="Cartas de la colección" data-i18n-aria-label="hub_explorer_track_aria"></div>
+                </div>
+
+                <p class="hub-explorer-hint">
+                  <svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg>
+                  <span data-i18n="hub_explorer_hint">Toca una carta para convertirla en tu favorita.</span>
+                </p>
+
+                <nav class="hub-explorer-menu" aria-label="Menú rápido" data-i18n-aria-label="hub_explorer_menu">
+                  <span class="hub-explorer-menu-label" data-i18n="hub_explorer_menu_label">Menú rápido</span>
+                  <button class="hub-explorer-menu-item" type="button" data-hub-route="library">
+                    <span class="hub-explorer-menu-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg></span>
+                    <span data-i18n="hub_explorer_library">Ver biblioteca</span>
                     <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
                   </button>
-                </div>
-              </div>
+                  <button class="hub-explorer-menu-item" type="button" data-hub-route="collections">
+                    <span class="hub-explorer-menu-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg></span>
+                    <span data-i18n="hub_explorer_collections">Colecciones</span>
+                    <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                  </button>
+                  <button class="hub-explorer-menu-item" type="button" data-hub-route="profile">
+                    <span class="hub-explorer-menu-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg></span>
+                    <span data-i18n="hub_explorer_profile">Mi perfil</span>
+                    <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                  </button>
+                </nav>
+              </aside>
             </div>
 
-            <section class="hub-stats" id="hub-stats" aria-label="Estadísticas de tu colección" data-i18n-aria-label="hub_stats_label">
-              <button class="hub-stat" type="button" data-hub-route="library">
-                <span class="hub-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg></span>
-                <span class="hub-stat-value" id="stat-cards">0</span>
-                <span class="hub-stat-label" data-i18n="hub_stat_cards">Cartas guardadas</span>
-                <span class="hub-stat-sub" id="stat-cards-sub"></span>
-              </button>
-              <button class="hub-stat" type="button" data-hub-route="collections">
-                <span class="hub-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg></span>
-                <span class="hub-stat-value" id="stat-collections">0</span>
-                <span class="hub-stat-label" data-i18n="hub_stat_collections">Colecciones</span>
-                <span class="hub-stat-sub" id="stat-collections-sub"></span>
-              </button>
-              <button class="hub-stat" type="button" data-hub-route="collections">
-                <span class="hub-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-compass"></use></svg></span>
-                <span class="hub-stat-value" id="stat-review">0</span>
-                <span class="hub-stat-label" data-i18n="hub_stat_review">Por revisar</span>
-                <span class="hub-stat-sub" id="stat-review-sub"></span>
-              </button>
-              <button class="hub-stat" type="button" data-hub-route="collections">
-                <span class="hub-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-layers"></use></svg></span>
-                <span class="hub-stat-value" id="stat-decks">0</span>
-                <span class="hub-stat-label" data-i18n="hub_stat_decks">Tus decks</span>
-                <span class="hub-stat-sub" id="stat-decks-sub"></span>
-              </button>
-              <button class="hub-stat" type="button" data-open-studio="canvas">
-                <span class="hub-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg></span>
-                <span class="hub-stat-value" id="stat-renders">0</span>
-                <span class="hub-stat-label" data-i18n="hub_stat_renders">Renders</span>
-                <span class="hub-stat-sub" data-i18n="hub_stat_renders_sub">exportados</span>
-              </button>
-            </section>
-
-            <section class="hub-section" aria-labelledby="hub-studio-title">
-              <div class="hub-section-head">
-                <div>
-                  <h2 id="hub-studio-title" data-i18n="hub_section_studio">Tu estudio</h2>
-                  <p data-i18n="hub_section_studio_hint">Todo lo que puedes hacer sin salir del lobby.</p>
-                </div>
-              </div>
-              <div class="hub-tiles">
-                <button class="hub-tile hub-tile-primary" type="button" data-open-studio="deck">
-                  <span class="hub-tile-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span>
-                  <span class="hub-tile-title" data-i18n="hub_tile_editor">Editor 3D</span>
-                  <span class="hub-tile-desc" data-i18n="hub_tile_editor_desc">Ajusta canto, bisel, brillo y cámara de tu carta.</span>
-                  <span class="hub-tile-cta" data-i18n="hub_tile_open">Entrar</span>
-                </button>
-                <button class="hub-tile" type="button" data-open-studio="canvas">
-                  <span class="hub-tile-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg></span>
-                  <span class="hub-tile-title" data-i18n="hub_tile_render">Creador de renders</span>
-                  <span class="hub-tile-desc" data-i18n="hub_tile_render_desc">Prepara el lienzo y exporta video vertical en HD.</span>
-                  <span class="hub-tile-cta" data-i18n="hub_tile_open">Entrar</span>
-                </button>
-                <button class="hub-tile" type="button" data-hub-route="library">
-                  <span class="hub-tile-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg></span>
-                  <span class="hub-tile-title" data-i18n="hub_tile_library">Mis cartas</span>
-                  <span class="hub-tile-desc" data-i18n="hub_tile_library_desc">Tus diseños guardados y el catálogo completo.</span>
-                  <span class="hub-tile-cta" data-i18n="hub_tile_open">Entrar</span>
-                </button>
-                <button class="hub-tile" type="button" data-hub-route="collections">
-                  <span class="hub-tile-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg></span>
-                  <span class="hub-tile-title" data-i18n="hub_tile_collections">Colecciones y decks</span>
-                  <span class="hub-tile-desc" data-i18n="hub_tile_collections_desc">Agrupa cartas por colección o crea tus propios decks.</span>
-                  <span class="hub-tile-cta" data-i18n="hub_tile_open">Entrar</span>
-                </button>
-              </div>
-            </section>
-
-            <section class="hub-section" aria-labelledby="hub-collections-title">
-              <div class="hub-section-head hub-section-head-row">
-                <div>
-                  <h2 id="hub-collections-title" data-i18n="hub_section_collections">Colecciones</h2>
-                  <p data-i18n="hub_section_collections_hint">Cada colección es una carpeta del catálogo, lista para abrir en el estudio.</p>
-                </div>
-                <button class="hub-text-btn" type="button" data-hub-route="collections">
-                  <span data-i18n="hub_see_all">Ver todas</span>
-                  <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
-                </button>
-              </div>
-              <div class="hub-collection-rail" id="hub-collection-rail"></div>
-            </section>
+            <div class="hub-mobile-privacy">
+              <svg class="icon" aria-hidden="true"><use href="#i-save"></use></svg>
+              <span data-i18n="hub_privacy">Local y privado · tus imágenes no salen de este dispositivo.</span>
+            </div>
           </section>
 
           <!-- ------------------------------------------------------------

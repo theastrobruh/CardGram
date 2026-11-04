@@ -35,6 +35,7 @@ const hub = {
   draftAvatar: null,
   deckCoverId: null,
   homeVisits: 0,
+  explorerFilter: 'all',
   opening: false,
   lastRoute: '',
   els: {}
@@ -378,8 +379,20 @@ function renderHubIdentity() {
   if (hub.els.topName) hub.els.topName.textContent = hubProfile.name;
   if (hub.els.topHandle) hub.els.topHandle.textContent = `@${hubProfile.handle}`;
   if (hub.els.greetingName) hub.els.greetingName.textContent = hubProfile.name;
+  if (hub.els.playerName) hub.els.playerName.textContent = hubProfile.name;
+  if (hub.els.playerHandle) hub.els.playerHandle.textContent = `@${hubProfile.handle}`;
+  if (hub.els.playerSince) {
+    hub.els.playerSince.textContent = t('profile_member_since', {
+      date: formatHubDate(hubProfile.joinedAt)
+    });
+  }
+  if (hub.els.playerBio) {
+    hub.els.playerBio.textContent = hubProfile.bio;
+    hub.els.playerBio.hidden = !hubProfile.bio;
+  }
 
   applyAvatar(hub.els.avatar, hub.els.avatarImg, hubProfile.avatar);
+  applyAvatar(hub.els.playerAvatar, hub.els.playerAvatarImg, hubProfile.avatar);
 }
 
 function favoriteCard() {
@@ -425,14 +438,159 @@ function renderFavoriteCard() {
 function setFavoriteCard(cardId) {
   const card = HUB_CATALOG.byId(cardId);
   if (!card) return;
+  const keepExplorerFocus = Boolean(
+    hub.els.explorerTrack && hub.els.explorerTrack.contains(document.activeElement)
+  );
   hubProfile.favoriteCardId = card.id;
   persistHubProfile();
   renderFavoriteCard();
   renderHubStats(false);
+  renderCardExplorer({ focusCardId: keepExplorerFocus ? card.id : null });
   if (hub.panel === 'library') renderLibrary();
   if (hub.panel === 'collections') renderCollections();
   if (hub.panel === 'profile') renderProfileForm();
   toast(t('library_favorite') + ': ' + card.name, { type: 'success' });
+}
+
+/* --------------------------------------------------------------------------
+   Explorador de cartas del inicio
+   -------------------------------------------------------------------------- */
+function renderExplorerFilters() {
+  const filters = hub.els.explorerFilters;
+  if (!filters) return;
+
+  const entries = [
+    { id: 'all', label: t('hub_explorer_all') },
+    ...HUB_CATALOG.collections.map((collection) => ({
+      id: collection.id,
+      label: collection.shortName || collection.name
+    }))
+  ];
+
+  if (!entries.some((entry) => entry.id === hub.explorerFilter)) {
+    hub.explorerFilter = 'all';
+  }
+
+  filters.replaceChildren(
+    ...entries.map((entry) => {
+      const button = makeNode('button', 'hub-explorer-filter', entry.label);
+      button.type = 'button';
+      button.dataset.explorerFilter = entry.id;
+      const active = entry.id === hub.explorerFilter;
+      button.setAttribute('aria-pressed', String(active));
+      return button;
+    })
+  );
+}
+
+function makeExplorerCard(card) {
+  const item = makeNode('article', 'hub-explorer-item');
+  const selected = hubProfile.favoriteCardId === card.id;
+
+  const cardButton = makeNode('button', 'hub-explorer-card');
+  cardButton.type = 'button';
+  cardButton.dataset.favCard = card.id;
+  cardButton.setAttribute('aria-pressed', String(selected));
+  cardButton.setAttribute(
+    'aria-label',
+    `${card.name} · ${selected ? t('hub_explorer_selected') : t('hub_explorer_make_favorite')}`
+  );
+
+  const art = makeNode('span', 'hub-explorer-art');
+  art.appendChild(makeHubImage(thumbOf(card), card.name));
+  art.appendChild(
+    makeNode('span', 'hub-explorer-badge', card.collectionShortName || card.set)
+  );
+
+  const selectedMark = makeNode('span', 'hub-explorer-selected');
+  selectedMark.setAttribute('aria-hidden', 'true');
+  selectedMark.appendChild(hubIcon('check'));
+  art.appendChild(selectedMark);
+
+  cardButton.appendChild(art);
+  cardButton.appendChild(makeNode('span', 'hub-explorer-card-name', card.name));
+  cardButton.appendChild(
+    makeNode(
+      'span',
+      'hub-explorer-card-meta',
+      [card.set, card.rarity].filter(Boolean).join(' · ')
+    )
+  );
+
+  const openButton = makeNode('button', 'hub-explorer-open');
+  openButton.type = 'button';
+  openButton.dataset.openCard = card.id;
+  openButton.setAttribute('aria-label', t('hub_explorer_open'));
+  openButton.title = t('hub_explorer_open');
+  openButton.appendChild(hubIcon('expand'));
+
+  item.appendChild(cardButton);
+  item.appendChild(openButton);
+  return item;
+}
+
+function updateExplorerArrows() {
+  const track = hub.els.explorerTrack;
+  if (!track) return;
+
+  const max = Math.max(0, track.scrollWidth - track.clientWidth);
+  if (hub.els.explorerPrev) hub.els.explorerPrev.disabled = track.scrollLeft <= 2;
+  if (hub.els.explorerNext) {
+    hub.els.explorerNext.disabled = track.scrollLeft >= max - 2;
+  }
+}
+
+function renderCardExplorer(options = {}) {
+  const track = hub.els.explorerTrack;
+  if (!track) return;
+
+  renderExplorerFilters();
+
+  const cards = HUB_CATALOG.cards.filter(
+    (card) => hub.explorerFilter === 'all' || card.collectionId === hub.explorerFilter
+  );
+
+  if (!cards.length) {
+    track.replaceChildren(
+      makeNode('p', 'hub-explorer-empty', t('hub_explorer_empty'))
+    );
+  } else {
+    track.replaceChildren(...cards.map((card) => makeExplorerCard(card)));
+  }
+
+  const targetScroll = options.resetScroll ? 0 : track.scrollLeft;
+  track.scrollLeft = targetScroll;
+  requestAnimationFrame(() => {
+    track.scrollLeft = targetScroll;
+    updateExplorerArrows();
+    if (options.focusCardId) {
+      const target = Array.from(track.querySelectorAll('[data-fav-card]')).find(
+        (button) => button.dataset.favCard === options.focusCardId
+      );
+      if (target) target.focus({ preventScroll: true });
+    }
+  });
+}
+
+function setExplorerFilter(filterId) {
+  if (filterId === hub.explorerFilter) return;
+  hub.explorerFilter = filterId;
+  renderCardExplorer({ resetScroll: true });
+}
+
+function scrollExplorer(direction) {
+  const track = hub.els.explorerTrack;
+  if (!track) return;
+
+  const firstItem = track.querySelector('.hub-explorer-item');
+  const step = firstItem
+    ? firstItem.getBoundingClientRect().width + 9
+    : Math.max(120, track.clientWidth * 0.6);
+
+  track.scrollBy({
+    left: step * direction,
+    behavior: reduceMotion() ? 'auto' : 'smooth'
+  });
 }
 
 /* --------------------------------------------------------------------------
@@ -1132,6 +1290,7 @@ function saveProfile() {
   renderFavoriteCard();
   renderProfileForm();
   renderHubStats(false);
+  renderCardExplorer();
   toast(t('profile_saved'), { type: 'success' });
 }
 
@@ -1169,6 +1328,7 @@ function setActivePanel(panel, options = {}) {
     renderFavoriteCard();
     renderHubStats(options.animateStats === true);
     renderCollectionRail();
+    renderCardExplorer();
   } else if (target === 'library') {
     renderLibrary();
   } else if (target === 'collections') {
@@ -1379,6 +1539,27 @@ function onHubClick(event) {
     return;
   }
 
+  if (target.closest('[data-open-favorite]')) {
+    event.preventDefault();
+    const card = favoriteCard();
+    if (card) openCatalogCard(card.id);
+    return;
+  }
+
+  const explorerArrow = target.closest('[data-explorer-nav]');
+  if (explorerArrow) {
+    event.preventDefault();
+    scrollExplorer(Number(explorerArrow.dataset.explorerNav) || 1);
+    return;
+  }
+
+  const explorerFilter = target.closest('[data-explorer-filter]');
+  if (explorerFilter) {
+    event.preventDefault();
+    setExplorerFilter(explorerFilter.dataset.explorerFilter);
+    return;
+  }
+
   const langButton = target.closest('[data-hub-lang]');
   if (langButton) {
     applyLanguage(langButton.dataset.hubLang);
@@ -1509,6 +1690,17 @@ function setupHubEvents() {
 
   setupShowcaseTilt();
 
+  if (hub.els.explorerTrack) {
+    hub.els.explorerTrack.addEventListener('scroll', updateExplorerArrows, { passive: true });
+    hub.els.explorerTrack.addEventListener('keydown', (event) => {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      event.preventDefault();
+      scrollExplorer(event.key === 'ArrowLeft' ? -1 : 1);
+    });
+  }
+
+  window.addEventListener('resize', updateExplorerArrows);
+
   window.addEventListener('popstate', applyRoute);
   window.addEventListener('hashchange', () => {
     hub.lastRoute = '';
@@ -1582,6 +1774,7 @@ function setupHubEvents() {
 function refreshHubData() {
   if (!hub.ready) return;
   renderHubStats(false);
+  renderCardExplorer();
   if (hub.panel === 'library') renderLibrary();
   if (hub.panel === 'collections') renderCollections();
   if (hub.panel === 'profile') renderProfileSummary();
@@ -1594,6 +1787,7 @@ function refreshHubLocale() {
   renderFavoriteCard();
   renderHubStats(false);
   renderCollectionRail();
+  renderCardExplorer();
   if (hub.panel === 'library') renderLibrary();
   if (hub.panel === 'collections') renderCollections();
   if (hub.panel === 'explore') renderExplore();
@@ -1624,6 +1818,13 @@ function cacheHubDom() {
   els.avatarImg = hubEl('hub-avatar-img');
   els.greetingName = hubEl('hub-greeting-name');
 
+  els.playerAvatar = hubEl('hub-player-avatar');
+  els.playerAvatarImg = hubEl('hub-player-avatar-img');
+  els.playerName = hubEl('hub-player-name');
+  els.playerHandle = hubEl('hub-player-handle');
+  els.playerBio = hubEl('hub-player-bio');
+  els.playerSince = hubEl('hub-player-since');
+
   els.showcase = hubEl('hub-showcase');
   els.card = hubEl('hub-card');
   els.cardFront = hubEl('hub-card-front');
@@ -1633,6 +1834,11 @@ function cacheHubDom() {
   els.cardChips = hubEl('hub-card-chips');
 
   els.collectionRail = hubEl('hub-collection-rail');
+
+  els.explorerFilters = hubEl('hub-explorer-filters');
+  els.explorerTrack = hubEl('hub-explorer-track');
+  els.explorerPrev = document.querySelector('[data-explorer-nav="-1"]');
+  els.explorerNext = document.querySelector('[data-explorer-nav="1"]');
 
   els.statCards = hubEl('stat-cards');
   els.statCardsSub = hubEl('stat-cards-sub');
@@ -1709,6 +1915,7 @@ function setupHub() {
   renderFavoriteCard();
   renderHubStats(true);
   renderCollectionRail();
+  renderCardExplorer();
   setLibraryTab('all', { render: false });
   renderProfileForm();
   renderHubStats(false);
