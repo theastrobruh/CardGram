@@ -570,7 +570,7 @@ function enterCinematic() {
   document.body.classList.add('cinematic-mode');
   el.exitTip.classList.add('visible');
   clearTimeout(cinematicTipTimer);
-  cinematicTipTimer = setTimeout(() => el.exitTip.classList.remove('visible'), 3200);
+  cinematicTipTimer = setTimeout(() => el.exitTip.classList.remove('visible'), 4500);
   scheduleResize();
 }
 
@@ -578,6 +578,7 @@ function exitCinematic() {
   if (!document.body.classList.contains('cinematic-mode')) return;
   document.body.classList.remove('cinematic-mode');
   el.exitTip.classList.remove('visible');
+  clearTimeout(cinematicTipTimer);
   scheduleResize();
 }
 
@@ -1703,6 +1704,7 @@ function cacheDom() {
   el.toggleBtn = $('#sidebar-toggle-btn');
   el.btnCloseDrawer = $('#btn-close-drawer');
   el.btnCinematic = $('#btn-cinematic');
+  el.btnCinematicExit = $('#btn-cinematic-exit');
   el.exitTip = $('#cinematic-exit-tip');
   el.navTabs = $('.nav-tabs');
   el.scrollContent = $('#scroll-content');
@@ -1841,17 +1843,36 @@ function setupChrome() {
   el.backdrop.addEventListener('click', () => setSidebar(false));
 
   el.btnCinematic.addEventListener('click', enterCinematic);
-  el.exitTip.addEventListener('click', exitCinematic);
+  if (el.btnCinematicExit) {
+    el.btnCinematicExit.addEventListener('click', (e) => {
+      e.stopPropagation();
+      exitCinematic();
+    });
+  }
+  el.exitTip.addEventListener('click', (e) => {
+    e.stopPropagation();
+    exitCinematic();
+  });
 
-  let pointerStart = { x: 0, y: 0 };
+  let pointerStart = { x: 0, y: 0, time: 0 };
   el.viewport.addEventListener('pointerdown', (event) => {
-    pointerStart = { x: event.clientX, y: event.clientY };
+    pointerStart = { x: event.clientX, y: event.clientY, time: performance.now() };
     el.viewportHint.classList.add('hidden');
+  });
+
+  el.viewport.addEventListener('pointerup', (event) => {
+    if (!document.body.classList.contains('cinematic-mode')) return;
+    const dist = Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y);
+    const duration = performance.now() - pointerStart.time;
+    // Detección de tap limpio en móvil (menos de 20px de movimiento y menos de 350ms)
+    if (dist < 20 && duration < 350) {
+      exitCinematic();
+    }
   });
 
   el.viewport.addEventListener('click', (event) => {
     if (!document.body.classList.contains('cinematic-mode')) return;
-    if (Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y) > 8) return;
+    if (Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y) > 20) return;
     exitCinematic();
   });
 
