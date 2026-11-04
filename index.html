@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>3D Card Studio</title>
+  <title>TCG:HUB — 3D Studio</title>
   <!-- Three.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <!-- OrbitControls CDN -->
@@ -13,26 +13,46 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: "Segoe UI", Tahoma, "Lucida Grande", Verdana, Arial, sans-serif;
       -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
+
     :root {
-      --bg-dark: #0b0d13;
-      --panel-bg: #131722;
-      --card-bg: #181e2d;
-      --border-color: #232b3e;
-      --accent: #38bdf8;
-      --accent-gold: #e2b842;
-      --green-btn: #10b981;
+      /* Windows XP Luna / Frutiger Aero Gloss Palette */
+      --xp-blue-dark: #0f3d7e;
+      --xp-blue-mid: #2563eb;
+      --xp-blue-light: #60a5fa;
+      --xp-cyan-aero: #38bdf8;
+      --xp-green-start: #22c55e;
+      --xp-panel-glass: rgba(18, 30, 52, 0.78);
+      --xp-panel-border: rgba(125, 185, 255, 0.35);
+      --xp-highlight: rgba(255, 255, 255, 0.25);
+      --gloss-grad: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.15) 51%, rgba(0,0,0,0.25) 100%);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
     }
+
     body {
-      background-color: var(--bg-dark);
-      color: #f1f5f9;
+      background: radial-gradient(circle at 50% 30%, #0d1b2a 0%, #060911 70%, #020408 100%);
+      color: var(--text-main);
       display: flex;
       height: 100vh;
       height: 100dvh;
       overflow: hidden;
       position: relative;
+    }
+
+    /* Frutiger Aero Scanline Overlay (Subtle retro screen shine) */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.12) 50%);
+      background-size: 100% 4px;
+      z-index: 5;
+      pointer-events: none;
+      opacity: 0.6;
     }
 
     /* Mobile toggle button */
@@ -42,55 +62,139 @@
       top: 14px;
       left: 14px;
       z-index: 100;
-      background: rgba(19, 23, 34, 0.85);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border-color);
+      background: linear-gradient(180deg, rgba(37, 99, 235, 0.85) 0%, rgba(15, 61, 126, 0.95) 100%);
+      border: 1px solid var(--xp-panel-border);
       color: #fff;
       font-size: 1.2rem;
       padding: 8px 12px;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
     }
 
-    /* Cinematic Mode trigger */
+    /* -------------------------------------------------------------
+       COSMIC BREATHING LOGO FX (UNIVERSE + RESPIRATION LOOP)
+    ------------------------------------------------------------- */
+    .brand-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .brand-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cosmic-orb-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      position: relative;
+      background: radial-gradient(circle at 35% 30%, #67e8f9 0%, #3b82f6 45%, #1e1b4b 85%, #050515 100%);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.6), inset 0 1px 3px rgba(255, 255, 255, 0.8);
+      animation: cosmicBreathe 4.5s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    .cosmic-orb-logo::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 4px;
+      width: 10px;
+      height: 6px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0));
+      transform: rotate(-25deg);
+    }
+
+    .cosmic-orb-logo::before {
+      content: "";
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      border: 1px dashed rgba(125, 211, 252, 0.6);
+      animation: cosmicOrbit 12s linear infinite;
+    }
+
+    @keyframes cosmicBreathe {
+      0%, 100% {
+        transform: scale(0.92);
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.4), 0 0 20px rgba(147, 51, 234, 0.3);
+        filter: brightness(0.95);
+      }
+      50% {
+        transform: scale(1.08);
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.9), 0 0 32px rgba(168, 85, 247, 0.7);
+        filter: brightness(1.25);
+      }
+    }
+
+    @keyframes cosmicOrbit {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .header h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      background: linear-gradient(180deg, #ffffff 30%, #7dd3fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(56, 189, 248, 0.4);
+    }
+
+    .author-credit {
+      font-size: 0.65rem;
+      letter-spacing: 0.04em;
+      color: rgba(148, 163, 184, 0.7);
+      margin-left: 36px;
+      font-weight: 500;
+      font-family: -apple-system, BlinkMacSystemFont, monospace;
+    }
+
+    /* -------------------------------------------------------------
+       CINEMATIC MODE BUTTON (ICON ONLY - EYE/CAMERA GLYPH)
+    ------------------------------------------------------------- */
     #btn-cinematic {
       position: fixed;
       top: 14px;
       right: 14px;
       z-index: 90;
-      background: rgba(19, 23, 34, 0.85);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border-color);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(30, 41, 59, 0.8) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--xp-panel-border);
       color: #fff;
-      font-size: 0.85rem;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: 20px;
+      font-size: 1.15rem;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      justify-content: center;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.4);
     }
     #btn-cinematic:hover {
-      background: #1c2233;
-      border-color: var(--accent);
-      transform: scale(1.03);
+      transform: scale(1.1) rotate(5deg);
+      border-color: var(--xp-cyan-aero);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
     }
 
-    /* Exit cinematic overlay prompt */
     #cinematic-exit-tip {
       display: none;
       position: fixed;
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.65);
-      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
       color: #cbd5e1;
-      padding: 6px 16px;
+      padding: 6px 18px;
       border-radius: 20px;
       font-size: 0.75rem;
       letter-spacing: 0.05em;
@@ -105,75 +209,74 @@
       100% { opacity: 0; }
     }
 
-    /* Sidebar controls */
+    /* -------------------------------------------------------------
+       SIDEBAR & WINDOWS XP x FRUTIGER AERO STYLING
+    ------------------------------------------------------------- */
     #sidebar {
       width: 410px;
       min-width: 380px;
       max-width: 420px;
-      background: var(--panel-bg);
-      border-right: 1px solid var(--border-color);
+      background: var(--xp-panel-glass);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--xp-panel-border);
       display: flex;
       flex-direction: column;
       height: 100%;
       z-index: 50;
-      box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+      box-shadow: 12px 0 35px rgba(0, 0, 0, 0.6), inset -1px 0 0 rgba(255, 255, 255, 0.1);
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    /* XP Window Header Bar */
     .header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border-color);
-      background: #171c2b;
+      padding: 14px 18px;
+      background: linear-gradient(180deg, #1e40af 0%, #1d4ed8 45%, #1e3a8a 55%, #172554 100%);
+      border-bottom: 1px solid rgba(125, 211, 252, 0.4);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: relative;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 8px rgba(0,0,0,0.4);
     }
-    .header .brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .header h1 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #ffffff;
-      white-space: nowrap;
-    }
+
     .lang-switcher {
       display: flex;
-      background: #0f131c;
-      border: 1px solid var(--border-color);
+      background: rgba(10, 16, 30, 0.6);
+      border: 1px solid var(--xp-panel-border);
       border-radius: 8px;
       padding: 2px;
       gap: 2px;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
     }
     .lang-btn {
       background: transparent;
       border: none;
-      color: #94a3b8;
-      font-size: 0.75rem;
+      color: #cbd5e1;
+      font-size: 0.72rem;
       font-weight: 700;
-      padding: 4px 8px;
+      padding: 3px 8px;
       border-radius: 6px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
     .lang-btn.active {
-      background: var(--accent);
-      color: #0b0d13;
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+      color: #030712;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
     }
 
     .scroll-content {
-      padding: 16px 20px;
+      padding: 14px 18px;
       overflow-y: auto;
       flex: 1;
     }
     .scroll-content::-webkit-scrollbar {
-      width: 6px;
+      width: 8px;
     }
     .scroll-content::-webkit-scrollbar-thumb {
-      background: #252e42;
-      border-radius: 3px;
+      background: linear-gradient(180deg, rgba(96, 165, 250, 0.4), rgba(30, 58, 138, 0.6));
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.15);
     }
 
     .section-title {
@@ -181,9 +284,10 @@
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--accent-gold);
-      margin-bottom: 10px;
-      margin-top: 18px;
+      color: #fde047;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+      margin-bottom: 8px;
+      margin-top: 14px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -192,60 +296,98 @@
       margin-top: 0;
     }
 
+    /* Cards Presets Quickbar (Saved sets) */
+    .card-presets-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .preset-chip {
+      background: linear-gradient(180deg, rgba(30, 58, 138, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+      border: 1px solid var(--xp-panel-border);
+      border-radius: 12px;
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      color: #e2e8f0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+    .preset-chip:hover, .preset-chip.active {
+      border-color: var(--xp-cyan-aero);
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.3) 0%, rgba(29, 78, 216, 0.6) 100%);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+    .preset-chip .del-btn {
+      color: #f87171;
+      font-weight: bold;
+      margin-left: 2px;
+    }
+
     /* Upload boxes */
     .upload-group {
       display: flex;
       gap: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .upload-box {
       flex: 1;
-      background: #1c2233;
-      border: 1px dashed #3b4766;
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%);
+      border: 1px dashed rgba(125, 211, 252, 0.4);
       border-radius: 10px;
-      padding: 10px;
+      padding: 8px;
       text-align: center;
       cursor: pointer;
       transition: all 0.2s ease;
       position: relative;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
     }
     .upload-box:hover {
-      border-color: var(--accent);
-      background: #20273a;
+      border-color: var(--xp-cyan-aero);
+      background: rgba(30, 58, 138, 0.35);
+      transform: translateY(-1px);
     }
     .upload-box input {
       display: none;
     }
     .upload-box img {
       width: 100%;
-      height: 105px;
+      height: 95px;
       object-fit: cover;
       border-radius: 6px;
-      margin-bottom: 6px;
-      background: #0f121a;
+      margin-bottom: 4px;
+      background: #020617;
       display: block;
+      border: 1px solid rgba(255,255,255,0.1);
     }
     .upload-box span {
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       color: #cbd5e1;
       display: block;
       font-weight: 600;
     }
 
-    /* Control inputs */
+    /* Aero Glass Card / Rows */
     .control-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
-      background: var(--card-bg);
-      padding: 8px 12px;
+      margin-bottom: 8px;
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.45) 0%, rgba(15, 23, 42, 0.7) 100%);
+      padding: 7px 11px;
       border-radius: 8px;
-      border: 1px solid var(--border-color);
+      border: 1px solid rgba(125, 211, 252, 0.2);
       gap: 8px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
     }
     .control-row label {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: #e2e8f0;
       font-weight: 500;
       display: flex;
@@ -256,7 +398,7 @@
     .control-row-col {
       flex-direction: column;
       align-items: stretch;
-      gap: 6px;
+      gap: 5px;
     }
     .control-row-col .header-line {
       display: flex;
@@ -264,83 +406,131 @@
       align-items: center;
     }
     .slider-val {
-      font-size: 0.75rem;
-      color: var(--accent);
-      font-weight: 600;
+      font-size: 0.74rem;
+      color: var(--xp-cyan-aero);
+      font-weight: 700;
       font-family: monospace;
     }
 
-    select, input[type="range"], input[type="number"] {
-      background: #252e42;
-      border: 1px solid #3b4766;
+    select, input[type="range"], input[type="text"] {
+      background: #0f172a;
+      border: 1px solid rgba(125, 211, 252, 0.3);
       color: #fff;
-      padding: 6px 8px;
+      padding: 5px 8px;
       border-radius: 6px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       outline: none;
       cursor: pointer;
     }
     select:focus, input:focus {
-      border-color: var(--accent);
+      border-color: var(--xp-cyan-aero);
+      box-shadow: 0 0 6px rgba(56, 189, 248, 0.5);
     }
     input[type="range"] {
       width: 100%;
-      height: 6px;
-      accent-color: var(--accent);
+      height: 5px;
+      accent-color: var(--xp-cyan-aero);
       padding: 0;
     }
 
+    /* Luna / Aero Button Pills */
     .preset-pill-group {
       display: flex;
       gap: 5px;
       width: 100%;
-      margin-top: 4px;
     }
     .pill-btn {
       flex: 1;
-      padding: 5px 6px;
+      padding: 4px 6px;
       font-size: 0.72rem;
-      background: #252e42;
-      border: 1px solid #3b4766;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid rgba(125, 211, 252, 0.3);
       border-radius: 6px;
       color: #cbd5e1;
       cursor: pointer;
       text-align: center;
       transition: all 0.15s ease;
       white-space: nowrap;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
     }
     .pill-btn.active, .pill-btn:hover {
-      background: var(--accent);
-      color: #0b0d13;
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+      color: #030712;
       font-weight: 700;
-      border-color: var(--accent);
+      border-color: #38bdf8;
+      box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
     }
 
-    /* Action footer */
+    /* Multi-scene Keyframe Layers (3 Scenes) */
+    .scene-timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .scene-card {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(125, 211, 252, 0.25);
+      border-radius: 8px;
+      padding: 6px;
+      text-align: center;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .scene-card.active {
+      border-color: var(--xp-cyan-aero);
+      background: rgba(14, 116, 144, 0.3);
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+    }
+    .scene-card .scene-label {
+      font-weight: bold;
+      color: #38bdf8;
+      margin-bottom: 3px;
+    }
+    .scene-card .btn-set-cam {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 4px;
+      color: #cbd5e1;
+      padding: 2px 4px;
+      font-size: 0.65rem;
+      cursor: pointer;
+      margin-top: 3px;
+      width: 100%;
+    }
+    .scene-card .btn-set-cam:hover {
+      background: #0284c7;
+      color: #fff;
+    }
+
+    /* Action footer with Frutiger/XP Gloss Green Button */
     .footer {
-      padding: 16px 20px;
-      background: #171c2b;
-      border-top: 1px solid var(--border-color);
+      padding: 14px 18px;
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+      border-top: 1px solid var(--xp-panel-border);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
     }
     .btn-record {
       width: 100%;
-      padding: 13px;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      padding: 12px;
+      background: linear-gradient(180deg, #4ade80 0%, #16a34a 48%, #15803d 52%, #14532d 100%);
       color: #fff;
-      border: none;
-      border-radius: 8px;
+      border: 1px solid #86efac;
+      border-radius: 10px;
       font-size: 0.92rem;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.5), inset 0 1px 0 rgba(255,255,255,0.6);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
     }
     .btn-record:hover {
-      filter: brightness(1.1);
+      filter: brightness(1.15);
       transform: translateY(-1px);
     }
     .btn-record:disabled {
@@ -348,79 +538,161 @@
       cursor: not-allowed;
       box-shadow: none;
       transform: none;
+      border-color: #64748b;
     }
     .status-text {
       text-align: center;
-      font-size: 0.74rem;
+      font-size: 0.73rem;
       color: #94a3b8;
-      margin-top: 8px;
+      margin-top: 7px;
     }
 
-    /* Main viewport & Frame wrapper */
+    /* -------------------------------------------------------------
+       MAIN VIEWPORT & CANVAS CONTAINER
+    ------------------------------------------------------------- */
     #viewport-container {
       flex: 1;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #06070a;
+      background: #020408;
       overflow: hidden;
-      padding: 20px;
+      padding: 16px;
     }
 
-    /* The responsive / custom dimension canvas window */
     #canvas-window-wrapper {
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
-      border-radius: 12px;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 20px rgba(37, 99, 235, 0.25);
+      border-radius: 14px;
       overflow: hidden;
-      border: 1px solid #232b3e;
+      border: 1px solid rgba(125, 211, 252, 0.35);
       transition: width 0.25s ease, height 0.25s ease, border-radius 0.2s ease;
     }
-
     #canvas-window-wrapper canvas {
       display: block;
       width: 100% !important;
       height: 100% !important;
     }
 
-    /* Floating quick controls inside viewport */
-    .viewport-overlay-controls {
+    /* -------------------------------------------------------------
+       RADIAL FLOWER FAB MENU (BOTTOM RIGHT OVERLAY)
+    ------------------------------------------------------------- */
+    .flower-fab-container {
       position: absolute;
-      bottom: 20px;
-      right: 20px;
-      display: flex;
-      gap: 8px;
-      z-index: 20;
-    }
-    .floating-pill {
-      background: rgba(19, 23, 34, 0.85);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border-color);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.74rem;
-      color: #cbd5e1;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
-    }
-    .floating-pill:hover {
-      background: #252e42;
-      color: #fff;
-      border-color: var(--accent);
+      bottom: 24px;
+      right: 24px;
+      z-index: 40;
     }
 
-    /* Cinematic Mode Active class */
+    .flower-main-trigger {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #38bdf8 0%, #2563eb 50%, #1d4ed8 100%);
+      border: 2px solid #bae6fd;
+      color: #fff;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(37, 99, 235, 0.7), inset 0 1px 0 rgba(255,255,255,0.7);
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .flower-main-trigger:hover {
+      transform: scale(1.08) rotate(15deg);
+      box-shadow: 0 0 22px rgba(56, 189, 248, 0.9);
+    }
+    .flower-fab-container.open .flower-main-trigger {
+      transform: rotate(45deg);
+      background: linear-gradient(180deg, #f43f5e 0%, #be123c 100%);
+      border-color: #fecdd3;
+    }
+
+    /* Petal buttons radiating outward */
+    .flower-petals {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      width: 40px;
+      height: 40px;
+      pointer-events: none;
+    }
+    .petal-btn {
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(30, 58, 138, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--xp-panel-border);
+      color: #fff;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.4);
+      opacity: 0;
+      transform: translate(0, 0) scale(0.4);
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+    }
+    .petal-btn:hover {
+      background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+      color: #030712;
+      transform: scale(1.15) !important;
+      border-color: #fff;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.8);
+    }
+
+    /* Open states: fan out like a flower / peacock arc */
+    .flower-fab-container.open .petal-btn {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    /* Petal 1: Centrar (Center) - Straight Up */
+    .flower-fab-container.open .petal-1 { transform: translate(0px, -65px) scale(1); transition-delay: 0.03s; }
+    /* Petal 2: Invertir Giro (Reverse Spin) - Top Left */
+    .flower-fab-container.open .petal-2 { transform: translate(-50px, -48px) scale(1); transition-delay: 0.06s; }
+    /* Petal 3: Nivelar Inclinación (Center Tilt) - Far Left */
+    .flower-fab-container.open .petal-3 { transform: translate(-70px, 0px) scale(1); transition-delay: 0.09s; }
+    /* Petal 4: Giro Intenso (Turbo Spin) - Low Left */
+    .flower-fab-container.open .petal-4 { transform: translate(-50px, 50px) scale(1); transition-delay: 0.12s; }
+    /* Petal 5: Guardar Pose Rápida (Save Pose) - Top-Right slant */
+    .flower-fab-container.open .petal-5 { transform: translate(45px, -50px) scale(1); transition-delay: 0.15s; }
+
+    /* Tooltip banner for flower buttons */
+    .petal-btn::after {
+      content: attr(data-tip);
+      position: absolute;
+      right: 50px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--xp-panel-border);
+      color: #e2e8f0;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .petal-btn:hover::after {
+      opacity: 1;
+    }
+
+    /* -------------------------------------------------------------
+       CINEMATIC MODE ACTIVE OVERRIDES
+    ------------------------------------------------------------- */
     body.cinematic-mode #sidebar,
     body.cinematic-mode #mobile-toggle-btn,
     body.cinematic-mode #btn-cinematic,
-    body.cinematic-mode .viewport-overlay-controls {
+    body.cinematic-mode .flower-fab-container {
       display: none !important;
     }
     body.cinematic-mode #viewport-container {
@@ -454,7 +726,7 @@
       }
       #sidebar.open {
         transform: translateX(0);
-        box-shadow: 15px 0 50px rgba(0,0,0,0.8);
+        box-shadow: 15px 0 50px rgba(0,0,0,0.85);
       }
       #viewport-container {
         padding: 0;
@@ -467,7 +739,7 @@
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.6);
+        background: rgba(0,0,0,0.65);
         backdrop-filter: blur(4px);
         z-index: 140;
       }
@@ -485,17 +757,21 @@
   <!-- Mobile Toggle Button -->
   <button id="mobile-toggle-btn" aria-label="Toggle Menu">☰</button>
 
-  <!-- Cinematic Mode Button -->
-  <button id="btn-cinematic" title="Modo Visor Pantalla Completa / Full Screen View">
-    <span>👁️</span> <span data-i18n="cinematic_btn">Visor</span>
+  <!-- Cinematic Mode Button (ICON ONLY - EYE) -->
+  <button id="btn-cinematic" title="Modo Visor Pantalla Completa / Cinema Clean View">
+    👁️
   </button>
   <div id="cinematic-exit-tip" data-i18n="cinematic_tip">Toca en cualquier lugar para salir</div>
 
-  <!-- SIDEBAR CONTROLS -->
+  <!-- SIDEBAR CONTROLS (Luna / Frutiger Glass) -->
   <aside id="sidebar">
     <div class="header">
-      <div class="brand">
-        <h1>🎴 3D Studio</h1>
+      <div class="brand-wrap">
+        <div class="brand-title-row">
+          <div class="cosmic-orb-logo" title="Universe Respiration Core"></div>
+          <h1>TCG:HUB</h1>
+        </div>
+        <div class="author-credit">by: theAstroBruh</div>
       </div>
       <div class="lang-switcher">
         <button class="lang-btn active" id="btn-lang-es">ES</button>
@@ -504,8 +780,14 @@
     </div>
 
     <div class="scroll-content">
-      <!-- 1. CARTAS -->
-      <div class="section-title"><span data-i18n="sec_cards">🎨 1. Diseños</span></div>
+      <!-- 1. CARTAS Y PRESETS GUARDADOS -->
+      <div class="section-title"><span data-i18n="sec_cards">🎨 1. Diseños & Presets</span></div>
+      
+      <!-- Quick card combination presets -->
+      <div class="card-presets-bar" id="card-presets-bar">
+        <div class="preset-chip active" id="chip-default">Default TCG</div>
+      </div>
+
       <div class="upload-group">
         <label class="upload-box" for="front-file-input">
           <img id="front-preview-img" src="assets/card_front.png" alt="Front Preview">
@@ -520,16 +802,41 @@
         </label>
       </div>
 
-      <!-- 2. CANVAS Y DIMENSIONES -->
-      <div class="section-title"><span data-i18n="sec_canvas">📐 2. Dimensiones Canvas</span></div>
+      <div class="control-row">
+        <label><span data-i18n="save_card_preset">💾 Guardar Carta Actual</span></label>
+        <button class="pill-btn" id="btn-save-card-preset" style="max-width: 100px;">💾 Guardar</button>
+      </div>
+
+      <!-- 2. MULTI-ESCENA / CAPAS DE TOMAS (HASTA 3 ESCENAS) -->
+      <div class="section-title"><span data-i18n="sec_scenes">🎬 2. Escenas & Animación</span></div>
+      <div class="scene-timeline-grid">
+        <div class="scene-card active" data-scene="1">
+          <div class="scene-label">Toma 1</div>
+          <button class="btn-set-cam" data-set-scene="1">📸 Grabar Pose</button>
+        </div>
+        <div class="scene-card" data-scene="2">
+          <div class="scene-label">Toma 2</div>
+          <button class="btn-set-cam" data-set-scene="2">📸 Grabar Pose</button>
+        </div>
+        <div class="scene-card" data-scene="3">
+          <div class="scene-label">Toma 3</div>
+          <button class="btn-set-cam" data-set-scene="3">📸 Grabar Pose</button>
+        </div>
+      </div>
+      <div class="preset-pill-group" style="margin-top: 8px;">
+        <button class="pill-btn" id="btn-play-scenes">▶️ Transición 3 Tomas</button>
+      </div>
+
+      <!-- 3. CANVAS Y DIMENSIONES -->
+      <div class="section-title"><span data-i18n="sec_canvas">📐 3. Dimensiones Canvas</span></div>
       <div class="control-row control-row-col">
         <div class="header-line">
-          <label><span data-i18n="canvas_aspect">📱 Formato / Aspecto</span></label>
+          <label><span data-i18n="canvas_aspect">📱 Formato</span></label>
         </div>
         <div class="preset-pill-group">
-          <button class="pill-btn active" data-preset="9:16">9:16 Reels</button>
-          <button class="pill-btn" data-preset="1:1">1:1 Post</button>
-          <button class="pill-btn" data-preset="16:9">16:9 Wide</button>
+          <button class="pill-btn active" data-preset="9:16">9:16</button>
+          <button class="pill-btn" data-preset="1:1">1:1</button>
+          <button class="pill-btn" data-preset="16:9">16:9</button>
           <button class="pill-btn" data-preset="fill" data-i18n="preset_fill">↔️ Ajustar</button>
         </div>
       </div>
@@ -538,14 +845,14 @@
         <input type="range" id="range-canvas-scale" min="50" max="100" value="100" step="1">
       </div>
 
-      <!-- 3. CÁMARA Y POSICIÓN -->
-      <div class="section-title"><span data-i18n="sec_camera">🎥 3. Cámara & Posición</span></div>
+      <!-- 4. CÁMARA & DINÁMICA DE GIRO -->
+      <div class="section-title"><span data-i18n="sec_camera">🎥 4. Cámara & Dinámica</span></div>
       <div class="control-row control-row-col">
         <div class="header-line">
           <label for="range-cam-dist"><span data-i18n="cam_dist">📏 Distancia</span></label>
           <span class="slider-val" id="val-cam-dist">4.6</span>
         </div>
-        <input type="range" id="range-cam-dist" min="2.2" max="8.0" step="0.1" value="4.6">
+        <input type="range" id="range-cam-dist" min="2.0" max="8.0" step="0.1" value="4.6">
       </div>
 
       <div class="control-row control-row-col">
@@ -556,8 +863,24 @@
         <input type="range" id="range-pos-y" min="-1.5" max="1.5" step="0.05" value="0.0">
       </div>
 
-      <!-- 4. DETALLES 3D (Canto, Borde, Brillo) -->
-      <div class="section-title"><span data-i18n="sec_card3d">✨ 4. Canto y Bordes</span></div>
+      <div class="control-row">
+        <label for="select-spin-dir"><span data-i18n="spin_dir">🔄 Sentido de Giro</span></label>
+        <select id="select-spin-dir">
+          <option value="1" data-i18n="dir_normal">Horario (Normal)</option>
+          <option value="-1" data-i18n="dir_reverse">Antihorario (Invertido)</option>
+        </select>
+      </div>
+
+      <div class="control-row control-row-col">
+        <div class="header-line">
+          <label for="range-tilt-intensity"><span data-i18n="tilt_intensity">📐 Intensidad Inclinación</span></label>
+          <span class="slider-val" id="val-tilt-intensity">1.0</span>
+        </div>
+        <input type="range" id="range-tilt-intensity" min="0.0" max="2.5" step="0.1" value="1.0">
+      </div>
+
+      <!-- 5. DETALLES 3D (Canto, Borde, Brillo) -->
+      <div class="section-title"><span data-i18n="sec_card3d">✨ 5. Canto y Bordes</span></div>
       
       <div class="control-row">
         <label for="select-corners"><span data-i18n="corners_type">✂️ Esquinas</span></label>
@@ -587,7 +910,7 @@
         <label for="select-edge"><span data-i18n="edge_color">🎨 Color Canto</span></label>
         <select id="select-edge">
           <option value="black" data-i18n="opt_black_edge">Negro Mate</option>
-          <option value="gold_foil" data-i18n="opt_gold_edge">Dorado Metalizado (Foil)</option>
+          <option value="gold_foil" data-i18n="opt_gold_edge">Dorado Foil</option>
           <option value="silver_foil" data-i18n="opt_silver_edge">Plata Metalizada</option>
           <option value="white" data-i18n="opt_white_edge">Cartulina Blanca</option>
         </select>
@@ -601,12 +924,13 @@
         <input type="range" id="range-gloss" min="0.05" max="0.9" step="0.05" value="0.25">
       </div>
 
-      <!-- 5. FONDO Y ANIMACIÓN -->
-      <div class="section-title"><span data-i18n="sec_env">🌌 5. Entorno & Giro</span></div>
+      <!-- 6. ENTORNO & GIRO -->
+      <div class="section-title"><span data-i18n="sec_env">🌌 6. Entorno & Giro</span></div>
       <div class="control-row">
         <label for="select-bg"><span data-i18n="bg_color">🏞️ Fondo</span></label>
         <select id="select-bg">
-          <option value="black" data-i18n="bg_black">Negro Absoluto (OLED)</option>
+          <option value="black" data-i18n="bg_black">Negro OLED</option>
+          <option value="aero_sky" data-i18n="bg_aero">Frutiger Aero Sky</option>
           <option value="dark_studio" data-i18n="bg_studio">Estudio Sutil</option>
           <option value="gold_luxury" data-i18n="bg_luxury">Lujo Dorado</option>
           <option value="cyber_neon" data-i18n="bg_cyber">Cyberpunk Neón</option>
@@ -619,7 +943,7 @@
         <select id="select-speed">
           <option value="1" data-i18n="spd_normal">Normal (2 giros / 10s)</option>
           <option value="0.5" data-i18n="spd_slow">Lento & Suave (1 giro)</option>
-          <option value="1.5" data-i18n="spd_fast">Rápido Dinámico</option>
+          <option value="2.0" data-i18n="spd_fast">Turbo Dinámico</option>
           <option value="0" data-i18n="spd_stop">Pausado (Estático)</option>
         </select>
       </div>
@@ -648,30 +972,50 @@
       <!-- Three.js canvas dynamically injected here -->
     </div>
 
-    <div class="viewport-overlay-controls">
-      <button class="floating-pill" id="btn-reset-cam">
-        <span>🎯</span> <span data-i18n="btn_center">Centrar</span>
+    <!-- RADIAL FLOWER FAB MENU IN BOTTOM RIGHT -->
+    <div class="flower-fab-container" id="flower-menu">
+      <div class="flower-petals">
+        <!-- 1. Reset / Centrar Pose -->
+        <button class="petal-btn petal-1" id="petal-center" data-tip="Centrar Cámara" title="Centrar Cámara">🎯</button>
+        <!-- 2. Invertir Sentido de Giro -->
+        <button class="petal-btn petal-2" id="petal-reverse" data-tip="Invertir Giro" title="Invertir Giro">🔁</button>
+        <!-- 3. Nivelar Inclinación (0 tilt) -->
+        <button class="petal-btn petal-3" id="petal-level" data-tip="Nivelar Inclinación" title="Nivelar Inclinación">⚖️</button>
+        <!-- 4. Giro Turbo / Intenso -->
+        <button class="petal-btn petal-4" id="petal-turbo" data-tip="Alternar Giro Rápido" title="Giro Turbo">⚡</button>
+        <!-- 5. Guardar Pose de Cámara -->
+        <button class="petal-btn petal-5" id="petal-save-pose" data-tip="Guardar Pose de Cámara" title="Guardar Pose">📌</button>
+      </div>
+
+      <button class="flower-main-trigger" id="flower-trigger" title="Opciones Avanzadas">
+        ⚙️
       </button>
     </div>
   </main>
 
   <script>
     // -------------------------------------------------------------------------
-    // I18N DICTIONARY (SPANISH & ENGLISH, MINIMAL TEXT, EMOJI FOCUSED)
+    // I18N DICTIONARY (SPANISH & ENGLISH)
     // -------------------------------------------------------------------------
     const translations = {
       es: {
-        sec_cards: "🎨 1. Diseños",
+        sec_cards: "🎨 1. Diseños & Presets",
         front_cover: "🖼️ Frontal",
         back_cover: "🔄 Trasera",
-        sec_canvas: "📐 2. Dimensiones Canvas",
-        canvas_aspect: "📱 Formato / Aspecto",
+        save_card_preset: "💾 Guardar Carta Actual",
+        sec_scenes: "🎬 2. Escenas & Animación",
+        sec_canvas: "📐 3. Dimensiones Canvas",
+        canvas_aspect: "📱 Formato",
         preset_fill: "↔️ Ajustar",
         canvas_scale: "🔍 Tamaño Canvas",
-        sec_camera: "🎥 3. Cámara & Posición",
+        sec_camera: "🎥 4. Cámara & Dinámica",
         cam_dist: "📏 Distancia",
         pos_y: "↕️ Posición Vertical",
-        sec_card3d: "✨ 4. Canto y Bordes",
+        spin_dir: "🔄 Sentido de Giro",
+        dir_normal: "Horario (Normal)",
+        dir_reverse: "Antihorario (Invertido)",
+        tilt_intensity: "📐 Intensidad Inclinación",
+        sec_card3d: "✨ 5. Canto y Bordes",
         corners_type: "✂️ Esquinas",
         opt_rounded: "Redondeadas (TCG)",
         opt_sharp: "Rectas Clásicas",
@@ -679,13 +1023,14 @@
         bevel_intensity: "💎 Intensidad de Borde",
         edge_color: "🎨 Color Canto",
         opt_black_edge: "Negro Mate",
-        opt_gold_edge: "Dorado Metalizado (Foil)",
+        opt_gold_edge: "Dorado Foil",
         opt_silver_edge: "Plata Metalizada",
         opt_white_edge: "Cartulina Blanca",
         glossiness: "✨ Brillo Reflectante",
-        sec_env: "🌌 5. Entorno & Giro",
+        sec_env: "🌌 6. Entorno & Giro",
         bg_color: "🏞️ Fondo",
-        bg_black: "Negro Absoluto (OLED)",
+        bg_black: "Negro OLED",
+        bg_aero: "Frutiger Aero Sky",
         bg_studio: "Estudio Sutil",
         bg_luxury: "Lujo Dorado",
         bg_cyber: "Cyberpunk Neón",
@@ -693,7 +1038,7 @@
         spin_speed: "⏱️ Giro",
         spd_normal: "Normal (2 giros / 10s)",
         spd_slow: "Lento & Suave (1 giro)",
-        spd_fast: "Rápido Dinámico",
+        spd_fast: "Turbo Dinámico",
         spd_stop: "Pausado (Estático)",
         floating: "🌊 Oscilación",
         float_on: "Activada (Orgánica)",
@@ -702,22 +1047,26 @@
         status_ready: "Listo para exportar video vertical HD",
         status_recording: "Grabando reel vertical 9:16 (1080x1920)...",
         status_done: "¡Video descargado con éxito!",
-        cinematic_btn: "Visor",
-        cinematic_tip: "Toca en cualquier lugar para salir",
-        btn_center: "Centrar"
+        cinematic_tip: "Toca en cualquier lugar para salir"
       },
       en: {
-        sec_cards: "🎨 1. Face Designs",
+        sec_cards: "🎨 1. Face Designs & Presets",
         front_cover: "🖼️ Front",
         back_cover: "🔄 Back",
-        sec_canvas: "📐 2. Canvas Dimensions",
+        save_card_preset: "💾 Save Current Card",
+        sec_scenes: "🎬 2. Scenes & Animation",
+        sec_canvas: "📐 3. Canvas Dimensions",
         canvas_aspect: "📱 Aspect Ratio",
         preset_fill: "↔️ Stretch",
         canvas_scale: "🔍 Canvas Size",
-        sec_camera: "🎥 3. Camera & Position",
+        sec_camera: "🎥 4. Camera & Dynamics",
         cam_dist: "📏 Distance",
         pos_y: "↕️ Vertical Position",
-        sec_card3d: "✨ 4. Edge & Borders",
+        spin_dir: "🔄 Spin Direction",
+        dir_normal: "Clockwise (Normal)",
+        dir_reverse: "Counter-Clockwise",
+        tilt_intensity: "📐 Tilt Intensity",
+        sec_card3d: "✨ 5. Edge & Borders",
         corners_type: "✂️ Corners",
         opt_rounded: "Rounded (TCG)",
         opt_sharp: "Classic Square",
@@ -725,13 +1074,14 @@
         bevel_intensity: "💎 Border Intensity",
         edge_color: "🎨 Edge Color",
         opt_black_edge: "Matte Black",
-        opt_gold_edge: "Metallic Gold (Foil)",
+        opt_gold_edge: "Foil Gold",
         opt_silver_edge: "Metallic Silver",
         opt_white_edge: "White Cardstock",
         glossiness: "✨ Gloss / Specular",
-        sec_env: "🌌 5. Environment & Spin",
+        sec_env: "🌌 6. Environment & Spin",
         bg_color: "🏞️ Background",
-        bg_black: "True OLED Black",
+        bg_black: "OLED Black",
+        bg_aero: "Frutiger Aero Sky",
         bg_studio: "Subtle Studio",
         bg_luxury: "Golden Luxury",
         bg_cyber: "Cyberpunk Neon",
@@ -739,7 +1089,7 @@
         spin_speed: "⏱️ Spin",
         spd_normal: "Normal (2 spins / 10s)",
         spd_slow: "Slow & Elegant (1 spin)",
-        spd_fast: "Fast Dynamic",
+        spd_fast: "Turbo Dynamic",
         spd_stop: "Paused (Static)",
         floating: "🌊 Floating Motion",
         float_on: "Enabled (Organic)",
@@ -748,9 +1098,7 @@
         status_ready: "Ready to export vertical HD reel",
         status_recording: "Recording 9:16 vertical video (1080x1920)...",
         status_done: "Video downloaded successfully!",
-        cinematic_btn: "Cinema",
-        cinematic_tip: "Tap anywhere to exit clean view",
-        btn_center: "Center"
+        cinematic_tip: "Tap anywhere to exit clean view"
       }
     };
 
@@ -779,11 +1127,13 @@
     const canvasWrapper = document.getElementById('canvas-window-wrapper');
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000); // OLED black by default
+    scene.background = new THREE.Color(0x000000);
 
-    // Camera initial configuration
     let camDistance = 4.6;
     let cardPosY = 0.0;
+    let spinDir = 1; // 1 or -1
+    let tiltMultiplier = 1.0;
+
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
     camera.position.set(0, 0, camDistance);
 
@@ -800,35 +1150,37 @@
     controls.enableZoom = true;
     controls.autoRotate = false;
 
-    // Lighting Rig
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
+    // Lighting Rig with Aero Gloss touch
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xfff8ee, 1.8);
-    keyLight.position.set(3, 3, 4);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.8);
+    keyLight.position.set(3, 4, 4);
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0x88bbff, 0.9);
+    const fillLight = new THREE.DirectionalLight(0x7dd3fc, 1.0);
     fillLight.position.set(-3, -1, 3);
     scene.add(fillLight);
 
-    const rimLight = new THREE.DirectionalLight(0xffe0a0, 1.6);
+    const rimLight = new THREE.DirectionalLight(0xffedd5, 1.6);
     rimLight.position.set(0, 4, -3);
     scene.add(rimLight);
 
     // -------------------------------------------------------------------------
-    // PROCEDURAL CARD WITH SEAMLESS BORDER FIX & CUSTOM BEVEL / THICKNESS
+    // PROCEDURAL CARD GEOMETRY & MATERIALS
     // -------------------------------------------------------------------------
     const cardGroup = new THREE.Group();
     scene.add(cardGroup);
 
     const textureLoader = new THREE.TextureLoader();
-    let frontTex = textureLoader.load('assets/card_front.png');
-    let backTex = textureLoader.load('assets/card_back.png');
+    let currentFrontSrc = 'assets/card_front.png';
+    let currentBackSrc = 'assets/card_back.png';
+
+    let frontTex = textureLoader.load(currentFrontSrc);
+    let backTex = textureLoader.load(currentBackSrc);
     frontTex.encoding = THREE.sRGBEncoding;
     backTex.encoding = THREE.sRGBEncoding;
 
-    // Materials
     let matFront = new THREE.MeshStandardMaterial({
       map: frontTex,
       roughness: 0.25,
@@ -847,7 +1199,6 @@
       metalness: 0.1
     });
 
-    // Card dimensions & parameters
     const cardParams = {
       w: 1.35,
       h: 1.89,
@@ -857,7 +1208,6 @@
     };
 
     function rebuildCard() {
-      // Clear previous meshes
       while (cardGroup.children.length > 0) {
         const obj = cardGroup.children[0];
         if (obj.geometry) obj.geometry.dispose();
@@ -870,7 +1220,6 @@
       const depth = cardParams.thickness;
       const bevel = cardParams.bevelSize;
 
-      // 1. Base 2D Shape with Rounded Corners
       const shape = new THREE.Shape();
       const x = -w / 2;
       const y = -h / 2;
@@ -885,7 +1234,6 @@
       shape.lineTo(x, y + radius);
       shape.quadraticCurveTo(x, y, x + radius, y);
 
-      // 2. Extrude Geometry for Edges and Body
       const extrudeSettings = {
         depth: depth,
         bevelEnabled: bevel > 0.0005,
@@ -898,12 +1246,9 @@
       const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
       geometry.center();
 
-      // UV mapping on extruded geometry for seamless texturing
       const pos = geometry.attributes.position;
       const uv = geometry.attributes.uv;
       const totalHalfDepth = (depth / 2) + (bevel > 0.0005 ? bevel : 0);
-
-      // Total outer bounds including bevel
       const outerW = w + bevel * 2;
       const outerH = h + bevel * 2;
 
@@ -912,29 +1257,24 @@
         const py = pos.getY(i);
         const pz = pos.getZ(i);
 
-        // UV normalized to [0, 1]
         const u = Math.min(Math.max((px / outerW) + 0.5, 0), 1);
         const v = Math.min(Math.max((py / outerH) + 0.5, 0), 1);
 
         if (pz > 0.001) {
           uv.setXY(i, u, v);
         } else if (pz < -0.001) {
-          uv.setXY(i, 1.0 - u, v); // Mirror UV for card back
+          uv.setXY(i, 1.0 - u, v);
         } else {
           uv.setXY(i, 0.5, 0.5);
         }
       }
       uv.needsUpdate = true;
 
-      // Multi-material: [0: Front/Back, 1: Edge]
       const cardBody = new THREE.Mesh(geometry, [matFront, matEdge]);
       cardGroup.add(cardBody);
 
-      // 3. Crisp Face Plates matching the exact card shape (NO SQUARE OVERHANG)
-      // ShapeGeometry ensures corners remain perfectly rounded with zero border cutoff
+      // ShapeGeometry face plates ensure seamless rounded borders
       const faceGeo = new THREE.ShapeGeometry(shape, 32);
-      
-      // Calculate normalized UV for face plates
       const facePos = faceGeo.attributes.position;
       const faceUV = faceGeo.attributes.uv;
       for (let i = 0; i < facePos.count; i++) {
@@ -944,12 +1284,10 @@
       }
       faceUV.needsUpdate = true;
 
-      // Front Face (slightly offset to eliminate z-fighting and cover the flat face)
       const frontFace = new THREE.Mesh(faceGeo, matFront);
       frontFace.position.z = totalHalfDepth + 0.0004;
       cardGroup.add(frontFace);
 
-      // Back Face
       const backGeo = faceGeo.clone();
       const backUV = backGeo.attributes.uv;
       for (let i = 0; i < backUV.count; i++) {
@@ -966,6 +1304,83 @@
     rebuildCard();
 
     // -------------------------------------------------------------------------
+    // SCENE CAMERA POSES & TRANSITIONS (UP TO 3 SCENES)
+    // -------------------------------------------------------------------------
+    const scenesData = {
+      1: { pos: new THREE.Vector3(0, 0, 4.6), target: new THREE.Vector3(0, 0, 0), cardY: 0 },
+      2: { pos: new THREE.Vector3(1.8, 1.2, 3.2), target: new THREE.Vector3(0, 0.3, 0), cardY: 0.1 },
+      3: { pos: new THREE.Vector3(-1.4, -0.6, 2.6), target: new THREE.Vector3(0, -0.2, 0), cardY: -0.1 }
+    };
+
+    let activeSceneIdx = 1;
+    let isTransitioning = false;
+    let transitionStartTime = 0;
+    let transitionDuration = 1.2; // seconds
+    let transStartCam = new THREE.Vector3();
+    let transTargetCam = new THREE.Vector3();
+    let transStartCtrl = new THREE.Vector3();
+    let transTargetCtrl = new THREE.Vector3();
+
+    function applyScene(idx) {
+      activeSceneIdx = idx;
+      document.querySelectorAll('.scene-card').forEach(c => {
+        c.classList.toggle('active', parseInt(c.getAttribute('data-scene')) === idx);
+      });
+
+      const s = scenesData[idx];
+      transStartCam.copy(camera.position);
+      transTargetCam.copy(s.pos);
+      transStartCtrl.copy(controls.target);
+      transTargetCtrl.copy(s.target);
+      cardPosY = s.cardY;
+      document.getElementById('range-pos-y').value = cardPosY;
+      document.getElementById('val-pos-y').textContent = cardPosY.toFixed(2);
+
+      transitionStartTime = performance.now();
+      isTransitioning = true;
+    }
+
+    document.querySelectorAll('.scene-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-set-cam')) return;
+        const idx = parseInt(card.getAttribute('data-scene'));
+        applyScene(idx);
+      });
+    });
+
+    document.querySelectorAll('.btn-set-cam').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.getAttribute('data-set-scene'));
+        scenesData[idx].pos.copy(camera.position);
+        scenesData[idx].target.copy(controls.target);
+        scenesData[idx].cardY = cardPosY;
+        btn.textContent = "✅ Guardado";
+        setTimeout(() => { btn.textContent = "📸 Grabar Pose"; }, 1500);
+      });
+    });
+
+    // Multi-scene sequence player
+    let isSequencePlaying = false;
+    document.getElementById('btn-play-scenes').addEventListener('click', () => {
+      if (isSequencePlaying) return;
+      isSequencePlaying = true;
+      document.getElementById('btn-play-scenes').textContent = "⏳ Ejecutando Tomas...";
+
+      applyScene(1);
+      setTimeout(() => {
+        applyScene(2);
+        setTimeout(() => {
+          applyScene(3);
+          setTimeout(() => {
+            isSequencePlaying = false;
+            document.getElementById('btn-play-scenes').textContent = "▶️ Transición 3 Tomas";
+          }, 2400);
+        }, 2400);
+      }, 2400);
+    });
+
+    // -------------------------------------------------------------------------
     // ANIMATION & RENDER LOOP
     // -------------------------------------------------------------------------
     let clock = new THREE.Clock();
@@ -976,12 +1391,25 @@
       requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      // Spin
-      cardGroup.rotation.y = (elapsedTime * 0.6283 * 2 * speedMult);
+      // Camera smooth interpolation during scene switches
+      if (isTransitioning) {
+        const progress = Math.min((performance.now() - transitionStartTime) / (transitionDuration * 1000), 1.0);
+        // Smooth step easing
+        const t = progress * progress * (3 - 2 * progress);
+        camera.position.lerpVectors(transStartCam, transTargetCam, t);
+        controls.target.lerpVectors(transStartCtrl, transTargetCtrl, t);
+        if (progress >= 1.0) {
+          isTransitioning = false;
+        }
+      }
+
+      // Continuous spin with direction and speed control
+      cardGroup.rotation.y += (0.018 * speedMult * spinDir);
 
       if (isFloating) {
-        cardGroup.rotation.x = Math.sin(elapsedTime * 1.5) * 0.12;
-        cardGroup.rotation.z = Math.cos(elapsedTime * 1.2) * 0.05;
+        // Tilt with intensity multiplier
+        cardGroup.rotation.x = Math.sin(elapsedTime * 1.5) * 0.12 * tiltMultiplier;
+        cardGroup.rotation.z = Math.cos(elapsedTime * 1.2) * 0.05 * tiltMultiplier;
         cardGroup.position.y = cardPosY + Math.sin(elapsedTime * 2.0) * 0.06;
       } else {
         cardGroup.rotation.x = 0;
@@ -995,7 +1423,131 @@
     animate();
 
     // -------------------------------------------------------------------------
-    // DYNAMIC CANVAS SIZING & PRESETS (9:16, 1:1, 16:9, Fill)
+    // CARD PRESETS MANAGER (LOCALSTORAGE INTEGRATION)
+    // -------------------------------------------------------------------------
+    let savedCardPresets = JSON.parse(localStorage.getItem('tcg_card_presets') || '[]');
+
+    function renderCardPresets() {
+      const bar = document.getElementById('card-presets-bar');
+      bar.innerHTML = '<div class="preset-chip active" id="chip-default">Default TCG</div>';
+
+      document.getElementById('chip-default').addEventListener('click', () => {
+        document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+        document.getElementById('chip-default').classList.add('active');
+        loadCardImages('assets/card_front.png', 'assets/card_back.png');
+      });
+
+      savedCardPresets.forEach((p, idx) => {
+        const chip = document.createElement('div');
+        chip.className = 'preset-chip';
+        chip.innerHTML = `<span>${p.name}</span> <span class="del-btn" data-del="${idx}">&times;</span>`;
+
+        chip.addEventListener('click', (e) => {
+          if (e.target.classList.contains('del-btn')) {
+            savedCardPresets.splice(idx, 1);
+            localStorage.setItem('tcg_card_presets', JSON.stringify(savedCardPresets));
+            renderCardPresets();
+            return;
+          }
+          document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          loadCardImages(p.front, p.back);
+        });
+
+        bar.appendChild(chip);
+      });
+    }
+
+    function loadCardImages(frontUrl, backUrl) {
+      document.getElementById('front-preview-img').src = frontUrl;
+      document.getElementById('back-preview-img').src = backUrl;
+
+      textureLoader.load(frontUrl, (t) => {
+        t.encoding = THREE.sRGBEncoding;
+        matFront.map = t;
+        matFront.needsUpdate = true;
+      });
+
+      textureLoader.load(backUrl, (t) => {
+        t.encoding = THREE.sRGBEncoding;
+        matBack.map = t;
+        matBack.needsUpdate = true;
+      });
+    }
+
+    document.getElementById('btn-save-card-preset').addEventListener('click', () => {
+      const name = prompt(currentLang === 'es' ? 'Nombre para este preset de carta:' : 'Preset name:', `Card #${savedCardPresets.length + 1}`);
+      if (name) {
+        savedCardPresets.push({
+          name: name.trim(),
+          front: document.getElementById('front-preview-img').src,
+          back: document.getElementById('back-preview-img').src
+        });
+        localStorage.setItem('tcg_card_presets', JSON.stringify(savedCardPresets));
+        renderCardPresets();
+      }
+    });
+
+    renderCardPresets();
+
+    // -------------------------------------------------------------------------
+    // RADIAL FLOWER FAB MENU LOGIC
+    // -------------------------------------------------------------------------
+    const flowerMenu = document.getElementById('flower-menu');
+    const flowerTrigger = document.getElementById('flower-trigger');
+
+    flowerTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      flowerMenu.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!flowerMenu.contains(e.target)) {
+        flowerMenu.classList.remove('open');
+      }
+    });
+
+    // Petal 1: Centrar
+    document.getElementById('petal-center').addEventListener('click', () => {
+      controls.target.set(0, 0, 0);
+      camera.position.set(0, 0, camDistance);
+      controls.update();
+      flowerMenu.classList.remove('open');
+    });
+
+    // Petal 2: Invertir Giro
+    document.getElementById('petal-reverse').addEventListener('click', () => {
+      spinDir *= -1;
+      document.getElementById('select-spin-dir').value = spinDir.toString();
+      flowerMenu.classList.remove('open');
+    });
+
+    // Petal 3: Nivelar Inclinación (0 tilt)
+    document.getElementById('petal-level').addEventListener('click', () => {
+      tiltMultiplier = (tiltMultiplier === 0 ? 1.0 : 0.0);
+      document.getElementById('range-tilt-intensity').value = tiltMultiplier;
+      document.getElementById('val-tilt-intensity').textContent = tiltMultiplier.toFixed(1);
+      flowerMenu.classList.remove('open');
+    });
+
+    // Petal 4: Giro Turbo (Toggle Speed)
+    document.getElementById('petal-turbo').addEventListener('click', () => {
+      speedMult = (speedMult === 2.0 ? 1.0 : 2.0);
+      document.getElementById('select-speed').value = speedMult.toString();
+      flowerMenu.classList.remove('open');
+    });
+
+    // Petal 5: Guardar Pose Rápida en Toma 1
+    document.getElementById('petal-save-pose').addEventListener('click', () => {
+      scenesData[1].pos.copy(camera.position);
+      scenesData[1].target.copy(controls.target);
+      scenesData[1].cardY = cardPosY;
+      alert(currentLang === 'es' ? 'Pose guardada en Toma 1!' : 'Camera Pose saved to Scene 1!');
+      flowerMenu.classList.remove('open');
+    });
+
+    // -------------------------------------------------------------------------
+    // DYNAMIC CANVAS SIZING & PRESETS
     // -------------------------------------------------------------------------
     let currentAspectRatio = 9 / 16;
     let currentScalePercent = 100;
@@ -1013,7 +1565,6 @@
         targetW = availW * (currentScalePercent / 100);
         targetH = availH * (currentScalePercent / 100);
       } else {
-        // Fit within available container bounds keeping target aspect ratio
         const scaleFactor = (currentScalePercent / 100);
         const maxW = availW * scaleFactor;
         const maxH = availH * scaleFactor;
@@ -1041,10 +1592,10 @@
     window.addEventListener('resize', resizeCanvas);
     setTimeout(resizeCanvas, 50);
 
-    // Canvas preset buttons
     document.querySelectorAll('.preset-pill-group .pill-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        document.querySelectorAll('.preset-pill-group .pill-btn').forEach(b => b.classList.remove('active'));
+      if (!btn.hasAttribute('data-preset')) return;
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.preset-pill-group .pill-btn[data-preset]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
         const preset = btn.getAttribute('data-preset');
@@ -1057,56 +1608,47 @@
       });
     });
 
-    // Canvas scale slider
-    const rangeCanvasScale = document.getElementById('range-canvas-scale');
-    rangeCanvasScale.addEventListener('input', (e) => {
+    document.getElementById('range-canvas-scale').addEventListener('input', (e) => {
       currentScalePercent = parseInt(e.target.value, 10);
       resizeCanvas();
     });
 
     // -------------------------------------------------------------------------
-    // CAMERA & POSITION CONTROLS
+    // CAMERA & DYNAMICS CONTROLS
     // -------------------------------------------------------------------------
-    const rangeCamDist = document.getElementById('range-cam-dist');
-    const valCamDist = document.getElementById('val-cam-dist');
-    rangeCamDist.addEventListener('input', (e) => {
+    document.getElementById('range-cam-dist').addEventListener('input', (e) => {
       camDistance = parseFloat(e.target.value);
-      valCamDist.textContent = camDistance.toFixed(1);
-      
-      // Update camera distance along current view vector
+      document.getElementById('val-cam-dist').textContent = camDistance.toFixed(1);
       const dir = camera.position.clone().sub(controls.target).normalize();
       camera.position.copy(controls.target).add(dir.multiplyScalar(camDistance));
     });
 
-    const rangePosY = document.getElementById('range-pos-y');
-    const valPosY = document.getElementById('val-pos-y');
-    rangePosY.addEventListener('input', (e) => {
+    document.getElementById('range-pos-y').addEventListener('input', (e) => {
       cardPosY = parseFloat(e.target.value);
-      valPosY.textContent = cardPosY.toFixed(2);
+      document.getElementById('val-pos-y').textContent = cardPosY.toFixed(2);
     });
 
-    document.getElementById('btn-reset-cam').addEventListener('click', () => {
-      controls.target.set(0, 0, 0);
-      camera.position.set(0, 0, camDistance);
-      controls.update();
+    document.getElementById('select-spin-dir').addEventListener('change', (e) => {
+      spinDir = parseInt(e.target.value);
+    });
+
+    document.getElementById('range-tilt-intensity').addEventListener('input', (e) => {
+      tiltMultiplier = parseFloat(e.target.value);
+      document.getElementById('val-tilt-intensity').textContent = tiltMultiplier.toFixed(1);
     });
 
     // -------------------------------------------------------------------------
-    // CARD 3D ATTRIBUTES (THICKNESS, BEVEL INTENSITY, GLOSS, CORNERS)
+    // CARD 3D ATTRIBUTES (THICKNESS, BEVEL, GLOSS, CORNERS)
     // -------------------------------------------------------------------------
-    const rangeEdgeThick = document.getElementById('range-edge-thickness');
-    const valEdgeThick = document.getElementById('val-edge-thick');
-    rangeEdgeThick.addEventListener('input', (e) => {
+    document.getElementById('range-edge-thickness').addEventListener('input', (e) => {
       cardParams.thickness = parseFloat(e.target.value);
-      valEdgeThick.textContent = cardParams.thickness.toFixed(3);
+      document.getElementById('val-edge-thick').textContent = cardParams.thickness.toFixed(3);
       rebuildCard();
     });
 
-    const rangeBevelInt = document.getElementById('range-bevel-intensity');
-    const valBevelInt = document.getElementById('val-bevel-int');
-    rangeBevelInt.addEventListener('input', (e) => {
+    document.getElementById('range-bevel-intensity').addEventListener('input', (e) => {
       cardParams.bevelSize = parseFloat(e.target.value);
-      valBevelInt.textContent = cardParams.bevelSize.toFixed(3);
+      document.getElementById('val-bevel-int').textContent = cardParams.bevelSize.toFixed(3);
       rebuildCard();
     });
 
@@ -1137,11 +1679,9 @@
       matEdge.needsUpdate = true;
     });
 
-    const rangeGloss = document.getElementById('range-gloss');
-    const valGloss = document.getElementById('val-gloss');
-    rangeGloss.addEventListener('input', (e) => {
+    document.getElementById('range-gloss').addEventListener('input', (e) => {
       const v = parseFloat(e.target.value);
-      valGloss.textContent = v.toFixed(2);
+      document.getElementById('val-gloss').textContent = v.toFixed(2);
       matFront.roughness = v;
       matBack.roughness = v;
     });
@@ -1149,16 +1689,11 @@
     // -------------------------------------------------------------------------
     // FILE UPLOADS
     // -------------------------------------------------------------------------
-    const frontInput = document.getElementById('front-file-input');
-    const backInput = document.getElementById('back-file-input');
-    const frontPreview = document.getElementById('front-preview-img');
-    const backPreview = document.getElementById('back-preview-img');
-
-    frontInput.addEventListener('change', (e) => {
+    document.getElementById('front-file-input').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
         const url = URL.createObjectURL(file);
-        frontPreview.src = url;
+        document.getElementById('front-preview-img').src = url;
         textureLoader.load(url, (t) => {
           t.encoding = THREE.sRGBEncoding;
           matFront.map = t;
@@ -1167,11 +1702,11 @@
       }
     });
 
-    backInput.addEventListener('change', (e) => {
+    document.getElementById('back-file-input').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
         const url = URL.createObjectURL(file);
-        backPreview.src = url;
+        document.getElementById('back-preview-img').src = url;
         textureLoader.load(url, (t) => {
           t.encoding = THREE.sRGBEncoding;
           matBack.map = t;
@@ -1181,12 +1716,14 @@
     });
 
     // -------------------------------------------------------------------------
-    // BACKGROUND & ENVIRONMENT
+    // BACKGROUND & ENVIRONMENT (INCLUDING FRUTIGER AERO SKY)
     // -------------------------------------------------------------------------
     document.getElementById('select-bg').addEventListener('change', (e) => {
       const val = e.target.value;
       if (val === 'black') {
         scene.background = new THREE.Color(0x000000);
+      } else if (val === 'aero_sky') {
+        scene.background = new THREE.Color(0x228be6); // Frutiger cyan-blue atmosphere
       } else if (val === 'dark_studio') {
         scene.background = new THREE.Color(0x060911);
       } else if (val === 'gold_luxury') {
@@ -1207,7 +1744,7 @@
     });
 
     // -------------------------------------------------------------------------
-    // CINEMATIC VIEWER MODE (FULL SCREEN CLEAN VIEW)
+    // CINEMATIC VIEWER MODE (CLEAN SCREEN RECORDING)
     // -------------------------------------------------------------------------
     const btnCinematic = document.getElementById('btn-cinematic');
     const exitTip = document.getElementById('cinematic-exit-tip');
@@ -1216,9 +1753,7 @@
       document.body.classList.add('cinematic-mode');
       resizeCanvas();
       exitTip.style.display = 'block';
-      setTimeout(() => {
-        exitTip.style.display = 'none';
-      }, 3000);
+      setTimeout(() => { exitTip.style.display = 'none'; }, 3000);
     }
 
     function exitCinematic() {
@@ -1231,7 +1766,6 @@
 
     btnCinematic.addEventListener('click', enterCinematic);
 
-    // Click anywhere on canvas/viewport during cinematic mode to exit
     container.addEventListener('click', (e) => {
       if (document.body.classList.contains('cinematic-mode')) {
         exitCinematic();
@@ -1245,25 +1779,23 @@
     });
 
     // -------------------------------------------------------------------------
-    // MOBILE DRAWER CONTROLS
+    // MOBILE DRAWER
     // -------------------------------------------------------------------------
     const mobileBtn = document.getElementById('mobile-toggle-btn');
     const sidebar = document.getElementById('sidebar');
     const backdrop = document.getElementById('sidebar-backdrop');
 
-    function toggleMobileMenu() {
+    mobileBtn.addEventListener('click', () => {
       const isOpen = sidebar.classList.toggle('open');
       backdrop.classList.toggle('active', isOpen);
-    }
-
-    mobileBtn.addEventListener('click', toggleMobileMenu);
+    });
     backdrop.addEventListener('click', () => {
       sidebar.classList.remove('open');
       backdrop.classList.remove('active');
     });
 
     // -------------------------------------------------------------------------
-    // GUARANTEED 9:16 VERTICAL HD (1080x1920) VIDEO EXPORT
+    // 9:16 VERTICAL HD (1080x1920) RECORDER
     // -------------------------------------------------------------------------
     const btnRecord = document.getElementById('btn-record');
     const recordBtnText = document.getElementById('record-btn-text');
@@ -1274,7 +1806,6 @@
       statusLabel.textContent = translations[currentLang].status_recording;
       recordBtnText.textContent = "⏳ ...";
 
-      // 1. Create dedicated offscreen 1080x1920 WebGL render canvas
       const exportCanvas = document.createElement('canvas');
       exportCanvas.width = 1080;
       exportCanvas.height = 1920;
@@ -1293,13 +1824,10 @@
       const exportCamera = new THREE.PerspectiveCamera(38, 1080 / 1920, 0.1, 100);
       exportCamera.position.copy(camera.position);
       exportCamera.quaternion.copy(camera.quaternion);
-
-      // Adjust camera distance to match vertical aspect ratio seamlessly
       exportCamera.aspect = 9 / 16;
       exportCamera.updateProjectionMatrix();
 
-      // 2. Setup high-bitrate MediaRecorder
-      const stream = exportCanvas.captureStream(30); // 30 FPS
+      const stream = exportCanvas.captureStream(30);
       const mime = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')
                  ? 'video/mp4'
                  : MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
@@ -1308,7 +1836,7 @@
 
       const recorder = new MediaRecorder(stream, {
         mimeType: mime,
-        videoBitsPerSecond: 12000000 // 12 Mbps pristine quality
+        videoBitsPerSecond: 12000000
       });
 
       const chunks = [];
@@ -1325,7 +1853,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `3D_Card_9x16_${Date.now()}.${ext}`;
+        a.download = `TCG_HUB_9x16_${Date.now()}.${ext}`;
         a.click();
 
         exportRenderer.dispose();
@@ -1334,7 +1862,6 @@
         btnRecord.disabled = false;
       };
 
-      // 3. Render offscreen frame-by-frame loop during recording
       function exportRenderLoop() {
         if (!isExporting) return;
         exportCamera.position.copy(camera.position);
