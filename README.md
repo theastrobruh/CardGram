@@ -1,4 +1,4 @@
-# 🎴 DeckGram
+# 🎴 CardGram
 
 > A real-time WebGL 3D interactive showcase and reel creator for trading card artists, digital collectors, and content creators — no installation required.
 
@@ -50,13 +50,13 @@
 ### Online
 Open the live site → upload front & back artwork → configure 3D Forge settings → record or snapshot.
 
-👉 **[Open DeckGram](https://theastrobruh.github.io/DeckGram/)**
+👉 **[Open CardGram](https://theastrobruh.github.io/CardGram/)**
 
 ### Local
 
 ```bash
-git clone https://github.com/theastrobruh/DeckGram.git
-cd DeckGram
+git clone https://github.com/theastrobruh/CardGram.git
+cd CardGram
 ```
 
 | Method | Command |
@@ -120,7 +120,7 @@ cd DeckGram
 
 ## ☕ Support
 
-If DeckGram is useful or inspiring to you, consider supporting development on Ko-fi. Thank you!
+If CardGram is useful or inspiring to you, consider supporting development on Ko-fi. Thank you!
 
 👉 [**Ko-fi · theAstroBruh**](https://ko-fi.com/theastrobruh)
 

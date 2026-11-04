@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Genera las miniaturas WebP que usa el lobby de DeckGram.
+"""Genera las miniaturas WebP que usa el lobby de CardGram.
 
 El estudio 3D siempre carga los PNG originales; el hub, la biblioteca y las
 colecciones usan estas miniaturas (máx. 760 px) para no descargar varios MB

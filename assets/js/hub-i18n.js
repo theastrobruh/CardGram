@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DeckGram — v0.4.4 · Textos del hub
+   CardGram — v0.4.4 · Textos del hub
    Se fusiona con el diccionario principal al cargar para mantener el lobby
    separado del vocabulario del editor.
    ========================================================================== */
@@ -9,7 +9,7 @@
   if (typeof I18N === 'undefined') return;
 
   Object.assign(I18N.es, {
-    hub_aria: 'DeckGram · Lobby',
+    hub_aria: 'CardGram · Lobby',
     hub_nav_aria: 'Navegación principal',
     hub_nav_home: 'Inicio',
     hub_nav_library: 'Mis cartas',
@@ -168,7 +168,7 @@
   });
 
   Object.assign(I18N.en, {
-    hub_aria: 'DeckGram · Hub',
+    hub_aria: 'CardGram · Hub',
     hub_nav_aria: 'Main navigation',
     hub_nav_home: 'Home',
     hub_nav_library: 'My cards',
@@ -327,7 +327,7 @@
   });
 
   Object.assign(I18N.de, {
-    hub_aria: 'DeckGram · Lobby',
+    hub_aria: 'CardGram · Lobby',
     hub_nav_aria: 'Hauptnavigation',
     hub_nav_home: 'Start',
     hub_nav_library: 'Meine Karten',

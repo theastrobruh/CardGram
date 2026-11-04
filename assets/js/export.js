@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DeckGram — v0.4.4 · Exportación
+   CardGram — v0.4.4 · Exportación
    Grabación 9:16 / 1:1 / 16:9 con MediaRecorder y captura PNG.
    ========================================================================== */
 'use strict';
@@ -55,7 +55,7 @@ function cancelExport() {
     try {
       exportRecorder.stop();
     } catch (error) {
-      console.warn('[DeckGram] Could not stop recorder', error);
+      console.warn('[CardGram] Could not stop recorder', error);
     }
   }
 }
@@ -95,7 +95,7 @@ async function exportVideo() {
     try {
       exportRecorder = new MediaRecorder(exportStream, options);
     } catch (error) {
-      console.warn('[DeckGram] Falling back to default MediaRecorder options', error);
+      console.warn('[CardGram] Falling back to default MediaRecorder options', error);
       exportRecorder = new MediaRecorder(exportStream);
     }
 
@@ -104,7 +104,7 @@ async function exportVideo() {
     };
 
     exportRecorder.onerror = (event) => {
-      console.error('[DeckGram] MediaRecorder error', event);
+      console.error('[CardGram] MediaRecorder error', event);
       failed = true;
       try {
         exportRecorder.stop();
@@ -158,7 +158,7 @@ async function exportVideo() {
       }
     }
   } catch (error) {
-    console.error('[DeckGram] Export setup failed', error);
+    console.error('[CardGram] Export setup failed', error);
     failed = true;
   } finally {
     clearInterval(exportTimer);
@@ -169,13 +169,13 @@ async function exportVideo() {
     try {
       if (exportStream) exportStream.getTracks().forEach((track) => track.stop());
     } catch (error) {
-      console.warn('[DeckGram] Could not stop stream tracks', error);
+      console.warn('[CardGram] Could not stop stream tracks', error);
     }
 
     try {
       if (exportRenderer) exportRenderer.dispose();
     } catch (error) {
-      console.warn('[DeckGram] Could not dispose export renderer', error);
+      console.warn('[CardGram] Could not dispose export renderer', error);
     }
 
     exportRenderer = null;
@@ -206,12 +206,12 @@ async function exportVideo() {
 
   downloadBlob(
     blob,
-    `DeckGram_v${APP_VERSION}_${size.width}x${size.height}_${fileStamp()}.${extension}`
+    `CardGram_v${APP_VERSION}_${size.width}x${size.height}_${fileStamp()}.${extension}`
   );
 
   setStatus(t('status_done'), 'success');
   toast(t('status_done'), { type: 'success' });
-  window.dispatchEvent(new CustomEvent('deckgram:exported', { detail: { kind: 'video' } }));
+  window.dispatchEvent(new CustomEvent('cardgram:exported', { detail: { kind: 'video' } }));
   exportRecorder = null;
 }
 
@@ -231,13 +231,13 @@ async function exportSnapshot() {
     const blob = await Scene.createSnapshot(size.width, size.height);
     downloadBlob(
       blob,
-      `DeckGram_v${APP_VERSION}_${size.width}x${size.height}_${fileStamp()}.png`
+      `CardGram_v${APP_VERSION}_${size.width}x${size.height}_${fileStamp()}.png`
     );
     setStatus(t('status_png_done'), 'success');
     toast(t('status_png_done'), { type: 'success' });
-    window.dispatchEvent(new CustomEvent('deckgram:exported', { detail: { kind: 'snapshot' } }));
+    window.dispatchEvent(new CustomEvent('cardgram:exported', { detail: { kind: 'snapshot' } }));
   } catch (error) {
-    console.error('[DeckGram] Snapshot failed', error);
+    console.error('[CardGram] Snapshot failed', error);
     setStatus(t('status_error'), 'error');
     toast(t('snapshot_error'), { type: 'error' });
   } finally {

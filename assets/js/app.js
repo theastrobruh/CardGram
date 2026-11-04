@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DeckGram — v0.4.4 · Aplicación
+   CardGram — v0.4.4 · Aplicación
    Estado, persistencia, presets, cargas, interfaz, accesibilidad e inicio.
    ========================================================================== */
 'use strict';
@@ -7,9 +7,9 @@
 const APP_VERSION = '0.4.4';
 
 const STORAGE = {
-  settings: 'deckgram.settings.v1',
-  presets: 'deckgram.presets.v2',
-  scenes: 'deckgram.scenes.v1'
+  settings: 'cardgram.settings.v1',
+  presets: 'cardgram.presets.v2',
+  scenes: 'cardgram.scenes.v1'
 };
 
 const MAX_UPLOAD_BYTES = 12 * 1024 * 1024;
@@ -49,7 +49,7 @@ const DEFAULTS = {
 const state = { ...DEFAULTS, lang: 'en', sidebarCollapsed: false };
 
 /* Catálogo segmentado por colecciones (assets/data/cards/catalog.js). */
-const CATALOG = window.DeckGramCatalog || null;
+const CATALOG = window.CardGramCatalog || null;
 const CATALOG_CARDS =
   CATALOG && Array.isArray(CATALOG.cards) && CATALOG.cards.length
     ? CATALOG.cards
@@ -150,18 +150,27 @@ function createIcon(name) {
 /* --------------------------------------------------------------------------
    Almacenamiento validado
    -------------------------------------------------------------------------- */
+/* Prefijos de almacenamiento de versiones anteriores (solo migración). */
+const LEGACY_STORAGE_PREFIXES = ['deckgram.', 'tcghub.'];
+const STORAGE_MIGRATIONS = [
+  ['cardgram.settings.v1', 'settings.v1'],
+  ['cardgram.presets.v2', 'presets.v2'],
+  ['cardgram.scenes.v1', 'scenes.v1'],
+  ['cardgram.profile.v1', 'profile.v1'],
+  ['cardgram.hub.v1', 'hub.v1']
+];
+
 const storage = {
   read(key, fallback) {
     try {
       let raw = localStorage.getItem(key);
-      if (!raw) {
-        // Fallback a claves heredadas previas a DeckGram
-        const legacyKey = key.replace('deckgram.', 'tcghub.');
-        raw = localStorage.getItem(legacyKey);
+      for (const prefix of LEGACY_STORAGE_PREFIXES) {
+        if (raw) break;
+        raw = localStorage.getItem(key.replace('cardgram.', prefix));
       }
       return raw ? JSON.parse(raw) : fallback;
     } catch (error) {
-      console.warn(`[DeckGram] No se pudo leer ${key}`, error);
+      console.warn(`[CardGram] No se pudo leer ${key}`, error);
       return fallback;
     }
   },
@@ -170,18 +179,47 @@ const storage = {
       localStorage.setItem(key, JSON.stringify(value));
       return true;
     } catch (error) {
-      console.warn(`[DeckGram] No se pudo guardar ${key}`, error);
+      console.warn(`[CardGram] No se pudo guardar ${key}`, error);
       return false;
     }
   },
   remove(key) {
     try {
       localStorage.removeItem(key);
+      LEGACY_STORAGE_PREFIXES.forEach((prefix) => {
+        localStorage.removeItem(key.replace('cardgram.', prefix));
+      });
     } catch (error) {
-      console.warn(`[DeckGram] No se pudo borrar ${key}`, error);
+      console.warn(`[CardGram] No se pudo borrar ${key}`, error);
     }
   }
 };
+
+/**
+ * Copia los datos guardados con el nombre anterior a las claves actuales y
+ * elimina las antiguas. Se ejecuta una sola vez, antes de loadState().
+ */
+function migrateLegacyStorage() {
+  STORAGE_MIGRATIONS.forEach(([target, suffix]) => {
+    try {
+      const current = localStorage.getItem(target);
+      if (!current) {
+        for (const prefix of LEGACY_STORAGE_PREFIXES) {
+          const legacy = localStorage.getItem(prefix + suffix);
+          if (legacy) {
+            localStorage.setItem(target, legacy);
+            break;
+          }
+        }
+      }
+      LEGACY_STORAGE_PREFIXES.forEach((prefix) => {
+        localStorage.removeItem(prefix + suffix);
+      });
+    } catch (error) {
+      console.warn('[CardGram] No se pudieron migrar los datos anteriores', error);
+    }
+  });
+}
 
 /* Rutas anteriores a la estructura por colecciones (v0.4.4). */
 const LEGACY_IMAGE_PATHS = {
@@ -705,7 +743,7 @@ function makePresetChip({ name, active, front, back, onSelect, onDelete }) {
   main.setAttribute('aria-pressed', String(active));
   main.addEventListener('click', onSelect);
 
-  if (front && back) {
+  if (front) {
     const thumbs = document.createElement('span');
     thumbs.className = 'preset-thumbs';
     thumbs.setAttribute('aria-hidden', 'true');
@@ -716,13 +754,7 @@ function makePresetChip({ name, active, front, back, onSelect, onDelete }) {
     frontThumb.loading = 'lazy';
     frontThumb.decoding = 'async';
 
-    const backThumb = document.createElement('img');
-    backThumb.src = PREVIEW_BACK.get(back) || back;
-    backThumb.alt = '';
-    backThumb.loading = 'lazy';
-    backThumb.decoding = 'async';
-
-    thumbs.append(frontThumb, backThumb);
+    thumbs.appendChild(frontThumb);
     main.appendChild(thumbs);
   }
 
@@ -1962,10 +1994,8 @@ function setupChrome() {
   }
 
   window.addEventListener('orientationchange', () => setTimeout(scheduleResize, 120));
-  window.addEventListener('deckgram:contextlost', () => toast(t('webgl_lost'), { type: 'warning', duration: 6000 }));
-  window.addEventListener('deckgram:contextrestored', () => toast(t('webgl_restored'), { type: 'success' }));
-  window.addEventListener('tcghub:contextlost', () => toast(t('webgl_lost'), { type: 'warning', duration: 6000 }));
-  window.addEventListener('tcghub:contextrestored', () => toast(t('webgl_restored'), { type: 'success' }));
+  window.addEventListener('cardgram:contextlost', () => toast(t('webgl_lost'), { type: 'warning', duration: 6000 }));
+  window.addEventListener('cardgram:contextrestored', () => toast(t('webgl_restored'), { type: 'success' }));
 }
 
 function init() {
@@ -1973,6 +2003,7 @@ function init() {
   initialized = true;
 
   cacheDom();
+  migrateLegacyStorage();
   loadState();
 
   document.querySelectorAll('[data-version]').forEach((node) => {
@@ -2009,7 +2040,7 @@ function init() {
   }
 
   console.info(
-    `%c DeckGram v${APP_VERSION} %c Aqua Glass Studio · by theAstroBruh `,
+    `%c CardGram v${APP_VERSION} %c Aqua Glass Studio · by theAstroBruh `,
     'background:linear-gradient(135deg,#7cebdd,#2f8fdd);color:#fff;font-weight:800;border-radius:6px 0 0 6px;padding:4px 8px',
     'background:#07333f;color:#b9f2e7;border-radius:0 6px 6px 0;padding:4px 8px'
   );

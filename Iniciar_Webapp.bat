@@ -1,7 +1,7 @@
 @echo off
-title DeckGram — 3D Studio Server
+title CardGram - 3D Studio Server
 echo ========================================================
-echo       DeckGram — Interactive 3D Card Studio
+echo       CardGram - Interactive 3D Card Studio
 echo               by theAstroBruh
 echo ========================================================
 echo.

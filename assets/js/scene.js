@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DeckGram — v0.4.4 · Motor 3D
+   CardGram — v0.4.4 · Motor 3D
    Escena Three.js, geometría procedural de la carta, materiales, fondos,
    cámara, transiciones y utilidades de exportación.
    ========================================================================== */
@@ -210,7 +210,7 @@ const Scene = (() => {
       animate();
       return true;
     } catch (error) {
-      console.error('[DeckGram] WebGL init failed', error);
+      console.error('[CardGram] WebGL init failed', error);
       ready = false;
       return false;
     }
@@ -645,12 +645,12 @@ const Scene = (() => {
     if (!matFront || !matBack) return;
 
     if (side === 'front' && !frontTexture) {
-      placeholderFront = placeholderFront || createPlaceholderTexture('DECKGRAM', 'FRONT');
+      placeholderFront = placeholderFront || createPlaceholderTexture('CARDGRAM', 'FRONT');
       setSideTexture('front', placeholderFront);
     }
 
     if (side === 'back' && !backTexture) {
-      placeholderBack = placeholderBack || createPlaceholderTexture('DECKGRAM', 'BACK');
+      placeholderBack = placeholderBack || createPlaceholderTexture('CARDGRAM', 'BACK');
       setSideTexture('back', placeholderBack);
     }
   }
@@ -724,7 +724,7 @@ const Scene = (() => {
       setSideTexture(side, texture);
       return true;
     } catch (error) {
-      console.warn(`[DeckGram] Texture ${side} failed`, error);
+      console.warn(`[CardGram] Texture ${side} failed`, error);
       ensurePlaceholder(side);
       return false;
     }
@@ -976,12 +976,12 @@ const Scene = (() => {
   function onContextLost(event) {
     event.preventDefault();
     contextLost = true;
-    window.dispatchEvent(new CustomEvent('deckgram:contextlost'));
+    window.dispatchEvent(new CustomEvent('cardgram:contextlost'));
   }
 
   function onContextRestored() {
     contextLost = false;
-    window.dispatchEvent(new CustomEvent('deckgram:contextrestored'));
+    window.dispatchEvent(new CustomEvent('cardgram:contextrestored'));
   }
 
   function setRenderPaused(paused) {

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DeckGram — v0.4.4 · Comunidad (preparado, aún no activo)
+   CardGram — v0.4.4 · Comunidad (preparado, aún no activo)
    Punto único de integración para el futuro feed de cartas y decks creados
    por otras personas. El hub ya consume isEnabled() para mostrar la vista
    "Explorar" como próxima funcionalidad.
@@ -26,7 +26,7 @@
 
   const emptyFeed = () => ({ cards: [], decks: [], creators: [], cursor: null });
 
-  window.DeckGramCommunity = {
+  window.CardGramCommunity = {
     config: CONFIG,
 
     isEnabled() {

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DeckGram — v0.4.4 · Catálogo de cartas
+   CardGram — v0.4.4 · Catálogo de cartas
    Estructura segmentada por colección. Cada colección es una carpeta dentro
    de /assets/data/cards y cada carta referencia sus dos (o tres) texturas.
 
@@ -16,9 +16,9 @@
       name: 'OG Collection',
       shortName: 'OG',
       tagline: {
-        en: 'The original designs that started DeckGram.',
-        es: 'Los diseños originales que iniciaron DeckGram.',
-        de: 'Die Originaldesigns, mit denen DeckGram begann.'
+        en: 'The original designs that started CardGram.',
+        es: 'Los diseños originales que iniciaron CardGram.',
+        de: 'Die Originaldesigns, mit denen CardGram begann.'
       },
       description: {
         en: 'Three foundational cards with dark fantasy, energy and mythology finishes. The starting point of the studio.',
@@ -136,7 +136,7 @@
 
   const featured = cards[0] || null;
 
-  window.DECKGRAM_CARDS = {
+  window.CARDGRAM_CARDS = {
     version: '0.4.4',
     updated: '2026-11-04',
     collections,
@@ -144,7 +144,7 @@
     featuredId: featured ? featured.id : null
   };
 
-  window.DeckGramCatalog = {
+  window.CardGramCatalog = {
     collections,
     cards,
     byId,

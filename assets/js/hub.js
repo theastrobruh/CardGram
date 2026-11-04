@@ -1,13 +1,13 @@
 /* ==========================================================================
-   DeckGram — v0.4.4 · Hub / Lobby
+   CardGram — v0.4.4 · Hub / Lobby
    Vista de entrada, estadísticas, biblioteca, colecciones, decks, perfil y
    arranque perezoso del motor 3D. El editor solo se inicializa al entrar.
    ========================================================================== */
 'use strict';
 
 const HUB_STORAGE = {
-  profile: 'deckgram.profile.v1',
-  data: 'deckgram.hub.v1'
+  profile: 'cardgram.profile.v1',
+  data: 'cardgram.hub.v1'
 };
 
 const HUB_PANELS = ['home', 'library', 'collections', 'explore', 'profile'];
@@ -18,7 +18,7 @@ const HUB_STUDIO_TABS = {
   canvas: 'tab-canvas'
 };
 
-const HUB_CATALOG = window.DeckGramCatalog || {
+const HUB_CATALOG = window.CardGramCatalog || {
   collections: [],
   cards: [],
   featured: null,
@@ -971,7 +971,7 @@ function createDeckFromForm() {
    -------------------------------------------------------------------------- */
 function renderExplore() {
   if (!hub.ready || !hub.els.explorePreview) return;
-  const community = window.DeckGramCommunity;
+  const community = window.CardGramCommunity;
 
   if (community && community.isEnabled()) {
     community
@@ -1515,7 +1515,7 @@ function setupHubEvents() {
     applyRoute();
   });
 
-  window.addEventListener('deckgram:exported', () => {
+  window.addEventListener('cardgram:exported', () => {
     recordRenderExport();
   });
 
