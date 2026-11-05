@@ -133,13 +133,14 @@ Original project root: `C:\Users\Meghan Camacho\Documents\Repos\CardGram` (adjus
 
 | Lines | Concern |
 |---|---|
-| 12–67 | Defaults, edge finishes, backgrounds |
+| 12–67 | Defaults, edge finishes, backgrounds, `CARD_FORMATS` + `CARD_BOX` |
 | 129–217 | Renderer, camera, controls, materials, environment |
 | 219–270 | Lighting and procedural env map |
-| 272–397 | Apply settings, gloss/exposure, edge color, background, camera distance |
-| 406–498 | Rounded card geometry, bevel, UV remap, front/back faces |
+| 272–397 | Apply settings, card format, gloss/exposure, edge color, background, camera distance |
+| 331–350 | `getCardRatio()` (auto = front texture) and `fitCardBox()` |
+| 442–540 | Rounded card geometry for the active format, bevel, UV remap, front/back faces |
 | 503–602 | Full-art shader and mix animation |
-| 603–735 | Texture loading, placeholders |
+| 603–735 | Texture loading, placeholders (auto format re-fits on front load) |
 | 736–842 | Pose get/apply, center, animate, float motion |
 | 843–1023 | Resize, video renderer, snapshot, context loss, pause |
 

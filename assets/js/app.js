@@ -26,6 +26,7 @@ const DEFAULT_SCENES = [
 
 const DEFAULTS = {
   corners: 'rounded',
+  cardFormat: 'auto',
   edgeThickness: 0.016,
   bevel: 0.004,
   edgeColor: 'black',
@@ -260,6 +261,8 @@ function sanitizeSettings(raw) {
   };
 
   result.corners = ['rounded', 'sharp'].includes(raw.corners) ? raw.corners : DEFAULTS.corners;
+  const cardFormats = Object.keys((typeof Scene !== 'undefined' && Scene.CARD_FORMATS) || {});
+  result.cardFormat = cardFormats.includes(raw.cardFormat) ? raw.cardFormat : DEFAULTS.cardFormat;
   result.edgeThickness = number(raw.edgeThickness, 0.005, 0.05, DEFAULTS.edgeThickness);
   result.bevel = number(raw.bevel, 0.001, 0.012, DEFAULTS.bevel);
   result.edgeColor = ['black', 'gold', 'silver', 'white'].includes(raw.edgeColor) ? raw.edgeColor : DEFAULTS.edgeColor;
@@ -349,6 +352,7 @@ function loadState() {
 function serializableState() {
   return {
     corners: state.corners,
+    cardFormat: state.cardFormat,
     edgeThickness: state.edgeThickness,
     bevel: state.bevel,
     edgeColor: state.edgeColor,
@@ -1176,6 +1180,8 @@ function syncUI() {
   setSwatch('edge-swatches', state.edgeColor);
   setSwatch('bg-grid', state.bg);
 
+  if (el.selectCardFormat) el.selectCardFormat.value = state.cardFormat;
+
   setRange(el.rangeEdgeThickness, el.valEdgeThick, state.edgeThickness, (value) => value.toFixed(3));
   setRange(el.rangeBevel, el.valBevelInt, state.bevel, (value) => value.toFixed(3));
   setRange(el.rangeGloss, el.valGloss, state.gloss, (value) => value.toFixed(2));
@@ -1192,6 +1198,7 @@ function syncUI() {
   if (Scene.isReady()) {
     Scene.applySettings({
       corners: state.corners,
+      cardFormat: state.cardFormat,
       edgeThickness: state.edgeThickness,
       bevel: state.bevel,
       edgeColor: state.edgeColor,
@@ -1225,6 +1232,14 @@ function setupControls() {
     if (Scene.isReady()) Scene.applySettings({ edgeColor: value });
     persistSettings();
   });
+
+  if (el.selectCardFormat) {
+    el.selectCardFormat.addEventListener('change', () => {
+      state.cardFormat = el.selectCardFormat.value;
+      if (Scene.isReady()) Scene.applySettings({ cardFormat: state.cardFormat });
+      persistSettings();
+    });
+  }
 
   bindRange(el.rangeEdgeThickness, el.valEdgeThick, 'edgeThickness', (value) => value.toFixed(3), (value) => {
     if (Scene.isReady()) Scene.applySettings({ edgeThickness: value });
@@ -1808,6 +1823,7 @@ function cacheDom() {
   el.selectSpeed = $('#select-speed');
   el.selectSpinDir = $('#select-spin-dir');
   el.selectFloating = $('#select-floating');
+  el.selectCardFormat = $('#select-card-format');
   el.rangeCamDist = $('#range-cam-dist');
   el.valCamDist = $('#val-cam-dist');
   el.rangePosY = $('#range-pos-y');

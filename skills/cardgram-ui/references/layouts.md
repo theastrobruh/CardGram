@@ -75,8 +75,7 @@ Responsive:
 - Topbar: brand left, avatar right. **No language pills, no center nav, no version badge.**
 - The player section is a single **identity chip** (`width: fit-content`, centred, ~42 px): 30 px avatar + name + `@handle`. Bio, edit, stats and CTAs are removed from the screen; the collection data lives inside the menu.
 - The card sits on a **vitrine**: `.hub-card-surface` is a light glass panel (24 px radius, hairline border) that exists only on mobile (`display: contents` on desktop). The card inside is sized by height: `width: min(100% - 6px, (100dvh - var(--hub-card-chrome)) * var(--card-ratio), 460px)` with `--hub-card-chrome: 317px`. At 492×893 the card is ~84 vw; at 390×844 the width is the limit.
-- **Any card ratio.** `.hub-card-stage` carries `--card-ratio` (default `0.7143`) and `aspect-ratio: var(--card-ratio)`. `syncCardRatio()` in `hub.js` reads `naturalWidth / naturalHeight` of the front thumb after it loads, so 5:7, 3:4, tarot or landscape art gets a stage of the right shape; `object-fit: contain` guarantees nothing is cropped. Grid thumbs (`.media-card-thumb`, `.hub-explorer-art`, deck covers, collection stacks) keep their 5:7 frames but also use `contain`, so mixed formats are never cut.
-- Under the vitrine: card name, collection line and the chip row. **No action buttons around the card.**
+- **Any card ratio.** `syncCardRatio()` in `hub.js` reads `naturalWidth / naturalHeight` of the image and writes that ratio to its nearest frame — `.hub-card-stage`, `.media-card-thumb`, `.hub-explorer-art`, `.deck-cover-option` or `.collection-stack` — each of which sizes itself with `aspect-ratio: var(--card-ratio, 0.7143)`. Frames therefore hug their art instead of showing filler bars, and `object-fit: contain` guarantees nothing is cropped. `setupCardRatios()` keeps it working for dynamically rendered cards (capture `load` listener + a `MutationObserver` on the hub and the deck dialog).
 - Under the vitrine: only the card name plus a 30 px **ⓘ button**. The collection line and the tag chips are not shown on mobile; they live in the details sheet.
 - A single **circular menu button** (52 px, icon only) floats above the privacy strip. In landscape (≤560 px tall) it moves to the centre of the topbar so it never touches the card.
 - The privacy note is a floating inset strip at the bottom (`left/right: 8px`, `bottom: 6px`, 12 px radius).
@@ -150,6 +149,9 @@ body[data-view="studio"]
 ```
 
 ### Sidebar
+
+- The **Deck** pane starts with the presets rail, the Full Art toggle and the front/back upload boxes; right after them comes **Card format** — a full-width `<select>` (`#select-card-format`) with `auto`, standard TCG (63 × 88 mm), Yu-Gi-Oh! (59 × 86 mm), Tarot (70 × 120 mm), Mini Euro (45 × 68 mm), landscape (88 × 63 mm) and square (70 × 70 mm).
+- `auto` follows the loaded artwork: `scene.js` reads the front texture and rebuilds the mesh with `fitCardBox()`, so the card keeps the same bounding box (1.35 × 1.89 units) in every format and the default camera framing never needs to change. The chosen format is part of `cardgram.settings.v1` and drives the 3D mesh, the live viewport and both exports.
 
 - `flex: 0 0 404px`, height `calc(100% - 28px)`, margin 14px 0 14px 14px.
 - Radius 30 px; glass gradient `165deg, rgba(255,255,255,.62) → rgba(238,252,251,.42) → rgba(226,248,252,.5)`.

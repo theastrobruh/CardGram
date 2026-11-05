@@ -978,6 +978,12 @@ select option {
   background: #f2fffd;
 }
 
+/* Select a todo el ancho de su fila (formato de carta). */
+select.select-block {
+  width: 100%;
+  max-width: none;
+}
+
 /* Sliders */
 input[type="range"] {
   -webkit-appearance: none;

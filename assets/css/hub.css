@@ -1090,7 +1090,7 @@ dialog {
 .collection-stack {
   position: relative;
   width: 78px;
-  aspect-ratio: 5 / 7;
+  aspect-ratio: var(--card-ratio, 0.7143);
   flex: 0 0 auto;
 }
 
@@ -1334,6 +1334,7 @@ dialog {
 .hub-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+  align-items: start;
   gap: 13px;
 }
 
@@ -1357,7 +1358,7 @@ dialog {
 
 .media-card-thumb {
   position: relative;
-  aspect-ratio: 5 / 7;
+  aspect-ratio: var(--card-ratio, 0.7143);
   overflow: hidden;
   border-radius: 13px;
   background: linear-gradient(160deg, #eafffb, #a9e6f5);
@@ -2232,6 +2233,7 @@ dialog {
 .deck-cover-options {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: start;
   gap: 7px;
   margin-top: 6px;
 }
@@ -2239,7 +2241,7 @@ dialog {
 .deck-cover-option {
   position: relative;
   display: block;
-  aspect-ratio: 5 / 7;
+  aspect-ratio: var(--card-ratio, 0.7143);
   padding: 0;
   border-radius: 9px;
   overflow: hidden;
@@ -3502,7 +3504,7 @@ dialog {
   display: block;
   width: 100%;
   overflow: hidden;
-  aspect-ratio: 5 / 7;
+  aspect-ratio: var(--card-ratio, 0.7143);
   border-radius: 9px;
   background: #dff6fb;
   border: 1px solid rgba(255, 255, 255, 0.86);

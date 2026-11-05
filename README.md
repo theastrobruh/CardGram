@@ -29,6 +29,7 @@
 
 ### 🎴 3D Engine & Card Forge
 - **Procedural Geometry** — accurate TCG rounded corners and adjustable reflective bevels
+- **Card Formats** — standard TCG, Yu-Gi-Oh!, Tarot, Mini Euro, landscape and square; *Auto* matches the loaded artwork. The mesh, the live viewport and both exports use the chosen proportions
 - **Customizable Edges** — variable thickness with Millennium Foil Gold, Metallic Silver, Matte Black, and White Cardstock finishes
 - **Specular & Gloss Tuning** — fine-grained roughness, gloss, and reflection control
 - **Exposure Control** — balanced default luminosity with manual slider to prevent artwork blowout

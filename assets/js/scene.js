@@ -11,6 +11,7 @@ const Scene = (() => {
 
   const DEFAULTS = {
     corners: 'rounded',
+    cardFormat: 'auto',
     edgeThickness: 0.016,
     bevel: 0.004,
     edgeColor: 'black',
@@ -24,6 +25,21 @@ const Scene = (() => {
     tilt: 1,
     bg: 'aqua'
   };
+
+  /* Formatos de carta habituales: proporción = ancho / alto. */
+  const CARD_FORMATS = {
+    auto: { ratio: 0 },
+    tcg: { ratio: 63 / 88 },
+    ygo: { ratio: 59 / 86 },
+    tarot: { ratio: 70 / 120 },
+    mini: { ratio: 45 / 68 },
+    wide: { ratio: 88 / 63 },
+    square: { ratio: 1 }
+  };
+
+  /* Caja de encuadre: cualquier formato cabe en el mismo volumen. */
+  const CARD_BOX = { w: 1.35, h: 1.89 };
+  const CARD_BOX_RATIO = CARD_BOX.w / CARD_BOX.h;
 
   const EDGE_COLORS = {
     black: { color: 0x0a0d10, metalness: 0.15, roughness: 0.45 },
@@ -274,6 +290,12 @@ const Scene = (() => {
     const previous = { ...settings };
     Object.assign(settings, next);
 
+    if (next.cardFormat !== undefined) {
+      const format = normalizeCardFormat(next.cardFormat);
+      settings.cardFormat = format;
+      if (format !== previous.cardFormat) scheduleRebuild();
+    }
+
     if (next.camDistance !== undefined && Number(next.camDistance) !== previous.camDistance) {
       setCameraDistance(next.camDistance);
     }
@@ -284,8 +306,6 @@ const Scene = (() => {
     if (next.bg !== undefined) applyBackground(settings.bg);
 
     const nextParams = {
-      w: cardParams.w,
-      h: cardParams.h,
       isRounded: settings.corners === 'rounded',
       thickness: settings.edgeThickness,
       bevelSize: settings.bevel
@@ -296,9 +316,33 @@ const Scene = (() => {
       nextParams.thickness !== cardParams.thickness ||
       nextParams.bevelSize !== cardParams.bevelSize
     ) {
-      cardParams = { ...nextParams };
+      cardParams = { ...cardParams, ...nextParams };
       scheduleRebuild();
     }
+  }
+
+  function normalizeCardFormat(value) {
+    return Object.prototype.hasOwnProperty.call(CARD_FORMATS, value) ? value : 'auto';
+  }
+
+  /* 'auto' sigue la proporción real de la textura delantera. */
+  function getCardRatio() {
+    if (settings.cardFormat === 'auto') {
+      const image = frontTexture && frontTexture.image;
+      const width = image && (image.naturalWidth || image.width);
+      const height = image && (image.naturalHeight || image.height);
+      if (width && height) return width / height;
+      return CARD_BOX_RATIO;
+    }
+    const format = CARD_FORMATS[settings.cardFormat];
+    return format && format.ratio ? format.ratio : CARD_BOX_RATIO;
+  }
+
+  /* Encaja la proporción dentro de CARD_BOX (mantiene el encuadre de cámara). */
+  function fitCardBox(ratio) {
+    if (!ratio || ratio <= 0) return { ...CARD_BOX };
+    if (ratio <= CARD_BOX_RATIO) return { w: CARD_BOX.h * ratio, h: CARD_BOX.h };
+    return { w: CARD_BOX.w, h: CARD_BOX.w / ratio };
   }
 
   function setGloss(value) {
@@ -412,9 +456,13 @@ const Scene = (() => {
       cardGroup.remove(child);
     }
 
-    const w = cardParams.w;
-    const h = cardParams.h;
-    const radius = cardParams.isRounded ? 0.09 : 0.0001;
+    const fitted = fitCardBox(getCardRatio());
+    const w = fitted.w;
+    const h = fitted.h;
+    cardParams.w = w;
+    cardParams.h = h;
+
+    const radius = cardParams.isRounded ? Math.min(w, h) * 0.0667 : 0.0001;
     const depth = cardParams.thickness;
     const bevel = cardParams.bevelSize;
 
@@ -630,6 +678,9 @@ const Scene = (() => {
       frontTexture = texture;
       matFront.map = texture;
       matFront.needsUpdate = true;
+
+      /* En 'auto' la geometría sigue a la imagen recién cargada. */
+      if (settings.cardFormat === 'auto') scheduleRebuild();
     } else {
       if (backTexture && backTexture !== texture) {
         backTexture.dispose();
@@ -1026,6 +1077,7 @@ const Scene = (() => {
     init,
     isReady,
     isRenderPaused,
+    CARD_FORMATS,
     applySettings,
     applyPose,
     getPose,

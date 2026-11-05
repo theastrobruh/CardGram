@@ -405,19 +405,71 @@ function favoriteCard() {
   return HUB_CATALOG.byId(hubProfile.favoriteCardId) || HUB_CATALOG.cards[0] || null;
 }
 
-/* La vitrina adopta la proporción real del arte (5:7, 3:4, tarot…). */
+/* Marcos que adoptan la proporción real del arte (5:7, 3:4, tarot…). */
+const CARD_RATIO_FRAMES = [
+  '.hub-card-stage',
+  '.media-card-thumb',
+  '.hub-explorer-art',
+  '.deck-cover-option',
+  '.collection-stack'
+].join(', ');
+
 function syncCardRatio(image) {
-  const stage = hub.els.cardStage;
-  if (!stage || !image) return;
+  if (!image) return;
+
+  const frame = image.closest(CARD_RATIO_FRAMES);
+  if (!frame) return;
 
   const { naturalWidth: width, naturalHeight: height } = image;
   if (!width || !height) return;
 
   const ratio = width / height;
-  const current = Number(stage.style.getPropertyValue('--card-ratio')) || 0;
+  const current = Number(frame.style.getPropertyValue('--card-ratio')) || 0;
   if (Math.abs(ratio - current) < 0.0005) return;
 
-  stage.style.setProperty('--card-ratio', ratio.toFixed(4));
+  frame.style.setProperty('--card-ratio', ratio.toFixed(4));
+}
+
+/* Aplica la proporción a los marcos ya montados (imágenes en caché). */
+function refreshCardRatios(root) {
+  const scope = root || hub.root;
+  if (!scope) return;
+  Array.from(scope.querySelectorAll(CARD_RATIO_FRAMES)).forEach((frame) => {
+    const image = frame.querySelector('img');
+    if (image && image.complete) syncCardRatio(image);
+  });
+}
+
+function setupCardRatios() {
+  /* Cualquier imagen que termine de cargar ajusta su marco. */
+  document.addEventListener(
+    'load',
+    (event) => {
+      const target = event.target;
+      if (target instanceof HTMLImageElement && target.closest('#hub, #deck-dialog')) {
+        syncCardRatio(target);
+      }
+    },
+    true
+  );
+
+  /* Los visores se repintan a menudo: cada nodo nuevo recalcula su marco. */
+  if (typeof MutationObserver !== 'function') return;
+
+  const observer = new MutationObserver((records) => {
+    records.forEach((record) => {
+      record.addedNodes.forEach((node) => {
+        if (!(node instanceof Element)) return;
+        if (node.tagName === 'IMG') syncCardRatio(node);
+        node.querySelectorAll('img').forEach(syncCardRatio);
+      });
+    });
+  });
+
+  if (hub.root) observer.observe(hub.root, { childList: true, subtree: true });
+  if (hub.els.deckDialog) {
+    observer.observe(hub.els.deckDialog, { childList: true, subtree: true });
+  }
 }
 
 function renderFavoriteCard() {
@@ -428,16 +480,7 @@ function renderFavoriteCard() {
   if (hub.els.cardFront) {
     hub.els.cardFront.src = thumbOf(card);
     hub.els.cardFront.alt = `${card.name} — ${card.type}`;
-
-    if (hub.els.cardFront.complete) {
-      syncCardRatio(hub.els.cardFront);
-    } else {
-      hub.els.cardFront.addEventListener(
-        'load',
-        () => syncCardRatio(hub.els.cardFront),
-        { once: true }
-      );
-    }
+    syncCardRatio(hub.els.cardFront);
   }
   if (hub.els.cardBack) {
     hub.els.cardBack.src = backThumbOf(card);
@@ -1485,6 +1528,8 @@ function setActivePanel(panel, options = {}) {
     renderProfileForm();
   }
 
+  refreshCardRatios();
+
   if (options.scroll !== false) {
     hub.scroll.scrollTo({ top: 0, behavior: 'auto' });
   }
@@ -2090,6 +2135,7 @@ function setupHub() {
   loadHubState();
   buildProfileFavoriteOptions();
   setupHubEvents();
+  setupCardRatios();
 
   hub.ready = true;
   updateLangButtons();
@@ -2101,6 +2147,7 @@ function setupHub() {
   setLibraryTab('all', { render: false });
   renderProfileForm();
   renderHubStats(false);
+  refreshCardRatios();
 }
 
 window.addEventListener('load', () => {
