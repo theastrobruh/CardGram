@@ -61,7 +61,7 @@ Responsive:
 
 ### Alternate hub panels
 
-- **My cards**: page head (back circle, title, subtitle, count pill) + segmented All/Saved/Catalog + responsive card grid `repeat(auto-fill, minmax(210px,1fr))`, cards drop to 150 px min on mobile.
+- **My cards**: page head (back circle, title, subtitle, count pill) + segmented All/Saved/Catalog + responsive card grid `repeat(auto-fill, minmax(196px,1fr))`, cards drop to ~150 px min on mobile.
 - **Collections**: page head with “New deck” primary + two-column catalog rail + full-width dashed empty state.
 - **Explore**: preview shell; deliberately disabled, gradient “soon” dot, no fake live data.
 - **Profile**: two-column editor + sticky profile summary; one column under 980 px.
@@ -73,21 +73,23 @@ Responsive:
 
 - One column, 390 px reference width.
 - Topbar: brand left, avatar right. **No language pills, no center nav, no version badge.**
-- The player section is a single **identity chip** (`width: fit-content`, centred, ~42 px): 30 px avatar + name + `@handle`. Bio, edit, stats and CTAs are removed from the screen; the collection data lives inside the menu.
-- The card sits on a **vitrine**: `.hub-card-surface` is a light glass panel (24 px radius, hairline border) that exists only on mobile (`display: contents` on desktop). The card inside is sized by height: `width: min(100% - 6px, (100dvh - var(--hub-card-chrome)) * var(--card-ratio), 460px)` with `--hub-card-chrome: 317px`. At 492×893 the card is ~84 vw; at 390×844 the width is the limit.
+- The player section is a single **identity chip** (`width: fit-content`, centred, 42 px): 30 px avatar + `@handle` **only**. Name, bio, edit, stats and CTAs are removed from the screen; the name and the collection data live inside the menu.
+- The chip is itself a button (`#hub-player-open`, transparent, absolutely covering the panel) that opens `#hub-menu-sheet`: tapping the pill shows the player info, focus returns to it on close. It is `display: none` on desktop, where the panel keeps its name, handle and edit button.
+- The card sits on a **vitrine**: `.hub-card-surface` is a light glass panel (24 px radius, hairline border) that exists only on mobile (`display: contents` on desktop). The card inside is sized by height: `width: min(100% - 6px, (100dvh - var(--hub-card-chrome)) * var(--card-ratio), 460px)` with `--hub-card-chrome: 339px`, which now includes the tags and name rows. At 476×891 the card is ~543 px tall.
 - **Any card ratio.** `syncCardRatio()` in `hub.js` reads `naturalWidth / naturalHeight` of the image and writes that ratio to its nearest frame — `.hub-card-stage`, `.media-card-thumb`, `.hub-explorer-art`, `.deck-cover-option` or `.collection-stack` — each of which sizes itself with `aspect-ratio: var(--card-ratio, 0.7143)`. Frames therefore hug their art instead of showing filler bars, and `object-fit: contain` guarantees nothing is cropped. `setupCardRatios()` keeps it working for dynamically rendered cards (capture `load` listener + a `MutationObserver` on the hub and the deck dialog).
-- Under the vitrine: only the card name plus a 30 px **ⓘ button**. The collection line and the tag chips are not shown on mobile; they live in the details sheet.
-- A single **circular menu button** (52 px, icon only) floats above the privacy strip. In landscape (≤560 px tall) it moves to the centre of the topbar so it never touches the card.
-- The privacy note is a floating inset strip at the bottom (`left/right: 8px`, `bottom: 6px`, 12 px radius).
+- Under the vitrine, a row of **three identifier pills** (`#hub-card-tags`): franchise/collection · type or element (`card.attribute || card.type`) · stats (`ATK 2000 · DEF 1700`, `STR 5 · AGI 9 · INT 5`). They never truncate: at ≤380 px the row wraps to two lines, above that it stays on one.
+- Then the **card name** plus a 30 px **ⓘ button**. `.hub-card-title-row` is `grid-template-columns: 1fr auto 1fr`, so the name is centred in the viewport and the ⓘ sits right beside it; a flex row would offset the name by half the button width. The collection line and the full tag chips stay hidden; they live in the details sheet.
+- A single **circular menu button** (52 px, icon only) floats at `bottom: 24px + safe-area` with **nothing under it**. In landscape (≤560 px tall) it moves to the centre of the topbar so it never touches the card.
+- The privacy note lives **inside the menu sheet** (`.hub-menu-privacy`, last row, above the safe area). No strip is pinned to the bottom of the home screen.
 - The old 5-item bottom nav is hidden (`.hub-mobile-nav { display: none }`); the sheet replaces it.
 
 ### Mobile menu sheet
 
 `#hub-menu-sheet` is a dialog (`role="dialog"`, `aria-modal`, `aria-expanded` on the trigger) with a blurred backdrop and a white sheet sliding from the bottom.
 
-- Order: title + close, primary "Open the studio", `Inkra` row, navigation (Home, My cards, Collections, Explore, Profile, synced with `data-menu-nav`), a 4-item collection summary, and the EN/ES/DE selector.
-- `Esc`, the close button and the backdrop close it; focus moves to the sheet panel (no stray ring) and returns to the trigger. Tab is trapped inside the sheet.
-- Under 700 px of height the sheet compacts; under 620 px it drops the summary row so it still fits without scrolling.
+- Order: player header (avatar, name, `@handle`, member since) + close, primary "Open the studio", `Inkra` row, navigation (Home, My cards, Collections, Explore, Profile, synced with `data-menu-nav`), a 4-item collection summary, the EN/ES/DE selector and the privacy note.
+- `Esc`, the close button and the backdrop close it; focus moves to the sheet panel (no stray ring) and returns to whichever trigger opened it (the round button or the identity chip). Tab is trapped inside the sheet.
+- Under 700 px of height the sheet compacts; under 620 px it drops the summary row and the member line, tightens the nav rows and may use 94 dvh so it still fits without scrolling.
 - Navigating from the sheet closes it (`closeHubMenu({ restoreFocus: false })` from `onHubClick`).
 
 ### Card details sheet
@@ -106,9 +108,10 @@ Measured at 320–980 px wide, in EN/ES/DE and with every catalog card:
 |---|---|
 | topbar → identity chip | 8 px |
 | identity chip → vitrine | 9 px |
-| vitrine → name/ⓘ row | 10 px |
-| name/ⓘ row → menu button | 22 px |
-| menu button → privacy strip | 15 px |
+| vitrine → tags row | 8 px |
+| tags row → name/ⓘ row | 8 px |
+| name/ⓘ row → menu button | 22 px (37 px at 320×568) |
+| menu button → viewport bottom | 24 px + safe-area |
 
 Nothing overlaps and the home view never scrolls. Content panels reserve 96 px at the bottom so their last row clears the floating button.
 
@@ -186,10 +189,10 @@ Only the stage remains visible. The menu button top-left opens the sidebar; home
 | `lg` | 1080–1239 | Profile copy hides, sidebar still fixed |
 | `md` | 980–1079 | Hub nav hides; studio sidebar narrows to 370 |
 | `sm` | 860–979 | Hub single column; studio drawer takes over |
-| `xs` | 560–859 | Mobile hub nav appears; stage loses chrome |
+| `xs` | 560–859 | Menu button + privacy strip replace the nav; stage loses chrome |
 | `2xs` | <560 | Edge-to-edge stage, compact type |
 
-Test at **1600, 1280, 1024, 900, 768, 390**. The 860–980 px band is where most implementations break: the hub should be single-column but still show the top nav only if it fits; the studio must already be a drawer.
+Test at **1600, 1280, 1024, 900, 768, 492, 390** and **320×568** (smallest phone), plus **844×390** landscape for the hub. The 860–980 px band is where most implementations break: the hub should be single-column but still show the top nav only if it fits; the studio must already be a drawer.
 
 ## 4. Z-index ladder
 
@@ -198,12 +201,16 @@ Keep it small and explicit:
 | Layer | z |
 |---|---|
 | Aero background | 0 |
+| Hub ambient layer | 1 |
 | Hub content | 2 |
+| Identity chip trigger (inside the panel) | 2 |
 | Sticky topbar | 30 |
 | Studio sidebar | 60 |
 | Floating menu buttons | 120 |
-| Mobile nav / drawer backdrop | 140–160 |
-| Modal / toast | 300–500 |
+| Drawer backdrop | 140–160 |
+| Hub menu button | 168 |
+| Bottom sheets (menu + details) | 240 |
+| Dialogs / toasts | 300–600 |
 | Cinematic exit | 500 |
 
 Never use `9999` as a shortcut; it makes dialogs and drawers fight.

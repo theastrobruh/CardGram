@@ -63,32 +63,36 @@
 
 ## 4. CSS 3D card
 
-The hub card is pure CSS 3D; no WebGL. Structure:
+The hub card is pure CSS 3D; no WebGL. Real structure (ids matter for `hub.js`):
 
 ```html
-<div class="card-stage">
-  <div class="card-tilt">
-    <button class="card" aria-pressed="false" aria-label="Flip card">
-      <span class="card-inner">
-        <span class="card-face card-front"><img …></span>
-        <span class="card-face card-back"><img …></span>
-      </span>
-    </button>
+<div class="hub-card-surface">
+  <div class="hub-card-stage" id="hub-card-stage">
+    <div class="hub-card-tilt" id="hub-card-tilt">
+      <button class="hub-card" id="hub-card" aria-pressed="false" aria-label="Flip card">
+        <span class="hub-card-inner">
+          <span class="hub-card-face hub-card-front"><img id="hub-card-front" …></span>
+          <span class="hub-card-face hub-card-back"><img id="hub-card-back" …></span>
+        </span>
+      </button>
+    </div>
   </div>
 </div>
 ```
 
 Rules:
 
-1. `.card-stage` owns `perspective: 1500px`.
-2. `.card-tilt` and `.card` and `.card-inner` all need `transform-style: preserve-3d`.
-3. Faces need `backface-visibility: hidden`; the back starts at `rotateY(180deg)`.
-4. Flip on hover/focus and on click (`is-flipped`), so touch users get it too.
-5. Pointer tilt: set `--tilt-x` / `--tilt-y` on the stage from normalized pointer position, clamp to ±8deg, reset on leave.
-6. Keep the idle animation on `.card`, not `.card-inner`, so it composes with the flip.
-7. Add a synthetic shine as a `::after` on the front, `mix-blend-mode: screen`, clipped by the face radius.
+1. `.hub-card-stage` owns `perspective: 1500px` **and `aspect-ratio: var(--card-ratio)`**; `hub.js` `syncCardRatio()` overwrites the ratio from the loaded art, so 5:7, Yu-Gi-Oh!, tarot or landscape all keep their shape. Faces use `object-fit: contain`; a matching frame means no bars and no crop.
+2. Mobile sizing is height-driven: `width: min(100% - 6px, (100dvh - var(--hub-card-chrome)) * var(--card-ratio), 460px)`. Height is therefore constant for every format; only the width changes. Desktop keeps `clamp(212px, 21vw, 292px)`.
+3. `.hub-card-tilt`, `.hub-card` and `.hub-card-inner` all need `transform-style: preserve-3d`.
+4. Faces need `backface-visibility: hidden`; the back starts at `rotateY(180deg)`.
+5. Flip on hover/focus and on click (`is-flipped`), so touch users get it too.
+6. Pointer tilt: set `--tilt-x` / `--tilt-y` on the stage from normalized pointer position, clamp to ±8deg, reset on leave.
+7. Keep the idle animation on `.hub-card`, not `.hub-card-inner`, so it composes with the flip.
+8. The synthetic shine is a `::after` on `.hub-card-front`, `mix-blend-mode: screen`, clipped by the face radius.
+9. Glow, orbit and shadow are tuned per breakpoint in `hub.css` §20; the glow draws from `--ambient-a/b`.
 
-The current implementation is in `assets/js/hub.js` (`setupShowcaseTilt`) and `assets/css/hub.css` §6.
+Implementation: `hub.js` (`syncCardRatio`, `setupShowcaseTilt`, `renderFavoriteCard`) and `hub.css` §6 + §20.
 
 ## 5. Three.js handoff
 
@@ -103,11 +107,14 @@ Reimplementing the studio engine is optional; this is the contract if you do.
 
 ### Card geometry
 
-- Card size `1.35 × 1.89`, depth `.016`, corner radius `.09`, bevel `.004`.
-- Build a rounded rectangle `THREE.Shape` with quadratic corners. `ExtrudeGeometry` with `bevelSegments:3`, `steps:1`, `bevelSize = bevelThickness = .004`. Center the geometry.
-- Remap UVs front/back so artwork covers the face including bevel; side faces get a neutral UV.
-- Add separate front/back `ShapeGeometry` planes offset by `depth/2 + bevel + .0004` for crisp art and a clean back.
+- **Bounding box** `CARD_BOX = { w: 1.35, h: 1.89 }`. The card's real size comes from the active format and is fitted *inside* that box: `fitCardBox(ratio)` returns `{ w: 1.89 * ratio, h: 1.89 }` for narrow formats and `{ w: 1.35, h: 1.35 / ratio }` for wide ones. That is why the camera never needs re-framing when the format changes.
+- **Formats** (`CARD_FORMATS`): `auto` (uses `frontTexture.image` ratio), `tcg` 63/88, `ygo` 59/86, `tarot` 70/120, `mini` 45/68, `wide` 88/63, `square` 1. Add a format by adding one entry plus an `<option>` + three i18n keys.
+- Depth `.016`, corner radius `min(w, h) * .0667` (≈ .09 for the base card), bevel `.004`.
+- Build a rounded rectangle `THREE.Shape` with quadratic corners. `ExtrudeGeometry` with `bevelSegments:3`, `steps:1`, `bevelSize = bevelThickness = bevel`. Center the geometry.
+- Remap UVs front/back so the artwork covers the face including the bevel; side faces get a neutral UV.
+- Add separate front/back `ShapeGeometry` planes offset by `depth/2 + bevel + .0004`.
 - Material array `[front, edge]` for the extruded body; `MeshStandardMaterial` for faces (`roughness = gloss`, `metalness:.04`, `envMapIntensity:.55`).
+- Rebuilds are rAF-throttled (`scheduleRebuild`) and triggered by: format change, corners/thickness/bevel change, and — in `auto` — a new front texture.
 
 ### Light and environment
 

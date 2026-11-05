@@ -23,12 +23,27 @@ Run this before claiming a CardGram-style UI is done. Take screenshots; do not j
 
 ## Layout
 
-- [ ] No horizontal scrollbar at 1600, 1280, 1024, 900, 768, 390.
-- [ ] No content hidden behind the mobile bottom nav; scroll has bottom padding.
-- [ ] Card stage keeps 5:7; studio stage keeps 9:16.
+- [ ] No horizontal scrollbar at 1600, 1280, 1024, 900, 768, 492, 390 and 844×390 landscape.
+- [ ] No element overlaps another: measure the boxes (title row, card, menu button, privacy strip, sheets).
+- [ ] Home never scrolls at any width; the content panels can scroll and their last row clears the floating menu button.
+- [ ] Card frames hug the art: no filler bars, no cropped edges, in the hero, library grid, explorer rail, deck covers and collection stacks.
+- [ ] The mobile menu button is 24 px above the safe area and ≥22 px below the card title; in landscape it sits in the topbar centre.
+- [ ] The mobile home ends with the round menu button and nothing else: no privacy strip, no footer, no nav.
+- [ ] The identity chip shows only `@handle`, sits centred, and opens the player menu on tap, Enter and Space.
+- [ ] The three identifier pills sit above the name, never truncate (they wrap at ≤380 px) and the card name is centred within 1 px of the viewport axis.
+- [ ] Bottom sheets fit without scrolling at 320×568 and up; below 620 px tall the menu drops its stats strip.
 - [ ] Panels don't collapse below their content; text wraps instead of overflow.
 - [ ] Tablet 860–980 px checked separately.
 - [ ] Safe-area inset respected on iPhone-sized screens.
+
+## Card formats
+
+- [ ] `Auto` matches the loaded artwork (5:7, Yu-Gi-Oh! 0.746, tarot…): the card is neither stretched nor cropped.
+- [ ] Each format (`tcg`, `ygo`, `tarot`, `mini`, `wide`, `square`) keeps the card inside the 9:16 stage at the default camera distance.
+- [ ] Changing format while a pose/keyframe is active keeps the card framed.
+- [ ] The chosen format survives a reload (`cardgram.settings.v1`) and is applied on the first studio open.
+- [ ] PNG snapshot and video export show the same proportions as the viewport.
+- [ ] Mixed formats in the hub library/explorer produce different frame heights without breaking the grid.
 
 ## Type
 
@@ -79,10 +94,12 @@ Run this before claiming a CardGram-style UI is done. Take screenshots; do not j
 ## Screenshot set to capture
 
 1. Hub at 1600×1000.
-2. Hub at 390×844.
-3. Studio Deck at 1600×1000.
-4. Studio at 390×844.
-5. One alternate panel (Library or Collections).
-6. One variant theme, if used.
+2. Hub at 492×893 with the menu sheet open.
+3. Hub at 492×893 with the card details sheet open.
+4. Hub at 390×844 and 320×568 (smallest phone).
+5. Library with at least two different card ratios.
+6. Studio Deck at 1600×1000, auto format.
+7. Studio with `tarot` and with `wide` selected.
+8. Studio at 390×844 with the drawer open on the format control.
 
 Compare against the running app side by side. If the silhouette and light feel different, fix tokens before adding detail.

@@ -84,27 +84,46 @@ The hub navigation uses the same pattern at a larger scale: 16 px radius contain
 
 Never use a dark chip unless the surface is the OLED variant.
 
-## 6. Card presentation
+## 6. Card presentation (hub)
 
-The hero card is a 3D object with a front and back:
+The hero card is a CSS 3D object — no WebGL — inside an optional vitrine:
 
-```css
-.card-stage { width: clamp(264px, 23vw, 360px); aspect-ratio: 5/7; perspective: 1500px; }
-.card-tilt { transform-style: preserve-3d; transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y)); transition: transform .9s var(--ease); }
-.card { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; animation: cardIdle 11s ease-in-out infinite; }
-.card-inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform 1.35s var(--ease); }
-.card:hover .card-inner, .card.is-flipped .card-inner { transform: rotateY(180deg); }
-.card-face { position: absolute; inset: 0; overflow: hidden; border-radius: 18px; backface-visibility: hidden; }
-.card-back { transform: rotateY(180deg); }
+```html
+<div class="hub-card-surface">                 <!-- mobile panel; display:contents on desktop -->
+  <div class="hub-card-stage" id="hub-card-stage">  <!-- --card-ratio, aspect-ratio -->
+    <div class="hub-card-tilt">
+      <button class="hub-card" aria-pressed="false">   <!-- flips on hover/focus/click -->
+        <span class="hub-card-inner">
+          <span class="hub-card-face hub-card-front"><img></span>
+          <span class="hub-card-face hub-card-back"><img></span>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
 ```
 
-- Face shadow: `0 36px 64px rgba(6,55,74,.28), 0 6px 16px rgba(6,55,74,.14), inset 0 1px 0 rgba(255,255,255,.9)`.
-- Hover shine: a 112° white band across the front, `mix-blend-mode: screen`, 8 s loop.
-- Idle: 11 s translateY ±6 px + rotateY ±5deg + rotateX ±1.5deg.
-- Entrance: 2.1 s from translateY 52 px / scale .82 / blur 14 px.
-- Metadata sits below: eyebrow, name, collection, chips, text link.
+```css
+.hub-card-stage { --card-ratio: .7143; aspect-ratio: var(--card-ratio); perspective: 1500px; }
+.hub-card-face img { width: 100%; height: 100%; object-fit: contain; }
+.hub-card-tilt, .hub-card, .hub-card-inner { transform-style: preserve-3d; }
+.hub-card-face { position: absolute; inset: 0; overflow: hidden; backface-visibility: hidden; }
+.hub-card-back { transform: rotateY(180deg); }
+```
 
-For the card art itself use the existing artwork or a real image with `object-fit: cover`. Keep the 5:7 ratio and the existing `assets/data/cards/` structure.
+- `--card-ratio` is written by `syncCardRatio()` from `naturalWidth / naturalHeight`, so 5:7, Yu-Gi-Oh!, tarot or landscape art gets a frame of its own shape. `contain` + matching frame = no crop and no filler bars.
+- Mobile sizing: `width: min(100% - 6px, (100dvh - var(--hub-card-chrome)) * var(--card-ratio), 460px)`; `--hub-card-chrome` is tuned per breakpoint in §20.
+- Desktop: `width: clamp(212px, 21vw, 292px)`; the stage keeps `aspect-ratio` so the height follows the art.
+- Face shadow: `0 36px 64px hsl(var(--ambient-shadow) / .34), 0 6px 16px …` + inset white highlight.
+- Hover shine: 112° white band on `.hub-card-front::after`, `mix-blend-mode: screen`, 8 s loop.
+- Idle: 11 s translateY ±6 px + rotateY ±5° + rotateX ±1.5°; entrance 2.1 s from translateY 52 px / scale .82 / blur 14 px.
+- Below the stage: `.hub-card-meta` = `.hub-card-tags` (three pills) → `.hub-card-title-row` (name + ⓘ) → on desktop `.hub-card-sub` and `.hub-card-chips`.
+
+**Identifier pills** (`#hub-card-tags`, mobile only): three `.hub-card-tag` spans rendered by `renderFavoriteCard()` — `collection.name`, `card.attribute || card.type`, and `stats` joined with ` · `. 999 px radius, `.5rem` 700 `#0a6b78`, white .56 with a white .88 border and a 3 px inset highlight; `flex-wrap: nowrap` above 380 px, `wrap` below it so nothing truncates. The same data appears as `.hub-chip` in the details sheet.
+
+**Symmetric title row:** `.hub-card-title-row` is `display: grid; grid-template-columns: 1fr auto 1fr; width: 100%`, with the name in column 2 and the ⓘ starting column 3. Equal outer tracks keep the name perfectly centred; never centre name + button as a flex group.
+
+Never hard-code `5 / 7` again: every card frame in the hub reads `--card-ratio`.
 
 ## 7. Sliders
 
@@ -167,9 +186,11 @@ box-shadow: 0 -8px 24px rgba(8,62,82,.05);
 
 Dashed white .55 border, 1.5 px, radius 24, centered stack: 52 px glass icon tile, 1rem 800 title, .78rem muted body, primary/soft CTA. Keep vertical padding 40–60 px.
 
-## 15. Media card (library)
+## 15. Media card (library / explore)
 
-White glass shell radius 18, 7 px padding, thumb with 12 px radius, favourite star top-right (glass circle), body with title .8rem 800, collection .62rem muted, and a full-width primary “Open” button. Hover lifts 2 px and increases shadow. Grid min 210 px desktop, 150 px mobile.
+White glass shell radius 18, 7 px padding, thumb with 12 px radius, favourite star top-right (glass circle), body with title .8rem 800, collection .62rem muted, and a full-width primary “Open” button. Hover lifts 2 px and increases shadow. Grid `repeat(auto-fill, minmax(196px, 1fr))`, `align-items: start` (formats have different heights), gap 13 px.
+
+`.media-card-thumb` uses `aspect-ratio: var(--card-ratio, .7143)` fed by `syncCardRatio()`, so every thumbnail hugs its art; `img { object-fit: contain }`. Same hook in `.hub-explorer-art`, `.deck-cover-option` and `.collection-stack`.
 
 ## 16. Profile fields
 
@@ -178,3 +199,48 @@ Label .6rem 800 uppercase; input 40 px, white .62, radius 12, white border, inse
 ## 17. Radial FAB
 
 A 54 px circular primary-gradient button bottom-right. On open, 3–5 petals fan out on a 60–70 px radius. Petals are 38 px glass circles with icons and labels on hover/focus. Auto-flip the fan up/left near viewport edges with `--petal-dir-x/y`. Use `role="menu"`/`menuitem`; Esc closes and returns focus to the trigger.
+
+## 18. Identity chip (hub ≤980 px)
+
+`.hub-player-panel` becomes a single centred capsule: `width: fit-content; margin: 0 auto; padding: 5px 16px 5px 5px; border-radius: 999px` on a white glass gradient. Its content is **only** the 30 px avatar and `@handle` (0.74rem, 700, `--ink`); `.hub-player-name` is `display: none` here — the name, bio and stats live in the menu sheet.
+
+The capsule is a trigger: `.hub-player-open` is an absolutely positioned, transparent button covering it (`z-index: 2`, `border-radius: inherit`), `aria-haspopup="dialog"`, `aria-controls="hub-menu-sheet"`, label `hub_player_open`. It calls `openHubMenu(trigger)` so `openHubSheet` can sync `aria-expanded` and restore focus on close. On desktop the button is `display: none` and the panel shows name + handle + edit as before.
+
+The handle truncates with `text-overflow: ellipsis` at `max-width: 100%` (long handles shrink the pill instead of overflowing).
+
+## 19. Vitrine (hub mobile stage)
+
+`.hub-card-surface` is the light panel the card sits on: 24 px radius, `clamp(8px, 2.6vw, 16px)` padding, `linear-gradient(170deg, white .58, sky .34, hsl(--ambient-a / .14))`, 1 px white border, soft shadow. It is `display: contents` on desktop (the wrapper disappears from layout). The card inside is `100% - 6px` wide.
+
+## 20. Menu button and bottom sheets
+
+```html
+<button class="hub-menu-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="hub-menu-sheet">…</button>
+
+<div class="hub-menu" id="hub-menu-sheet" role="dialog" aria-modal="true" hidden>
+  <div class="hub-menu-backdrop" data-menu-close></div>
+  <div class="hub-menu-panel" tabindex="-1"> … </div>
+</div>
+```
+
+- **Button**: fixed, centred, 52 px circle, white glass, 19 px icon, `bottom: 48px + safe-area`. In landscape (≤560 px tall) it moves to the topbar centre (`top: 9px`, 44 px) so it never touches the card.
+- **Sheet**: fixed overlay `z 240`, panel `min(100%, 470px)`, `border-radius: 26px 26px 0 0`, white→sky gradient, `max-height: 88dvh`, `transform: translateY(102%)` → `none` on `.is-open` (280 ms `--ease`); backdrop `rgba(5,43,55,.32)` + `blur(5px)`.
+- **Menu content**: player header (42 px avatar, name, `@handle`, “member since”; close button right), primary “Open the studio”, Inkra row, five `data-menu-nav` rows (active state synced by `setActivePanel`), 4-up stats strip, EN/ES/DE pill, and the privacy note (`.hub-menu-privacy`) as the last row.
+- **Details sheet** (`#hub-card-sheet`): same shell, `max-height: 72dvh`, content = `collection · set`, tag chips, italic lore box. Triggered by `#hub-card-info` (30 px circle next to the card name).
+- Behaviour lives in `hub.js`: `openHubSheet(sheet, trigger)` / `closeHubSheet({restoreFocus})` / `onSheetKeydown` (Esc + Tab trap). Focus goes to the panel (no stray ring) and returns to the trigger — the round button or the identity chip. Both sheets refuse to open above 980 px.
+- Under 700 px of height the menu compacts; under 620 px it hides the stats strip and the member line, tightens the nav rows, and raises the panel to `94dvh` so it fits without scrolling.
+
+## 21. Ambient layer (reactive background)
+
+```html
+<div class="hub-ambient" aria-hidden="true">
+  <span class="hub-ambient-layer" data-ambient-layer="0"></span>
+  <span class="hub-ambient-layer" data-ambient-layer="1"></span>
+</div>
+```
+
+Two absolute layers (`z 1`, above `.hub::before`, below `.hub-scroll`) whose radial gradients read `--amb-1/2/3`; `ambient.js` cross-fades them over 1.4 s when the card changes. The same triplets tint `.hub-showcase-glow`, the card shadow (`--ambient-shadow`) and `<meta name="theme-color">`. Alphas .55–.72, `filter: saturate(112%)`. Fallback: collection accent from `catalog.js`.
+
+## 22. Card format control (studio)
+
+`#select-card-format` lives in the Deck pane under the uploads, inside a `.control-row-col` with a `.header-line` label and a `.control-note` hint, using `select.select-block` (full width, no `max-width`). Options: `auto`, `tcg`, `ygo`, `tarot`, `mini`, `wide`, `square` — labels carry the millimetres. On change: `state.cardFormat` → `Scene.applySettings({ cardFormat })` → `persistSettings()`; `sanitizeSettings` validates against `Scene.CARD_FORMATS`.

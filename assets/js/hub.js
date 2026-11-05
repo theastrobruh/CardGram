@@ -399,6 +399,15 @@ function renderHubIdentity() {
 
   applyAvatar(hub.els.avatar, hub.els.avatarImg, hubProfile.avatar);
   applyAvatar(hub.els.playerAvatar, hub.els.playerAvatarImg, hubProfile.avatar);
+  applyAvatar(hub.els.menuAvatar, hub.els.menuAvatarImg, hubProfile.avatar);
+
+  if (hub.els.menuName) hub.els.menuName.textContent = hubProfile.name;
+  if (hub.els.menuHandle) hub.els.menuHandle.textContent = `@${hubProfile.handle}`;
+  if (hub.els.menuSince) {
+    hub.els.menuSince.textContent = t('profile_member_since', {
+      date: formatHubDate(hubProfile.joinedAt)
+    });
+  }
 }
 
 function favoriteCard() {
@@ -517,6 +526,27 @@ function renderFavoriteCard() {
       ...chipTexts.map((text) => makeNode('span', 'hub-chip', text))
     );
   });
+
+  /* Tres identificadores sobre el nombre: franquicia, tipo/elemento y stats. */
+  if (hub.els.cardTags) {
+    const tagTexts = [];
+    const franchise = collection ? collection.name : card.collectionName;
+    if (franchise) tagTexts.push(franchise);
+    const kind = card.attribute || card.type;
+    if (kind) tagTexts.push(kind);
+    const statLine = Object.keys(card.stats || {})
+      .map((key) => `${key} ${card.stats[key]}`)
+      .join(' · ');
+    if (statLine) tagTexts.push(statLine);
+
+    hub.els.cardTags.replaceChildren(
+      ...tagTexts.map((text) => {
+        const tag = makeNode('span', 'hub-card-tag', text);
+        tag.title = text;
+        return tag;
+      })
+    );
+  }
 
   if (hub.els.cardSheetLore) {
     hub.els.cardSheetLore.textContent = card.lore || '';
@@ -1483,8 +1513,8 @@ function onSheetKeydown(event) {
   }
 }
 
-function openHubMenu() {
-  openHubSheet(hub.els.menu, hub.els.menuBtn);
+function openHubMenu(trigger) {
+  openHubSheet(hub.els.menu, trigger || hub.els.menuBtn);
 }
 
 function closeHubMenu(options = {}) {
@@ -1884,7 +1914,11 @@ function setupHubEvents() {
   setupShowcaseTilt();
 
   if (hub.els.menuBtn) {
-    hub.els.menuBtn.addEventListener('click', openHubMenu);
+    hub.els.menuBtn.addEventListener('click', () => openHubMenu(hub.els.menuBtn));
+  }
+
+  if (hub.els.playerOpen) {
+    hub.els.playerOpen.addEventListener('click', () => openHubMenu(hub.els.playerOpen));
   }
 
   if (hub.els.cardInfo) {
@@ -2032,8 +2066,15 @@ function cacheHubDom() {
   els.menuStatCollections = hubEl('menu-stat-collections');
   els.menuStatDecks = hubEl('menu-stat-decks');
   els.menuStatRenders = hubEl('menu-stat-renders');
+  els.playerOpen = hubEl('hub-player-open');
+  els.menuAvatar = hubEl('hub-menu-avatar');
+  els.menuAvatarImg = hubEl('hub-menu-avatar-img');
+  els.menuName = hubEl('hub-menu-title');
+  els.menuHandle = hubEl('hub-menu-handle');
+  els.menuSince = hubEl('hub-menu-since');
 
   els.cardInfo = hubEl('hub-card-info');
+  els.cardTags = hubEl('hub-card-tags');
   els.cardSheet = hubEl('hub-card-sheet');
   els.cardSheetSub = hubEl('hub-card-sheet-sub');
   els.cardSheetChips = hubEl('hub-card-sheet-chips');

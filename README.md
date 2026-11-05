@@ -109,6 +109,8 @@ cd CardGram
 │           ├── thumbs/         # WebP thumbnails used by the lobby
 │           └── tools/          # make-thumbs.py (regenerate thumbnails)
 ├── README.md
+├── skills/
+│   └── cardgram-ui/            # Agent guide: map, layouts, components, QA, run & debug
 ├── .gitattributes
 ├── .gitignore
 └── .github/

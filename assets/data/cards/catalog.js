@@ -100,6 +100,7 @@
           number: '001',
           name: 'Dark Magician Girl',
           type: 'Spellcaster / Effect',
+          attribute: 'DARK',
           rarity: 'Ultra Rare',
           front: 'assets/data/cards/YGO/FRONT-DMG_01.png',
           back: 'assets/data/cards/YGO/BACK-BASE.png',

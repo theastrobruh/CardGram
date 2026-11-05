@@ -84,6 +84,20 @@ These are the production values. Keep the names when porting.
 
 Use `--accent` for primary buttons, the active language pill, the active preset and the brand mark. Never fill a large background with the full-saturation gradient; it is a small-area signal.
 
+### Reactive and geometry tokens
+
+Written at runtime, never hard-coded in components:
+
+| Token | Value | Set by | Use |
+|---|---|---|---|
+| `--ambient-a/b/c` | HSL triplets, e.g. `199 53% 64%` | `ambient.js` on `:root` | Radial washes, card glow, menu icons |
+| `--ambient-shadow` | HSL triplet, dark | `ambient.js` | Card drop shadow tint |
+| `--amb-1/2/3` | same triplets, per layer | `ambient.js` on each `.hub-ambient-layer` | Cross-fade background |
+| `--card-ratio` | unitless number, default `.7143` | `hub.js` / CSS fallback | Every card frame (`aspect-ratio`, sizing calc) |
+| `--hub-card-chrome` | px budget, `352px` (mobile), `317px` at ≤700 px | `hub.css` §20 | Height-driven card sizing |
+
+`hsl(var(--ambient-a) / .3)` is the house idiom for a tinted surface. If a new card frame needs to respect the artwork, consume `--card-ratio`; never write `5 / 7` again.
+
 ## 3. Page light
 
 The body is a four-layer light field, not a flat color:
@@ -105,7 +119,7 @@ Add ambient orbs and bubbles with very low contrast:
 - Bubble border: `1px solid rgba(255,255,255,.6)` plus an inner top-left highlight.
 - Drift: 22 s `ease-in-out infinite alternate`; bubbles 16 s. Keep opacity under .7.
 
-The hub adds a soft radial white wash at 50% −12% and a light cyan veil that fades out once on entry.
+The hub adds a soft radial white wash at 50% −12% and a light cyan veil that fades out once on entry, plus the **ambient layer**: two stacked radial gradients tinted with the active card's palette (`--ambient-a/b/c`), above the wash and below the content. It is a colour wash, not a texture: keep alphas .55–.72 so dark text keeps its contrast.
 
 ## 4. Glass hierarchy
 
@@ -126,6 +140,7 @@ Rules:
 4. Use `backdrop-filter: blur(22px) saturate(135%)` on large panels, `blur(10–16px)` on chips and menus. Always add `-webkit-backdrop-filter`.
 5. Provide an `@supports not (backdrop-filter: blur(1px))` fallback with an opaque `rgba(244,255,253,.96)`.
 6. Shadows are cyan-tinted: `rgba(8,62,82,…)`, never `rgba(0,0,0,…)`.
+7. **Media frames hug their art.** A frame around a card uses `aspect-ratio: var(--card-ratio)` and `object-fit: contain`; letterbox bars, filler gradients behind the art and `cover` crops are all bugs.
 
 ## 5. Type scale
 
