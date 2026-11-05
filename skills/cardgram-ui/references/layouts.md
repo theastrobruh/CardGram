@@ -10,9 +10,9 @@ Use the running app as the visual reference. Open it locally with `Iniciar_Webap
 ```
 body[data-view="hub"]
 └── .hub (fixed, 100dvh, flex column)
-    ├── .hub-scroll (the only scroll container)
-    │   ├── .hub-shell (max 1280px, centered)
-    │   │   ├── .hub-topbar (sticky)
+    ├── .hub-scroll (the only scroll container, flex column)
+    │   ├── .hub-topbar (sticky, full-bleed, outside the shell on purpose)
+    │   ├── .hub-shell (max 1280px, centered, flex: 1)
     │   │   ├── main.hub-main
     │   │   │   └── section.hub-panel[data-hub-panel="home|library|collections|explore|profile"]
     │   │   └── footer.hub-footer
@@ -23,7 +23,7 @@ body[data-view="hub"]
 ### Topbar
 
 - Sticky at `top: 0`, z-index 30.
-- Full-bleed: the bar reaches both viewport edges (`margin: 0 calc(-1 * page-gutter)` cancels `.hub-scroll` padding). Its content lives in `.hub-topbar-inner` (flex, 16 px block padding, `max-width: 1280px + 2 gutters`, centred), so the brand stays aligned with the dashboard columns instead of ending at the shell edge.
+- Full-bleed: the header is a direct child of `.hub-scroll` (not of `.hub-shell`), so its negative side margins cancel the scroll padding and the background reaches both viewport edges. Its content lives in `.hub-topbar-inner` (flex, 16 px block padding, `max-width: 1280px + 2 gutters`, centred), so the brand stays aligned with the dashboard columns.
 - Background `rgba(207,245,245,.93)`, `blur(18px) saturate(140%)`.
 - Left: 38 px gradient brand mark + `CardGram` + version badge.
 - Center: a glass segmented nav (`Home`, `My cards`, `Collections`, `Explore` with a tiny gradient “soon” dot).
