@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CardGram — v0.4.5 · Hub / Lobby
+   CardGram — v0.5.5 · Hub / Lobby
    Vista de entrada, estadísticas, biblioteca, colecciones, decks, perfil y
    arranque perezoso del motor 3D. El editor solo se inicializa al entrar.
    ========================================================================== */
@@ -41,6 +41,7 @@ const hub = {
   explorerShowcase: true,
   explorerTimers: false,
   gachaIds: [],
+  handDraft: [],
   opening: false,
   lastRoute: '',
   activeSheet: null,
@@ -147,19 +148,29 @@ function previewThumb(url) {
    Estado persistido
    -------------------------------------------------------------------------- */
 function defaultFavoriteId() {
-  if (HUB_CATALOG.featured && HUB_CATALOG.featured.id) return HUB_CATALOG.featured.id;
-  if (HUB_CATALOG.cards.length) return HUB_CATALOG.cards[0].id;
-  return null;
+  const cards = HUB_CATALOG.cards;
+  if (!cards.length) return null;
+  return cards[Math.floor(Math.random() * cards.length)].id;
+}
+
+function defaultFeaturedIds(favoriteId) {
+  const ids = [];
+  if (favoriteId) ids.push(favoriteId);
+  HUB_CATALOG.cards.forEach((card) => {
+    if (ids.length < 3 && !ids.includes(card.id)) ids.push(card.id);
+  });
+  return ids;
 }
 
 function sanitizeHubProfile(raw) {
   const fallbackFavorite = defaultFavoriteId();
   const base = {
-    name: 'Card Creator',
-    handle: 'cardcreator',
+    name: '¿?',
+    handle: 'Fulanito',
     bio: '',
     avatar: null,
     favoriteCardId: fallbackFavorite,
+    featuredIds: defaultFeaturedIds(fallbackFavorite),
     joinedAt: Date.now()
   };
 
@@ -171,12 +182,23 @@ function sanitizeHubProfile(raw) {
   const favorite = HUB_CATALOG.byId(raw.favoriteCardId) ? raw.favoriteCardId : fallbackFavorite;
   const joined = Number(raw.joinedAt);
 
+  const featuredIds = [];
+  if (Array.isArray(raw.featuredIds)) {
+    raw.featuredIds.forEach((id) => {
+      if (featuredIds.length < 6 && HUB_CATALOG.byId(id) && !featuredIds.includes(id)) {
+        featuredIds.push(id);
+      }
+    });
+  }
+  if (!featuredIds.length) featuredIds.push(...defaultFeaturedIds(favorite));
+
   return {
     name: name || base.name,
-    handle: normalizeHandle(raw.handle || name || 'creator'),
+    handle: raw.handle ? normalizeHandle(raw.handle) : base.handle,
     bio,
     avatar,
     favoriteCardId: favorite,
+    featuredIds,
     joinedAt: Number.isFinite(joined) && joined > 0 ? joined : Date.now()
   };
 }
@@ -352,6 +374,13 @@ function renderHubStats(animate) {
   if (hub.els.menuStatCollections) hub.els.menuStatCollections.textContent = String(stats.collections);
   if (hub.els.menuStatDecks) hub.els.menuStatDecks.textContent = String(stats.decks);
   if (hub.els.menuStatRenders) hub.els.menuStatRenders.textContent = String(stats.renders);
+
+  if (hub.els.playerSummary) {
+    hub.els.playerSummary.textContent = t('hub_mobile_summary', {
+      cards: stats.catalogCards,
+      collections: HUB_CATALOG.collections.length
+    });
+  }
 
   renderProfileSummary(stats);
 }
@@ -664,17 +693,102 @@ function makeStackCard(card) {
 }
 
 /* Abanico de cartas destacadas del jugador en el panel izquierdo. */
+function featuredCards() {
+  const ids =
+    Array.isArray(hubProfile.featuredIds) && hubProfile.featuredIds.length
+      ? hubProfile.featuredIds
+      : defaultFeaturedIds(hubProfile.favoriteCardId);
+  const cards = ids
+    .map((id) => HUB_CATALOG.byId(id))
+    .filter(Boolean)
+    .slice(0, 6);
+  return cards.length ? cards : HUB_CATALOG.cards.slice(0, 3);
+}
+
+function makeHandThumb(card) {
+  const button = makeNode('button', 'hub-hand-thumb');
+  button.type = 'button';
+  button.dataset.favCard = card.id;
+  button.title = card.name;
+  button.setAttribute('aria-label', explorerCardLabel(card, hubProfile.favoriteCardId === card.id));
+  button.setAttribute('aria-pressed', String(hubProfile.favoriteCardId === card.id));
+  button.appendChild(makeExplorerArt(card));
+  return button;
+}
+
+function renderHandRail(cards) {
+  const track = hub.els.handTrack;
+  if (!track) return;
+  track.replaceChildren(...cards.map((card) => makeHandThumb(card)));
+}
+
 function renderFeaturedStack() {
   const stack = hub.els.playerStack;
   if (!stack) return;
 
-  const favorite = favoriteCard();
-  const others = HUB_CATALOG.cards.filter(
-    (card) => !favorite || card.id !== favorite.id
-  );
-  const ordered = [others[0], favorite, others[1]].filter(Boolean);
+  const cards = featuredCards();
+  stack.dataset.count = String(cards.length);
+  stack.replaceChildren(...cards.map((card) => makeStackCard(card)));
+  renderHandRail(cards);
+}
 
-  stack.replaceChildren(...ordered.map((card) => makeStackCard(card)));
+/* --------------------------------------------------------------------------
+   Selector de la mano (hasta 6 cartas)
+   -------------------------------------------------------------------------- */
+function makeHandOption(card) {
+  const active = hub.handDraft.includes(card.id);
+  const button = makeNode('button', 'hand-option');
+  button.type = 'button';
+  button.dataset.handPick = card.id;
+  button.setAttribute('aria-pressed', String(active));
+  button.classList.toggle('is-active', active);
+  button.disabled = !active && hub.handDraft.length >= 6;
+  button.appendChild(makeExplorerArt(card));
+  button.appendChild(makeNode('span', 'hand-option-name', card.name));
+  return button;
+}
+
+function updateHandCount() {
+  if (hub.els.handCount) hub.els.handCount.textContent = `${hub.handDraft.length}/6`;
+  if (hub.els.handSave) hub.els.handSave.disabled = !hub.handDraft.length;
+}
+
+function renderHandPicker() {
+  const picker = hub.els.handPicker;
+  if (!picker) return;
+  picker.replaceChildren(...HUB_CATALOG.cards.map((card) => makeHandOption(card)));
+  updateHandCount();
+}
+
+function openHandDialog() {
+  hub.handDraft = featuredCards().map((card) => card.id);
+  renderHandPicker();
+  if (hub.els.handDialog && !hub.els.handDialog.open) {
+    hub.els.handDialog.showModal();
+  }
+}
+
+function toggleHandPick(cardId) {
+  if (!HUB_CATALOG.byId(cardId)) return;
+  const index = hub.handDraft.indexOf(cardId);
+  if (index >= 0) {
+    hub.handDraft.splice(index, 1);
+  } else if (hub.handDraft.length < 6) {
+    hub.handDraft.push(cardId);
+  }
+  renderHandPicker();
+}
+
+function saveHand() {
+  if (!hub.handDraft.length) {
+    toast(t('hub_hand_empty'), { type: 'warning' });
+    return;
+  }
+
+  hubProfile.featuredIds = hub.handDraft.slice(0, 6);
+  persistHubProfile();
+  renderFeaturedStack();
+  if (hub.els.handDialog && hub.els.handDialog.open) hub.els.handDialog.close();
 }
 
 function makeExplorerSpotlight(card, index, total) {
@@ -2281,8 +2395,26 @@ function setupHubEvents() {
     hub.els.menuBtn.addEventListener('click', () => openHubMenu(hub.els.menuBtn));
   }
 
-  if (hub.els.playerOpen) {
-    hub.els.playerOpen.addEventListener('click', () => openHubMenu(hub.els.playerOpen));
+  [hub.els.playerStackEdit, hub.els.mobileHandEdit].forEach((button) => {
+    if (button) button.addEventListener('click', openHandDialog);
+  });
+
+  if (hub.els.handPicker) {
+    hub.els.handPicker.addEventListener('click', (event) => {
+      const option = event.target.closest('[data-hand-pick]');
+      if (option) toggleHandPick(option.dataset.handPick);
+    });
+  }
+
+  if (hub.els.handForm) {
+    hub.els.handForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      saveHand();
+    });
+  }
+
+  if (hub.els.handCancel && hub.els.handDialog) {
+    hub.els.handCancel.addEventListener('click', () => hub.els.handDialog.close());
   }
 
   if (hub.els.cardInfo) {
@@ -2454,6 +2586,17 @@ function cacheHubDom() {
   els.playerBio = hubEl('hub-player-bio');
   els.playerSince = hubEl('hub-player-since');
   els.playerStack = hubEl('hub-player-stack');
+  els.playerSummary = hubEl('hub-player-summary');
+  els.playerStackEdit = hubEl('hub-player-stack-edit');
+  els.mobileHand = hubEl('hub-mobile-hand');
+  els.mobileHandEdit = hubEl('hub-mobile-hand-edit');
+  els.handTrack = hubEl('hub-mobile-hand-track');
+  els.handDialog = hubEl('hand-dialog');
+  els.handForm = hubEl('hand-form');
+  els.handPicker = hubEl('hand-picker');
+  els.handCount = hubEl('hand-count');
+  els.handSave = hubEl('hand-save');
+  els.handCancel = hubEl('hand-cancel');
 
   els.showcase = hubEl('hub-showcase');
   els.card = hubEl('hub-card');

@@ -5,14 +5,14 @@
 ![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)
 ![GitHub Pages](https://img.shields.io/badge/Hosted%20on-GitHub%20Pages-222?logo=github&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-r128-black?logo=threedotjs&logoColor=white)
-![Version](https://img.shields.io/badge/Version-v0.4.5-00d2d3)
+![Version](https://img.shields.io/badge/Version-v0.5.5-00d2d3)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
 
 ## ✨ Features
 
-### 🏛️ Immersive Lobby (v0.4.5)
+### 🏛️ Immersive Lobby (v0.5.5)
 - **Slow, cinematic entrance** — your favorite card settles in over a soft glass veil before the lobby content
 - **Live stats** — saved cards, catalog collections, collections left to review, decks and rendered exports
 - **My cards** — saved presets plus the full catalog, with favorite selection and one-tap open in the studio

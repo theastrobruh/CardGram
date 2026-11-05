@@ -7,7 +7,7 @@ description: Use when reading, changing or reviewing CardGram — the hub/lobby,
 
 One static page: `index.html` + `assets/`. Vanilla JavaScript, plain CSS and Three.js r128 from a CDN. **No build step, no framework, no package manager, no server code.** Everything runs from a folder, even `file://`.
 
-Current version: **v0.4.5** (`data-version`, the `?v=` query strings and `APP_VERSION` must move together).
+Current version: **v0.5.5** (`data-version`, the `?v=` query strings and `APP_VERSION` must move together).
 
 ## 60-second map
 
@@ -70,7 +70,7 @@ For every change: **screenshot the real page** at 390×844, 492×893 and 1440×9
 
 ### The rev rule (this bites every time)
 
-Every asset is referenced with a cache-busting query: `assets/css/hub.css?v=0.4.5&rev=31`.
+Every asset is referenced with a cache-busting query: `assets/css/hub.css?v=0.5.5&rev=31`.
 
 **After editing any CSS or JS, bump `rev` on every asset tag in `index.html`** (keep them identical):
 

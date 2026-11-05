@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CardGram — v0.4.5 · Ambiente reactivo
+   CardGram — v0.5.5 · Ambiente reactivo
    Lee el arte de la carta en uso, extrae su paleta dominante y tiñe el fondo
    con un degradado pastel. Dos capas se funden entre sí al cambiar de carta,
    así el cambio se siente como una respiración y no como un salto.

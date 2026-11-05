@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CardGram — v0.4.5 · Capa de idioma
+   CardGram — v0.5.5 · Capa de idioma
    Diccionario ES/EN/DE + utilidades de traducción.
    ========================================================================== */
 'use strict';
@@ -215,7 +215,7 @@ const I18N = {
     shortcut_help: 'Abrir esta ayuda',
     shortcut_close: 'Cerrar o salir',
     got_it: 'Entendido',
-    help_note: 'CardGram v0.4.5 · Hecho con Three.js, Canvas y mucho cariño por theAstroBruh.'
+    help_note: 'CardGram v0.5.5 · Hecho con Three.js, Canvas y mucho cariño por theAstroBruh.'
   },
 
   en: {
@@ -422,7 +422,7 @@ const I18N = {
     shortcut_help: 'Open this help',
     shortcut_close: 'Close or exit',
     got_it: 'Got it',
-    help_note: 'CardGram v0.4.5 · Made with Three.js, Canvas and care by theAstroBruh.'
+    help_note: 'CardGram v0.5.5 · Made with Three.js, Canvas and care by theAstroBruh.'
   },
 
   de: {
@@ -629,7 +629,7 @@ const I18N = {
     shortcut_help: 'Diese Hilfe öffnen',
     shortcut_close: 'Schließen oder beenden',
     got_it: 'Verstanden',
-    help_note: 'CardGram v0.4.5 · Mit Three.js, Canvas und Liebe von theAstroBruh.'
+    help_note: 'CardGram v0.5.5 · Mit Three.js, Canvas und Liebe von theAstroBruh.'
   }
 };
 

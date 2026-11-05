@@ -31,6 +31,7 @@
   let ctx = null;
   let master = null;
   let limiter = null;
+  let echo = null;
   let noiseBuffer = null;
   let unlocked = false;
   let attached = false;
@@ -98,6 +99,22 @@
     master.connect(limiter);
     limiter.connect(ctx.destination);
 
+    /* Eco corto y cálido: la firma "PSX" que une todos los gestos. */
+    echo = ctx.createDelay(1);
+    echo.delayTime.value = 0.135;
+    const feedback = ctx.createGain();
+    feedback.gain.value = 0.24;
+    const damp = ctx.createBiquadFilter();
+    damp.type = 'lowpass';
+    damp.frequency.value = 2600;
+    const wet = ctx.createGain();
+    wet.gain.value = 0.16;
+    echo.connect(damp);
+    damp.connect(feedback);
+    feedback.connect(echo);
+    echo.connect(wet);
+    wet.connect(master);
+
     /* Ruido reutilizable para soplos de papel y aire. */
     const frames = Math.floor(ctx.sampleRate * 0.6);
     noiseBuffer = ctx.createBuffer(1, frames, ctx.sampleRate);
@@ -147,7 +164,8 @@
       attack = 0.005,
       delay = 0,
       pan = 0,
-      detune = 0
+      detune = 0,
+      send = 0
     } = options;
 
     const start = now() + Math.max(0, delay);
@@ -166,8 +184,24 @@
     env.gain.exponentialRampToValueAtTime(Math.max(0.0002, gain), start + attack);
     env.gain.exponentialRampToValueAtTime(0.0001, end);
 
-    osc.connect(env);
+    if (type === 'square' || type === 'sawtooth') {
+      const soft = ctx.createBiquadFilter();
+      soft.type = 'lowpass';
+      soft.frequency.setValueAtTime(4200, start);
+      soft.frequency.exponentialRampToValueAtTime(2200, end);
+      osc.connect(soft);
+      soft.connect(env);
+    } else {
+      osc.connect(env);
+    }
+
     env.connect(outputNode(pan));
+    if (send > 0 && echo) {
+      const sendGain = ctx.createGain();
+      sendGain.gain.value = send;
+      env.connect(sendGain);
+      sendGain.connect(echo);
+    }
     osc.start(start);
     osc.stop(end + 0.03);
   }
@@ -210,117 +244,137 @@
   /* ------------------------------------------------------------------------
      Paleta
      ---------------------------------------------------------------------- */
+  /* Arpegio de chip corto: la base del vocabulario PSX. */
+  function chip(notes, options = {}) {
+    const {
+      type = 'square',
+      step = 0.05,
+      dur = 0.12,
+      gain = 0.014,
+      send = 0.12
+    } = options;
+
+    notes.forEach((freq, index) => {
+      tone({
+        freq,
+        type,
+        dur,
+        gain,
+        delay: index * step,
+        attack: 0.004,
+        send
+      });
+      tone({
+        freq: freq * 2,
+        type: 'triangle',
+        dur: dur * 0.6,
+        gain: gain * 0.18,
+        delay: index * step + 0.005
+      });
+    });
+  }
+
   const palette = {
-    /* Toque de cristal al pulsar. */
+    /* Blip de selección: madera + chispa de chip. */
     tap() {
-      tone({ freq: 1046.5, to: 880, type: 'sine', dur: 0.085, gain: 0.045 });
-      tone({ freq: 2093, to: 1760, type: 'triangle', dur: 0.05, gain: 0.009 });
+      tone({ freq: 987.77, to: 880, type: 'triangle', dur: 0.06, gain: 0.03 });
+      tone({ freq: 1975.53, type: 'square', dur: 0.03, gain: 0.006, send: 0.08 });
     },
 
-    /* Chispa casi inaudible al pasar el puntero. */
+    /* Tick casi inaudible al pasar el puntero. */
     hover() {
-      tone({ freq: 1760, to: 1568, type: 'sine', dur: 0.035, gain: 0.007 });
-      tone({ freq: 2637, type: 'triangle', dur: 0.026, gain: 0.003 });
+      tone({ freq: 1760, type: 'square', dur: 0.022, gain: 0.0035 });
     },
 
-    /* Cambio de vista: dos notas que suben. */
+    /* Cambio de vista: arpegio ascendente de tres pasos. */
     navigate() {
-      tone({ freq: 659.25, type: 'sine', dur: 0.085, gain: 0.03 });
-      tone({ freq: 987.77, type: 'sine', dur: 0.12, gain: 0.022, delay: 0.055 });
+      chip([523.25, 659.25, 783.99], { step: 0.042, dur: 0.09, gain: 0.012 });
+      tone({ freq: 392, type: 'triangle', dur: 0.1, gain: 0.012 });
     },
 
-    /* Idioma: pequeña campana de dos tonos. */
+    /* Idioma: campanilla de dos notas. */
     lang() {
-      tone({ freq: 783.99, type: 'triangle', dur: 0.09, gain: 0.028 });
-      tone({ freq: 1174.66, type: 'sine', dur: 0.13, gain: 0.018, delay: 0.06 });
+      chip([659.25, 987.77], { type: 'triangle', step: 0.05, dur: 0.1, gain: 0.011 });
     },
 
-    /* Pestaña del estudio. */
+    /* Pestaña del estudio: pequeño barrido. */
     tab() {
-      tone({ freq: 740, to: 988, type: 'triangle', dur: 0.075, gain: 0.024 });
+      tone({ freq: 740, to: 988, type: 'square', dur: 0.055, gain: 0.014 });
+      tone({ freq: 1480, type: 'triangle', dur: 0.03, gain: 0.004 });
     },
 
-    /* Hoja o diálogo que se abre: aire que sube. */
+    /* Diálogo que se abre: aire cálido + destello. */
     open() {
-      air({ from: 480, to: 2600, dur: 0.3, gain: 0.026, q: 0.8 });
-      tone({ freq: 392, to: 784, type: 'sine', dur: 0.24, gain: 0.02 });
-      tone({ freq: 1568, type: 'triangle', dur: 0.12, gain: 0.007, delay: 0.1 });
+      air({ from: 480, to: 2600, dur: 0.3, gain: 0.024, q: 0.8 });
+      tone({ freq: 392, to: 784, type: 'triangle', dur: 0.22, gain: 0.015 });
+      chip([1046.5, 1567.98], { step: 0.05, dur: 0.1, gain: 0.009, send: 0.18 });
     },
 
-    /* Hoja o diálogo que se cierra: aire que baja. */
+    /* Diálogo que se cierra: el eco se apaga. */
     close() {
-      air({ from: 2200, to: 380, dur: 0.26, gain: 0.022, q: 0.8 });
-      tone({ freq: 784, to: 392, type: 'sine', dur: 0.2, gain: 0.016 });
+      air({ from: 2200, to: 380, dur: 0.26, gain: 0.02, q: 0.8 });
+      tone({ freq: 784, to: 392, type: 'triangle', dur: 0.18, gain: 0.014 });
+      tone({ freq: 523.25, type: 'square', dur: 0.06, gain: 0.008, delay: 0.1 });
     },
 
-    /* Interruptor encendido. */
+    /* Interruptor encendido: moneda de PSX. */
     toggleOn() {
-      tone({ freq: 587.33, type: 'sine', dur: 0.08, gain: 0.036 });
-      tone({ freq: 880, type: 'sine', dur: 0.14, gain: 0.03, delay: 0.06 });
-      tone({ freq: 1760, type: 'triangle', dur: 0.08, gain: 0.006, delay: 0.09 });
+      chip([1046.5, 1318.51, 1567.98], { step: 0.045, dur: 0.1, gain: 0.013, send: 0.16 });
     },
 
     /* Interruptor apagado. */
     toggleOff() {
-      tone({ freq: 659.25, type: 'triangle', dur: 0.08, gain: 0.03 });
-      tone({ freq: 440, type: 'sine', dur: 0.12, gain: 0.022, delay: 0.055 });
+      tone({ freq: 783.99, to: 523.25, type: 'square', dur: 0.12, gain: 0.014 });
+      tone({ freq: 392, type: 'triangle', dur: 0.14, gain: 0.012, delay: 0.05 });
     },
 
-    /* La carta gira: papel y aire. */
+    /* La carta gira: papel y un chirp de chip. */
     flip() {
-      air({ from: 900, to: 3000, dur: 0.3, gain: 0.03, q: 1.1 });
-      tone({ freq: 300, to: 680, type: 'triangle', dur: 0.16, gain: 0.01 });
+      air({ from: 900, to: 3000, dur: 0.3, gain: 0.028, q: 1.1 });
+      tone({ freq: 220, to: 660, type: 'square', dur: 0.09, gain: 0.007 });
+      tone({ freq: 440, to: 330, type: 'triangle', dur: 0.12, gain: 0.009, delay: 0.04 });
     },
 
-    /* La carta vuelve a su sitio tras inspeccionarla. */
+    /* La carta vuelve a su sitio. */
     cardSettle() {
-      air({ from: 1500, to: 420, dur: 0.24, gain: 0.02, q: 0.9 });
-      tone({ freq: 320, to: 240, type: 'triangle', dur: 0.14, gain: 0.008 });
+      air({ from: 1500, to: 420, dur: 0.24, gain: 0.018, q: 0.9 });
+      tone({ freq: 240, type: 'triangle', dur: 0.12, gain: 0.012 });
+      tone({ freq: 160, type: 'square', dur: 0.08, gain: 0.005 });
     },
 
-    /* Acción principal (exportar, guardar, estrenar). */
+    /* Acción principal: fanfarria breve de cuatro notas. */
     primary() {
-      tone({ freq: 523.25, type: 'sine', dur: 0.09, gain: 0.032 });
-      tone({ freq: 783.99, type: 'sine', dur: 0.16, gain: 0.026, delay: 0.06 });
-      tone({ freq: 1568, type: 'triangle', dur: 0.1, gain: 0.006, delay: 0.12 });
+      chip([523.25, 659.25, 783.99, 1046.5], { step: 0.05, dur: 0.14, gain: 0.015, send: 0.2 });
+      tone({ freq: 261.63, type: 'triangle', dur: 0.12, gain: 0.014 });
     },
 
     /* Aviso neutro. */
     info() {
-      tone({ freq: 880, type: 'sine', dur: 0.09, gain: 0.02 });
-      tone({ freq: 1174.66, type: 'sine', dur: 0.12, gain: 0.014, delay: 0.06 });
+      chip([880, 1174.66], { type: 'triangle', step: 0.055, dur: 0.09, gain: 0.01 });
     },
 
-    /* Confirmación: campanilla de tres notas. */
+    /* Confirmación: arpegio luminoso. */
     success() {
-      const notes = [1046.5, 1318.51, 1567.98];
-      notes.forEach((freq, index) => {
-        tone({ freq, type: 'sine', dur: 0.2, gain: 0.026, delay: index * 0.06 });
-        tone({ freq: freq * 2, type: 'triangle', dur: 0.12, gain: 0.004, delay: index * 0.06 });
-      });
-      tone({ freq: 2093, type: 'sine', dur: 0.16, gain: 0.006, delay: 0.18 });
+      chip([783.99, 987.77, 1174.66, 1567.98], { step: 0.055, dur: 0.16, gain: 0.014, send: 0.22 });
     },
 
-    /* Recompensa (favorito, hito): arpegio de cuatro notas. */
+    /* Recompensa: arpegio largo con cola. */
     reward() {
-      const notes = [523.25, 659.25, 783.99, 1046.5];
-      notes.forEach((freq, index) => {
-        tone({ freq, type: 'triangle', dur: 0.22, gain: 0.028, delay: index * 0.07 });
-      });
-      tone({ freq: 2637, type: 'sine', dur: 0.2, gain: 0.006, delay: 0.26 });
+      chip([523.25, 659.25, 783.99, 1046.5, 1318.51], { step: 0.055, dur: 0.2, gain: 0.014, send: 0.26 });
+      tone({ freq: 261.63, type: 'triangle', dur: 0.2, gain: 0.011 });
     },
 
-    /* Error suave, nunca estridente. */
+    /* Error suave: caída de chip, nunca estridente. */
     error() {
-      tone({ freq: 233.08, to: 196, type: 'triangle', dur: 0.16, gain: 0.03 });
-      tone({ freq: 164.81, type: 'sine', dur: 0.2, gain: 0.022, delay: 0.08 });
+      tone({ freq: 233.08, to: 174.61, type: 'square', dur: 0.14, gain: 0.018 });
+      tone({ freq: 110, type: 'triangle', dur: 0.18, gain: 0.016 });
     },
 
-    /* Paso de control deslizante: tono según el valor. */
+    /* Paso de control deslizante. */
     slider(options) {
       const value = clamp(Number(options && options.value), 0, 1);
-      const freq = 900 + value * 620;
-      tone({ freq, type: 'sine', dur: 0.03, gain: 0.006 });
+      const freq = 900 + value * 700;
+      tone({ freq, type: 'square', dur: 0.022, gain: 0.005 });
     }
   };
 

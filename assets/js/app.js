@@ -1,10 +1,10 @@
 /* ==========================================================================
-   CardGram — v0.4.5 · Aplicación
+   CardGram — v0.5.5 · Aplicación
    Estado, persistencia, presets, cargas, interfaz, accesibilidad e inicio.
    ========================================================================== */
 'use strict';
 
-const APP_VERSION = '0.4.5';
+const APP_VERSION = '0.5.5';
 
 const STORAGE = {
   settings: 'cardgram.settings.v1',

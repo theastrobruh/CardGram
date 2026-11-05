@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CardGram — v0.4.5 · Textos del hub
+   CardGram — v0.5.5 · Textos del hub
    Se fusiona con el diccionario principal al cargar para mantener el lobby
    separado del vocabulario del editor.
    ========================================================================== */
@@ -90,6 +90,13 @@
     hub_sponsor_2_text: 'Tu marca, en cada partida',
     hub_sponsor_3_title: 'Colabora conmigo',
     hub_sponsor_3_text: 'Marcas y creadores',
+    hub_player_collection_aria: 'Ver tu colección',
+    hub_mobile_summary: '{cards} cartas · {collections} col.',
+    hub_hand_title: 'Tu mano',
+    hub_hand_desc: 'Elige hasta 6 cartas. Se alternarán como tus destacadas.',
+    hub_hand_edit: 'Elegir cartas de la mano',
+    hub_hand_save: 'Guardar mano',
+    hub_hand_empty: 'Elige al menos una carta.',
     hub_stats_label: 'Estadísticas de tu colección',
     hub_stat_cards: 'Cartas guardadas',
     hub_stat_cards_sub: '{count} en catálogo',
@@ -310,6 +317,13 @@
     hub_sponsor_2_text: 'Your brand in every match',
     hub_sponsor_3_title: 'Work with me',
     hub_sponsor_3_text: 'Brands & creators',
+    hub_player_collection_aria: 'View your collection',
+    hub_mobile_summary: '{cards} cards · {collections} sets',
+    hub_hand_title: 'Your hand',
+    hub_hand_desc: 'Pick up to 6 cards. They will rotate as your featured cards.',
+    hub_hand_edit: 'Choose hand cards',
+    hub_hand_save: 'Save hand',
+    hub_hand_empty: 'Pick at least one card.',
     hub_stats_label: 'Your collection at a glance',
     hub_stat_cards: 'Saved cards',
     hub_stat_cards_sub: '{count} in catalog',
@@ -530,6 +544,13 @@
     hub_sponsor_2_text: 'Deine Marke in jedem Match',
     hub_sponsor_3_title: 'Arbeite mit mir',
     hub_sponsor_3_text: 'Marken & Creator',
+    hub_player_collection_aria: 'Deine Sammlung ansehen',
+    hub_mobile_summary: '{cards} Karten · {collections} Sets',
+    hub_hand_title: 'Deine Hand',
+    hub_hand_desc: 'Wähle bis zu 6 Karten. Sie wechseln als deine Highlights.',
+    hub_hand_edit: 'Handkarten auswählen',
+    hub_hand_save: 'Hand speichern',
+    hub_hand_empty: 'Wähle mindestens eine Karte.',
     hub_stats_label: 'Deine Sammlung auf einen Blick',
     hub_stat_cards: 'Gespeicherte Karten',
     hub_stat_cards_sub: '{count} im Katalog',

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CardGram — v0.4.5 · Catálogo de cartas
+   CardGram — v0.5.5 · Catálogo de cartas
    Fuente única de verdad para el hub, la biblioteca y los presets integrados.
 
    Todas las imágenes viven en assets/data/cards/database/<COLECCIÓN>/ y sus
@@ -307,7 +307,7 @@
   const featured = cards[0] || null;
 
   window.CARDGRAM_CARDS = {
-    version: '0.4.5',
+    version: '0.5.5',
     updated: '2026-11-04',
     collections,
     cards,
