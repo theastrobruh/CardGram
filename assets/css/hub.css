@@ -4930,6 +4930,8 @@ dialog {
 }
 
 .hub-menu-btn,
+.hub-fab-actions,
+.hub-music-btn,
 .hub-menu {
   display: none;
 }
@@ -5309,8 +5311,8 @@ dialog {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 52px;
-    height: 52px;
+    width: 80px;
+    height: 80px;
     padding: 0;
     border-radius: 50%;
     color: #07333f;
@@ -5332,13 +5334,109 @@ dialog {
   }
 
   .hub-menu-btn .icon {
-    width: 19px;
-    height: 19px;
+    width: 26px;
+    height: 26px;
     opacity: 0.8;
   }
 
   .hub-menu-btn[aria-expanded="true"] {
     opacity: 0.55;
+  }
+
+  /* Acciones en flor sobre el botón de menú. */
+  .hub-fab-actions {
+    position: fixed;
+    left: 50%;
+    bottom: calc(108px + env(safe-area-inset-bottom));
+    z-index: 167;
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .hub-fab-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    pointer-events: auto;
+    border-radius: 50%;
+    color: #07333f;
+    background: linear-gradient(168deg, rgba(255, 255, 255, 0.96), rgba(235, 252, 255, 0.78));
+    border: 1px solid rgba(255, 255, 255, 0.98);
+    box-shadow: 0 8px 18px rgba(5, 43, 55, 0.16), inset 0 1px 0 #ffffff;
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    transition: transform 0.2s var(--ease), box-shadow 0.2s ease;
+  }
+
+  .hub-fab-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 22px rgba(5, 43, 55, 0.2), inset 0 1px 0 #ffffff;
+  }
+
+  .hub-fab-btn:active {
+    transform: translateY(0) scale(0.95);
+  }
+
+  .hub-fab-btn:not(.hub-fab-btn-primary) {
+    position: relative;
+    top: 10px;
+  }
+
+  .hub-fab-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .hub-fab-btn-primary {
+    width: 70px;
+    height: 70px;
+    color: #ffffff;
+    background: linear-gradient(160deg, #45d9c2 0%, #2f8fdd 100%);
+    border-color: rgba(255, 255, 255, 0.84);
+    box-shadow: 0 12px 24px rgba(47, 143, 221, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    transform: translateY(-10px);
+  }
+
+  .hub-fab-btn-primary:hover {
+    transform: translateY(-12px);
+  }
+
+  .hub-fab-btn-primary .hub-fab-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Reproductor de música: adelanto, todavía sin función. */
+  .hub-music-btn {
+    position: fixed;
+    right: 16px;
+    bottom: calc(24px + env(safe-area-inset-bottom));
+    z-index: 167;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    color: #0a6b78;
+    background: linear-gradient(168deg, rgba(255, 255, 255, 0.9), rgba(232, 250, 255, 0.72));
+    border: 1px solid rgba(255, 255, 255, 0.94);
+    box-shadow: 0 8px 16px rgba(5, 43, 55, 0.14), inset 0 1px 0 #ffffff;
+    backdrop-filter: blur(14px) saturate(145%);
+    -webkit-backdrop-filter: blur(14px) saturate(145%);
+  }
+
+  .hub-music-btn .hub-fab-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.78;
   }
 
   /* Los avisos flotan por encima del botón y de la franja de privacidad. */

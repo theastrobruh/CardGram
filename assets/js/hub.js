@@ -2119,7 +2119,7 @@ async function openStudio(tab) {
 /* --------------------------------------------------------------------------
    Acciones de biblioteca
    -------------------------------------------------------------------------- */
-function openCatalogCard(cardId) {
+function openCatalogCard(cardId, tab = 'deck') {
   const card = HUB_CATALOG.byId(cardId);
   if (!card) return;
 
@@ -2129,7 +2129,7 @@ function openCatalogCard(cardId) {
   activePresetId = builtin ? builtin.id : null;
   renderPresets();
   applyCardImages(card.front, card.back, card.fullArt || null);
-  navigate('studio/deck');
+  navigate(`studio/${tab}`);
 }
 
 function openSavedPreset(presetId) {
@@ -2158,6 +2158,22 @@ function onHubClick(event) {
     event.preventDefault();
     closeHubMenu({ restoreFocus: false, silent: true });
     navigate(routeButton.dataset.hubRoute);
+    return;
+  }
+
+  if (target.closest('[data-render-favorite]')) {
+    event.preventDefault();
+    const card = favoriteCard();
+    if (card) {
+      closeHubMenu({ restoreFocus: false, silent: true });
+      openCatalogCard(card.id, 'canvas');
+    }
+    return;
+  }
+
+  if (target.closest('[data-music-soon]')) {
+    event.preventDefault();
+    toast(t('hub_music_soon'), { type: 'info' });
     return;
   }
 
