@@ -19,6 +19,7 @@ Select-String -Path assets\js\hub.js  -Pattern '^(async )?function ' | % { "{0,5
 | `assets/js/scene.js` | 1096 | Three.js scene, card geometry + formats, camera, snapshots |
 | `assets/js/ambient.js` | 318 | Card-art palette → `--ambient-*` background tint |
 | `assets/js/export.js` | 247 | PNG snapshot and MediaStream video export |
+| `assets/js/sound.js` | 564 | Web Audio palette, gesture delegation, sound toggle + persistence |
 | `assets/js/i18n.js` | 652 | Studio dictionaries ES/EN/DE + `t()`/`applyLanguage` |
 | `assets/js/hub-i18n.js` | 604 | Hub dictionary, merged into `I18N` |
 | `assets/js/community.js` | 58 | Community adapter stub, disabled |
@@ -182,7 +183,8 @@ Rule: every visible key needs **three** entries. `data-i18n`, `data-i18n-aria-la
 
 - **One document, two views.** `body[data-view="hub|studio"]` toggles the shells. The Hub renders first; the 3D engine is lazy (`openStudio` → `Scene.init`).
 - **Hash router.** `#/home`, `#/library`, `#/collections`, `#/collections/<id>`, `#/collections/deck/<id>`, `#/explore`, `#/profile`, `#/studio/<tab>`.
-- **State is local.** `cardgram.settings.v1`, `cardgram.presets.v2`, `cardgram.scenes.v1`, `cardgram.profile.v1`, `cardgram.hub.v1`. No backend, no telemetry.
+- **State is local.** `cardgram.settings.v1`, `cardgram.presets.v2`, `cardgram.scenes.v1`, `cardgram.profile.v1`, `cardgram.hub.v1`, `cardgram.sound.v1`. No backend, no telemetry.
+- **Sound is synthetic.** `sound.js` owns one lazy `AudioContext`, a compressor, a noise buffer and the named palette; `toast()` and hub sheet/card handlers call `Sound.play()`.
 - **Catalog is static.** `catalog.js` exposes `collections`, `cards`, `featured`, `byId`, `collectionOf`; thumbnails in `thumbs/`.
 - **Studio ↔ scene bridge.** `app.js` calls `Scene.*`; `scene.js` never touches the DOM outside its container.
 - **Card geometry** adapts to `CARD_FORMATS` (auto = front texture ratio) inside a fixed 1.35 × 1.89 bounding box, so the camera never needs to re-frame.

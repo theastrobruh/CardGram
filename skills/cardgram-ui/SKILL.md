@@ -23,6 +23,7 @@ Current version: **v0.4.5** (`data-version`, the `?v=` query strings and `APP_VE
 | `assets/js/i18n.js` | Studio dictionary ES/EN/DE + language switch | Studio strings |
 | `assets/js/hub-i18n.js` | Hub dictionary, merged into `I18N` on load | Hub strings |
 | `assets/js/export.js` | Video recording + PNG snapshot plumbing | Export flow |
+| `assets/js/sound.js` | Synthesized Web Audio palette, global gesture delegation, sound toggle state | Adding a sound, changing feedback |
 | `assets/data/cards/catalog.js` | Collections and cards (front/back/thumbs/lore/stats) | Adding a card or collection |
 
 ## Read in this order
@@ -53,6 +54,8 @@ The project is the source of truth: if a reference disagrees with the code, trus
 | 3D card geometry / formats | `scene.js` `CARD_FORMATS`, `getCardRatio`, `fitCardBox`, `rebuildCard` | `app.js` `state.cardFormat` |
 | Camera / poses / float | `scene.js` camera block + `app.js` `setupScenes` | `motion-and-3d.md` |
 | Export PNG / video | `export.js` + `scene.js` `createSnapshot` / `createVideoRenderer` | `app.js` `getExportSize` |
+| Click / hover / success sounds | `sound.js` palette + `classify()` | `data-sound` on the node, `toast()` in `app.js` |
+| Sound on-off UI | `[data-sound-toggle]` in `index.html` | `sound.js` `syncButtons`, `components.md` §23 |
 | Any visible string | `i18n.js` (studio) or `hub-i18n.js` (hub) | `data-i18n*` attributes |
 | New catalog card | `assets/data/cards/<COLLECTION>/…` + `catalog.js` | `thumbs/` (WebP) |
 
@@ -92,6 +95,7 @@ For bulk edits use `[System.IO.File]::ReadAllText/WriteAllText` with `UTF8Encodi
 - **State is local.** Settings, presets, scenes, hub data and profile live in `localStorage` under `cardgram.*.v*`. No backend; the only network call is the Three.js CDN.
 - **No new dependencies** and no build step unless the user asks.
 - **Preserve accessibility.** `aria-pressed`/`aria-selected`/`aria-current`, focus-visible, sheet focus trap, `prefers-reduced-motion`.
+- **Sound is a garnish.** Synthesized only (no files), unlocked by the first gesture, never louder than the UI, always mutable from the hub and the studio. Mark one-off transitions `data-sound="none"` and play their sound from the transition function so a click never doubles.
 
 ## Gotchas that cost time
 
@@ -111,5 +115,6 @@ For bulk edits use `[System.IO.File]::ReadAllText/WriteAllText` with `UTF8Encodi
 - No horizontal scroll, no overlaps, no clipped card, no stray letterbox bars.
 - Cards in `auto` and in mixed formats display fully in hub and studio; exports keep the chosen format.
 - Keyboard, focus and Esc work on every new control; reduced motion respected.
+- Sound toggle reachable in hub (topbar or mobile menu) and studio, state persists, first gesture unlocks audio, zero console errors.
 - The page still reads as CardGram with the logo and the card art removed.
 - The references in this skill updated if you moved a section or added a component.

@@ -12,8 +12,8 @@
   <title>CardGram · v0.4.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.4.5&rev=39">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.4.5&rev=39">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.4.5&rev=41">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.4.5&rev=41">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
           integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu"
@@ -21,15 +21,16 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"
           integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf"
           crossorigin="anonymous" defer></script>
-  <script src="assets/data/cards/catalog.js?v=0.4.5&rev=39" defer></script>
-  <script src="assets/js/i18n.js?v=0.4.5&rev=39" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.4.5&rev=39" defer></script>
-  <script src="assets/js/community.js?v=0.4.5&rev=39" defer></script>
-  <script src="assets/js/ambient.js?v=0.4.5&rev=39" defer></script>
-  <script src="assets/js/scene.js?v=0.4.5&rev=39" defer></script>
-  <script src="assets/js/export.js?v=0.4.5&rev=39" defer></script>
-  <script src="assets/js/hub.js?v=0.4.5&rev=39" defer></script>
-  <script src="assets/js/app.js?v=0.4.5&rev=39" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.4.5&rev=41" defer></script>
+  <script src="assets/js/i18n.js?v=0.4.5&rev=41" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.4.5&rev=41" defer></script>
+  <script src="assets/js/community.js?v=0.4.5&rev=41" defer></script>
+  <script src="assets/js/ambient.js?v=0.4.5&rev=41" defer></script>
+  <script src="assets/js/scene.js?v=0.4.5&rev=41" defer></script>
+  <script src="assets/js/export.js?v=0.4.5&rev=41" defer></script>
+  <script src="assets/js/sound.js?v=0.4.5&rev=41" defer></script>
+  <script src="assets/js/hub.js?v=0.4.5&rev=41" defer></script>
+  <script src="assets/js/app.js?v=0.4.5&rev=41" defer></script>
 </head>
 <body data-view="hub">
 
@@ -147,6 +148,14 @@
     <symbol id="i-globe" viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="9"></circle>
       <path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"></path>
+    </symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24">
+      <path d="M4 9.5h3.2L12 5.2v13.6L7.2 14.5H4z"></path>
+      <path d="M16 9.2a4.2 4.2 0 0 1 0 5.6M18.6 6.6a8 8 0 0 1 0 10.8"></path>
+    </symbol>
+    <symbol id="i-sound-off" viewBox="0 0 24 24">
+      <path d="M4 9.5h3.2L12 5.2v13.6L7.2 14.5H4z"></path>
+      <path d="M16.2 9.6l4.6 4.8M20.8 9.6l-4.6 4.8"></path>
     </symbol>
     <symbol id="i-help" viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="9"></circle>
@@ -294,6 +303,10 @@
           </nav>
 
           <div class="hub-top-actions">
+            <button class="hub-sound-btn" type="button" data-sound-toggle data-sound="none" aria-pressed="true" aria-label="Efectos de sonido" data-i18n-aria-label="ui_sound_toggle" title="Efectos de sonido" data-i18n-title="ui_sound_toggle">
+              <svg class="icon sound-on" aria-hidden="true"><use href="#i-sound"></use></svg>
+              <svg class="icon sound-off" aria-hidden="true"><use href="#i-sound-off"></use></svg>
+            </button>
             <div class="hub-lang" id="hub-lang" role="group" aria-label="Idioma" data-i18n-aria-label="hub_lang_aria">
               <button class="hub-lang-btn active" type="button" data-hub-lang="en" aria-pressed="true">EN</button>
               <button class="hub-lang-btn" type="button" data-hub-lang="es" aria-pressed="false">ES</button>
@@ -323,7 +336,7 @@
             <div class="hub-dashboard">
               <!-- Panel de jugador y datos de colección -->
               <aside class="hub-player-panel" aria-labelledby="hub-player-name">
-                <button class="hub-player-open" id="hub-player-open" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="hub-menu-sheet" aria-label="Ver tu información" data-i18n-aria-label="hub_player_open"></button>
+                <button class="hub-player-open" id="hub-player-open" type="button" data-sound="none" aria-haspopup="dialog" aria-expanded="false" aria-controls="hub-menu-sheet" aria-label="Ver tu información" data-i18n-aria-label="hub_player_open"></button>
 
                 <div class="hub-player-head">
                   <span class="hub-player-avatar" id="hub-player-avatar">
@@ -423,7 +436,7 @@
                   <div class="hub-card-surface">
                     <div class="hub-card-stage" id="hub-card-stage">
                       <div class="hub-card-tilt" id="hub-card-tilt">
-                        <button class="hub-card" id="hub-card" type="button" aria-pressed="false" aria-label="Girar la carta" data-i18n-aria-label="hub_card_flip" title="Girar la carta" data-i18n-title="hub_card_flip">
+                        <button class="hub-card" id="hub-card" type="button" data-sound="none" aria-pressed="false" aria-label="Girar la carta" data-i18n-aria-label="hub_card_flip" title="Girar la carta" data-i18n-title="hub_card_flip">
                           <span class="hub-card-inner">
                             <span class="hub-card-face hub-card-front">
                               <img id="hub-card-front" src="assets/data/cards/OG/SET-01/thumbs/FRONT-01.webp" alt="" width="750" height="1050" decoding="async" fetchpriority="high">
@@ -441,7 +454,7 @@
                     <div class="hub-card-tags" id="hub-card-tags" aria-label="Identificadores de la carta" data-i18n-aria-label="card_tags_aria"></div>
                     <div class="hub-card-title-row">
                       <h2 class="hub-card-name" id="hub-card-name" aria-live="polite">Shadowblade Kinetic</h2>
-                      <button class="hub-card-info" id="hub-card-info" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="hub-card-sheet" aria-label="Ver etiquetas y detalles de la carta" data-i18n-aria-label="card_details_open" title="Ver etiquetas y detalles de la carta" data-i18n-title="card_details_open">
+                      <button class="hub-card-info" id="hub-card-info" type="button" data-sound="none" aria-haspopup="dialog" aria-expanded="false" aria-controls="hub-card-sheet" aria-label="Ver etiquetas y detalles de la carta" data-i18n-aria-label="card_details_open" title="Ver etiquetas y detalles de la carta" data-i18n-title="card_details_open">
                         <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
                       </button>
                     </div>
@@ -780,7 +793,7 @@
     </nav>
 
     <!-- Botón único de menú + navegación (móvil) -->
-    <button class="hub-menu-btn" id="hub-menu-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="hub-menu-sheet" aria-label="Abrir el menú" data-i18n-aria-label="hub_menu_open" title="Abrir el menú" data-i18n-title="hub_menu_open">
+    <button class="hub-menu-btn" id="hub-menu-btn" type="button" data-sound="none" aria-haspopup="dialog" aria-expanded="false" aria-controls="hub-menu-sheet" aria-label="Abrir el menú" data-i18n-aria-label="hub_menu_open" title="Abrir el menú" data-i18n-title="hub_menu_open">
       <svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg>
     </button>
 
@@ -799,7 +812,7 @@
             <span class="hub-menu-handle" id="hub-menu-handle">@cardcreator</span>
             <span class="hub-menu-since" id="hub-menu-since"></span>
           </div>
-          <button class="hub-menu-close" type="button" data-menu-close aria-label="Cerrar el menú" data-i18n-aria-label="hub_menu_close">
+          <button class="hub-menu-close" type="button" data-menu-close data-sound="none" aria-label="Cerrar el menú" data-i18n-aria-label="hub_menu_close">
             <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
           </button>
         </header>
@@ -858,6 +871,10 @@
           <button class="hub-lang-btn active" type="button" data-hub-lang="en" aria-pressed="true">EN</button>
           <button class="hub-lang-btn" type="button" data-hub-lang="es" aria-pressed="false">ES</button>
           <button class="hub-lang-btn" type="button" data-hub-lang="de" aria-pressed="false">DE</button>
+          <button class="hub-menu-sound" type="button" data-sound-toggle data-sound="none" aria-pressed="true" aria-label="Efectos de sonido" data-i18n-aria-label="ui_sound_toggle" title="Efectos de sonido" data-i18n-title="ui_sound_toggle">
+            <svg class="icon sound-on" aria-hidden="true"><use href="#i-sound"></use></svg>
+            <svg class="icon sound-off" aria-hidden="true"><use href="#i-sound-off"></use></svg>
+          </button>
         </div>
 
         <p class="hub-menu-privacy">
@@ -877,7 +894,7 @@
             <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky" aria-hidden="true"></span><span data-i18n="card_details_kicker">Carta</span></span>
             <h2 id="hub-card-sheet-title" data-i18n="card_details">Detalles</h2>
           </div>
-          <button class="hub-menu-close" type="button" data-menu-close aria-label="Cerrar los detalles" data-i18n-aria-label="card_details_close">
+          <button class="hub-menu-close" type="button" data-menu-close data-sound="none" aria-label="Cerrar los detalles" data-i18n-aria-label="card_details_close">
             <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
           </button>
         </header>
@@ -978,6 +995,10 @@
             </button>
           </div>
         </div>
+        <button class="icon-btn" id="btn-sound" type="button" data-sound-toggle data-sound="none" aria-pressed="true" aria-label="Efectos de sonido" data-i18n-aria-label="ui_sound_toggle" title="Efectos de sonido" data-i18n-title="ui_sound_toggle">
+          <svg class="icon sound-on" aria-hidden="true"><use href="#i-sound"></use></svg>
+          <svg class="icon sound-off" aria-hidden="true"><use href="#i-sound-off"></use></svg>
+        </button>
         <button class="icon-btn" id="btn-help" type="button" aria-label="Atajos y ayuda" data-i18n-aria-label="ui_help" title="Atajos y ayuda (?)" data-i18n-title="ui_help_title">
           <svg class="icon" aria-hidden="true"><use href="#i-help"></use></svg>
         </button>

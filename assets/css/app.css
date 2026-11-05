@@ -150,6 +150,23 @@ img {
   stroke-linejoin: round;
 }
 
+/* Interruptor de sonido: una sola forma, dos estados. */
+[data-sound-toggle] .sound-off {
+  display: none;
+}
+
+[data-sound-toggle].is-muted .sound-on {
+  display: none;
+}
+
+[data-sound-toggle].is-muted .sound-off {
+  display: inline;
+}
+
+[data-sound-toggle].is-muted {
+  color: var(--muted-strong);
+}
+
 /* --------------------------------------------------------------------------
    3. Fondo aero (orbes, burbujas y brillo)
    -------------------------------------------------------------------------- */

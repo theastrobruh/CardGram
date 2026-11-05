@@ -411,6 +411,12 @@ function toast(message, options = {}) {
   const node = document.createElement('div');
   node.className = `toast ${type}`;
 
+  if (window.Sound) {
+    window.Sound.play(
+      type === 'success' ? 'success' : type === 'error' || type === 'warning' ? 'error' : 'info'
+    );
+  }
+
   const iconWrap = document.createElement('span');
   iconWrap.className = 'toast-icon';
   const iconName = type === 'success' ? 'check' : type === 'error' || type === 'warning' ? 'alert' : 'info';

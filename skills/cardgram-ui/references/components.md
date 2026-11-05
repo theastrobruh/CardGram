@@ -244,3 +244,20 @@ Two absolute layers (`z 1`, above `.hub::before`, below `.hub-scroll`) whose rad
 ## 22. Card format control (studio)
 
 `#select-card-format` lives in the Deck pane under the uploads, inside a `.control-row-col` with a `.header-line` label and a `.control-note` hint, using `select.select-block` (full width, no `max-width`). Options: `auto`, `tcg`, `ygo`, `tarot`, `mini`, `wide`, `square` — labels carry the millimetres. On change: `state.cardFormat` → `Scene.applySettings({ cardFormat })` → `persistSettings()`; `sanitizeSettings` validates against `Scene.CARD_FORMATS`.
+
+## 23. Sound toggle
+
+One shared button contract, three placements: `.hub-sound-btn` (desktop topbar, hidden ≤980), `.hub-menu-sound` (inside `.hub-menu-lang` in the mobile sheet) and `#btn-sound` (studio `.header-actions`).
+
+```html
+<button class="icon-btn" type="button" data-sound-toggle data-sound="none"
+        aria-pressed="true" aria-label="Efectos de sonido" data-i18n-aria-label="ui_sound_toggle">
+  <svg class="icon sound-on" aria-hidden="true"><use href="#i-sound"></use></svg>
+  <svg class="icon sound-off" aria-hidden="true"><use href="#i-sound-off"></use></svg>
+</button>
+```
+
+- `data-sound-toggle` is the hook: `sound.js` syncs `is-muted` and `aria-pressed` on all three at once and toggles on click.
+- `data-sound="none"` stops the generic pointerdown tick so the toggle does not double-fire.
+- `is-muted` swaps the wave icon for the crossed one (rules in `app.css` §2).
+- State lives in `cardgram.sound.v1`; labels in `i18n.js` as `ui_sound_toggle` (ES/EN/DE).

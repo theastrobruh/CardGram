@@ -149,3 +149,13 @@ Reimplementing the studio engine is optional; this is the contract if you do.
 - Use one `requestAnimationFrame` loop; cancel it when the studio is hidden.
 - Avoid multiple large `backdrop-filter` layers stacked; blur is the most expensive part of this look.
 - On low-end mobile, reduce blur to 12–16 px and disable the card shine.
+
+## 7. Sound feedback
+
+`assets/js/sound.js` synthesizes every cue with Web Audio — no files, no requests, CSP-safe.
+
+- **Lazy and polite.** The `AudioContext` is created on the first pointer/key gesture; boot-time toasts stay silent. Palette gains sit between .006 and .045 with a shared compressor, so effects sit under the UI, not over it.
+- **One gesture, one cue.** A delegated `pointerdown` plays a default `tap` and overrides it from `data-sound`. Structural transitions (sheets, card flip) use `data-sound="none"` plus an explicit `Sound.play()` inside the function that really performs the change.
+- **Semantic palette.** `tap` glass tick · `hover` faint sparkle · `navigate` rising two-note · `lang` small bell · `tab` wood tick · `open`/`close` air sweep · `toggleOn`/`toggleOff` · `flip` paper whoosh · `primary` warm two-note · `info` neutral pair · `success` three-note bell · `reward` four-note arpeggio · `error` soft low interval · `slider` pitch follows value (0–1).
+- **Outcomes speak.** `toast()` maps success→bell, error/warning→low interval, info→neutral pair, so favorites, saved presets, deck actions and exports get their reward automatically.
+- **Respect the user.** `[data-sound-toggle]` in the hub topbar, mobile menu and studio header flips `cardgram.sound.v1`; `aria-pressed` mirrors it on all three. New sounds belong in the `palette` object, not in inline `AudioContext` calls.

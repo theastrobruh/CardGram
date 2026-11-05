@@ -25,7 +25,7 @@ $t=[System.IO.File]::ReadAllText($f,$u)
 [System.IO.File]::WriteAllText($f,[regex]::Replace($t,'rev=\d+','rev=32'),$u)
 ```
 
-Check: `Select-String index.html -Pattern 'rev='` → all eleven rows identical.
+Check: `Select-String index.html -Pattern 'rev='` → all twelve rows identical.
 
 Symptoms of a stale rev: new markup missing, `data-i18n` printing keys, a new select without options, "my CSS change does nothing". **Check the rev before debugging anything else.**
 
@@ -76,6 +76,7 @@ const hit = (a, b) => Math.min(a.right, b.right) - Math.max(a.left, b.left) > 0.
 | `setFavoriteCard(id)`, `navigate(route)`, `openStudio(tab)` | Hub actions |
 | `Scene.applySettings({ speed: 0, float: 'off' })` | Freeze the card for a clean screenshot |
 | `Scene.centerCamera()` | Face the camera to the card |
+| `Sound` | `play(name, opts), toggle(), setEnabled(bool), isEnabled(), attach(), syncButtons()`, `Sound.state` (`enabled, volume, unlocked, context`) |
 
 ### localStorage
 
@@ -86,6 +87,7 @@ const hit = (a, b) => Math.min(a.right, b.right) - Math.max(a.left, b.left) > 0.
 | `cardgram.scenes.v1` | Three camera keyframes |
 | `cardgram.profile.v1` | Hub profile: `name, handle, bio, avatar, favoriteCardId, joinedAt` |
 | `cardgram.hub.v1` | `exports`, `reviewedCollections`, `decks`, `lastRenderAt` |
+| `cardgram.sound.v1` | `enabled`, `volume` (sound toggle preference) |
 
 Legacy prefixes `deckgram.` / `tcghub.` are migrated on boot (`migrateLegacyStorage`). To reset the demo state:
 
@@ -116,6 +118,7 @@ Scene.centerCamera();
 | `#sidebar`, `#viewport-container`, `#canvas-window-wrapper` | Studio panel, stage, 9:16 wrapper |
 | `#select-card-format` | Card format control |
 | `#tab-deck / #tab-3d / #tab-anim / #tab-canvas` | Studio panes |
+| `[data-sound-toggle]` | Sound on/off (`.hub-sound-btn`, `.hub-menu-sound`, `#btn-sound`) |
 
 ## 6. Common failures
 
@@ -130,6 +133,7 @@ Scene.centerCamera();
 | Export is empty | snapshot happens on the live scene; check `#canvas-window-wrapper` size and `body[data-view="studio"]` |
 | Overlap at one breakpoint | measure; adjust `--hub-card-chrome`, sheet paddings or `--card-ratio` |
 | Accents garbled in the file | a script wrote it with the wrong encoding — rewrite that file with the editor tool |
+| No sound | Audio starts muted (`cardgram.sound.v1`), the page has not received a gesture yet, or a `data-sound="none"` node swallowed the generic tick on purpose |
 
 ## 7. Repository hygiene
 

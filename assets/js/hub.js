@@ -1446,6 +1446,7 @@ function openHubSheet(sheet, trigger) {
   requestAnimationFrame(() => sheet.classList.add('is-open'));
   if (trigger) trigger.setAttribute('aria-expanded', 'true');
   document.addEventListener('keydown', onSheetKeydown);
+  if (window.Sound) window.Sound.play('open');
 
   const panel = sheet.querySelector('.hub-menu-panel');
   if (panel) panel.focus({ preventScroll: true });
@@ -1461,6 +1462,7 @@ function closeHubSheet(options = {}) {
   document.removeEventListener('keydown', onSheetKeydown);
   el.classList.remove('is-open');
   if (trigger) trigger.setAttribute('aria-expanded', 'false');
+  if (window.Sound && !options.instant && !options.silent) window.Sound.play('close');
 
   const finish = () => {
     el.hidden = true;
@@ -1749,7 +1751,7 @@ function onHubClick(event) {
   const routeButton = target.closest('[data-hub-route]');
   if (routeButton) {
     event.preventDefault();
-    closeHubMenu({ restoreFocus: false });
+    closeHubMenu({ restoreFocus: false, silent: true });
     navigate(routeButton.dataset.hubRoute);
     return;
   }
@@ -1757,7 +1759,7 @@ function onHubClick(event) {
   const studioButton = target.closest('[data-open-studio]');
   if (studioButton) {
     event.preventDefault();
-    closeHubMenu({ restoreFocus: false });
+    closeHubMenu({ restoreFocus: false, silent: true });
     navigate(`studio/${studioButton.dataset.openStudio || 'deck'}`);
     return;
   }
@@ -1908,6 +1910,7 @@ function setupHubEvents() {
     hub.els.card.addEventListener('click', () => {
       const flipped = hub.els.card.classList.toggle('is-flipped');
       hub.els.card.setAttribute('aria-pressed', String(flipped));
+      if (window.Sound) window.Sound.play('flip');
     });
   }
 
