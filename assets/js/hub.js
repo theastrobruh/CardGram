@@ -705,21 +705,50 @@ function featuredCards() {
   return cards.length ? cards : HUB_CATALOG.cards.slice(0, 3);
 }
 
-function makeHandThumb(card) {
-  const button = makeNode('button', 'hub-hand-thumb');
+function makeDeckCard(card) {
+  const button = makeNode('button', 'hub-hand-deck-card');
   button.type = 'button';
   button.dataset.favCard = card.id;
   button.title = card.name;
-  button.setAttribute('aria-label', explorerCardLabel(card, hubProfile.favoriteCardId === card.id));
-  button.setAttribute('aria-pressed', String(hubProfile.favoriteCardId === card.id));
+  button.setAttribute(
+    'aria-label',
+    explorerCardLabel(card, hubProfile.favoriteCardId === card.id)
+  );
   button.appendChild(makeExplorerArt(card));
   return button;
 }
 
-function renderHandRail(cards) {
-  const track = hub.els.handTrack;
-  if (!track) return;
-  track.replaceChildren(...cards.map((card) => makeHandThumb(card)));
+/* Dos cartas detrás de la principal en móvil: carrusel de la mano. */
+function renderHandDeck(cards) {
+  const deck = hub.els.handDeck;
+  if (!deck) return;
+
+  if (cards.length < 2) {
+    deck.replaceChildren();
+    return;
+  }
+
+  const current = favoriteCard();
+  let index = cards.findIndex((card) => current && card.id === current.id);
+  if (index < 0) index = 0;
+
+  const prev = cards[(index - 1 + cards.length) % cards.length];
+  const next = cards[(index + 1) % cards.length];
+  const picks = prev.id === next.id ? [next] : [prev, next];
+
+  deck.replaceChildren(...picks.map((card) => makeDeckCard(card)));
+}
+
+function cycleHand(direction) {
+  const cards = featuredCards();
+  if (cards.length < 2) return;
+
+  const current = favoriteCard();
+  let index = cards.findIndex((card) => current && card.id === current.id);
+  if (index < 0) index = 0;
+
+  const next = cards[(index + direction + cards.length) % cards.length];
+  if (next) setFavoriteCard(next.id);
 }
 
 function renderFeaturedStack() {
@@ -729,7 +758,7 @@ function renderFeaturedStack() {
   const cards = featuredCards();
   stack.dataset.count = String(cards.length);
   stack.replaceChildren(...cards.map((card) => makeStackCard(card)));
-  renderHandRail(cards);
+  renderHandDeck(cards);
 }
 
 /* --------------------------------------------------------------------------
@@ -2391,6 +2420,39 @@ function setupHubEvents() {
 
   setupCardInteraction();
 
+  /* Deslizar la carta principal alterna entre las cartas de la mano. */
+  if (hub.els.showcase) {
+    let touchX = 0;
+    let touchY = 0;
+    let tracking = false;
+
+    hub.els.showcase.addEventListener(
+      'touchstart',
+      (event) => {
+        if (event.touches.length !== 1) return;
+        touchX = event.touches[0].clientX;
+        touchY = event.touches[0].clientY;
+        tracking = true;
+      },
+      { passive: true }
+    );
+
+    hub.els.showcase.addEventListener(
+      'touchend',
+      (event) => {
+        if (!tracking) return;
+        tracking = false;
+        const touch = event.changedTouches[0];
+        if (!touch) return;
+        const dx = touch.clientX - touchX;
+        const dy = touch.clientY - touchY;
+        if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+        cycleHand(dx < 0 ? 1 : -1);
+      },
+      { passive: true }
+    );
+  }
+
   if (hub.els.menuBtn) {
     hub.els.menuBtn.addEventListener('click', () => openHubMenu(hub.els.menuBtn));
   }
@@ -2588,9 +2650,8 @@ function cacheHubDom() {
   els.playerStack = hubEl('hub-player-stack');
   els.playerSummary = hubEl('hub-player-summary');
   els.playerStackEdit = hubEl('hub-player-stack-edit');
-  els.mobileHand = hubEl('hub-mobile-hand');
   els.mobileHandEdit = hubEl('hub-mobile-hand-edit');
-  els.handTrack = hubEl('hub-mobile-hand-track');
+  els.handDeck = hubEl('hub-hand-deck');
   els.handDialog = hubEl('hand-dialog');
   els.handForm = hubEl('hand-form');
   els.handPicker = hubEl('hand-picker');
