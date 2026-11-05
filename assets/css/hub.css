@@ -4245,22 +4245,20 @@ dialog {
   display: none;
 }
 
-/* Fila del nombre: el nombre manda y queda centrado en el ancho completo.
-   El botón ⓘ (solo móvil) se sale del flujo y se ancla al borde derecho,
-   con un hueco simétrico a la izquierda, para no descentrar el nombre. */
+/* Fila del nombre: pista central para el nombre y el botón a su derecha.
+   Las pistas laterales son iguales, así el nombre queda centrado. */
 .hub-card-title-row {
-  position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
   width: 100%;
   max-width: 100%;
 }
 
 .hub-card-title-row .hub-card-name {
+  grid-column: 2;
   min-width: 0;
-  padding: 0 40px;
-  text-align: center;
 }
 
 .hub-card-info {
@@ -4392,7 +4390,7 @@ dialog {
   }
   /* ---- Escenario: la carta ocupa el alto disponible ---- */
   .hub-dashboard {
-    --hub-card-chrome: 339px;
+    --hub-card-chrome: 300px;
     max-width: 640px;
     gap: 9px;
     padding: 8px 0 0;
@@ -4456,11 +4454,7 @@ dialog {
     padding: 0 10px;
   }
 
-  /* Fuera del flujo, contra el borde derecho de la fila: el nombre queda centrado. */
   .hub-card-info {
-    position: absolute;
-    top: 50%;
-    right: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -4472,13 +4466,12 @@ dialog {
     background: rgba(255, 255, 255, 0.52);
     border: 1px solid rgba(255, 255, 255, 0.88);
     box-shadow: 0 4px 10px rgba(8, 62, 82, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.94);
-    transform: translateY(-50%);
     transition: background 0.2s ease, transform 0.2s var(--ease), box-shadow 0.2s ease;
   }
 
   .hub-card-info:hover {
     background: rgba(255, 255, 255, 0.82);
-    transform: translateY(calc(-50% - 1px));
+    transform: translateY(-1px);
     box-shadow: 0 8px 16px rgba(8, 62, 82, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.94);
   }
 
@@ -4637,6 +4630,11 @@ dialog {
   .hub-card-tags {
     flex-wrap: wrap;
     row-gap: 3px;
+  }
+
+  /* Con etiquetas a dos líneas la carta cede un poco para no llegar al botón */
+  .hub-dashboard {
+    --hub-card-chrome: 336px;
   }
 
   .hub-card-tag {
