@@ -36,6 +36,7 @@ const hub = {
   deckCoverId: null,
   homeVisits: 0,
   explorerFilter: 'all',
+  explorerIndex: 0,
   opening: false,
   lastRoute: '',
   activeSheet: null,
@@ -563,7 +564,8 @@ function setFavoriteCard(cardId) {
   const card = HUB_CATALOG.byId(cardId);
   if (!card) return;
   const keepExplorerFocus = Boolean(
-    hub.els.explorerTrack && hub.els.explorerTrack.contains(document.activeElement)
+    (hub.els.explorerSpotlight && hub.els.explorerSpotlight.contains(document.activeElement)) ||
+      (hub.els.explorerGrid && hub.els.explorerGrid.contains(document.activeElement))
   );
   hubProfile.favoriteCardId = card.id;
   persistHubProfile();
@@ -607,39 +609,65 @@ function renderExplorerFilters() {
   );
 }
 
-function makeExplorerCard(card) {
-  const item = makeNode('article', 'hub-explorer-item');
-  const selected = hubProfile.favoriteCardId === card.id;
-
-  const cardButton = makeNode('button', 'hub-explorer-card');
-  cardButton.type = 'button';
-  cardButton.dataset.favCard = card.id;
-  cardButton.setAttribute('aria-pressed', String(selected));
-  cardButton.setAttribute(
-    'aria-label',
-    `${card.name} · ${selected ? t('hub_explorer_selected') : t('hub_explorer_make_favorite')}`
+function explorerCards() {
+  return HUB_CATALOG.cards.filter(
+    (card) => hub.explorerFilter === 'all' || card.collectionId === hub.explorerFilter
   );
+}
 
-  const art = makeNode('span', 'hub-explorer-art');
+function explorerCardLabel(card, selected) {
+  return `${card.name} · ${selected ? t('hub_explorer_selected') : t('hub_explorer_make_favorite')}`;
+}
+
+function makeExplorerArt(card, extraClass) {
+  const art = makeNode(
+    'span',
+    extraClass ? `hub-explorer-art ${extraClass}` : 'hub-explorer-art'
+  );
   art.appendChild(makeHubImage(thumbOf(card), card.name));
   art.appendChild(
     makeNode('span', 'hub-explorer-badge', card.collectionShortName || card.set)
   );
 
-  const selectedMark = makeNode('span', 'hub-explorer-selected');
-  selectedMark.setAttribute('aria-hidden', 'true');
-  selectedMark.appendChild(hubIcon('check'));
-  art.appendChild(selectedMark);
+  if (hubProfile.favoriteCardId === card.id) {
+    const selectedMark = makeNode('span', 'hub-explorer-selected');
+    selectedMark.setAttribute('aria-hidden', 'true');
+    selectedMark.appendChild(hubIcon('check'));
+    art.appendChild(selectedMark);
+  }
 
-  cardButton.appendChild(art);
-  cardButton.appendChild(makeNode('span', 'hub-explorer-card-name', card.name));
-  cardButton.appendChild(
+  return art;
+}
+
+function makeExplorerSpotlight(card, index, total) {
+  const selected = hubProfile.favoriteCardId === card.id;
+
+  const feature = makeNode('button', 'hub-explorer-feature');
+  feature.type = 'button';
+  feature.dataset.favCard = card.id;
+  feature.setAttribute('aria-pressed', String(selected));
+  feature.setAttribute('aria-label', explorerCardLabel(card, selected));
+
+  const art = makeExplorerArt(card, 'hub-explorer-spotlight-art');
+  art.appendChild(
     makeNode(
       'span',
-      'hub-explorer-card-meta',
+      'hub-explorer-counter',
+      `${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`
+    )
+  );
+  feature.appendChild(art);
+
+  const copy = makeNode('span', 'hub-explorer-feature-copy');
+  copy.appendChild(makeNode('strong', 'hub-explorer-feature-name', card.name));
+  copy.appendChild(
+    makeNode(
+      'span',
+      'hub-explorer-feature-meta',
       [card.set, card.rarity].filter(Boolean).join(' · ')
     )
   );
+  feature.appendChild(copy);
 
   const openButton = makeNode('button', 'hub-explorer-open');
   openButton.type = 'button';
@@ -648,73 +676,106 @@ function makeExplorerCard(card) {
   openButton.title = t('hub_explorer_open');
   openButton.appendChild(hubIcon('expand'));
 
-  item.appendChild(cardButton);
-  item.appendChild(openButton);
-  return item;
+  return [feature, openButton];
+}
+
+function makeExplorerPick(card) {
+  const selected = hubProfile.favoriteCardId === card.id;
+
+  const button = makeNode('button', 'hub-explorer-pick');
+  button.type = 'button';
+  button.dataset.favCard = card.id;
+  button.setAttribute('aria-pressed', String(selected));
+  button.setAttribute('aria-label', explorerCardLabel(card, selected));
+  button.appendChild(makeExplorerArt(card));
+  button.appendChild(makeNode('span', 'hub-explorer-pick-name', card.name));
+  return button;
 }
 
 function updateExplorerArrows() {
-  const track = hub.els.explorerTrack;
-  if (!track) return;
-
-  const max = Math.max(0, track.scrollWidth - track.clientWidth);
-  if (hub.els.explorerPrev) hub.els.explorerPrev.disabled = track.scrollLeft <= 2;
+  const total = explorerCards().length;
+  const blocked = total <= 1;
+  if (hub.els.explorerPrev) {
+    hub.els.explorerPrev.disabled = blocked || hub.explorerIndex <= 0;
+  }
   if (hub.els.explorerNext) {
-    hub.els.explorerNext.disabled = track.scrollLeft >= max - 2;
+    hub.els.explorerNext.disabled = blocked || hub.explorerIndex >= total - 1;
   }
 }
 
 function renderCardExplorer(options = {}) {
-  const track = hub.els.explorerTrack;
-  if (!track) return;
+  const spotlight = hub.els.explorerSpotlight;
+  if (!spotlight) return;
 
   renderExplorerFilters();
 
-  const cards = HUB_CATALOG.cards.filter(
-    (card) => hub.explorerFilter === 'all' || card.collectionId === hub.explorerFilter
-  );
+  const cards = explorerCards();
+  const dots = hub.els.explorerDots;
+  const grid = hub.els.explorerGrid;
 
   if (!cards.length) {
-    track.replaceChildren(
+    hub.explorerIndex = 0;
+    spotlight.replaceChildren(
       makeNode('p', 'hub-explorer-empty', t('hub_explorer_empty'))
     );
-  } else {
-    track.replaceChildren(...cards.map((card) => makeExplorerCard(card)));
+    if (dots) dots.replaceChildren();
+    if (grid) grid.replaceChildren();
+    updateExplorerArrows();
+    return;
   }
 
-  const targetScroll = options.resetScroll ? 0 : track.scrollLeft;
-  track.scrollLeft = targetScroll;
-  requestAnimationFrame(() => {
-    track.scrollLeft = targetScroll;
-    updateExplorerArrows();
-    if (options.focusCardId) {
-      const target = Array.from(track.querySelectorAll('[data-fav-card]')).find(
+  hub.explorerIndex = Math.min(Math.max(hub.explorerIndex, 0), cards.length - 1);
+  const active = cards[hub.explorerIndex];
+
+  spotlight.replaceChildren(
+    ...makeExplorerSpotlight(active, hub.explorerIndex, cards.length)
+  );
+
+  if (dots) {
+    dots.replaceChildren(
+      ...cards.map((card, index) => {
+        const dot = makeNode('button', 'hub-explorer-dot');
+        dot.type = 'button';
+        dot.dataset.explorerDot = String(index);
+        dot.setAttribute('aria-label', card.name);
+        dot.setAttribute('aria-current', String(index === hub.explorerIndex));
+        return dot;
+      })
+    );
+  }
+
+  if (grid) {
+    grid.replaceChildren(...cards.map((card) => makeExplorerPick(card)));
+  }
+
+  updateExplorerArrows();
+
+  if (options.focusCardId && grid) {
+    requestAnimationFrame(() => {
+      const target = Array.from(grid.querySelectorAll('[data-fav-card]')).find(
         (button) => button.dataset.favCard === options.focusCardId
       );
       if (target) target.focus({ preventScroll: true });
-    }
-  });
+    });
+  }
 }
 
 function setExplorerFilter(filterId) {
   if (filterId === hub.explorerFilter) return;
   hub.explorerFilter = filterId;
-  renderCardExplorer({ resetScroll: true });
+  hub.explorerIndex = 0;
+  renderCardExplorer();
 }
 
-function scrollExplorer(direction) {
-  const track = hub.els.explorerTrack;
-  if (!track) return;
+function stepExplorer(direction) {
+  const total = explorerCards().length;
+  if (!total) return;
 
-  const firstItem = track.querySelector('.hub-explorer-item');
-  const step = firstItem
-    ? firstItem.getBoundingClientRect().width + 9
-    : Math.max(120, track.clientWidth * 0.6);
+  const next = Math.min(Math.max(hub.explorerIndex + direction, 0), total - 1);
+  if (next === hub.explorerIndex) return;
 
-  track.scrollBy({
-    left: step * direction,
-    behavior: reduceMotion() ? 'auto' : 'smooth'
-  });
+  hub.explorerIndex = next;
+  renderCardExplorer();
 }
 
 /* --------------------------------------------------------------------------
@@ -1774,7 +1835,15 @@ function onHubClick(event) {
   const explorerArrow = target.closest('[data-explorer-nav]');
   if (explorerArrow) {
     event.preventDefault();
-    scrollExplorer(Number(explorerArrow.dataset.explorerNav) || 1);
+    stepExplorer(Number(explorerArrow.dataset.explorerNav) || 1);
+    return;
+  }
+
+  const explorerDot = target.closest('[data-explorer-dot]');
+  if (explorerDot) {
+    event.preventDefault();
+    hub.explorerIndex = Number(explorerDot.dataset.explorerDot) || 0;
+    renderCardExplorer();
     return;
   }
 
@@ -2036,16 +2105,14 @@ function setupHubEvents() {
     node.addEventListener('click', () => closeHubSheet());
   });
 
-  if (hub.els.explorerTrack) {
-    hub.els.explorerTrack.addEventListener('scroll', updateExplorerArrows, { passive: true });
-    hub.els.explorerTrack.addEventListener('keydown', (event) => {
+  if (hub.els.explorerCarousel) {
+    hub.els.explorerCarousel.addEventListener('keydown', (event) => {
+      if (event.target !== hub.els.explorerCarousel) return;
       if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
       event.preventDefault();
-      scrollExplorer(event.key === 'ArrowLeft' ? -1 : 1);
+      stepExplorer(event.key === 'ArrowLeft' ? -1 : 1);
     });
   }
-
-  window.addEventListener('resize', updateExplorerArrows);
 
   /* Las hojas solo existen en móvil: al cruzar el breakpoint se cierran. */
   window.addEventListener('resize', () => {
@@ -2211,7 +2278,10 @@ function cacheHubDom() {
   els.collectionRail = hubEl('hub-collection-rail');
 
   els.explorerFilters = hubEl('hub-explorer-filters');
-  els.explorerTrack = hubEl('hub-explorer-track');
+  els.explorerCarousel = hubEl('hub-explorer-carousel');
+  els.explorerSpotlight = hubEl('hub-explorer-spotlight');
+  els.explorerDots = hubEl('hub-explorer-dots');
+  els.explorerGrid = hubEl('hub-explorer-grid');
   els.explorerPrev = document.querySelector('[data-explorer-nav="-1"]');
   els.explorerNext = document.querySelector('[data-explorer-nav="1"]');
 

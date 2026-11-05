@@ -23,7 +23,7 @@ body[data-view="hub"]
 ### Topbar
 
 - Sticky at `top: 0`, z-index 30.
-- Full-bleed: `margin: 0 calc(-1 * page-gutter)`, `padding: 16px page-gutter`.
+- Full-bleed: the bar reaches both viewport edges (`margin: 0 calc(-1 * page-gutter)` cancels `.hub-scroll` padding). Its content lives in `.hub-topbar-inner` (flex, 16 px block padding, `max-width: 1280px + 2 gutters`, centred), so the brand stays aligned with the dashboard columns instead of ending at the shell edge.
 - Background `rgba(207,245,245,.93)`, `blur(18px) saturate(140%)`.
 - Left: 38 px gradient brand mark + `CardGram` + version badge.
 - Center: a glass segmented nav (`Home`, `My cards`, `Collections`, `Explore` with a tiny gradient “soon” dot).
@@ -46,8 +46,8 @@ min-height: min(820px, calc(100dvh - 112px));
 - Outer page gutters remain; panels are 28 px radius with 16–21 px padding.
 - Left and right panels are full-height glass columns; the center is **not** a panel — it is open space with a glow and orbit.
 - Center column is the visual anchor. Card stage `width: clamp(264px, 23vw, 360px)`, aspect 5:7. The card sits above title, collection, chips and a text link.
-- Left panel: avatar/identity, divider, “COLLECTION DATA” micro-label, 2-column stat grid, a full-width render stat, two CTAs, privacy note pinned to the bottom.
-- Right panel: eyebrow + “Card explorer”, short 2-line description, arrows, segmented All/OG/YGO, horizontal card rail, “tap a card” hint, quick menu rows, each with a right arrow.
+- Left panel: avatar/identity, divider, “COLLECTION DATA” micro-label, then the five counters in **one compact single-column list** (icon + value + label per row, no subs, no big tiles), two CTAs and privacy note pinned to the bottom. The member-since line is gone from desktop (only the mobile menu sheet keeps it).
+- Right panel: eyebrow + “Card explorer”, short 2-line description, arrows, segmented All/OG/YGO, a **one-card carousel** (`.hub-explorer-spotlight`: large art, name/meta, index counter, dots) and below it a **quick-picks grid** (`.hub-explorer-grid`, one thumbnail per available card, wraps to more rows when the catalog grows). The old quick-menu rows are gone.
 
 Responsive:
 
