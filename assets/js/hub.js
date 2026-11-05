@@ -615,7 +615,6 @@ function setFavoriteCard(cardId) {
   if (hub.panel === 'library') renderLibrary();
   if (hub.panel === 'collections') renderCollections();
   if (hub.panel === 'profile') renderProfileForm();
-  toast(t('library_favorite') + ': ' + card.name, { type: 'success' });
 }
 
 /* --------------------------------------------------------------------------
@@ -2129,6 +2128,13 @@ function openSavedPreset(presetId) {
 function onHubClick(event) {
   const target = event.target;
   if (!(target instanceof Element)) return;
+
+  const handNav = target.closest('[data-hand-nav]');
+  if (handNav) {
+    event.preventDefault();
+    cycleHand(Number(handNav.dataset.handNav) || 1);
+    return;
+  }
 
   const routeButton = target.closest('[data-hub-route]');
   if (routeButton) {
