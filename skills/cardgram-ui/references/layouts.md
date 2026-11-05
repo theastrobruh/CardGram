@@ -47,7 +47,11 @@ min-height: min(820px, calc(100dvh - 112px));
 - Left and right panels are full-height glass columns; the center is **not** a panel — it is open space with a glow and orbit.
 - Center column is the visual anchor. Card stage `width: clamp(264px, 23vw, 360px)`, aspect 5:7. The card sits above title, collection, chips and a text link.
 - Left panel: avatar/identity, divider, “COLLECTION DATA” micro-label, then the five counters in **one compact single-column list** (icon + value + label per row, no subs, no big tiles), two CTAs and privacy note pinned to the bottom. The member-since line is gone from desktop (only the mobile menu sheet keeps it).
-- Right panel: eyebrow + “Card explorer”, short 2-line description, arrows, segmented All/OG/YGO, a **one-card carousel** (`.hub-explorer-spotlight`: large art, name/meta, index counter, dots) and below it a **quick-picks grid** (`.hub-explorer-grid`, one thumbnail per available card, wraps to more rows when the catalog grows). The old quick-menu rows are gone.
+- Right panel: eyebrow + “Card explorer”, short 2-line description, arrows, segmented All/OG/YGO, a **mode switch** (Carousel · Album · Gacha) and three interchangeable views in the same slot:
+  - **Carousel** (`.hub-explorer-spotlight`): one large card with name/meta, index counter and dots.
+  - **Album** (`.hub-explorer-album-grid`): 3-column grid of every available card (2×2 when there are ≤4) and the quick-picks row hidden.
+  - **Gacha** (`.hub-explorer-hand`): a fanned hand of three random cards that redraws every 5 s; tapping one makes it the favourite.
+  Until the user picks a mode, the panel cycles the three every 6 s as a showcase (`hub.explorerShowcase`). The old quick-menu rows are gone.
 
 Responsive:
 

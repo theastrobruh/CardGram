@@ -37,6 +37,10 @@ const hub = {
   homeVisits: 0,
   explorerFilter: 'all',
   explorerIndex: 0,
+  explorerMode: 'carousel',
+  explorerShowcase: true,
+  explorerTimers: false,
+  gachaIds: [],
   opening: false,
   lastRoute: '',
   activeSheet: null,
@@ -563,6 +567,7 @@ function renderFavoriteCard() {
 function setFavoriteCard(cardId) {
   const card = HUB_CATALOG.byId(cardId);
   if (!card) return;
+  hub.explorerShowcase = false;
   const keepExplorerFocus = Boolean(
     (hub.els.explorerSpotlight && hub.els.explorerSpotlight.contains(document.activeElement)) ||
       (hub.els.explorerGrid && hub.els.explorerGrid.contains(document.activeElement))
@@ -692,6 +697,137 @@ function makeExplorerPick(card) {
   return button;
 }
 
+const EXPLORER_MODES = ['carousel', 'album', 'gacha'];
+
+function shuffleList(list) {
+  const copy = list.slice();
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function renderExplorerModes() {
+  const modes = hub.els.explorerModes;
+  if (!modes) return;
+
+  Array.from(modes.querySelectorAll('[data-explorer-mode]')).forEach((button) => {
+    const active = button.dataset.explorerMode === hub.explorerMode;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+
+  if (hub.els.explorerPanel) {
+    hub.els.explorerPanel.dataset.explorerViewMode = hub.explorerMode;
+  }
+}
+
+function renderExplorerViews() {
+  const views = {
+    carousel: hub.els.explorerCarousel,
+    album: hub.els.explorerAlbum,
+    gacha: hub.els.explorerGacha
+  };
+
+  Object.keys(views).forEach((mode) => {
+    if (views[mode]) views[mode].hidden = mode !== hub.explorerMode;
+  });
+}
+
+function makeExplorerAlbumCard(card) {
+  const selected = hubProfile.favoriteCardId === card.id;
+
+  const button = makeNode('button', 'hub-explorer-album-card');
+  button.type = 'button';
+  button.dataset.favCard = card.id;
+  button.setAttribute('aria-pressed', String(selected));
+  button.setAttribute('aria-label', explorerCardLabel(card, selected));
+  button.appendChild(makeExplorerArt(card));
+  button.appendChild(makeNode('span', 'hub-explorer-album-name', card.name));
+  return button;
+}
+
+function makeExplorerHandCard(card) {
+  const selected = hubProfile.favoriteCardId === card.id;
+
+  const button = makeNode('button', 'hub-explorer-hand-card');
+  button.type = 'button';
+  button.dataset.favCard = card.id;
+  button.title = card.name;
+  button.setAttribute('aria-pressed', String(selected));
+  button.setAttribute('aria-label', explorerCardLabel(card, selected));
+  button.appendChild(makeExplorerArt(card));
+  return button;
+}
+
+function renderExplorerAlbum(cards) {
+  const album = hub.els.explorerAlbumGrid;
+  if (!album) return;
+
+  if (!cards.length) {
+    album.classList.remove('is-quad');
+    album.replaceChildren(
+      makeNode('p', 'hub-explorer-empty', t('hub_explorer_empty'))
+    );
+    return;
+  }
+
+  album.replaceChildren(...cards.map((card) => makeExplorerAlbumCard(card)));
+  album.classList.toggle('is-quad', cards.length <= 4);
+}
+
+function ensureGachaHand(cards, force) {
+  const available = cards.map((card) => card.id);
+  const valid = hub.gachaIds.filter((id) => available.includes(id));
+  const needed = Math.min(3, available.length);
+
+  if (force || valid.length < needed || valid.length !== hub.gachaIds.length) {
+    hub.gachaIds = shuffleList(available).slice(0, needed);
+  } else {
+    hub.gachaIds = valid;
+  }
+}
+
+function renderExplorerHand() {
+  const hand = hub.els.explorerHand;
+  if (!hand) return;
+
+  const cards = hub.gachaIds.map((id) => HUB_CATALOG.byId(id)).filter(Boolean);
+  if (!cards.length) {
+    hand.replaceChildren(
+      makeNode('p', 'hub-explorer-empty', t('hub_explorer_empty'))
+    );
+    return;
+  }
+
+  hand.replaceChildren(...cards.map((card) => makeExplorerHandCard(card)));
+}
+
+function refreshGacha() {
+  ensureGachaHand(explorerCards(), true);
+  renderExplorerHand();
+}
+
+function startExplorerTimers() {
+  if (hub.explorerTimers) return;
+  hub.explorerTimers = true;
+
+  window.setInterval(() => {
+    if (!hub.explorerShowcase || hub.panel !== 'home') return;
+    if (document.body.dataset.view !== 'hub') return;
+    const next = EXPLORER_MODES[(EXPLORER_MODES.indexOf(hub.explorerMode) + 1) % EXPLORER_MODES.length];
+    hub.explorerMode = next;
+    renderCardExplorer({ redrawGacha: next === 'gacha' });
+  }, 6000);
+
+  window.setInterval(() => {
+    if (hub.explorerMode !== 'gacha' || hub.panel !== 'home') return;
+    if (document.body.dataset.view !== 'hub') return;
+    refreshGacha();
+  }, 5000);
+}
+
 function updateExplorerArrows() {
   const total = explorerCards().length;
   const blocked = total <= 1;
@@ -708,10 +844,17 @@ function renderCardExplorer(options = {}) {
   if (!spotlight) return;
 
   renderExplorerFilters();
+  renderExplorerModes();
 
   const cards = explorerCards();
   const dots = hub.els.explorerDots;
   const grid = hub.els.explorerGrid;
+
+  ensureGachaHand(cards, Boolean(options.redrawGacha));
+  renderExplorerAlbum(cards);
+  renderExplorerHand();
+  renderExplorerViews();
+  startExplorerTimers();
 
   if (!cards.length) {
     hub.explorerIndex = 0;
@@ -762,9 +905,10 @@ function renderCardExplorer(options = {}) {
 
 function setExplorerFilter(filterId) {
   if (filterId === hub.explorerFilter) return;
+  hub.explorerShowcase = false;
   hub.explorerFilter = filterId;
   hub.explorerIndex = 0;
-  renderCardExplorer();
+  renderCardExplorer({ redrawGacha: hub.explorerMode === 'gacha' });
 }
 
 function stepExplorer(direction) {
@@ -774,6 +918,7 @@ function stepExplorer(direction) {
   const next = Math.min(Math.max(hub.explorerIndex + direction, 0), total - 1);
   if (next === hub.explorerIndex) return;
 
+  hub.explorerShowcase = false;
   hub.explorerIndex = next;
   renderCardExplorer();
 }
@@ -1832,6 +1977,15 @@ function onHubClick(event) {
     return;
   }
 
+  const explorerMode = target.closest('[data-explorer-mode]');
+  if (explorerMode) {
+    event.preventDefault();
+    hub.explorerShowcase = false;
+    hub.explorerMode = explorerMode.dataset.explorerMode || 'carousel';
+    renderCardExplorer({ redrawGacha: hub.explorerMode === 'gacha' });
+    return;
+  }
+
   const explorerArrow = target.closest('[data-explorer-nav]');
   if (explorerArrow) {
     event.preventDefault();
@@ -1842,6 +1996,7 @@ function onHubClick(event) {
   const explorerDot = target.closest('[data-explorer-dot]');
   if (explorerDot) {
     event.preventDefault();
+    hub.explorerShowcase = false;
     hub.explorerIndex = Number(explorerDot.dataset.explorerDot) || 0;
     renderCardExplorer();
     return;
@@ -2278,9 +2433,15 @@ function cacheHubDom() {
   els.collectionRail = hubEl('hub-collection-rail');
 
   els.explorerFilters = hubEl('hub-explorer-filters');
+  els.explorerPanel = document.querySelector('.hub-explorer-panel');
+  els.explorerModes = hubEl('hub-explorer-modes');
   els.explorerCarousel = hubEl('hub-explorer-carousel');
   els.explorerSpotlight = hubEl('hub-explorer-spotlight');
   els.explorerDots = hubEl('hub-explorer-dots');
+  els.explorerAlbum = hubEl('hub-explorer-album');
+  els.explorerAlbumGrid = hubEl('hub-explorer-album-grid');
+  els.explorerGacha = hubEl('hub-explorer-gacha');
+  els.explorerHand = hubEl('hub-explorer-hand');
   els.explorerGrid = hubEl('hub-explorer-grid');
   els.explorerPrev = document.querySelector('[data-explorer-nav="-1"]');
   els.explorerNext = document.querySelector('[data-explorer-nav="1"]');
