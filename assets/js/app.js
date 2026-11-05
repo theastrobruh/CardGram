@@ -56,11 +56,11 @@ const CATALOG_CARDS =
     ? CATALOG.cards
     : [
         {
-          id: 'og-set-01',
-          name: 'Shadowblade Kinetic',
-          front: 'assets/data/cards/OG/SET-01/FRONT-01.png',
-          back: 'assets/data/cards/OG/SET-01/BACK-BASE.png',
-          fullArt: null
+          id: 'og-azura-lone-wanderer',
+          name: 'Azura, Lone Wanderer',
+          front: 'assets/data/cards/database/OG/FRONT_A_00_AZURA_LONE-WANDERER.png',
+          back: 'assets/data/cards/database/OG/BACK_A_00.png',
+          fullArt: 'assets/data/cards/database/OG/FRONT_A_00_AZURA_LONE-WANDERER(FULL-ART).png'
         }
       ];
 
@@ -222,16 +222,28 @@ function migrateLegacyStorage() {
   });
 }
 
-/* Rutas anteriores a la estructura por colecciones (v0.4.4). */
+/* Rutas anteriores a la estructura por colecciones (v0.4.4 y anteriores). */
+const DB_CARDS = 'assets/data/cards/database';
 const LEGACY_IMAGE_PATHS = {
-  'assets/card_front - base.png': 'assets/data/cards/OG/SET-01/FRONT-01.png',
-  'assets/card_front - base - ALT-1.png': 'assets/data/cards/OG/SET-01/FRONT-01.png',
-  'assets/card_front - base - ALT-2.png': 'assets/data/cards/OG/SET-02/FRONT-01.png',
-  'assets/card_front - base - ALT-3.png': 'assets/data/cards/OG/SET-03/FRONT-01.png',
-  'assets/card_back - base.png': 'assets/data/cards/OG/SET-01/BACK-BASE.png',
-  'assets/card_back - ALT-1.png': 'assets/data/cards/OG/SET-01/BACK-BASE.png',
-  'assets/card_back - ALT-2.png': 'assets/data/cards/OG/SET-02/BACK-BASE.png',
-  'assets/card_back - ALT-3.png': 'assets/data/cards/OG/SET-03/BACK-BASE.png'
+  'assets/card_front - base.png': `${DB_CARDS}/OG/FRONT_A_00_AZURA_LONE-WANDERER.png`,
+  'assets/card_front - base - ALT-1.png': `${DB_CARDS}/OG/FRONT_A_00_AZURA_LONE-WANDERER.png`,
+  'assets/card_front - base - ALT-2.png': `${DB_CARDS}/OG/FRONT_A_02_AZURA SS.png`,
+  'assets/card_front - base - ALT-3.png': `${DB_CARDS}/OG/FRONT_A_03-The-Devil.png`,
+  'assets/card_back - base.png': `${DB_CARDS}/OG/BACK_A_00.png`,
+  'assets/card_back - ALT-1.png': `${DB_CARDS}/OG/BACK_A_00.png`,
+  'assets/card_back - ALT-2.png': `${DB_CARDS}/OG/BACK_A_02.png`,
+  'assets/card_back - ALT-3.png': `${DB_CARDS}/OG/BACK_A_03.png`,
+  'assets/data/cards/OG/SET-01/FRONT-01.png': `${DB_CARDS}/OG/FRONT_A_00_AZURA_LONE-WANDERER.png`,
+  'assets/data/cards/OG/SET-01/BACK-BASE.png': `${DB_CARDS}/OG/BACK_A_00.png`,
+  'assets/data/cards/OG/SET-02/FRONT-01.png': `${DB_CARDS}/OG/FRONT_A_02_AZURA SS.png`,
+  'assets/data/cards/OG/SET-02/BACK-BASE.png': `${DB_CARDS}/OG/BACK_A_02.png`,
+  'assets/data/cards/OG/SET-03/FRONT-01.png': `${DB_CARDS}/OG/FRONT_A_03-The-Devil.png`,
+  'assets/data/cards/OG/SET-03/BACK-BASE.png': `${DB_CARDS}/OG/BACK_A_03.png`,
+  'assets/data/cards/SET_01/FRONT_A_02_AZURA SS.png': `${DB_CARDS}/OG/FRONT_A_02_AZURA SS.png`,
+  'assets/data/cards/SET_01/BACK_A_02.png': `${DB_CARDS}/OG/BACK_A_02.png`,
+  'assets/data/cards/YGO/FRONT-DMG_01.png': `${DB_CARDS}/YGO/FRONT_YGO_01.png`,
+  'assets/data/cards/YGO/FRONT-DMG_02 (FULL ART).png': `${DB_CARDS}/YGO/FRONT_YGO_01(FULL-ART).png`,
+  'assets/data/cards/YGO/BACK-BASE.png': `${DB_CARDS}/YGO/BACK_YGO_01.png`
 };
 
 function safeImageUrl(value) {

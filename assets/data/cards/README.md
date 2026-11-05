@@ -7,33 +7,31 @@ assets/data/cards/
 ├── catalog.js          ← manifiesto que lee la web app
 ├── tools/
 │   └── make-thumbs.py  ← genera las miniaturas WebP del lobby
-├── OG/
-│   ├── SET-01/
-│   │   ├── FRONT-01.png
-│   │   ├── BACK-BASE.png
-│   │   └── thumbs/
-│   │       ├── FRONT-01.webp
-│   │       └── BACK-BASE.webp
-│   ├── SET-02/
-│   └── SET-03/
-├── YGO/
-│   ├── FRONT-DMG_01.png
-│   ├── FRONT-DMG_02 (FULL ART).png
-│   ├── BACK-BASE.png
-│   └── thumbs/
-└── PSD/
-    └── cards.psd       ← material fuente, no se carga en la web
+└── database/           ← única carpeta de imágenes de cartas
+    ├── OG/
+    │   ├── FRONT_A_00_AZURA_LONE-WANDERER.png
+    │   ├── FRONT_A_00_AZURA_LONE-WANDERER(FULL-ART).png
+    │   ├── BACK_A_00.png
+    │   └── thumbs/
+    ├── FAN ART/
+    │   ├── FRONT_DBZ-01_SUPER_SAIYAN.png
+    │   ├── BACK_DBZ.png
+    │   └── thumbs/
+    └── YGO/
+        ├── FRONT_YGO_01.png
+        ├── FRONT_YGO_01(FULL-ART).png
+        ├── BACK_YGO_01.png
+        └── thumbs/
 ```
 
 ## Convenciones de archivos
 
 | Archivo | Uso |
 | --- | --- |
-| `FRONT-*.png` | Anverso (750 × 1050 o 1792 × 2400). |
-| `BACK-BASE.png` | Reverso compartido por la colección. |
-| `FRONT-* (FULL ART).png` | Variante Full Art opcional del mismo anverso. |
+| `FRONT_*.png` | Anverso (1792 × 2400). |
+| `BACK_*.png` | Reverso de la carta o de la colección. |
+| `FRONT_* (FULL-ART).png` | Variante Full Art opcional del mismo anverso. |
 | `thumbs/*.webp` | Miniatura de 760 px que usa el lobby; el estudio usa el PNG. |
-| `PSD/` | Fuentes editables; no se sirven en el visor 3D. |
 
 ## Miniaturas
 
@@ -42,13 +40,13 @@ para no descargar varios MB por tarjeta. El estudio 3D siempre usa el PNG
 original. Después de añadir imágenes nuevas:
 
 ```bash
-python assets/data/cards/tools/make-thumbs.py
+python assets/data/cards/tools/make-thumbs.py --root assets/data/cards/database
 ```
 
 ## Añadir una colección
 
-1. Crea la carpeta `assets/data/cards/<COLECCION>/SET-XX/`.
-2. Copia el anverso y el reverso con los nombres de arriba.
+1. Crea la carpeta `assets/data/cards/database/<COLECCION>/`.
+2. Copia los anversos y reversos con los nombres de arriba.
 3. Añade la colección al array `collections` de `catalog.js`:
 
 ```js
@@ -67,20 +65,20 @@ python assets/data/cards/tools/make-thumbs.py
     de: 'Vorstellungstext der Sammlung.'
   },
   accent: ['#7cebdd', '#2f8fdd'],
-  cover: 'assets/data/cards/NUEVA/SET-01/FRONT-01.png',
-  thumbCover: 'assets/data/cards/NUEVA/SET-01/thumbs/FRONT-01.webp',
+  cover: 'assets/data/cards/database/NUEVA/FRONT_01.png',
+  thumbCover: 'assets/data/cards/database/NUEVA/thumbs/FRONT_01.webp',
   cards: [
     {
-      id: 'nueva-set-01',
+      id: 'nueva-01',
       set: 'SET-01',
       number: '001',
       name: 'Nombre de la carta',
       type: 'Tipo — Subtipo',
       rarity: 'Rare',
-      front: 'assets/data/cards/NUEVA/SET-01/FRONT-01.png',
-      back: 'assets/data/cards/NUEVA/SET-01/BACK-BASE.png',
-      thumbFront: 'assets/data/cards/NUEVA/SET-01/thumbs/FRONT-01.webp',
-      thumbBack: 'assets/data/cards/NUEVA/SET-01/thumbs/BACK-BASE.webp',
+      front: 'assets/data/cards/database/NUEVA/FRONT_01.png',
+      back: 'assets/data/cards/database/NUEVA/BACK_01.png',
+      thumbFront: 'assets/data/cards/database/NUEVA/thumbs/FRONT_01.webp',
+      thumbBack: 'assets/data/cards/database/NUEVA/thumbs/BACK_01.webp',
       fullArt: null,
       stats: { ATK: 2000, DEF: 1700 },
       lore: 'Texto de sabor.'

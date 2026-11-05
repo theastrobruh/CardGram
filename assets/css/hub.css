@@ -3831,7 +3831,7 @@ dialog {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 14px 12px;
+  padding: 12px;
   overflow: hidden;
   border-radius: 18px;
   background:
@@ -3851,7 +3851,7 @@ dialog {
 }
 
 .hub-explorer-art.hub-explorer-spotlight-art {
-  width: min(100%, clamp(120px, 11.6vw, 182px));
+  width: min(100%, clamp(112px, 10.6vw, 166px));
   border-radius: 12px;
   box-shadow:
     0 18px 32px hsl(var(--ambient-shadow) / 0.3),
@@ -3958,14 +3958,20 @@ dialog {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
-  align-content: center;
+  align-content: start;
   min-height: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  padding-right: 2px;
+  scrollbar-width: thin;
 }
 
 /* Con 4 cartas, 2×2 ocupa el panel mejor que 3+1. */
 .hub-explorer-album-grid.is-quad {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+  align-content: center;
+  overflow: visible;
 }
 
 @media (min-width: 981px) and (max-height: 879px) {
@@ -4254,8 +4260,12 @@ dialog {
 
 .hub-explorer-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
   gap: 6px;
+  max-height: 192px;
+  overflow-y: auto;
+  padding-right: 2px;
+  scrollbar-width: thin;
 }
 
 .hub-explorer-pick {

@@ -194,9 +194,9 @@ Rule: every visible key needs **three** entries. `data-i18n`, `data-i18n-aria-la
 
 ## Assets
 
-- Full card art: `assets/data/cards/**/FRONT-*.png`, `BACK-BASE.png` (OG 750×1050, YGO 1792×2400).
-- Hub thumbnails: `assets/data/cards/**/thumbs/*.webp` (OG 543×760, YGO 567×760).
-- Thumbnail generator: `assets/data/cards/tools/make-thumbs.py`.
+- Full card art: `assets/data/cards/database/**/FRONT_*.png`, `BACK_*.png` (1792×2400).
+- Hub thumbnails: `assets/data/cards/database/**/thumbs/*.webp` (760 px max).
+- Thumbnail generator: `assets/data/cards/tools/make-thumbs.py` (`--root assets/data/cards/database`).
 - Local launcher: `Iniciar_Webapp.bat`.
 - Deployment: `.github/workflows/deploy.yml` → GitHub Pages.
 
