@@ -6228,10 +6228,14 @@ dialog {
 
   .hub-favorite .hub-card-stage {
     width: min(
-      calc(100vw - 48px),
-      430px,
+      calc((100vw - 48px) * 0.78),
+      344px,
       calc((100dvh - var(--hub-card-chrome)) * var(--card-ratio))
     );
+  }
+
+  .hub-hand-deck-card {
+    width: min(calc((100vw - 48px) * 0.78), 344px);
   }
 }
 
