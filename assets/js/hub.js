@@ -359,6 +359,10 @@ function renderHubStats(animate) {
 function renderProfileSummary(stats) {
   const values = stats || hubStats();
   if (hub.els.profileStatCards) hub.els.profileStatCards.textContent = String(values.cards);
+  if (hub.els.profileStatCollections) {
+    hub.els.profileStatCollections.textContent = String(values.collections);
+  }
+  if (hub.els.profileStatReview) hub.els.profileStatReview.textContent = String(values.review);
   if (hub.els.profileStatDecks) hub.els.profileStatDecks.textContent = String(values.decks);
   if (hub.els.profileStatRenders) hub.els.profileStatRenders.textContent = String(values.renders);
   if (hub.els.profileMemberSince) {
@@ -490,6 +494,8 @@ function renderFavoriteCard() {
   if (!hub.ready) return;
   const card = favoriteCard();
   if (!card) return;
+
+  renderFeaturedStack();
 
   if (hub.els.cardFront) {
     hub.els.cardFront.src = thumbOf(card);
@@ -642,6 +648,33 @@ function makeExplorerArt(card, extraClass) {
   }
 
   return art;
+}
+
+function makeStackCard(card) {
+  const selected = hubProfile.favoriteCardId === card.id;
+
+  const button = makeNode('button', 'hub-stack-card');
+  button.type = 'button';
+  button.dataset.favCard = card.id;
+  button.title = card.name;
+  button.setAttribute('aria-pressed', String(selected));
+  button.setAttribute('aria-label', explorerCardLabel(card, selected));
+  button.appendChild(makeExplorerArt(card));
+  return button;
+}
+
+/* Abanico de cartas destacadas del jugador en el panel izquierdo. */
+function renderFeaturedStack() {
+  const stack = hub.els.playerStack;
+  if (!stack) return;
+
+  const favorite = favoriteCard();
+  const others = HUB_CATALOG.cards.filter(
+    (card) => !favorite || card.id !== favorite.id
+  );
+  const ordered = [others[0], favorite, others[1]].filter(Boolean);
+
+  stack.replaceChildren(...ordered.map((card) => makeStackCard(card)));
 }
 
 function makeExplorerSpotlight(card, index, total) {
@@ -2420,6 +2453,7 @@ function cacheHubDom() {
   els.playerHandle = hubEl('hub-player-handle');
   els.playerBio = hubEl('hub-player-bio');
   els.playerSince = hubEl('hub-player-since');
+  els.playerStack = hubEl('hub-player-stack');
 
   els.showcase = hubEl('hub-showcase');
   els.card = hubEl('hub-card');
@@ -2491,6 +2525,8 @@ function cacheHubDom() {
   els.btnAvatarUpload = hubEl('btn-avatar-upload');
   els.btnAvatarRemove = hubEl('btn-avatar-remove');
   els.profileStatCards = hubEl('profile-stat-cards');
+  els.profileStatCollections = hubEl('profile-stat-collections');
+  els.profileStatReview = hubEl('profile-stat-review');
   els.profileStatDecks = hubEl('profile-stat-decks');
   els.profileStatRenders = hubEl('profile-stat-renders');
   els.profileMemberSince = hubEl('profile-member-since');

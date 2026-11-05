@@ -12,8 +12,8 @@
   <title>CardGram · v0.4.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.4.5&rev=53">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.4.5&rev=53">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.4.5&rev=54">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.4.5&rev=54">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
           integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu"
@@ -21,16 +21,16 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"
           integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf"
           crossorigin="anonymous" defer></script>
-  <script src="assets/data/cards/catalog.js?v=0.4.5&rev=53" defer></script>
-  <script src="assets/js/i18n.js?v=0.4.5&rev=53" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.4.5&rev=53" defer></script>
-  <script src="assets/js/community.js?v=0.4.5&rev=53" defer></script>
-  <script src="assets/js/ambient.js?v=0.4.5&rev=53" defer></script>
-  <script src="assets/js/scene.js?v=0.4.5&rev=53" defer></script>
-  <script src="assets/js/export.js?v=0.4.5&rev=53" defer></script>
-  <script src="assets/js/sound.js?v=0.4.5&rev=53" defer></script>
-  <script src="assets/js/hub.js?v=0.4.5&rev=53" defer></script>
-  <script src="assets/js/app.js?v=0.4.5&rev=53" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.4.5&rev=54" defer></script>
+  <script src="assets/js/i18n.js?v=0.4.5&rev=54" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.4.5&rev=54" defer></script>
+  <script src="assets/js/community.js?v=0.4.5&rev=54" defer></script>
+  <script src="assets/js/ambient.js?v=0.4.5&rev=54" defer></script>
+  <script src="assets/js/scene.js?v=0.4.5&rev=54" defer></script>
+  <script src="assets/js/export.js?v=0.4.5&rev=54" defer></script>
+  <script src="assets/js/sound.js?v=0.4.5&rev=54" defer></script>
+  <script src="assets/js/hub.js?v=0.4.5&rev=54" defer></script>
+  <script src="assets/js/app.js?v=0.4.5&rev=54" defer></script>
 </head>
 <body data-view="hub">
 
@@ -359,43 +359,8 @@
 
                 <div class="hub-player-divider" aria-hidden="true"></div>
 
-                <div class="hub-player-stats-head">
-                  <span data-i18n="hub_player_stats_label">Datos de colección</span>
-                  <svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>
-                </div>
-
-                <div class="hub-player-stats">
-                  <button class="hub-player-stat" type="button" data-hub-route="library">
-                    <span class="hub-player-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg></span>
-                    <span class="hub-player-stat-value" id="stat-cards">0</span>
-                    <span class="hub-player-stat-label" data-i18n="hub_stat_cards">Cartas guardadas</span>
-                    <span class="hub-player-stat-sub" id="stat-cards-sub"></span>
-                  </button>
-                  <button class="hub-player-stat" type="button" data-hub-route="collections">
-                    <span class="hub-player-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg></span>
-                    <span class="hub-player-stat-value" id="stat-collections">0</span>
-                    <span class="hub-player-stat-label" data-i18n="hub_stat_collections">Colecciones</span>
-                    <span class="hub-player-stat-sub" id="stat-collections-sub"></span>
-                  </button>
-                  <button class="hub-player-stat" type="button" data-hub-route="collections">
-                    <span class="hub-player-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-compass"></use></svg></span>
-                    <span class="hub-player-stat-value" id="stat-review">0</span>
-                    <span class="hub-player-stat-label" data-i18n="hub_stat_review">Por revisar</span>
-                    <span class="hub-player-stat-sub" id="stat-review-sub"></span>
-                  </button>
-                  <button class="hub-player-stat" type="button" data-hub-route="collections">
-                    <span class="hub-player-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-layers"></use></svg></span>
-                    <span class="hub-player-stat-value" id="stat-decks">0</span>
-                    <span class="hub-player-stat-label" data-i18n="hub_stat_decks">Tus decks</span>
-                    <span class="hub-player-stat-sub" id="stat-decks-sub"></span>
-                  </button>
-                  <button class="hub-player-stat hub-player-stat-wide" type="button" data-open-studio="canvas">
-                    <span class="hub-player-stat-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg></span>
-                    <span class="hub-player-stat-value" id="stat-renders">0</span>
-                    <span class="hub-player-stat-label" data-i18n="hub_stat_renders">Renders</span>
-                    <span class="hub-player-stat-sub" data-i18n="hub_stat_renders_sub">exportados</span>
-                  </button>
-                </div>
+                <!-- Cartas destacadas: abanico compacto, la favorita al frente. -->
+                <div class="hub-player-stack" id="hub-player-stack" role="group" aria-label="Cartas destacadas" data-i18n-aria-label="hub_featured_aria"></div>
 
                 <div class="hub-player-actions">
                   <button class="btn btn-primary hub-player-cta" type="button" data-open-studio="deck">
@@ -414,6 +379,50 @@
                   </a>
                 </div>
 
+                <div class="hub-support" aria-label="Apoyar CardGram" data-i18n-aria-label="hub_support_aria">
+                  <div class="hub-support-links">
+                    <a class="hub-support-btn" href="https://github.com/theastrobruh/CardGram" target="_blank" rel="noopener noreferrer" title="Repositorio de CardGram en GitHub" data-i18n-title="hub_support_github_title" aria-label="Abrir el repositorio de CardGram en GitHub" data-i18n-aria-label="hub_support_github_title">
+                      <svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg>
+                      <span data-i18n="hub_support_github">GitHub</span>
+                    </a>
+                    <a class="hub-support-btn hub-support-btn-kofi" href="https://ko-fi.com/theastrobruh" target="_blank" rel="noopener noreferrer" title="Apoyar CardGram en Ko-fi" data-i18n-title="hub_support_kofi_title" aria-label="Apoyar CardGram en Ko-fi" data-i18n-aria-label="hub_support_kofi_title">
+                      <svg class="icon" aria-hidden="true"><use href="#i-kofi"></use></svg>
+                      <span>Ko-fi</span>
+                    </a>
+                    <a class="hub-support-btn" href="https://beacons.ai/el.astro.verse" target="_blank" rel="noopener noreferrer" title="Perfiles de AstroBruh" data-i18n-title="hub_support_creator_title" aria-label="Abrir los perfiles de AstroBruh" data-i18n-aria-label="hub_support_creator_title">
+                      <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+                      <span data-i18n="hub_support_creator">AstroBruh</span>
+                    </a>
+                  </div>
+
+                  <div class="hub-sponsors">
+                    <a class="hub-sponsor" href="https://ko-fi.com/theastrobruh" target="_blank" rel="noopener noreferrer">
+                      <span class="hub-sponsor-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-kofi"></use></svg></span>
+                      <span class="hub-sponsor-copy">
+                        <strong data-i18n="hub_sponsor_1_title">Invítame un café</strong>
+                        <small data-i18n="hub_sponsor_1_text">Apoya el desarrollo</small>
+                      </span>
+                      <svg class="icon hub-sponsor-arrow" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                    </a>
+                    <a class="hub-sponsor" href="https://github.com/theastrobruh/CardGram" target="_blank" rel="noopener noreferrer">
+                      <span class="hub-sponsor-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg></span>
+                      <span class="hub-sponsor-copy">
+                        <strong data-i18n="hub_sponsor_2_title">Patrocina el proyecto</strong>
+                        <small data-i18n="hub_sponsor_2_text">Tu marca, en cada partida</small>
+                      </span>
+                      <svg class="icon hub-sponsor-arrow" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                    </a>
+                    <a class="hub-sponsor" href="https://beacons.ai/el.astro.verse" target="_blank" rel="noopener noreferrer">
+                      <span class="hub-sponsor-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg></span>
+                      <span class="hub-sponsor-copy">
+                        <strong data-i18n="hub_sponsor_3_title">Colabora conmigo</strong>
+                        <small data-i18n="hub_sponsor_3_text">Marcas y creadores</small>
+                      </span>
+                      <svg class="icon hub-sponsor-arrow" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                    </a>
+                  </div>
+                </div>
+
                 <p class="hub-player-privacy">
                   <svg class="icon" aria-hidden="true"><use href="#i-save"></use></svg>
                   <span data-i18n="hub_privacy">Local y privado · tus imágenes no salen de este dispositivo.</span>
@@ -422,14 +431,6 @@
 
               <!-- Carta favorita -->
               <div class="hub-favorite">
-                <div class="hub-favorite-head">
-                  <span class="hub-favorite-kicker">
-                    <span class="hub-live-dot" aria-hidden="true"></span>
-                    <span data-i18n="hub_favorite_label">Tu carta favorita</span>
-                  </span>
-                  <span class="hub-favorite-ornament" aria-hidden="true"></span>
-                </div>
-
                 <div class="hub-showcase" id="hub-showcase">
                   <div class="hub-showcase-glow" aria-hidden="true"></div>
                   <div class="hub-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -761,6 +762,8 @@
                 <h2 id="profile-summary-title" data-i18n="profile_summary">Resumen</h2>
                 <dl class="profile-stat-list">
                   <div><dt data-i18n="profile_summary_cards">Cartas guardadas</dt><dd id="profile-stat-cards">0</dd></div>
+                  <div><dt data-i18n="hub_stat_collections">Colecciones</dt><dd id="profile-stat-collections">0</dd></div>
+                  <div><dt data-i18n="hub_stat_review">Por revisar</dt><dd id="profile-stat-review">0</dd></div>
                   <div><dt data-i18n="profile_summary_decks">Decks creados</dt><dd id="profile-stat-decks">0</dd></div>
                   <div><dt data-i18n="profile_summary_renders">Renders exportados</dt><dd id="profile-stat-renders">0</dd></div>
                 </dl>

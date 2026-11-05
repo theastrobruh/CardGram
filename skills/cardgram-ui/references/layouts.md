@@ -46,7 +46,7 @@ min-height: min(820px, calc(100dvh - 112px));
 - Outer page gutters remain; panels are 28 px radius with 16–21 px padding.
 - Left and right panels are full-height glass columns; the center is **not** a panel — it is open space with a glow and orbit.
 - Center column is the visual anchor. Card stage `width: clamp(264px, 23vw, 360px)`, aspect 5:7. The card sits above title, collection, chips and a text link.
-- Left panel: avatar/identity, divider, “COLLECTION DATA” micro-label, then the five counters in **one compact single-column list** (icon + value + label per row, no subs, no big tiles), two CTAs and privacy note pinned to the bottom. The member-since line is gone from desktop (only the mobile menu sheet keeps it).
+- Left panel: avatar/identity, divider, a **stacked fan of featured cards** (`.hub-player-stack`; the current favourite sits in the centre and is marked, side cards also set the favourite on click), the **support block** (GitHub · Ko-fi · AstroBruh row plus three mini sponsor banners) and the privacy note pinned to the bottom. The collection counters no longer live here: they are in the profile summary (cards, collections, to review, decks, renders) and the mobile menu sheet. The member-since line is gone from desktop too.
 - Right panel: eyebrow + “Card explorer”, short 2-line description, arrows, segmented All/OG/YGO, a **mode switch** (Carousel · Album · Gacha) and three interchangeable views in the same slot:
   - **Carousel** (`.hub-explorer-spotlight`): one large card with name/meta, index counter and dots.
   - **Album** (`.hub-explorer-album-grid`): 3-column grid of every available card (2×2 when there are ≤4) and the quick-picks row hidden.
