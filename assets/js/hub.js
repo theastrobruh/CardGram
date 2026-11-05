@@ -1877,28 +1877,127 @@ async function removeSavedPreset(presetId) {
   renderHubStats(false);
 }
 
-function setupShowcaseTilt() {
-  if (!hub.els.showcase || reduceMotion()) return;
-  let frame = 0;
+/* --------------------------------------------------------------------------
+   Carta del inicio: clic para voltear, arrastre para inspeccionar los bordes.
+   -------------------------------------------------------------------------- */
+const cardGesture = {
+  pointerId: null,
+  startX: 0,
+  startY: 0,
+  baseX: 0,
+  baseY: 0,
+  tiltX: 0,
+  tiltY: 0,
+  moved: false
+};
+let cardSuppressClick = false;
 
-  hub.els.showcase.addEventListener('pointermove', (event) => {
-    if (event.pointerType === 'touch') return;
-    if (frame) return;
+function setCardTilt(x, y) {
+  cardGesture.tiltX = x;
+  cardGesture.tiltY = y;
+  if (!hub.els.cardStage) return;
+  hub.els.cardStage.style.setProperty('--tilt-x', `${x.toFixed(2)}deg`);
+  hub.els.cardStage.style.setProperty('--tilt-y', `${y.toFixed(2)}deg`);
+}
 
-    frame = requestAnimationFrame(() => {
-      frame = 0;
-      const rect = hub.els.showcase.getBoundingClientRect();
+function setupCardInteraction() {
+  const stage = hub.els.cardStage;
+  const showcase = hub.els.showcase;
+  if (!stage || !showcase) return;
+
+  const DRAG_THRESHOLD = 5;
+  const MAX_TILT_X = 30;
+  const MAX_TILT_Y = 68;
+
+  function startDrag(event) {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    if (cardGesture.pointerId !== null) return;
+
+    cardGesture.pointerId = event.pointerId;
+    cardGesture.startX = event.clientX;
+    cardGesture.startY = event.clientY;
+    cardGesture.baseX = cardGesture.tiltX;
+    cardGesture.baseY = cardGesture.tiltY;
+    cardGesture.moved = false;
+    cardSuppressClick = false;
+  }
+
+  function moveDrag(event) {
+    if (cardGesture.pointerId === null) {
+      /* Inclinación suave al pasar el ratón, sin voltear la carta. */
+      if (event.pointerType !== 'mouse' || reduceMotion()) return;
+      const rect = stage.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width - 0.5;
       const y = (event.clientY - rect.top) / rect.height - 0.5;
-      hub.els.showcase.style.setProperty('--tilt-x', `${(-y * 9).toFixed(2)}deg`);
-      hub.els.showcase.style.setProperty('--tilt-y', `${(x * 11).toFixed(2)}deg`);
-    });
-  });
+      setCardTilt(-y * 7, x * 9);
+      return;
+    }
 
-  hub.els.showcase.addEventListener('pointerleave', () => {
-    hub.els.showcase.style.setProperty('--tilt-x', '0deg');
-    hub.els.showcase.style.setProperty('--tilt-y', '0deg');
+    if (event.pointerId !== cardGesture.pointerId) return;
+
+    const dx = event.clientX - cardGesture.startX;
+    const dy = event.clientY - cardGesture.startY;
+
+    if (!cardGesture.moved && Math.hypot(dx, dy) > DRAG_THRESHOLD) {
+      cardGesture.moved = true;
+      showcase.classList.add('is-dragging');
+      /* La captura se toma al superar el umbral para no romper el clic. */
+      try {
+        stage.setPointerCapture(event.pointerId);
+      } catch (error) {
+        /* Navegadores sin pointer capture: seguimos con el gesto. */
+      }
+      if (window.Sound) window.Sound.play('flip');
+    }
+
+    if (!cardGesture.moved) return;
+
+    const tiltY = Math.max(-MAX_TILT_Y, Math.min(MAX_TILT_Y, cardGesture.baseY + dx * 0.42));
+    const tiltX = Math.max(-MAX_TILT_X, Math.min(MAX_TILT_X, cardGesture.baseX - dy * 0.3));
+    setCardTilt(tiltX, tiltY);
+  }
+
+  function endDrag(event) {
+    if (cardGesture.pointerId === null) return;
+    if (event && event.pointerId !== cardGesture.pointerId) return;
+
+    const wasDragging = cardGesture.moved;
+    const pointerId = cardGesture.pointerId;
+    cardGesture.pointerId = null;
+    cardGesture.moved = false;
+    showcase.classList.remove('is-dragging');
+
+    if (wasDragging) {
+      setCardTilt(0, 0);
+      cardSuppressClick = true;
+      window.setTimeout(() => {
+        cardSuppressClick = false;
+      }, 350);
+      if (window.Sound) window.Sound.play('cardSettle');
+    }
+
+    if (stage.hasPointerCapture && stage.hasPointerCapture(pointerId)) {
+      try {
+        stage.releasePointerCapture(pointerId);
+      } catch (error) {
+        /* La captura ya se liberó. */
+      }
+    }
+  }
+
+  stage.addEventListener('pointerdown', startDrag);
+  stage.addEventListener('pointermove', moveDrag);
+  stage.addEventListener('pointerup', endDrag);
+  stage.addEventListener('pointercancel', endDrag);
+  stage.addEventListener('pointerleave', () => {
+    if (cardGesture.pointerId === null) {
+      setCardTilt(0, 0);
+      return;
+    }
+    /* Salió antes de superar el umbral: el gesto se cancela, no queda colgado. */
+    if (!cardGesture.moved) endDrag();
   });
+  stage.addEventListener('dragstart', (event) => event.preventDefault());
 }
 
 function setupHubEvents() {
@@ -1908,13 +2007,18 @@ function setupHubEvents() {
 
   if (hub.els.card) {
     hub.els.card.addEventListener('click', () => {
+      /* Un arrastre no debe voltear la carta al soltar. */
+      if (cardSuppressClick) {
+        cardSuppressClick = false;
+        return;
+      }
       const flipped = hub.els.card.classList.toggle('is-flipped');
       hub.els.card.setAttribute('aria-pressed', String(flipped));
       if (window.Sound) window.Sound.play('flip');
     });
   }
 
-  setupShowcaseTilt();
+  setupCardInteraction();
 
   if (hub.els.menuBtn) {
     hub.els.menuBtn.addEventListener('click', () => openHubMenu(hub.els.menuBtn));

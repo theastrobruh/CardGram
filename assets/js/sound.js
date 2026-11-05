@@ -20,6 +20,7 @@
     open: 0.12,
     close: 0.12,
     flip: 0.18,
+    cardSettle: 0.2,
     success: 0.35,
     reward: 0.35,
     error: 0.3,
@@ -269,6 +270,12 @@
     flip() {
       air({ from: 900, to: 3000, dur: 0.3, gain: 0.03, q: 1.1 });
       tone({ freq: 300, to: 680, type: 'triangle', dur: 0.16, gain: 0.01 });
+    },
+
+    /* La carta vuelve a su sitio tras inspeccionarla. */
+    cardSettle() {
+      air({ from: 1500, to: 420, dur: 0.24, gain: 0.02, q: 0.9 });
+      tone({ freq: 320, to: 240, type: 'triangle', dur: 0.14, gain: 0.008 });
     },
 
     /* Acción principal (exportar, guardar, estrenar). */

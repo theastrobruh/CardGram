@@ -18,7 +18,9 @@
 | Panel/view rise | .75 s | — | `--ease` |
 | Tab pane in | .36 s | — | `--ease` |
 | Card flip | 1.35 s | — | `--ease` |
-| Tilt follow | .9 s | — | `--ease` |
+| Card drag follow | 0 s (direct) | — | none |
+| Card settle after drag | .7 s | — | `--ease` |
+| Hover tilt (pointer only) | .7 s | — | `--ease` |
 | Button hover | .2 s | — | `--ease` |
 | Switch thumb | .26 s | — | `--ease-bounce` |
 | Toast enter | .22 s | — | `--ease` |
@@ -86,13 +88,15 @@ Rules:
 2. Mobile sizing is height-driven: `width: min(100% - 6px, (100dvh - var(--hub-card-chrome)) * var(--card-ratio), 460px)`. Height is therefore constant for every format; only the width changes. Desktop keeps `clamp(212px, 21vw, 292px)`.
 3. `.hub-card-tilt`, `.hub-card` and `.hub-card-inner` all need `transform-style: preserve-3d`.
 4. Faces need `backface-visibility: hidden`; the back starts at `rotateY(180deg)`.
-5. Flip on hover/focus and on click (`is-flipped`), so touch users get it too.
-6. Pointer tilt: set `--tilt-x` / `--tilt-y` on the stage from normalized pointer position, clamp to ±8deg, reset on leave.
-7. Keep the idle animation on `.hub-card`, not `.hub-card-inner`, so it composes with the flip.
-8. The synthetic shine is a `::after` on `.hub-card-front`, `mix-blend-mode: screen`, clipped by the face radius.
-9. Glow, orbit and shadow are tuned per breakpoint in `hub.css` §20; the glow draws from `--ambient-a/b`.
+5. **Flip is deliberate, never automatic.** Only `.hub-card.is-flipped .hub-card-inner` gets `rotateY(180deg)`. There is no `:hover`/`:focus-visible` flip — hover may tilt at most, and keyboard activation goes through the same click path.
+6. **Drag to inspect.** `setupCardInteraction()` in `hub.js` handles `pointerdown/move/up/cancel` on `#hub-card-stage`: under a 5 px threshold nothing happens (so a click still flips); past it the stage captures the pointer (only then, to keep the click alive), `.hub-showcase` gets `.is-dragging`, and `--tilt-x` / `--tilt-y` follow the delta clamped to ±30° X and ±68° Y. `touch-action: none` on the stage keeps the gesture from scrolling the page.
+7. **Settle back.** On release the tilt resets to `0deg`, `.is-dragging` is removed (transition returns, idle animation resumes) and `cardSuppressClick` swallows the click that would otherwise flip the card. A new click 350 ms later flips normally. Sounds: `flip` when the drag actually starts and on a real flip, `cardSettle` when the card springs back.
+8. **Hover never flips.** With no active pointer the same handler applies a gentle pointer-only tilt (±7° X / ±9° Y) and resets it on leave; `reduceMotion()` disables both the hover tilt and the gesture.
+9. Keep the idle animation on `.hub-card`, not `.hub-card-inner`, so it composes with the flip; `.is-dragging` pauses it so the card follows the finger exactly.
+10. The synthetic shine is a `::after` on `.hub-card-front`, `mix-blend-mode: screen`, clipped by the face radius.
+11. Glow, orbit and shadow are tuned per breakpoint in `hub.css` §20; the glow draws from `--ambient-a/b`.
 
-Implementation: `hub.js` (`syncCardRatio`, `setupShowcaseTilt`, `renderFavoriteCard`) and `hub.css` §6 + §20.
+Implementation: `hub.js` (`syncCardRatio`, `setupCardInteraction`, `setCardTilt`, `renderFavoriteCard`) and `hub.css` §6 + §20.
 
 ## 5. Three.js handoff
 

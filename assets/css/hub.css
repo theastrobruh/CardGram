@@ -633,6 +633,11 @@ dialog {
   width: clamp(212px, 21vw, 292px);
   aspect-ratio: var(--card-ratio);
   perspective: 1500px;
+  /* La carta se arrastra para inspeccionarla: el gesto no hace scroll. */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: grab;
 }
 
 .hub-panel.active .hub-card-stage {
@@ -661,7 +666,8 @@ dialog {
   height: 100%;
   transform-style: preserve-3d;
   transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
-  transition: transform 0.9s var(--ease);
+  transition: transform 0.7s var(--ease);
+  will-change: transform;
 }
 
 .hub-card {
@@ -674,7 +680,22 @@ dialog {
   background: transparent;
   transform-style: preserve-3d;
   animation: hubCardIdle 11s ease-in-out infinite;
-  cursor: pointer;
+  cursor: grab;
+  -webkit-user-drag: none;
+}
+
+/* Gesto directo: al arrastrar se congela el idle y la inclinación sigue al puntero. */
+.hub-showcase.is-dragging .hub-card-tilt {
+  transition: none;
+}
+
+.hub-showcase.is-dragging .hub-card {
+  animation-play-state: paused;
+  cursor: grabbing;
+}
+
+.hub-showcase.is-dragging .hub-card-stage {
+  cursor: grabbing;
 }
 
 @keyframes hubCardIdle {
@@ -689,8 +710,7 @@ dialog {
   transition: transform 1.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.hub-card:hover .hub-card-inner,
-.hub-card:focus-visible .hub-card-inner,
+/* El giro es una acción deliberada: clic, toque o teclado. Nunca el hover. */
 .hub-card.is-flipped .hub-card-inner {
   transform: rotateY(180deg);
 }
@@ -717,6 +737,9 @@ dialog {
   /* La carta se ve completa aunque su formato no sea 5:7. */
   object-fit: contain;
   display: block;
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
 }
 
 .hub-card-front::after {
@@ -2855,8 +2878,6 @@ dialog {
     transition: none !important;
   }
 
-  .hub-card:hover .hub-card-inner,
-  .hub-card:focus-visible .hub-card-inner,
   .hub-card.is-flipped .hub-card-inner {
     transform: rotateY(180deg);
   }

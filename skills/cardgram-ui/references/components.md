@@ -92,7 +92,7 @@ The hero card is a CSS 3D object — no WebGL — inside an optional vitrine:
 <div class="hub-card-surface">                 <!-- mobile panel; display:contents on desktop -->
   <div class="hub-card-stage" id="hub-card-stage">  <!-- --card-ratio, aspect-ratio -->
     <div class="hub-card-tilt">
-      <button class="hub-card" aria-pressed="false">   <!-- flips on hover/focus/click -->
+      <button class="hub-card" aria-pressed="false">   <!-- click/tap flips; drag rotates -->
         <span class="hub-card-inner">
           <span class="hub-card-face hub-card-front"><img></span>
           <span class="hub-card-face hub-card-back"><img></span>
@@ -117,6 +117,7 @@ The hero card is a CSS 3D object — no WebGL — inside an optional vitrine:
 - Face shadow: `0 36px 64px hsl(var(--ambient-shadow) / .34), 0 6px 16px …` + inset white highlight.
 - Hover shine: 112° white band on `.hub-card-front::after`, `mix-blend-mode: screen`, 8 s loop.
 - Idle: 11 s translateY ±6 px + rotateY ±5° + rotateX ±1.5°; entrance 2.1 s from translateY 52 px / scale .82 / blur 14 px.
+- Interaction (`setupCardInteraction()`): hover only tilts (±7° X / ±9° Y); click or tap flips (`is-flipped`); drag on `#hub-card-stage` rotates to inspect the edges (clamped ±30° X / ±68° Y, `touch-action: none`), pauses the idle, then springs back in .7 s and swallows the click that would have flipped it. Any change here needs the touch path re-tested, not just the mouse.
 - Below the stage: `.hub-card-meta` = `.hub-card-tags` (three pills) → `.hub-card-title-row` (name + ⓘ) → on desktop `.hub-card-sub` and `.hub-card-chips`.
 
 **Identifier pills** (`#hub-card-tags`, mobile only): three `.hub-card-tag` spans rendered by `renderFavoriteCard()` — `collection.name`, `card.attribute || card.type`, and `stats` joined with ` · `. 999 px radius, `.5rem` 700 `#0a6b78`, white .56 with a white .88 border and a 3 px inset highlight; `flex-wrap: nowrap` above 380 px, `wrap` below it so nothing truncates. The same data appears as `.hub-chip` in the details sheet.
