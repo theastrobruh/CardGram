@@ -3361,6 +3361,12 @@ dialog {
   transform: rotate(12deg) translateY(10px);
 }
 
+/* Una sola carta: sin abanico ni inclinación. */
+.hub-player-stack[data-count="1"] .hub-stack-card {
+  z-index: 3;
+  transform: rotate(0deg) translateY(0);
+}
+
 .hub-stack-card:hover,
 .hub-stack-card:focus-visible {
   z-index: 8;

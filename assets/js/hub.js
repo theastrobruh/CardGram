@@ -154,12 +154,7 @@ function defaultFavoriteId() {
 }
 
 function defaultFeaturedIds(favoriteId) {
-  const ids = [];
-  if (favoriteId) ids.push(favoriteId);
-  HUB_CATALOG.cards.forEach((card) => {
-    if (ids.length < 3 && !ids.includes(card.id)) ids.push(card.id);
-  });
-  return ids;
+  return favoriteId ? [favoriteId] : [];
 }
 
 function sanitizeHubProfile(raw) {
@@ -191,6 +186,20 @@ function sanitizeHubProfile(raw) {
     });
   }
   if (!featuredIds.length) featuredIds.push(...defaultFeaturedIds(favorite));
+
+  /* Manos viejas que nacieron del abanico automático de 3: deja solo la principal. */
+  if (featuredIds.length === 3 && featuredIds[0] === favorite) {
+    const legacy = [
+      favorite,
+      ...HUB_CATALOG.cards
+        .filter((card) => card.id !== favorite)
+        .slice(0, 2)
+        .map((card) => card.id)
+    ];
+    if (legacy.every((id, index) => featuredIds[index] === id)) {
+      featuredIds.length = 1;
+    }
+  }
 
   return {
     name: name || base.name,
@@ -723,8 +732,12 @@ function renderHandDeck(cards) {
   const deck = hub.els.handDeck;
   if (!deck) return;
 
+  const navs = document.querySelectorAll('[data-hand-nav]');
   if (cards.length < 2) {
     deck.replaceChildren();
+    navs.forEach((button) => {
+      button.hidden = true;
+    });
     return;
   }
 
@@ -737,6 +750,9 @@ function renderHandDeck(cards) {
   const picks = prev.id === next.id ? [next] : [prev, next];
 
   deck.replaceChildren(...picks.map((card) => makeDeckCard(card)));
+  navs.forEach((button) => {
+    button.hidden = false;
+  });
 }
 
 function cycleHand(direction) {
