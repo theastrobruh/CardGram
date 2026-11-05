@@ -376,7 +376,8 @@ function renderHubStats(animate) {
   if (hub.els.menuStatRenders) hub.els.menuStatRenders.textContent = String(stats.renders);
 
   if (hub.els.playerSummary) {
-    hub.els.playerSummary.textContent = t('hub_mobile_summary', {
+    hub.els.playerSummary.textContent = `${stats.catalogCards}·${HUB_CATALOG.collections.length}`;
+    hub.els.playerSummary.title = t('hub_mobile_summary', {
       cards: stats.catalogCards,
       collections: HUB_CATALOG.collections.length
     });

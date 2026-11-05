@@ -6154,33 +6154,39 @@ dialog {
     z-index: 5;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
     width: 26px;
-    height: 26px;
-    border-radius: 50%;
+    height: 64px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
     color: #0a6b78;
-    background: rgba(255, 255, 255, 0.52);
-    border: 1px solid rgba(255, 255, 255, 0.86);
-    box-shadow: 0 4px 10px rgba(8, 62, 82, 0.12);
-    opacity: 0.72;
+    background: transparent;
+    box-shadow: none;
+    opacity: 0.52;
     transform: translateY(-50%);
+    transition: opacity 0.2s ease, color 0.2s ease;
   }
 
-  .hub-hand-nav:active {
-    transform: translateY(-50%) scale(0.94);
+  .hub-hand-nav:hover,
+  .hub-hand-nav:focus-visible {
+    opacity: 0.95;
   }
 
   .hub-hand-nav-prev {
-    left: 1px;
+    left: -18px;
+    justify-content: flex-start;
   }
 
   .hub-hand-nav-next {
-    right: 1px;
+    right: -18px;
+    justify-content: flex-end;
   }
 
   .hub-hand-nav .icon {
-    width: 12px;
-    height: 12px;
+    width: 22px;
+    height: 22px;
+    stroke-width: 2.2;
+    filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.8));
   }
 
   .hub-card-hand-edit {
@@ -6212,7 +6218,7 @@ dialog {
 
   .hub-favorite .hub-card-stage {
     width: min(
-      calc(100vw - 24px),
+      calc(100vw - 48px),
       430px,
       calc((100dvh - var(--hub-card-chrome)) * var(--card-ratio))
     );
@@ -6255,6 +6261,61 @@ dialog {
   .hub-top-actions {
     position: absolute;
     right: clamp(18px, 4vw, 56px);
+  }
+
+  .hub-profile {
+    display: none;
+  }
+
+  /* La píldora del jugador vive en el header, a la derecha del logo. */
+  .hub-player-panel {
+    position: fixed;
+    top: 4px;
+    right: clamp(12px, 4vw, 56px);
+    left: auto;
+    z-index: 40;
+    width: fit-content;
+    max-width: calc(50vw - 86px);
+    margin: 0;
+    padding: 4px 8px 4px 4px;
+    overflow: hidden;
+  }
+
+  .hub-player-identity {
+    display: grid;
+    grid-template-columns: minmax(0, auto) 11px;
+    grid-template-areas:
+      "handle chevron"
+      "summary chevron";
+    align-items: center;
+    column-gap: 5px;
+    row-gap: 0;
+  }
+
+  .hub-player-handle {
+    grid-area: handle;
+    max-width: clamp(46px, 12vw, 86px);
+  }
+
+  .hub-player-summary {
+    grid-area: summary;
+    font-size: 0.5rem;
+    line-height: 1.15;
+  }
+
+  .hub-player-summary::before {
+    content: none;
+  }
+
+  .hub-player-chevron {
+    grid-area: chevron;
+    align-self: center;
+  }
+}
+
+@media (max-width: 430px) {
+  .hub-player-handle {
+    max-width: 46px;
   }
 }
 
