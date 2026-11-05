@@ -259,6 +259,10 @@ dialog {
   flex: 0 0 auto;
 }
 
+.hub-header-support {
+  display: none;
+}
+
 .hub-sound-btn {
   display: inline-flex;
   align-items: center;
@@ -6251,34 +6255,75 @@ dialog {
 @media (max-width: 860px) {
   .hub-topbar-inner {
     position: relative;
-    justify-content: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding-inline: clamp(12px, 3vw, 20px);
   }
 
   .hub-brand {
-    margin: 0 auto;
+    margin: 0;
+    gap: 7px;
+  }
+
+  .hub-brand-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+  }
+
+  .hub-brand-mark .icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .hub-brand-copy strong {
+    font-size: 0.84rem;
   }
 
   .hub-top-actions {
-    position: absolute;
-    right: clamp(18px, 4vw, 56px);
-  }
-
-  .hub-profile {
     display: none;
   }
 
-  /* La píldora del jugador vive en el header, a la derecha del logo. */
+  .hub-header-support {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    margin-left: auto;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    color: #ffffff;
+    background: linear-gradient(160deg, #ff9a76 0%, #ff5e5b 100%);
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    box-shadow: 0 6px 14px rgba(214, 74, 68, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+    z-index: 2;
+  }
+
+  .hub-header-support .icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* La píldora del jugador vive centrada en el header. */
   .hub-player-panel {
     position: fixed;
-    top: 4px;
-    right: clamp(12px, 4vw, 56px);
-    left: auto;
+    top: 7px;
+    left: 50%;
+    right: auto;
     z-index: 40;
     width: fit-content;
-    max-width: calc(50vw - 86px);
+    max-width: calc(100vw - 220px);
     margin: 0;
     padding: 4px 8px 4px 4px;
     overflow: hidden;
+    transform: translateX(-50%);
+  }
+
+  .hub-player-avatar {
+    width: 26px;
+    height: 26px;
   }
 
   .hub-player-identity {
@@ -6294,7 +6339,8 @@ dialog {
 
   .hub-player-handle {
     grid-area: handle;
-    max-width: clamp(46px, 12vw, 86px);
+    max-width: none;
+    font-size: 0.66rem;
   }
 
   .hub-player-summary {
@@ -6313,9 +6359,13 @@ dialog {
   }
 }
 
-@media (max-width: 430px) {
-  .hub-player-handle {
-    max-width: 46px;
+@media (max-width: 360px) {
+  .hub-brand-copy {
+    display: none;
+  }
+
+  .hub-player-panel {
+    max-width: calc(100vw - 140px);
   }
 }
 
