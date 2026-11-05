@@ -121,7 +121,7 @@ The hero card is a CSS 3D object — no WebGL — inside an optional vitrine:
 
 **Identifier pills** (`#hub-card-tags`, mobile only): three `.hub-card-tag` spans rendered by `renderFavoriteCard()` — `collection.name`, `card.attribute || card.type`, and `stats` joined with ` · `. 999 px radius, `.5rem` 700 `#0a6b78`, white .56 with a white .88 border and a 3 px inset highlight; `flex-wrap: nowrap` above 380 px, `wrap` below it so nothing truncates. The same data appears as `.hub-chip` in the details sheet.
 
-**Symmetric title row:** `.hub-card-title-row` is `display: grid; grid-template-columns: 1fr auto 1fr; width: 100%`, with the name in column 2 and the ⓘ starting column 3. Equal outer tracks keep the name perfectly centred; never centre name + button as a flex group.
+**Symmetric title row:** `.hub-card-title-row` is `position: relative; display: flex; justify-content: center; width: 100%`, the name is `text-align: center` with `padding: 0 40px`, and the ⓘ is `position: absolute; right: 0; top: 50%; transform: translateY(-50%)`. The name therefore owns the full width and its text centre matches the viewport centre exactly (verified at 320/390/489/492 for every card); the padding reserves the button's gutter without shifting the text. Never centre name + button as a flex group, and never give the button its own grid track — its min-content width unbalances the tracks.
 
 Never hard-code `5 / 7` again: every card frame in the hub reads `--card-ratio`.
 
