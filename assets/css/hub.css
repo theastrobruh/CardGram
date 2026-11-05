@@ -259,7 +259,7 @@ dialog {
   flex: 0 0 auto;
 }
 
-.hub-header-support {
+.hub-header-actions {
   display: none;
 }
 
@@ -6284,26 +6284,45 @@ dialog {
     display: none;
   }
 
-  .hub-header-support {
-    display: inline-flex;
+  .hub-header-actions {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
+    gap: 4px;
     margin-left: auto;
     flex: 0 0 auto;
-    border-radius: 50%;
-    color: #ffffff;
-    background: linear-gradient(160deg, #ff9a76 0%, #ff5e5b 100%);
-    border: 1px solid rgba(255, 255, 255, 0.72);
-    box-shadow: 0 6px 14px rgba(214, 74, 68, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-    text-decoration: none;
     z-index: 2;
   }
 
+  .hub-header-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    color: #0a6b78;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.82);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+  }
+
+  .hub-header-btn .icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .hub-header-support {
+    color: #ffffff;
+    background: linear-gradient(160deg, #ff9a76 0%, #ff5e5b 100%);
+    border-color: rgba(255, 255, 255, 0.72);
+    box-shadow: 0 6px 14px rgba(214, 74, 68, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
   .hub-header-support .icon {
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
   }
 
   /* La píldora del jugador vive centrada en el header. */
@@ -6314,7 +6333,7 @@ dialog {
     right: auto;
     z-index: 40;
     width: fit-content;
-    max-width: calc(100vw - 220px);
+    max-width: calc(100vw - 240px);
     margin: 0;
     padding: 4px 8px 4px 4px;
     overflow: hidden;
@@ -6365,7 +6384,7 @@ dialog {
   }
 
   .hub-player-panel {
-    max-width: calc(100vw - 140px);
+    max-width: calc(100vw - 230px);
   }
 }
 
