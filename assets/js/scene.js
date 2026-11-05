@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CardGram — v0.4.4 · Motor 3D
+   CardGram — v0.4.5 · Motor 3D
    Escena Three.js, geometría procedural de la carta, materiales, fondos,
    cámara, transiciones y utilidades de exportación.
    ========================================================================== */

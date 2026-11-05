@@ -6,14 +6,14 @@
   <meta name="theme-color" content="#b6ebea">
   <meta name="color-scheme" content="light">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta name="generator" content="CardGram v0.4.4">
+  <meta name="generator" content="CardGram v0.4.5">
   <meta name="description" content="CardGram — Interactive 3D studio for trading cards. Import your designs, fine-tune edges, bevels and gloss, and export vertical HD reels right from your browser.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
-  <title>CardGram · v0.4.4</title>
+  <title>CardGram · v0.4.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.4.4&rev=19">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.4.4&rev=19">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.4.5&rev=19">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.4.5&rev=27">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
           integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu"
@@ -21,14 +21,15 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"
           integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf"
           crossorigin="anonymous" defer></script>
-  <script src="assets/data/cards/catalog.js?v=0.4.4&rev=19" defer></script>
-  <script src="assets/js/i18n.js?v=0.4.4&rev=19" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.4.4&rev=19" defer></script>
-  <script src="assets/js/community.js?v=0.4.4&rev=19" defer></script>
-  <script src="assets/js/scene.js?v=0.4.4&rev=19" defer></script>
-  <script src="assets/js/export.js?v=0.4.4&rev=19" defer></script>
-  <script src="assets/js/hub.js?v=0.4.4&rev=19" defer></script>
-  <script src="assets/js/app.js?v=0.4.4&rev=19" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.4.5&rev=19" defer></script>
+  <script src="assets/js/i18n.js?v=0.4.5&rev=19" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.4.5&rev=27" defer></script>
+  <script src="assets/js/community.js?v=0.4.5&rev=19" defer></script>
+  <script src="assets/js/ambient.js?v=0.4.5&rev=27" defer></script>
+  <script src="assets/js/scene.js?v=0.4.5&rev=19" defer></script>
+  <script src="assets/js/export.js?v=0.4.5&rev=19" defer></script>
+  <script src="assets/js/hub.js?v=0.4.5&rev=27" defer></script>
+  <script src="assets/js/app.js?v=0.4.5&rev=19" defer></script>
 </head>
 <body data-view="hub">
 
@@ -218,6 +219,16 @@
       <circle cx="11" cy="11" r="7"></circle>
       <path d="M20 20l-4.2-4.2"></path>
     </symbol>
+    <symbol id="i-external" viewBox="0 0 24 24">
+      <path d="M14 4h6v6"></path>
+      <path d="M20 4l-8.5 8.5"></path>
+      <path d="M18.5 14.5V18a2.5 2.5 0 0 1-2.5 2.5H6A2.5 2.5 0 0 1 3.5 18V8A2.5 2.5 0 0 1 6 5.5h3.5"></path>
+    </symbol>
+    <symbol id="i-print" viewBox="0 0 24 24">
+      <path d="M6.5 9V3.5h11V9"></path>
+      <path d="M6.5 18.5H5A2.5 2.5 0 0 1 2.5 16v-4.5A2.5 2.5 0 0 1 5 9h14a2.5 2.5 0 0 1 2.5 2.5V16a2.5 2.5 0 0 1-2.5 2.5h-1.5"></path>
+      <rect x="6.5" y="14.5" width="11" height="6" rx="1.5"></rect>
+    </symbol>
   </svg>
 
   <!-- ======================================================================
@@ -242,6 +253,12 @@
   <div id="hub" class="hub" aria-label="CardGram · Lobby" data-i18n-aria-label="hub_aria">
     <div class="hub-veil" aria-hidden="true"></div>
 
+    <!-- Fondo reactivo: se tiñe con los colores de la carta en uso. -->
+    <div class="hub-ambient" id="hub-ambient" aria-hidden="true">
+      <span class="hub-ambient-layer" data-ambient-layer="0"></span>
+      <span class="hub-ambient-layer" data-ambient-layer="1"></span>
+    </div>
+
     <div class="hub-scroll" id="hub-scroll">
       <div class="hub-shell">
 
@@ -252,7 +269,7 @@
             </span>
             <span class="hub-brand-copy">
               <strong>Card<span>Gram</span></strong>
-              <span class="version-badge" data-version>v0.4.4</span>
+              <span class="version-badge" data-version>v0.4.5</span>
             </span>
           </a>
 
@@ -373,6 +390,12 @@
                     <svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg>
                     <span data-i18n="hub_create_render">Crear un render</span>
                   </button>
+                  <a class="btn btn-ghost hub-player-secondary hub-tool-link" id="hub-tool-inkra" href="https://theastrobruh.github.io/Inkra/" target="_blank" rel="noopener noreferrer" title="Inkra — impresión de oricas a escala real" data-i18n-title="hub_tool_inkra_hint" aria-label="Abrir Inkra, el complemento de impresión de CardGram" data-i18n-aria-label="hub_tool_inkra_aria">
+                    <svg class="icon" aria-hidden="true"><use href="#i-print"></use></svg>
+                    <span data-i18n="hub_tool_inkra">Inkra</span>
+                    <span class="hub-tool-tag" data-i18n="hub_tool_companion">Complemento</span>
+                    <svg class="icon hub-tool-external" aria-hidden="true"><use href="#i-external"></use></svg>
+                  </a>
                 </div>
 
                 <p class="hub-player-privacy">
@@ -395,23 +418,30 @@
                   <div class="hub-showcase-glow" aria-hidden="true"></div>
                   <div class="hub-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
 
-                  <div class="hub-card-stage" id="hub-card-stage">
-                    <div class="hub-card-tilt" id="hub-card-tilt">
-                      <button class="hub-card" id="hub-card" type="button" aria-pressed="false" aria-label="Girar la carta" data-i18n-aria-label="hub_card_flip" title="Girar la carta" data-i18n-title="hub_card_flip">
-                        <span class="hub-card-inner">
-                          <span class="hub-card-face hub-card-front">
-                            <img id="hub-card-front" src="assets/data/cards/OG/SET-01/thumbs/FRONT-01.webp" alt="" width="750" height="1050" decoding="async" fetchpriority="high">
+                  <div class="hub-card-surface">
+                    <div class="hub-card-stage" id="hub-card-stage">
+                      <div class="hub-card-tilt" id="hub-card-tilt">
+                        <button class="hub-card" id="hub-card" type="button" aria-pressed="false" aria-label="Girar la carta" data-i18n-aria-label="hub_card_flip" title="Girar la carta" data-i18n-title="hub_card_flip">
+                          <span class="hub-card-inner">
+                            <span class="hub-card-face hub-card-front">
+                              <img id="hub-card-front" src="assets/data/cards/OG/SET-01/thumbs/FRONT-01.webp" alt="" width="750" height="1050" decoding="async" fetchpriority="high">
+                            </span>
+                            <span class="hub-card-face hub-card-back">
+                              <img id="hub-card-back" src="assets/data/cards/OG/SET-01/thumbs/BACK-BASE.webp" alt="" width="750" height="1050" decoding="async">
+                            </span>
                           </span>
-                          <span class="hub-card-face hub-card-back">
-                            <img id="hub-card-back" src="assets/data/cards/OG/SET-01/thumbs/BACK-BASE.webp" alt="" width="750" height="1050" decoding="async">
-                          </span>
-                        </span>
-                      </button>
+                        </button>
+                      </div>
                     </div>
                   </div>
 
                   <div class="hub-card-meta">
-                    <h2 class="hub-card-name" id="hub-card-name" aria-live="polite">Shadowblade Kinetic</h2>
+                    <div class="hub-card-title-row">
+                      <h2 class="hub-card-name" id="hub-card-name" aria-live="polite">Shadowblade Kinetic</h2>
+                      <button class="hub-card-info" id="hub-card-info" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="hub-card-sheet" aria-label="Ver etiquetas y detalles de la carta" data-i18n-aria-label="card_details_open" title="Ver etiquetas y detalles de la carta" data-i18n-title="card_details_open">
+                        <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+                      </button>
+                    </div>
                     <p class="hub-card-sub" id="hub-card-sub">OG Collection · SET-01</p>
                     <div class="hub-card-chips" id="hub-card-chips"></div>
                     <div class="hub-card-actions">
@@ -419,9 +449,15 @@
                         <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
                         <span data-i18n="hub_open_studio">Abrir el estudio</span>
                       </button>
-                      <button class="hub-card-link" type="button" data-hub-route="library">
+                      <a class="hub-card-tool" href="https://theastrobruh.github.io/Inkra/" target="_blank" rel="noopener noreferrer" title="Inkra — impresión de oricas a escala real" data-i18n-title="hub_tool_inkra_hint" aria-label="Abrir Inkra, el complemento de impresión de CardGram" data-i18n-aria-label="hub_tool_inkra_aria">
+                        <svg class="icon" aria-hidden="true"><use href="#i-print"></use></svg>
+                        <span data-i18n="hub_tool_inkra">Inkra</span>
+                        <svg class="icon hub-tool-external" aria-hidden="true"><use href="#i-external"></use></svg>
+                      </a>
+                      <button class="hub-card-link" type="button" data-hub-route="library" aria-label="Cambiar favorita" data-i18n-aria-label="hub_change_favorite" title="Cambiar favorita" data-i18n-title="hub_change_favorite">
+                        <svg class="icon hub-card-link-icon" aria-hidden="true"><use href="#i-star"></use></svg>
                         <span data-i18n="hub_change_favorite">Cambiar favorita</span>
-                        <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                        <svg class="icon hub-card-link-arrow" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
                       </button>
                     </div>
                   </div>
@@ -715,7 +751,7 @@
         </main>
 
         <footer class="hub-footer">
-          <span>CardGram <span data-version>v0.4.4</span> · by theAstroBruh</span>
+          <span>CardGram <span data-version>v0.4.5</span> · by theAstroBruh</span>
           <span class="hub-footer-dot" aria-hidden="true"></span>
           <span data-i18n="profile_local_note">Tu perfil se guarda solo en este navegador. La cuenta pública llegará con la comunidad.</span>
         </footer>
@@ -744,6 +780,104 @@
         <span data-i18n="hub_nav_profile">Perfil</span>
       </button>
     </nav>
+
+    <!-- Botón único de menú + navegación (móvil) -->
+    <button class="hub-menu-btn" id="hub-menu-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="hub-menu-sheet" aria-label="Abrir el menú" data-i18n-aria-label="hub_menu_open" title="Abrir el menú" data-i18n-title="hub_menu_open">
+      <svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg>
+    </button>
+
+    <div class="hub-menu" id="hub-menu-sheet" role="dialog" aria-modal="true" aria-labelledby="hub-menu-title" hidden>
+      <div class="hub-menu-backdrop" data-menu-close></div>
+
+      <div class="hub-menu-panel" tabindex="-1">
+        <header class="hub-menu-head">
+          <div class="hub-menu-head-copy">
+            <span class="hub-panel-eyebrow"><span class="hub-live-dot" aria-hidden="true"></span>CardGram</span>
+            <h2 id="hub-menu-title" data-i18n="hub_menu_title">Menú</h2>
+          </div>
+          <button class="hub-menu-close" type="button" data-menu-close aria-label="Cerrar el menú" data-i18n-aria-label="hub_menu_close">
+            <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+          </button>
+        </header>
+
+        <button class="btn btn-primary hub-menu-primary" type="button" data-open-studio="deck">
+          <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+          <span data-i18n="hub_open_studio">Abrir el estudio</span>
+        </button>
+
+        <a class="hub-menu-tool" href="https://theastrobruh.github.io/Inkra/" target="_blank" rel="noopener noreferrer" title="Inkra — impresión de oricas a escala real" data-i18n-title="hub_tool_inkra_hint" aria-label="Abrir Inkra, el complemento de impresión de CardGram" data-i18n-aria-label="hub_tool_inkra_aria">
+          <span class="hub-menu-item-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-print"></use></svg></span>
+          <span class="hub-menu-item-copy">
+            <strong data-i18n="hub_tool_inkra">Inkra</strong>
+            <small data-i18n="hub_tool_inkra_sub">Imprime tus oricas a escala real</small>
+          </span>
+          <svg class="icon hub-menu-chevron" aria-hidden="true"><use href="#i-external"></use></svg>
+        </a>
+
+        <nav class="hub-menu-nav" aria-label="Navegación principal" data-i18n-aria-label="hub_nav_aria">
+          <button class="hub-menu-item" type="button" data-hub-route="home" data-menu-nav>
+            <span class="hub-menu-item-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg></span>
+            <span class="hub-menu-item-copy"><strong data-i18n="hub_nav_home">Inicio</strong></span>
+            <svg class="icon hub-menu-chevron" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </button>
+          <button class="hub-menu-item" type="button" data-hub-route="library" data-menu-nav>
+            <span class="hub-menu-item-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg></span>
+            <span class="hub-menu-item-copy"><strong data-i18n="hub_nav_library">Mis cartas</strong></span>
+            <svg class="icon hub-menu-chevron" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </button>
+          <button class="hub-menu-item" type="button" data-hub-route="collections" data-menu-nav>
+            <span class="hub-menu-item-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg></span>
+            <span class="hub-menu-item-copy"><strong data-i18n="hub_nav_collections">Colecciones</strong></span>
+            <svg class="icon hub-menu-chevron" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </button>
+          <button class="hub-menu-item" type="button" data-hub-route="explore" data-menu-nav>
+            <span class="hub-menu-item-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-compass"></use></svg></span>
+            <span class="hub-menu-item-copy"><strong data-i18n="hub_nav_explore">Explorar</strong></span>
+            <span class="hub-nav-soon" aria-hidden="true"></span>
+            <svg class="icon hub-menu-chevron" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </button>
+          <button class="hub-menu-item" type="button" data-hub-route="profile" data-menu-nav>
+            <span class="hub-menu-item-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg></span>
+            <span class="hub-menu-item-copy"><strong data-i18n="hub_nav_profile">Perfil</strong></span>
+            <svg class="icon hub-menu-chevron" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </button>
+        </nav>
+
+        <div class="hub-menu-stats" aria-label="Datos de colección" data-i18n-aria-label="hub_player_stats_label">
+          <span><strong id="menu-stat-cards">0</strong><span data-i18n="hub_stat_cards_short">Cartas</span></span>
+          <span><strong id="menu-stat-collections">0</strong><span data-i18n="hub_stat_collections_short">Colecciones</span></span>
+          <span><strong id="menu-stat-decks">0</strong><span data-i18n="hub_stat_decks_short">Decks</span></span>
+          <span><strong id="menu-stat-renders">0</strong><span data-i18n="hub_stat_renders_short">Renders</span></span>
+        </div>
+
+        <div class="hub-menu-lang" role="group" aria-label="Idioma" data-i18n-aria-label="hub_lang_aria">
+          <button class="hub-lang-btn active" type="button" data-hub-lang="en" aria-pressed="true">EN</button>
+          <button class="hub-lang-btn" type="button" data-hub-lang="es" aria-pressed="false">ES</button>
+          <button class="hub-lang-btn" type="button" data-hub-lang="de" aria-pressed="false">DE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hoja de detalles de la carta (etiquetas e información) -->
+    <div class="hub-menu hub-card-sheet" id="hub-card-sheet" role="dialog" aria-modal="true" aria-labelledby="hub-card-sheet-title" hidden>
+      <div class="hub-menu-backdrop" data-menu-close></div>
+
+      <div class="hub-menu-panel hub-card-sheet-panel" tabindex="-1">
+        <header class="hub-menu-head">
+          <div class="hub-menu-head-copy">
+            <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky" aria-hidden="true"></span><span data-i18n="card_details_kicker">Carta</span></span>
+            <h2 id="hub-card-sheet-title" data-i18n="card_details">Detalles</h2>
+          </div>
+          <button class="hub-menu-close" type="button" data-menu-close aria-label="Cerrar los detalles" data-i18n-aria-label="card_details_close">
+            <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+          </button>
+        </header>
+
+        <p class="hub-card-sheet-sub" id="hub-card-sheet-sub">OG Collection · SET-01</p>
+        <div class="hub-card-sheet-chips" id="hub-card-sheet-chips"></div>
+        <p class="hub-card-sheet-lore" id="hub-card-sheet-lore"></p>
+      </div>
+    </div>
   </div>
 
   <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
@@ -810,7 +944,7 @@
         <div class="brand-copy">
           <div class="brand-title-row">
             <h1>Card<span>Gram</span></h1>
-            <span class="version-badge" data-version>v0.4.4</span>
+            <span class="version-badge" data-version>v0.4.5</span>
           </div>
           <div class="author-credit">by theAstroBruh</div>
         </div>
@@ -1377,7 +1511,7 @@
       <div class="dialog-actions">
         <button class="btn btn-primary" id="help-close" type="button" data-i18n="got_it">Entendido</button>
       </div>
-      <p class="dialog-footer-note" data-i18n="help_note">CardGram v0.4.4 · Hecho con Three.js, Canvas y mucho cariño por theAstroBruh.</p>
+      <p class="dialog-footer-note" data-i18n="help_note">CardGram v0.4.5 · Hecho con Three.js, Canvas y mucho cariño por theAstroBruh.</p>
     </div>
   </dialog>
 

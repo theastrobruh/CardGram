@@ -28,7 +28,7 @@ body[data-view="hub"]
 - Left: 38 px gradient brand mark + `CardGram` + version badge.
 - Center: a glass segmented nav (`Home`, `My cards`, `Collections`, `Explore` with a tiny gradient “soon” dot).
 - Right: `EN ES DE` segmented control + pill profile (32 px avatar + name/handle).
-- At ≤1080 px hide the profile copy; at ≤980 px hide the center nav; at ≤860 px hide the version badge and show the mobile bottom nav.
+- At ≤1080 px hide the profile copy; at ≤980 px hide the center nav and the language pills; at ≤860 px hide the version badge and show the floating menu button.
 
 ### Dashboard
 
@@ -55,9 +55,9 @@ Responsive:
 |---|---|
 | ≤1240 px | columns 250/1fr/304, gap 13, panel radius 24 |
 | ≤1080 px | columns 232/1fr/278, panel padding 14, avatar 52 |
-| ≤980 px | dashboard becomes a single 690 px column: player panel → favourite → (explorer hidden); stats become 5 columns; card stage ~44 vw |
-| ≤860 px | topbar compressed, mobile nav fixed at bottom, scroll gets 96 px bottom padding |
-| ≤560 px | card 41 vw, stats labels shrink, CTAs full width, nav labels 0.54rem |
+| ≤980 px | dashboard becomes a single 640 px column: identity chip → vitrine + card → name/chips, explorer hidden; the card is sized from `100dvh` (~78–84 vw on phones) |
+| ≤860 px | topbar compressed, 5-item bottom nav hidden in favour of the menu button; content panels reserve 96 px at the bottom so nothing rests under the floating button |
+| ≤560 px | identity chip stays one row, chips wrap, name/collection step down; very short screens (≤690 px tall) shrink the card further |
 
 ### Alternate hub panels
 
@@ -72,10 +72,62 @@ Responsive:
 
 
 - One column, 390 px reference width.
-- Topbar: brand left, language + avatar right. No center nav.
-- Player panel compresses: stats become 5 equal tiles with no icons; CTAs stack; privacy note stays.
-- Favourite card is the hero; metadata and CTA follow it.
-- Bottom nav is a floating 94 vw glass bar with 5 items: Home, My cards, Collections, Explore, Profile. Safe-area inset at the bottom.
+- Topbar: brand left, avatar right. **No language pills, no center nav, no version badge.**
+- The player section is a single **identity chip** (`width: fit-content`, centred, ~42 px): 30 px avatar + name + `@handle`. Bio, edit, stats and CTAs are removed from the screen; the collection data lives inside the menu.
+- The card sits on a **vitrine**: `.hub-card-surface` is a light glass panel (24 px radius, hairline border) that exists only on mobile (`display: contents` on desktop). The card inside is sized by height: `width: min(100% - 6px, (100dvh - var(--hub-card-chrome)) * var(--card-ratio), 460px)` with `--hub-card-chrome: 317px`. At 492×893 the card is ~84 vw; at 390×844 the width is the limit.
+- **Any card ratio.** `.hub-card-stage` carries `--card-ratio` (default `0.7143`) and `aspect-ratio: var(--card-ratio)`. `syncCardRatio()` in `hub.js` reads `naturalWidth / naturalHeight` of the front thumb after it loads, so 5:7, 3:4, tarot or landscape art gets a stage of the right shape; `object-fit: contain` guarantees nothing is cropped. Grid thumbs (`.media-card-thumb`, `.hub-explorer-art`, deck covers, collection stacks) keep their 5:7 frames but also use `contain`, so mixed formats are never cut.
+- Under the vitrine: card name, collection line and the chip row. **No action buttons around the card.**
+- Under the vitrine: only the card name plus a 30 px **ⓘ button**. The collection line and the tag chips are not shown on mobile; they live in the details sheet.
+- A single **circular menu button** (52 px, icon only) floats above the privacy strip. In landscape (≤560 px tall) it moves to the centre of the topbar so it never touches the card.
+- The privacy note is a floating inset strip at the bottom (`left/right: 8px`, `bottom: 6px`, 12 px radius).
+- The old 5-item bottom nav is hidden (`.hub-mobile-nav { display: none }`); the sheet replaces it.
+
+### Mobile menu sheet
+
+`#hub-menu-sheet` is a dialog (`role="dialog"`, `aria-modal`, `aria-expanded` on the trigger) with a blurred backdrop and a white sheet sliding from the bottom.
+
+- Order: title + close, primary "Open the studio", `Inkra` row, navigation (Home, My cards, Collections, Explore, Profile, synced with `data-menu-nav`), a 4-item collection summary, and the EN/ES/DE selector.
+- `Esc`, the close button and the backdrop close it; focus moves to the sheet panel (no stray ring) and returns to the trigger. Tab is trapped inside the sheet.
+- Under 700 px of height the sheet compacts; under 620 px it drops the summary row so it still fits without scrolling.
+- Navigating from the sheet closes it (`closeHubMenu({ restoreFocus: false })` from `onHubClick`).
+
+### Card details sheet
+
+`#hub-card-sheet` (opened by `#hub-card-info`) is a compact bottom sheet — same component as the menu, `role="dialog"`, `aria-modal`, `aria-expanded` on the ⓘ.
+
+- Content: "Details" title, `collection · set`, every tag chip (rarity, type, stats) and the card lore in an italic box.
+- Tags are rendered twice by `renderFavoriteCard()`: `#hub-card-chips` (desktop layout, hidden under 980 px) and `#hub-card-sheet-chips`.
+- Closing returns focus to the ⓘ; `Esc`, the X and the backdrop close it. Crossing to desktop closes it automatically.
+
+### Spacing contract (mobile)
+
+Measured at 320–980 px wide, in EN/ES/DE and with every catalog card:
+
+| Between | Minimum gap |
+|---|---|
+| topbar → identity chip | 8 px |
+| identity chip → vitrine | 9 px |
+| vitrine → name/ⓘ row | 10 px |
+| name/ⓘ row → menu button | 22 px |
+| menu button → privacy strip | 15 px |
+
+Nothing overlaps and the home view never scrolls. Content panels reserve 96 px at the bottom so their last row clears the floating button.
+
+### Ambient background
+
+
+`assets/js/ambient.js` samples the active card's art on a 44 px canvas, buckets hues into 12 bins weighted by saturation and mid-lightness, and writes three pastel triplets as `--ambient-a/b/c` on `:root` plus `--amb-1/2/3` on one of two `.hub-ambient-layer` elements. The layers cross-fade over 1.4 s, so switching favourites feels like a breath instead of a jump.
+
+- The same triplets tint `.hub-showcase-glow`, the card drop shadow (`--ambient-shadow`) and `<meta name="theme-color">`.
+- Colours are lifted to 64–84 % lightness and 47–88 % saturation so dark art still produces a readable, light background.
+- Noise guard: a hue must reach 16 % of the dominant bin's weight to be used, so a two-pixel glint never sets the mood.
+- If the canvas is tainted (`file://`) or the image fails, the collection accent from `catalog.js` is used instead.
+- `prefers-reduced-motion` removes the cross-fade.
+
+### Inkra companion
+
+`Inkra` (https://theastrobruh.github.io/Inkra/) is CardGram's print companion: it lays out card proxies at real scale. On desktop it is a row in the player panel actions; on mobile it is the second row of the menu sheet. Always `target="_blank"` + `rel="noopener noreferrer"`. It cannot be embedded (CSP `default-src 'self'`), so it always opens in a new tab.
+
 
 ## 2. Studio — the editor
 

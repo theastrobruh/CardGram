@@ -5,20 +5,26 @@
 ![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)
 ![GitHub Pages](https://img.shields.io/badge/Hosted%20on-GitHub%20Pages-222?logo=github&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-r128-black?logo=threedotjs&logoColor=white)
-![Version](https://img.shields.io/badge/Version-v0.4.4-00d2d3)
+![Version](https://img.shields.io/badge/Version-v0.4.5-00d2d3)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
 
 ## ✨ Features
 
-### 🏛️ Immersive Lobby (v0.4.4)
+### 🏛️ Immersive Lobby (v0.4.5)
 - **Slow, cinematic entrance** — your favorite card settles in over a soft glass veil before the lobby content
 - **Live stats** — saved cards, catalog collections, collections left to review, decks and rendered exports
 - **My cards** — saved presets plus the full catalog, with favorite selection and one-tap open in the studio
 - **Collections & decks** — collections read from the segmented card folders, plus user-created decks with covers and card lists
 - **Profile** — local avatar upload (square crop), creator name, handle, bio and favorite card
 - **Explore (prepared)** — community feed shell and data adapter ready, disabled until a backend exists
+- **Card-first mobile layout** — one identity chip, the card on a glass vitrine and a single round menu button; no bottom nav, no always-on stats, no language pills in the bar
+- **Details on demand** — the collection line and the card tags (rarity, type, stats, lore) sit behind a compact ⓘ next to the card name, so the card keeps the space
+- **Any card format** — the hero reads each art's real aspect ratio (5:7, 3:4, tarot, landscape) and sizes a matching frame; thumbnails use `contain`, so nothing is ever cropped
+- **Mobile menu sheet** — studio, Inkra, navigation, collection data and EN/ES/DE in one bottom sheet
+- **Reactive ambient background** — the lobby is tinted with a pastel palette sampled from the active card's artwork; the same hue drives the card glow, its shadow and the browser theme colour
+- **Inkra companion** — one tap opens [Inkra](https://theastrobruh.github.io/Inkra/), the real-scale print layout tool, in a new tab
 - **Lazy 3D engine** — no WebGL context on load; the render loop pauses while you are in the lobby
 
 ### 🎴 3D Engine & Card Forge
@@ -93,6 +99,7 @@ cd CardGram
 │   │   ├── scene.js            # Three.js WebGL scene & card geometry
 │   │   ├── export.js           # PNG snapshot & video recording
 │   │   ├── hub.js              # Card Hub browser
+│   │   ├── ambient.js          # Reactive background palette sampled from the card art
 │   │   ├── i18n.js             # Studio translations (EN/ES/DE)
 │   │   ├── hub-i18n.js         # Hub translations
 │   │   └── community.js        # Community feed adapter (prepared, disabled)

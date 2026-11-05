@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CardGram — v0.4.4 · Catálogo de cartas
+   CardGram — v0.4.5 · Catálogo de cartas
    Estructura segmentada por colección. Cada colección es una carpeta dentro
    de /assets/data/cards y cada carta referencia sus dos (o tres) texturas.
 
@@ -137,7 +137,7 @@
   const featured = cards[0] || null;
 
   window.CARDGRAM_CARDS = {
-    version: '0.4.4',
+    version: '0.4.5',
     updated: '2026-11-04',
     collections,
     cards,

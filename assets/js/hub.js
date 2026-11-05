@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CardGram — v0.4.4 · Hub / Lobby
+   CardGram — v0.4.5 · Hub / Lobby
    Vista de entrada, estadísticas, biblioteca, colecciones, decks, perfil y
    arranque perezoso del motor 3D. El editor solo se inicializa al entrar.
    ========================================================================== */
@@ -38,6 +38,7 @@ const hub = {
   explorerFilter: 'all',
   opening: false,
   lastRoute: '',
+  activeSheet: null,
   els: {}
 };
 
@@ -342,6 +343,11 @@ function renderHubStats(animate) {
     hub.els.statDecksSub.textContent = countLabel('hub_stat_decks_sub', stats.deckCards);
   }
 
+  if (hub.els.menuStatCards) hub.els.menuStatCards.textContent = String(stats.cards);
+  if (hub.els.menuStatCollections) hub.els.menuStatCollections.textContent = String(stats.collections);
+  if (hub.els.menuStatDecks) hub.els.menuStatDecks.textContent = String(stats.decks);
+  if (hub.els.menuStatRenders) hub.els.menuStatRenders.textContent = String(stats.renders);
+
   renderProfileSummary(stats);
 }
 
@@ -399,6 +405,21 @@ function favoriteCard() {
   return HUB_CATALOG.byId(hubProfile.favoriteCardId) || HUB_CATALOG.cards[0] || null;
 }
 
+/* La vitrina adopta la proporción real del arte (5:7, 3:4, tarot…). */
+function syncCardRatio(image) {
+  const stage = hub.els.cardStage;
+  if (!stage || !image) return;
+
+  const { naturalWidth: width, naturalHeight: height } = image;
+  if (!width || !height) return;
+
+  const ratio = width / height;
+  const current = Number(stage.style.getPropertyValue('--card-ratio')) || 0;
+  if (Math.abs(ratio - current) < 0.0005) return;
+
+  stage.style.setProperty('--card-ratio', ratio.toFixed(4));
+}
+
 function renderFavoriteCard() {
   if (!hub.ready) return;
   const card = favoriteCard();
@@ -407,6 +428,16 @@ function renderFavoriteCard() {
   if (hub.els.cardFront) {
     hub.els.cardFront.src = thumbOf(card);
     hub.els.cardFront.alt = `${card.name} — ${card.type}`;
+
+    if (hub.els.cardFront.complete) {
+      syncCardRatio(hub.els.cardFront);
+    } else {
+      hub.els.cardFront.addEventListener(
+        'load',
+        () => syncCardRatio(hub.els.cardFront),
+        { once: true }
+      );
+    }
   }
   if (hub.els.cardBack) {
     hub.els.cardBack.src = backThumbOf(card);
@@ -415,18 +446,38 @@ function renderFavoriteCard() {
   if (hub.els.cardName) hub.els.cardName.textContent = card.name;
 
   const collection = HUB_CATALOG.collectionOf(card);
+  const metaLine = `${collection ? collection.name : card.collectionName} · ${card.set}`;
   if (hub.els.cardSub) {
-    hub.els.cardSub.textContent = `${collection ? collection.name : card.collectionName} · ${card.set}`;
+    hub.els.cardSub.textContent = metaLine;
+  }
+  if (hub.els.cardSheetSub) {
+    hub.els.cardSheetSub.textContent = metaLine;
   }
 
-  if (hub.els.cardChips) {
-    hub.els.cardChips.replaceChildren();
-    const chips = [];
-    if (card.rarity) chips.push(card.rarity);
-    if (card.type) chips.push(card.type);
-    Object.keys(card.stats || {}).forEach((key) => chips.push(`${key} ${card.stats[key]}`));
+  /* El fondo del lobby se tiñe con el arte de la carta activa. */
+  if (window.CardGramAmbient) {
+    window.CardGramAmbient.apply(
+      thumbOf(card),
+      (collection && collection.accent) || card.collectionAccent
+    );
+  }
 
-    chips.forEach((text) => hub.els.cardChips.appendChild(makeNode('span', 'hub-chip', text)));
+  const chipTexts = [];
+  if (card.rarity) chipTexts.push(card.rarity);
+  if (card.type) chipTexts.push(card.type);
+  Object.keys(card.stats || {}).forEach((key) => chipTexts.push(`${key} ${card.stats[key]}`));
+
+  /* Las etiquetas viven en el home (escritorio) y en la hoja de detalles. */
+  [hub.els.cardChips, hub.els.cardSheetChips].forEach((container) => {
+    if (!container) return;
+    container.replaceChildren(
+      ...chipTexts.map((text) => makeNode('span', 'hub-chip', text))
+    );
+  });
+
+  if (hub.els.cardSheetLore) {
+    hub.els.cardSheetLore.textContent = card.lore || '';
+    hub.els.cardSheetLore.hidden = !card.lore;
   }
 
   if (hub.els.card) {
@@ -1298,12 +1349,107 @@ function saveProfile() {
    Paneles y navegación
    -------------------------------------------------------------------------- */
 function updateLangButtons() {
-  if (!hub.els.lang) return;
-  Array.from(hub.els.lang.querySelectorAll('[data-hub-lang]')).forEach((button) => {
+  if (!hub.root) return;
+  Array.from(hub.root.querySelectorAll('[data-hub-lang]')).forEach((button) => {
     const active = button.dataset.hubLang === currentLang;
     button.classList.toggle('active', active);
     button.setAttribute('aria-pressed', String(active));
   });
+}
+
+/* --------------------------------------------------------------------------
+   Hojas modales del lobby: menú y detalles de la carta
+   -------------------------------------------------------------------------- */
+function openHubSheet(sheet, trigger) {
+  if (!sheet || !sheet.hidden) return;
+  /* Las hojas son solo de móvil: en escritorio no se abren. */
+  if (window.innerWidth > 980) return;
+  if (hub.activeSheet && hub.activeSheet.el !== sheet) {
+    closeHubSheet({ restoreFocus: false, instant: true });
+  }
+
+  hub.activeSheet = { el: sheet, trigger: trigger || null };
+  sheet.hidden = false;
+  requestAnimationFrame(() => sheet.classList.add('is-open'));
+  if (trigger) trigger.setAttribute('aria-expanded', 'true');
+  document.addEventListener('keydown', onSheetKeydown);
+
+  const panel = sheet.querySelector('.hub-menu-panel');
+  if (panel) panel.focus({ preventScroll: true });
+}
+
+function closeHubSheet(options = {}) {
+  const active = hub.activeSheet;
+  if (!active) return;
+
+  const { el, trigger } = active;
+  hub.activeSheet = null;
+
+  document.removeEventListener('keydown', onSheetKeydown);
+  el.classList.remove('is-open');
+  if (trigger) trigger.setAttribute('aria-expanded', 'false');
+
+  const finish = () => {
+    el.hidden = true;
+  };
+
+  if (options.instant || reduceMotion()) finish();
+  else window.setTimeout(finish, 240);
+
+  if (options.restoreFocus !== false && trigger) {
+    trigger.focus({ preventScroll: true });
+  }
+}
+
+function onSheetKeydown(event) {
+  const active = hub.activeSheet;
+  if (!active) return;
+
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    closeHubSheet();
+    return;
+  }
+
+  if (event.key !== 'Tab') return;
+
+  const panel = active.el.querySelector('.hub-menu-panel');
+  if (!panel) return;
+
+  const focusables = Array.from(panel.querySelectorAll('button, a[href]'))
+    .filter((node) => !node.disabled && node.offsetParent !== null);
+  if (!focusables.length) return;
+
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+
+  if (document.activeElement === panel) {
+    if (event.shiftKey) {
+      event.preventDefault();
+      last.focus();
+    }
+    return;
+  }
+
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+function openHubMenu() {
+  openHubSheet(hub.els.menu, hub.els.menuBtn);
+}
+
+function closeHubMenu(options = {}) {
+  closeHubSheet(options);
+}
+
+function openCardDetails() {
+  openHubSheet(hub.els.cardSheet, hub.els.cardInfo);
 }
 
 function setActivePanel(panel, options = {}) {
@@ -1316,7 +1462,7 @@ function setActivePanel(panel, options = {}) {
     section.classList.toggle('active', active);
   });
 
-  Array.from(hub.root.querySelectorAll('.hub-nav-btn, .hub-mobile-btn')).forEach((button) => {
+  Array.from(hub.root.querySelectorAll('.hub-nav-btn, .hub-mobile-btn, [data-menu-nav]')).forEach((button) => {
     const active = button.dataset.hubRoute === target;
     button.classList.toggle('active', active);
     if (active) button.setAttribute('aria-current', 'page');
@@ -1528,6 +1674,7 @@ function onHubClick(event) {
   const routeButton = target.closest('[data-hub-route]');
   if (routeButton) {
     event.preventDefault();
+    closeHubMenu({ restoreFocus: false });
     navigate(routeButton.dataset.hubRoute);
     return;
   }
@@ -1535,6 +1682,7 @@ function onHubClick(event) {
   const studioButton = target.closest('[data-open-studio]');
   if (studioButton) {
     event.preventDefault();
+    closeHubMenu({ restoreFocus: false });
     navigate(`studio/${studioButton.dataset.openStudio || 'deck'}`);
     return;
   }
@@ -1690,6 +1838,18 @@ function setupHubEvents() {
 
   setupShowcaseTilt();
 
+  if (hub.els.menuBtn) {
+    hub.els.menuBtn.addEventListener('click', openHubMenu);
+  }
+
+  if (hub.els.cardInfo) {
+    hub.els.cardInfo.addEventListener('click', openCardDetails);
+  }
+
+  Array.from(hub.root.querySelectorAll('[data-menu-close]')).forEach((node) => {
+    node.addEventListener('click', () => closeHubSheet());
+  });
+
   if (hub.els.explorerTrack) {
     hub.els.explorerTrack.addEventListener('scroll', updateExplorerArrows, { passive: true });
     hub.els.explorerTrack.addEventListener('keydown', (event) => {
@@ -1700,6 +1860,13 @@ function setupHubEvents() {
   }
 
   window.addEventListener('resize', updateExplorerArrows);
+
+  /* Las hojas solo existen en móvil: al cruzar el breakpoint se cierran. */
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 980 && hub.activeSheet) {
+      closeHubSheet({ restoreFocus: false, instant: true });
+    }
+  });
 
   window.addEventListener('popstate', applyRoute);
   window.addEventListener('hashchange', () => {
@@ -1812,6 +1979,20 @@ function cacheHubDom() {
   hub.scroll = hubEl('hub-scroll');
 
   els.lang = hubEl('hub-lang');
+  els.menuBtn = hubEl('hub-menu-btn');
+  els.menu = hubEl('hub-menu-sheet');
+  els.menuPanel = document.querySelector('.hub-menu-panel');
+  els.menuClose = document.querySelector('.hub-menu-close');
+  els.menuStatCards = hubEl('menu-stat-cards');
+  els.menuStatCollections = hubEl('menu-stat-collections');
+  els.menuStatDecks = hubEl('menu-stat-decks');
+  els.menuStatRenders = hubEl('menu-stat-renders');
+
+  els.cardInfo = hubEl('hub-card-info');
+  els.cardSheet = hubEl('hub-card-sheet');
+  els.cardSheetSub = hubEl('hub-card-sheet-sub');
+  els.cardSheetChips = hubEl('hub-card-sheet-chips');
+  els.cardSheetLore = hubEl('hub-card-sheet-lore');
   els.topName = hubEl('hub-profile-name');
   els.topHandle = hubEl('hub-profile-handle');
   els.avatar = hubEl('hub-avatar');
@@ -1829,6 +2010,7 @@ function cacheHubDom() {
   els.card = hubEl('hub-card');
   els.cardFront = hubEl('hub-card-front');
   els.cardBack = hubEl('hub-card-back');
+  els.cardStage = hubEl('hub-card-stage');
   els.cardName = hubEl('hub-card-name');
   els.cardSub = hubEl('hub-card-sub');
   els.cardChips = hubEl('hub-card-chips');

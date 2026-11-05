@@ -1,4 +1,4 @@
-# Source map — CardGram v0.4.4
+# Source map — CardGram v0.4.5
 
 Original project root: `C:\Users\Meghan Camacho\Documents\Repos\CardGram` (adjust if moved). All references below are to that checkout.
 
@@ -81,6 +81,9 @@ Original project root: `C:\Users\Meghan Camacho\Documents\Repos\CardGram` (adjus
 | 16. Responsive | 2300–2775 | 1080 / 980 / 860 / 560 |
 | 17. Reduced motion | 2776–2842 | Motion fallback |
 | 18. Dashboard | 2843–4162 | Player, favourite, explorer, responsive at 1240/1080/980/560 |
+| 19. Ambient | 4165–4295 | Reactive background layers, tinted glow/shadow, Inkra entry points |
+| 20. Card-first mobile | 4296–4733 | Identity chip, vitrine, privacy strip, menu button, card info row, landscape |
+| 21. Mobile menu | 4734–5113 | Bottom sheet (studio, Inkra, nav, stats, language) + compact variants + card details sheet |
 
 ## `assets/js/app.js` map
 
@@ -108,7 +111,7 @@ Original project root: `C:\Users\Meghan Camacho\Documents\Repos\CardGram` (adjus
 |---|---|
 | 8–45 | Storage keys, panels, tab map, hub state |
 | 149–260 | Sanitize profile/data, load/persist |
-| 261–397 | Stats, counts, identity/avatar |
+| 261–397 | Stats, counts, identity/avatar, card ratio sync |
 | 398–598 | Favourite card, explorer filters/rail |
 | 599–854 | Library cards, collections, decks |
 | 855–1129 | Collection detail, deck detail/edit/create |
@@ -116,6 +119,15 @@ Original project root: `C:\Users\Meghan Camacho\Documents\Repos\CardGram` (adjus
 | 1309–1500 | Panel switching, hash routing, lazy `openStudio` |
 | 1501–1773 | Catalog/preset open, delegated hub clicks, showcase tilt, events |
 | 1774–1932 | Refresh, export counter, DOM cache, boot |
+
+## `assets/js/ambient.js` map
+
+| Lines | Concern |
+|---|---|
+| 1–60 | Config, state, colour helpers |
+| 60–160 | Palette derivation (HSL clamps, theme colour, accent fallback) |
+| 160–250 | Canvas sampling, hue bins, noise threshold |
+| 250–330 | Layer cross-fade, `apply()` / `reset()` API |
 
 ## `assets/js/scene.js` map
 
