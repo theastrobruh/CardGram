@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+  <defs>
+    <linearGradient id="r-bg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0a1e2e"/>
+      <stop offset="100%" stop-color="#0d3040"/>
+    </linearGradient>
+    <linearGradient id="r-line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1aa39a"/>
+      <stop offset="100%" stop-color="#7cebdd"/>
+    </linearGradient>
+    <linearGradient id="r-done" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1aa39a"/>
+      <stop offset="100%" stop-color="#0d6b5f"/>
+    </linearGradient>
+    <linearGradient id="r-wip" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2087c9"/>
+      <stop offset="100%" stop-color="#155a87"/>
+    </linearGradient>
+    <linearGradient id="r-next" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3cc9d8"/>
+      <stop offset="100%" stop-color="#1a6e78"/>
+    </linearGradient>
+    <filter id="r-glow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
+      <feFlood flood-color="#3cc9d8" flood-opacity="0.3"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="200" rx="16" fill="url(#r-bg)"/>
+  <rect x="1" y="1" width="798" height="198" rx="15" fill="none" stroke="rgba(124,235,221,0.1)" stroke-width="1"/>
+
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="14" fill="#7cebdd" letter-spacing="4" font-weight="600">🗺️ ROADMAP</text>
+
+  <!-- Timeline line -->
+  <line x1="60" y1="90" x2="740" y2="90" stroke="url(#r-line)" stroke-width="2" opacity="0.4"/>
+  
+  <!-- Animated progress pulse -->
+  <line x1="60" y1="90" x2="420" y2="90" stroke="url(#r-line)" stroke-width="3" opacity="0.8">
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+  </line>
+
+  <!-- Phase 1: Done ✅ -->
+  <g transform="translate(120, 55)" filter="url(#r-glow)">
+    <circle cx="0" cy="35" r="14" fill="url(#r-done)" stroke="#7cebdd" stroke-width="1.5"/>
+    <text x="0" y="40" text-anchor="middle" font-size="14" fill="#fff">✅</text>
+    <text x="0" y="0" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="11" fill="#ffffff" font-weight="700">eCard Studio</text>
+    <text x="0" y="14" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="#7cebdd" opacity="0.8">3D Engine + Export</text>
+    <text x="0" y="70" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="8" fill="#4aeacc" opacity="0.6">v0.3</text>
+  </g>
+
+  <!-- Phase 2: Done ✅ -->
+  <g transform="translate(270, 55)" filter="url(#r-glow)">
+    <circle cx="0" cy="35" r="14" fill="url(#r-done)" stroke="#7cebdd" stroke-width="1.5"/>
+    <text x="0" y="40" text-anchor="middle" font-size="14" fill="#fff">✅</text>
+    <text x="0" y="0" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="11" fill="#ffffff" font-weight="700">Card Hub</text>
+    <text x="0" y="14" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="#7cebdd" opacity="0.8">Lobby + Collections</text>
+    <text x="0" y="70" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="8" fill="#4aeacc" opacity="0.6">v0.5</text>
+  </g>
+
+  <!-- Phase 3: WIP 🔧 -->
+  <g transform="translate(420, 55)">
+    <circle cx="0" cy="35" r="14" fill="url(#r-wip)" stroke="#4db8ff" stroke-width="1.5">
+      <animate attributeName="stroke-opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <text x="0" y="40" text-anchor="middle" font-size="14" fill="#fff">🔧</text>
+    <text x="0" y="0" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="11" fill="#ffffff" font-weight="700">Inkra Print</text>
+    <text x="0" y="14" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="#4db8ff" opacity="0.8">Real-Scale Layouts</text>
+    <text x="0" y="70" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="8" fill="#4db8ff" opacity="0.6">v0.6</text>
+  </g>
+
+  <!-- Phase 4: Next 🌐 -->
+  <g transform="translate(570, 55)">
+    <circle cx="0" cy="35" r="14" fill="url(#r-next)" stroke="rgba(124,235,221,0.4)" stroke-width="1.5" stroke-dasharray="3,3"/>
+    <text x="0" y="40" text-anchor="middle" font-size="14" fill="#fff">🌐</text>
+    <text x="0" y="0" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="11" fill="rgba(255,255,255,0.7)" font-weight="700">Community</text>
+    <text x="0" y="14" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="rgba(124,235,221,0.5)">Share + Drops</text>
+    <text x="0" y="70" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="8" fill="rgba(124,235,221,0.4)">v0.7+</text>
+  </g>
+
+  <!-- Phase 5: Future ✨ -->
+  <g transform="translate(700, 55)">
+    <circle cx="0" cy="35" r="14" fill="rgba(60,201,216,0.15)" stroke="rgba(124,235,221,0.25)" stroke-width="1.5" stroke-dasharray="2,4"/>
+    <text x="0" y="40" text-anchor="middle" font-size="14" fill="rgba(255,255,255,0.5)">✨</text>
+    <text x="0" y="0" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="11" fill="rgba(255,255,255,0.5)" font-weight="700">Marketplace</text>
+    <text x="0" y="14" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="rgba(124,235,221,0.35)">Drops + Trading</text>
+    <text x="0" y="70" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="8" fill="rgba(124,235,221,0.3)">Future</text>
+  </g>
+
+  <!-- Footer note -->
+  <text x="400" y="185" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="rgba(124,235,221,0.4)" letter-spacing="1">Built with ♥ by theAstroBruh + AI Crew · Support us on Ko-fi</text>
+</svg>
