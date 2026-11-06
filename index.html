@@ -12,8 +12,8 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=77">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=77">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=78">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=78">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
           integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu"
@@ -21,16 +21,16 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"
           integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf"
           crossorigin="anonymous" defer></script>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=77" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=77" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=77" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=77" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=77" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=77" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=77" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=77" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=77" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=77" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=78" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=78" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=78" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=78" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=78" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=78" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=78" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=78" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=78" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=78" defer></script>
 </head>
 <body data-view="hub">
 
@@ -454,9 +454,6 @@
                   <div class="hub-card-meta">
                     <div class="hub-card-tags" id="hub-card-tags" aria-label="Identificadores de la carta" data-i18n-aria-label="card_tags_aria"></div>
                     <div class="hub-card-title-row">
-                      <button class="hub-card-hand-edit" id="hub-mobile-hand-edit" type="button" aria-haspopup="dialog" aria-controls="hand-dialog" aria-label="Elegir cartas de la mano" data-i18n-aria-label="hub_hand_edit" title="Elegir cartas de la mano" data-i18n-title="hub_hand_edit">
-                        <svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg>
-                      </button>
                       <h2 class="hub-card-name" id="hub-card-name" aria-live="polite">Shadowblade Kinetic</h2>
                       <button class="hub-card-info" id="hub-card-info" type="button" data-sound="none" aria-haspopup="dialog" aria-expanded="false" aria-controls="hub-card-sheet" aria-label="Ver etiquetas y detalles de la carta" data-i18n-aria-label="card_details_open" title="Ver etiquetas y detalles de la carta" data-i18n-title="card_details_open">
                         <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
@@ -808,7 +805,7 @@
       </button>
     </nav>
 
-    <!-- Acciones rápidas en flor alrededor del menú (móvil) -->
+    <!-- Acciones rápidas sobre el menú (móvil) -->
     <div class="hub-fab-actions" aria-label="Acciones rápidas" data-i18n-aria-label="hub_quick_actions">
       <button class="hub-fab-btn" type="button" data-hub-route="library" aria-label="Mis cartas" data-i18n-aria-label="hub_nav_library" title="Mis cartas" data-i18n-title="hub_nav_library">
         <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
@@ -817,12 +814,18 @@
           <path d="M12.5 7.4l1 2.1 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3z" fill="currentColor" stroke="none"/>
         </svg>
       </button>
-      <button class="hub-fab-btn hub-fab-btn-primary" type="button" data-render-favorite aria-label="Crear un render con tu carta" data-i18n-aria-label="hub_render_favorite" title="Crear un render con tu carta" data-i18n-title="hub_render_favorite">
+      <button class="hub-fab-btn hub-fab-btn-primary" type="button" data-hub-route="home" aria-label="Inicio" data-i18n-aria-label="hub_nav_home" title="Inicio" data-i18n-title="hub_nav_home">
         <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
-          <rect x="2.8" y="7" width="12.6" height="10" rx="2.2"/>
-          <path d="M15.4 10.3l5.2-2.4v8.2l-5.2-2.4z"/>
-          <circle cx="8.6" cy="12" r="2.5"/>
-          <path d="M8.6 4.2V2.8M6.8 3.5h3.6" stroke-linecap="square"/>
+          <path d="M3.8 11.2L12 4l8.2 7.2"/>
+          <path d="M6.4 10v9.8h11.2V10"/>
+          <path d="M10.2 19.8v-5.2h3.6v5.2"/>
+        </svg>
+      </button>
+      <button class="hub-fab-btn" id="hub-mobile-hand-edit" type="button" aria-haspopup="dialog" aria-controls="hand-dialog" aria-label="Elegir cartas de la mano" data-i18n-aria-label="hub_hand_edit" title="Elegir cartas de la mano" data-i18n-title="hub_hand_edit">
+        <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+          <rect x="9" y="4.5" width="6.4" height="12" rx="1.6"/>
+          <path d="M5.4 8.2v8.9a2.4 2.4 0 0 0 2.4 2.4h8.4"/>
+          <path d="M18.6 8.2v8.9a2.4 2.4 0 0 1-2.4 2.4H7.8"/>
         </svg>
       </button>
       <button class="hub-fab-btn" type="button" data-hub-route="explore" aria-label="Explorar" data-i18n-aria-label="hub_nav_explore" title="Explorar" data-i18n-title="hub_nav_explore">

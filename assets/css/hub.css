@@ -5311,8 +5311,8 @@ dialog {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 80px;
-    height: 80px;
+    width: 38px;
+    height: 38px;
     padding: 0;
     border-radius: 50%;
     color: #07333f;
@@ -5334,8 +5334,8 @@ dialog {
   }
 
   .hub-menu-btn .icon {
-    width: 26px;
-    height: 26px;
+    width: 17px;
+    height: 17px;
     opacity: 0.8;
   }
 
@@ -5347,11 +5347,11 @@ dialog {
   .hub-fab-actions {
     position: fixed;
     left: 50%;
-    bottom: calc(108px + env(safe-area-inset-bottom));
+    bottom: calc(72px + env(safe-area-inset-bottom));
     z-index: 167;
     display: flex;
     align-items: flex-end;
-    gap: 12px;
+    gap: 6px;
     transform: translateX(-50%);
     pointer-events: none;
   }
@@ -5360,8 +5360,8 @@ dialog {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 46px;
-    height: 46px;
+    width: 30px;
+    height: 30px;
     padding: 0;
     pointer-events: auto;
     border-radius: 50%;
@@ -5383,33 +5383,28 @@ dialog {
     transform: translateY(0) scale(0.95);
   }
 
-  .hub-fab-btn:not(.hub-fab-btn-primary) {
-    position: relative;
-    top: 10px;
-  }
-
   .hub-fab-icon {
-    width: 20px;
-    height: 20px;
+    width: 14px;
+    height: 14px;
   }
 
   .hub-fab-btn-primary {
-    width: 70px;
-    height: 70px;
+    width: 34px;
+    height: 34px;
     color: #ffffff;
     background: linear-gradient(160deg, #45d9c2 0%, #2f8fdd 100%);
     border-color: rgba(255, 255, 255, 0.84);
-    box-shadow: 0 12px 24px rgba(47, 143, 221, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.45);
-    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(47, 143, 221, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    transform: translateY(-4px);
   }
 
   .hub-fab-btn-primary:hover {
-    transform: translateY(-12px);
+    transform: translateY(-6px);
   }
 
   .hub-fab-btn-primary .hub-fab-icon {
-    width: 28px;
-    height: 28px;
+    width: 16px;
+    height: 16px;
   }
 
   /* Reproductor de música: adelanto, todavía sin función. */
