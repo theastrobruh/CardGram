@@ -3470,3 +3470,170 @@ body.cinematic-mode .bottom-left-bg-wrap {
   border-color: rgba(255, 255, 255, 0.8);
   box-shadow: 0 12px 24px rgba(201, 42, 84, 0.4);
 }
+
+/* Ocultar botones de cabecera del menú lateral en pantallas responsivas */
+@media (max-width: 860px) {
+  #sidebar .app-header .header-actions {
+    display: none !important;
+  }
+}
+
+/* Mini botón flotante en esquina inferior derecha para configuración */
+.bottom-right-cfg-wrap {
+  position: absolute;
+  right: 20px;
+  bottom: 24px;
+  z-index: 45;
+}
+
+.mini-cfg-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 16px rgba(7, 51, 63, 0.18), var(--inset-hi);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.mini-cfg-btn:hover {
+  transform: scale(1.08);
+  background: #ffffff;
+  color: var(--accent);
+}
+
+.mini-cfg-btn .icon {
+  width: 17px;
+  height: 17px;
+}
+
+.quick-cfg-popup {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  right: 0;
+  width: 220px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.98);
+  border-radius: 16px;
+  padding: 12px 14px;
+  box-shadow: 0 10px 28px rgba(7, 51, 63, 0.2), var(--inset-hi);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 50;
+  animation: dialogIn 0.2s var(--ease) both;
+}
+
+.quick-cfg-popup[hidden] {
+  display: none !important;
+}
+
+.quick-cfg-title {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.quick-cfg-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quick-cfg-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #3b6672;
+}
+
+.quick-cfg-label .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.quick-cfg-lang-pills {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.cfg-lang-btn {
+  background: rgba(7, 51, 63, 0.06);
+  border: 1px solid rgba(7, 51, 63, 0.12);
+  border-radius: 8px;
+  padding: 5px 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: center;
+}
+
+.cfg-lang-btn.active, .cfg-lang-btn:hover {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+.cfg-sound-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(7, 51, 63, 0.06);
+  border: 1px solid rgba(7, 51, 63, 0.12);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.cfg-sound-btn:hover {
+  background: rgba(47, 143, 221, 0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.cfg-sound-btn .icon {
+  width: 15px;
+  height: 15px;
+}
+
+.cfg-sound-btn .sound-off {
+  display: none;
+}
+
+body.sound-muted .cfg-sound-btn .sound-on {
+  display: none;
+}
+
+body.sound-muted .cfg-sound-btn .sound-off {
+  display: inline-block;
+}
+
+body.cinematic-mode .bottom-right-cfg-wrap {
+  display: none !important;
+}
+
+@media (max-width: 860px) {
+  .bottom-right-cfg-wrap {
+    right: 14px;
+    bottom: 18px;
+  }
+}

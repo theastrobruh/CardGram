@@ -1737,6 +1737,53 @@ function setupControls() {
       reader.readAsDataURL(file);
     });
   }
+  function syncQuickCfgUI() {
+    if (el.cfgLangBtns) {
+      el.cfgLangBtns.forEach((btn) => {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === currentLang);
+      });
+    }
+    if (el.quickSoundLabel) {
+      const isMuted = document.body.classList.contains('sound-muted');
+      el.quickSoundLabel.textContent = isMuted ? 'Silenciado' : 'Activado';
+    }
+  }
+
+  if (el.btnQuickCfg && el.quickCfgPopup) {
+    el.btnQuickCfg.addEventListener('click', (e) => {
+      e.stopPropagation();
+      el.quickCfgPopup.hidden = !el.quickCfgPopup.hidden;
+      if (!el.quickCfgPopup.hidden) syncQuickCfgUI();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!el.quickCfgPopup.hidden && !el.quickCfgPopup.contains(e.target) && !el.btnQuickCfg.contains(e.target)) {
+        el.quickCfgPopup.hidden = true;
+      }
+    });
+
+    if (el.cfgLangBtns) {
+      el.cfgLangBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const lang = btn.getAttribute('data-lang');
+          if (typeof applyLanguage === 'function') applyLanguage(lang);
+          syncQuickCfgUI();
+          el.quickCfgPopup.hidden = true;
+        });
+      });
+    }
+
+    if (el.btnQuickSoundToggle) {
+      el.btnQuickSoundToggle.addEventListener('click', () => {
+        if (el.btnSound) {
+          el.btnSound.click();
+        } else if (window.CardGramSound) {
+          window.CardGramSound.toggle();
+        }
+        syncQuickCfgUI();
+      });
+    }
+  }
 }
 
 function setupScenes() {
@@ -2540,6 +2587,11 @@ function cacheDom() {
   el.btnQuickBg = $('#btn-quick-bg');
   el.quickBgPopup = $('#quick-bg-popup');
   el.customBgInput = $('#custom-bg-input');
+  el.btnQuickCfg = $('#btn-quick-cfg');
+  el.quickCfgPopup = $('#quick-cfg-popup');
+  el.btnQuickSoundToggle = $('#btn-quick-sound-toggle');
+  el.quickSoundLabel = $('#quick-sound-label');
+  el.cfgLangBtns = $$('.cfg-lang-btn');
 
   el.toastStack = $('#toast-stack');
   el.presetDialog = $('#preset-dialog');
