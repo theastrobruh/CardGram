@@ -172,11 +172,26 @@ dialog {
 }
 
 .hub-brand-logo {
-  width: 28px;
-  height: 38px;
+  position: relative;
+  width: 36px;
+  height: 46px;
   flex: 0 0 auto;
-  filter: drop-shadow(0 6px 12px rgba(6, 55, 74, 0.18));
+  border-radius: 10px;
+  background: radial-gradient(circle at 50% 42%, rgba(124, 235, 221, 0.3), rgba(124, 235, 221, 0) 72%);
+  filter: drop-shadow(0 6px 12px rgba(6, 55, 74, 0.2));
   transition: transform 0.3s var(--ease);
+}
+
+/* La cara se mantiene visible más tiempo antes de girar. */
+.hub-brand-logo .spinning-card-inner {
+  display: block;
+  animation: hubBrandLogoSpin 6.4s ease-in-out infinite;
+}
+
+@keyframes hubBrandLogoSpin {
+  0%, 34% { transform: rotateY(0deg) rotateZ(-4deg); }
+  50%, 84% { transform: rotateY(180deg) rotateZ(4deg); }
+  100% { transform: rotateY(360deg) rotateZ(-4deg); }
 }
 
 .hub-brand:hover .hub-brand-logo {
@@ -6422,8 +6437,8 @@ dialog {
   }
 
   .hub-brand-logo {
-    width: 24px;
-    height: 32px;
+    width: 30px;
+    height: 40px;
   }
 
   .hub-brand-mark .icon {
@@ -6600,6 +6615,10 @@ dialog {
   .hub-kofi-coffee,
   .hub-kofi-heart,
   .hub-music-btn.is-playing .hub-music-disc {
+    animation: none !important;
+  }
+
+  .hub-brand-logo .spinning-card-inner {
     animation: none !important;
   }
 }

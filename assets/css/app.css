@@ -2718,7 +2718,20 @@ body.cinematic-mode .toast-stack {
   }
 
   .brand-title-row h1 {
-    font-size: 1.02rem;
+    font-size: 1rem;
+  }
+
+  .brand-title-row {
+    flex-wrap: wrap;
+    row-gap: 2px;
+  }
+
+  .author-credit {
+    display: none;
+  }
+
+  #btn-help {
+    display: none;
   }
 
   .nav-tabs {
