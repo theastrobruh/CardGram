@@ -156,7 +156,7 @@ Reimplementing the studio engine is optional; this is the contract if you do.
 
 ## 7. Sound feedback
 
-`assets/js/sound.js` synthesizes every cue with Web Audio — no files, no requests, CSP-safe.
+`assets/js/sound.js` synthesizes most cues with Web Audio. Five named cues (`tap`, `flip`, `open`, `tab`, `error`) play local samples from `assets/data/sounds/` through an `<audio>` element (works on `file://`); the synthesized palette stays for everything else.
 
 - **Lazy and polite.** The `AudioContext` is created on the first pointer/key gesture; boot-time toasts stay silent. Palette gains sit between .006 and .045 with a shared compressor, so effects sit under the UI, not over it.
 - **One gesture, one cue.** A delegated `pointerdown` plays a default `tap` and overrides it from `data-sound`. Structural transitions (sheets, card flip) use `data-sound="none"` plus an explicit `Sound.play()` inside the function that really performs the change.

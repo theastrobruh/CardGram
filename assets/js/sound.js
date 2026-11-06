@@ -1,9 +1,9 @@
 /* ==========================================================================
    CardGram · Sonido
-   Micro-diseño sonoro sintetizado con Web Audio (sin archivos, sin red).
-   Toques de cristal, madera suave y campanillas acuáticas para acompañar
-   cada gesto sin competir con la lectura. Se activa con el primer gesto del
-   usuario (política de autoplay) y recuerda la preferencia.
+   Micro-diseño sonoro: cinco gestos usan muestras de audio locales
+   (assets/data/sounds) y el resto sigue sintetizado con Web Audio.
+   Se activa con el primer gesto del usuario (política de autoplay) y
+   recuerda la preferencia.
    ========================================================================== */
 (function () {
   'use strict';
@@ -26,6 +26,17 @@
     error: 0.3,
     primary: 0.1
   };
+
+  /* Muestras puntuales: sustituyen únicamente al gesto con el mismo nombre.
+     El resto de la paleta sigue siendo sintetizada. */
+  const SAMPLES = {
+    tap: { src: 'assets/data/sounds/click - tap.wav', gain: 0.55 },
+    flip: { src: 'assets/data/sounds/favorite-card-select.wav', gain: 0.6 },
+    open: { src: 'assets/data/sounds/menu-button-select.wav', gain: 0.6 },
+    tab: { src: 'assets/data/sounds/options click.wav', gain: 0.55 },
+    error: { src: 'assets/data/sounds/warning-alert.wav', gain: 0.65 }
+  };
+  const samplePool = Object.create(null);
 
   let settings = loadSettings();
   let ctx = null;
@@ -381,6 +392,42 @@
   /* ------------------------------------------------------------------------
      Reproducción
      ---------------------------------------------------------------------- */
+  /* Las muestras van por un elemento <audio> para funcionar también con
+     file://, donde fetch/decodeAudioData no puede leer el archivo. */
+  function playSample(name) {
+    const sample = SAMPLES[name];
+    if (!sample) return false;
+
+    let audio = samplePool[name];
+    if (!audio) {
+      audio = new Audio();
+      audio.src = sample.src;
+      audio.preload = 'auto';
+      samplePool[name] = audio;
+    }
+
+    try {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.volume = clamp(masterLevel() * sample.gain, 0, 1);
+      const promise = audio.play();
+      if (promise && typeof promise.catch === 'function') promise.catch(() => {});
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function preloadSamples() {
+    Object.keys(SAMPLES).forEach((name) => {
+      if (samplePool[name]) return;
+      const audio = new Audio();
+      audio.src = SAMPLES[name].src;
+      audio.preload = 'auto';
+      samplePool[name] = audio;
+    });
+  }
+
   function play(name, options = {}) {
     if (!settings.enabled && !options.force) return false;
     if (!unlocked) return false;
@@ -395,6 +442,7 @@
     lastPlayed[name] = stamp;
 
     try {
+      if (SAMPLES[name]) return playSample(name);
       recipe(options);
       return true;
     } catch (error) {
@@ -595,6 +643,7 @@
     document.addEventListener('change', onChange, true);
     document.addEventListener('click', onClick, true);
 
+    preloadSamples();
     syncButtons();
   }
 
