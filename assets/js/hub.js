@@ -8,10 +8,27 @@
 const HUB_STORAGE = {
   profile: 'cardgram.profile.v1',
   data: 'cardgram.hub.v1',
-  booster: 'cardgram.booster.v1'
+  booster: 'cardgram.booster.v1',
+  layout: 'cardgram.layout.v1'
 };
 
-const HUB_PANELS = ['home', 'booster', 'library', 'collections', 'explore', 'profile'];
+const HUB_LAYOUT_DEFAULT = {
+  mode: 'controlled',
+  leftWidth: 280,
+  rightWidth: 325,
+  height: 470,
+  offset: 0,
+  cardSize: 90,
+  sideCards: 115,
+  leftX: 0,
+  leftY: 0,
+  rightX: 0,
+  rightY: 0,
+  heroX: 0,
+  heroY: 0
+};
+
+const HUB_PANELS = ['home', 'booster', 'collections', 'explore', 'profile'];
 const HUB_STUDIO_TABS = {
   deck: 'tab-deck',
   '3d': 'tab-3d',
@@ -807,6 +824,178 @@ function persistBooster() {
 }
 
 /* --------------------------------------------------------------------------
+   Composición libre del inicio de escritorio
+   -------------------------------------------------------------------------- */
+let hubLayout = { ...HUB_LAYOUT_DEFAULT };
+
+function sanitizeLayout(raw) {
+  const data = { ...HUB_LAYOUT_DEFAULT };
+  if (!raw || typeof raw !== 'object') return data;
+  const number = (key, min, max) => {
+    const value = Number(raw[key]);
+    if (Number.isFinite(value)) data[key] = Math.min(max, Math.max(min, value));
+  };
+  if (raw.mode === 'free' || raw.mode === 'controlled') data.mode = raw.mode;
+  number('leftWidth', 230, 380);
+  number('rightWidth', 260, 420);
+  number('height', 300, 700);
+  number('offset', -120, 180);
+  number('cardSize', 70, 125);
+  number('sideCards', 70, 150);
+  number('leftX', -500, 500);
+  number('leftY', -300, 300);
+  number('rightX', -500, 500);
+  number('rightY', -300, 300);
+  number('heroX', -500, 500);
+  number('heroY', -300, 300);
+  return data;
+}
+
+function persistHubLayout() {
+  storage.write(HUB_STORAGE.layout, hubLayout);
+}
+
+function applyHubLayout() {
+  const panel = document.querySelector('.hub-home-panel');
+  if (!panel) return;
+  const free = hubLayout.mode === 'free';
+  panel.dataset.layoutMode = hubLayout.mode;
+  panel.style.setProperty('--side-w-left', `${hubLayout.leftWidth}px`);
+  panel.style.setProperty('--side-w-right', `${hubLayout.rightWidth}px`);
+  panel.style.setProperty('--side-h', `${hubLayout.height}px`);
+  panel.style.setProperty('--side-offset', `${hubLayout.offset}px`);
+  panel.style.setProperty('--hero-scale', String(hubLayout.cardSize / 100));
+  panel.style.setProperty('--side-card-scale', String(hubLayout.sideCards / 100));
+  panel.style.setProperty('--left-x', `${free ? hubLayout.leftX : 0}px`);
+  panel.style.setProperty('--left-y', `${free ? hubLayout.leftY : 0}px`);
+  panel.style.setProperty('--right-x', `${free ? hubLayout.rightX : 0}px`);
+  panel.style.setProperty('--right-y', `${free ? hubLayout.rightY : 0}px`);
+  panel.style.setProperty('--hero-x', `${free ? hubLayout.heroX : 0}px`);
+  panel.style.setProperty('--hero-y', `${free ? hubLayout.heroY : 0}px`);
+
+  const values = {
+    'layout-left-width': hubLayout.leftWidth,
+    'layout-right-width': hubLayout.rightWidth,
+    'layout-height': hubLayout.height,
+    'layout-offset': hubLayout.offset,
+    'layout-card-size': hubLayout.cardSize,
+    'layout-side-cards': hubLayout.sideCards
+  };
+  Object.entries(values).forEach(([id, value]) => {
+    const input = document.getElementById(id);
+    if (input) input.value = String(value);
+  });
+
+  document.querySelectorAll('[data-layout-mode]').forEach((button) => {
+    const active = button.dataset.layoutMode === hubLayout.mode;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', String(active));
+  });
+}
+
+function setupLayoutEditor() {
+  const dock = document.getElementById('hub-layout-dock');
+  const toggle = document.getElementById('hub-layout-toggle');
+  const panel = document.getElementById('hub-layout-panel');
+  if (!dock || !toggle || !panel) return;
+
+  hubLayout = sanitizeLayout(storage.read(HUB_STORAGE.layout, null));
+  applyHubLayout();
+
+  toggle.addEventListener('click', () => {
+    const open = panel.hidden;
+    panel.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+
+  panel.addEventListener('click', (event) => {
+    const mode = event.target.closest('[data-layout-mode]');
+    if (mode) {
+      hubLayout.mode = mode.dataset.layoutMode;
+      applyHubLayout();
+      persistHubLayout();
+    }
+  });
+
+  const bind = (id, key) => {
+    const input = document.getElementById(id);
+    if (!input) return;
+    input.addEventListener('input', () => {
+      hubLayout[key] = Number(input.value);
+      applyHubLayout();
+      persistHubLayout();
+    });
+  };
+  bind('layout-left-width', 'leftWidth');
+  bind('layout-right-width', 'rightWidth');
+  bind('layout-height', 'height');
+  bind('layout-offset', 'offset');
+  bind('layout-card-size', 'cardSize');
+  bind('layout-side-cards', 'sideCards');
+
+  const reset = document.getElementById('layout-reset');
+  if (reset) {
+    reset.addEventListener('click', () => {
+      hubLayout = { ...HUB_LAYOUT_DEFAULT };
+      applyHubLayout();
+      persistHubLayout();
+    });
+  }
+
+  const grips = [
+    ['left', document.querySelector('.hub-player-panel')],
+    ['right', document.querySelector('.hub-explorer-panel')],
+    ['hero', document.querySelector('.hub-favorite')]
+  ];
+  grips.forEach(([key, host]) => {
+    if (!host || host.querySelector(`[data-layout-grip="${key}"]`)) return;
+    const grip = document.createElement('button');
+    grip.type = 'button';
+    grip.className = 'hub-layout-grip';
+    grip.dataset.layoutGrip = key;
+    grip.setAttribute('aria-label', t('layout_drag'));
+    grip.title = t('layout_drag');
+    host.appendChild(grip);
+    grip.addEventListener('pointerdown', (event) => {
+      if (hubLayout.mode !== 'free') return;
+      event.preventDefault();
+      const start = { x: event.clientX, y: event.clientY };
+      const base = key === 'left'
+        ? { x: hubLayout.leftX, y: hubLayout.leftY }
+        : key === 'right'
+          ? { x: hubLayout.rightX, y: hubLayout.rightY }
+          : { x: hubLayout.heroX, y: hubLayout.heroY };
+      grip.setPointerCapture(event.pointerId);
+
+      const move = (moveEvent) => {
+        const dx = moveEvent.clientX - start.x;
+        const dy = moveEvent.clientY - start.y;
+        if (key === 'left') {
+          hubLayout.leftX = base.x + dx;
+          hubLayout.leftY = base.y + dy;
+        } else if (key === 'right') {
+          hubLayout.rightX = base.x + dx;
+          hubLayout.rightY = base.y + dy;
+        } else {
+          hubLayout.heroX = base.x + dx;
+          hubLayout.heroY = base.y + dy;
+        }
+        applyHubLayout();
+      };
+      const end = () => {
+        grip.removeEventListener('pointermove', move);
+        grip.removeEventListener('pointerup', end);
+        grip.removeEventListener('pointercancel', end);
+        persistHubLayout();
+      };
+      grip.addEventListener('pointermove', move);
+      grip.addEventListener('pointerup', end);
+      grip.addEventListener('pointercancel', end);
+    });
+  });
+}
+
+/* --------------------------------------------------------------------------
    Estadísticas
    -------------------------------------------------------------------------- */
 function hubStats() {
@@ -1394,7 +1583,16 @@ function renderFeaturedStack() {
   const stack = hub.els.playerStack;
   if (!stack) return;
 
-  const cards = featuredCards();
+  let cards = featuredCards();
+  if (cards.length && cards.length < 3) {
+    const used = new Set(cards.map((card) => card.id));
+    const extras = HUB_CATALOG.cards
+      .filter((card) => !used.has(card.id))
+      .slice(0, 3 - cards.length);
+    cards = cards.concat(extras);
+  }
+  cards = cards.slice(0, 3);
+
   const signature = `${currentLang}|${cards.map((card) => card.id).join('|')}`;
   stack.dataset.count = String(cards.length);
   if (hub.featuredSignature === signature && stack.childElementCount) {
@@ -2841,7 +3039,7 @@ function closeCardViewer(options = {}) {
 }
 
 function setActivePanel(panel, options = {}) {
-  const target = HUB_PANELS.includes(panel) ? panel : 'home';
+  const target = panel === 'library' ? 'collections' : HUB_PANELS.includes(panel) ? panel : 'home';
   hub.panel = target;
 
   Array.from(hub.root.querySelectorAll('[data-hub-panel]')).forEach((section) => {
@@ -2902,7 +3100,8 @@ function showHub(panel) {
 }
 
 function navigate(route) {
-  const clean = String(route || 'home').replace(/^#?\/*/, '');
+  let clean = String(route || 'home').replace(/^#?\/*/, '');
+  if (clean === 'library') clean = 'collections';
   const hash = `#/${clean}`;
 
   if (location.hash === hash) {
@@ -2931,6 +3130,11 @@ function applyRoute() {
 
   if (head === 'studio') {
     openStudio(parts[1] || 'deck');
+    return;
+  }
+
+  if (head === 'library') {
+    showHub('collections');
     return;
   }
 
@@ -3918,6 +4122,7 @@ function setupHub() {
   buildProfileFavoriteOptions();
   setupHubEvents();
   setupCardRatios();
+  setupLayoutEditor();
 
   hub.ready = true;
   updateLangButtons();

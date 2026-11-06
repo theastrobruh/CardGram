@@ -672,3 +672,72 @@ Object.assign(I18N.de, {
   studio_saved: 'Meine gespeicherten Designs',
   studio_new_card_option: 'Neue Karte (Kunst hochladen)'
 });
+Object.assign(I18N.es, {
+  template_title: 'Crear con plantilla',
+  template_lead: 'Usa un borde, tu artwork y textos para armar una carta desde cero.',
+  template_gallery_aria: 'Plantillas disponibles',
+  template_upload: 'Subir plantilla',
+  template_artwork_upload: 'Subir artwork',
+  template_preview_aria: 'Vista previa de la carta',
+  template_art_zoom: 'Zoom artwork',
+  template_art_x: 'Artwork X',
+  template_art_y: 'Artwork Y',
+  template_zoom: 'Zoom plantilla',
+  template_text: 'Texto / emojis',
+  template_text_placeholder: 'Escribe un título…',
+  template_text_size: 'Tamaño',
+  template_text_x: 'Texto X',
+  template_text_y: 'Texto Y',
+  template_text_color: 'Color',
+  template_emoji_aria: 'Añadir emoji',
+  template_apply: 'Usar como anverso',
+  template_reset: 'Reiniciar',
+  template_applied: 'Plantilla aplicada como anverso'
+});
+Object.assign(I18N.en, {
+  template_title: 'Create with a template',
+  template_lead: 'Use a border, your artwork and text to build a card from scratch.',
+  template_gallery_aria: 'Available templates',
+  template_upload: 'Upload template',
+  template_artwork_upload: 'Upload artwork',
+  template_preview_aria: 'Card preview',
+  template_art_zoom: 'Artwork zoom',
+  template_art_x: 'Artwork X',
+  template_art_y: 'Artwork Y',
+  template_zoom: 'Template zoom',
+  template_text: 'Text / emojis',
+  template_text_placeholder: 'Type a title…',
+  template_text_size: 'Size',
+  template_text_x: 'Text X',
+  template_text_y: 'Text Y',
+  template_text_color: 'Color',
+  template_emoji_aria: 'Add emoji',
+  template_apply: 'Use as front',
+  template_reset: 'Reset',
+  template_applied: 'Template applied as front'
+});
+Object.assign(I18N.de, {
+  template_title: 'Mit Vorlage erstellen',
+  template_lead: 'Nutze einen Rahmen, dein Artwork und Text, um eine Karte von Grund auf zu bauen.',
+  template_gallery_aria: 'Verfügbare Vorlagen',
+  template_upload: 'Vorlage hochladen',
+  template_artwork_upload: 'Artwork hochladen',
+  template_preview_aria: 'Kartenvorschau',
+  template_art_zoom: 'Artwork-Zoom',
+  template_art_x: 'Artwork X',
+  template_art_y: 'Artwork Y',
+  template_zoom: 'Vorlagen-Zoom',
+  template_text: 'Text / Emojis',
+  template_text_placeholder: 'Titel eingeben…',
+  template_text_size: 'Größe',
+  template_text_x: 'Text X',
+  template_text_y: 'Text Y',
+  template_text_color: 'Farbe',
+  template_emoji_aria: 'Emoji hinzufügen',
+  template_apply: 'Als Vorderseite verwenden',
+  template_reset: 'Zurücksetzen',
+  template_applied: 'Vorlage als Vorderseite übernommen'
+});
+Object.assign(I18N.es, { template_x: 'Plantilla X', template_y: 'Plantilla Y' });
+Object.assign(I18N.en, { template_x: 'Template X', template_y: 'Template Y' });
+Object.assign(I18N.de, { template_x: 'Vorlage X', template_y: 'Vorlage Y' });

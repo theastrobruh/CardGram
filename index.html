@@ -12,21 +12,21 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=126">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=126">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=130">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=130">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=126" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=126" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=126" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=126" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=126" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=126" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=126" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=126" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=126" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=126" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=130" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=130" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=130" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=130" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=130" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=130" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=130" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=130" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=130" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=130" defer></script>
 </head>
 <body data-view="hub">
 
@@ -312,17 +312,13 @@
                 <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>
                 <span data-i18n="hub_nav_home">Inicio</span>
               </button>
-              <button class="hub-nav-btn" type="button" data-hub-route="library">
-                <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
-                <span data-i18n="hub_nav_library">Mis cartas</span>
-              </button>
               <button class="hub-nav-btn" type="button" data-hub-route="booster">
                 <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
                 <span data-i18n="hub_nav_booster">Sobre</span>
               </button>
               <button class="hub-nav-btn" type="button" data-hub-route="collections">
                 <svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg>
-                <span data-i18n="hub_nav_collections">Colecciones</span>
+                <span data-i18n="hub_nav_library">Mis cartas</span>
               </button>
               <button class="hub-nav-btn" type="button" data-hub-route="explore">
                 <svg class="icon" aria-hidden="true"><use href="#i-compass"></use></svg>
@@ -503,16 +499,18 @@
                     <p class="hub-card-sub" id="hub-card-sub">Mew Tarot · MEW-00</p>
                     <div class="hub-card-chips" id="hub-card-chips"></div>
                     <div class="hub-card-actions">
-                      <button class="btn btn-primary hub-card-open" type="button" data-open-favorite>
-                        <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
-                        <span data-i18n="hub_open_studio">Abrir el estudio</span>
-                      </button>
-                      <a class="hub-card-tool" href="https://theastrobruh.github.io/Inkra/" target="_blank" rel="noopener noreferrer" title="Inkra — impresión de oricas a escala real" data-i18n-title="hub_tool_inkra_hint" aria-label="Abrir Inkra, el complemento de impresión de CardGram" data-i18n-aria-label="hub_tool_inkra_aria">
-                        <svg class="icon" aria-hidden="true"><use href="#i-print"></use></svg>
-                        <span data-i18n="hub_tool_inkra">Inkra</span>
-                        <svg class="icon hub-tool-external" aria-hidden="true"><use href="#i-external"></use></svg>
-                      </a>
-                      <button class="hub-card-link" type="button" data-hub-route="library" aria-label="Cambiar favorita" data-i18n-aria-label="hub_change_favorite" title="Cambiar favorita" data-i18n-title="hub_change_favorite">
+                      <div class="hub-hero-tools">
+                        <button class="hub-hero-action" type="button" data-open-favorite aria-label="Abrir el estudio" data-i18n-aria-label="hub_open_studio" title="Abrir el estudio" data-i18n-title="hub_open_studio">
+                          <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+                        </button>
+                        <button class="hub-hero-action" type="button" data-open-studio="canvas" aria-label="Crear un render" data-i18n-aria-label="hub_create_render" title="Crear un render" data-i18n-title="hub_create_render">
+                          <svg class="icon" aria-hidden="true"><use href="#i-video"></use></svg>
+                        </button>
+                        <a class="hub-hero-action" href="https://theastrobruh.github.io/Inkra/" target="_blank" rel="noopener noreferrer" title="Inkra — impresión de oricas a escala real" data-i18n-title="hub_tool_inkra_hint" aria-label="Abrir Inkra, el complemento de impresión de CardGram" data-i18n-aria-label="hub_tool_inkra_aria">
+                          <svg class="icon" aria-hidden="true"><use href="#i-print"></use></svg>
+                        </a>
+                      </div>
+                      <button class="hub-card-link" type="button" data-hub-route="collections" aria-label="Cambiar favorita" data-i18n-aria-label="hub_change_favorite" title="Cambiar favorita" data-i18n-title="hub_change_favorite">
                         <svg class="icon hub-card-link-icon" aria-hidden="true"><use href="#i-star"></use></svg>
                         <span data-i18n="hub_change_favorite">Cambiar favorita</span>
                         <svg class="icon hub-card-link-arrow" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
@@ -556,6 +554,32 @@
                   <span data-i18n="hub_explorer_hint">Toca una carta para convertirla en tu favorita.</span>
                 </p>
               </aside>
+            </div>
+
+            <div class="hub-layout-dock" id="hub-layout-dock">
+              <button class="hub-layout-toggle" id="hub-layout-toggle" type="button" aria-expanded="false" aria-controls="hub-layout-panel" aria-label="Ajustar vista" data-i18n-aria-label="layout_title" title="Ajustar vista" data-i18n-title="layout_title">
+                <svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>
+                <span data-i18n="layout_title">Ajustar vista</span>
+              </button>
+
+              <div class="hub-layout-panel" id="hub-layout-panel" hidden>
+                <div class="hub-layout-modes" role="group" aria-label="Modo de diseño" data-i18n-aria-label="layout_mode_aria">
+                  <button class="hub-layout-mode active" type="button" data-layout-mode="controlled" aria-pressed="true" data-i18n="layout_controlled">Controlado</button>
+                  <button class="hub-layout-mode" type="button" data-layout-mode="free" aria-pressed="false" data-i18n="layout_free">Libre</button>
+                </div>
+
+                <label class="hub-layout-control"><span data-i18n="layout_left_width">Ancho izquierdo</span><input type="range" id="layout-left-width" min="230" max="380" value="280"></label>
+                <label class="hub-layout-control"><span data-i18n="layout_right_width">Ancho derecho</span><input type="range" id="layout-right-width" min="260" max="420" value="325"></label>
+                <label class="hub-layout-control"><span data-i18n="layout_height">Alto paneles</span><input type="range" id="layout-height" min="300" max="700" value="470"></label>
+                <label class="hub-layout-control"><span data-i18n="layout_offset">Posición vertical</span><input type="range" id="layout-offset" min="-120" max="180" value="0"></label>
+                <label class="hub-layout-control"><span data-i18n="layout_card_size">Tamaño carta</span><input type="range" id="layout-card-size" min="70" max="125" value="90"></label>
+                <label class="hub-layout-control"><span data-i18n="layout_side_cards">Cartas laterales</span><input type="range" id="layout-side-cards" min="70" max="150" value="115"></label>
+
+                <div class="hub-layout-actions">
+                  <span class="hub-layout-hint" data-i18n="layout_free_hint">En modo libre arrastra los tiradores de los paneles.</span>
+                  <button class="btn btn-ghost btn-sm" type="button" id="layout-reset" data-i18n="layout_reset">Restablecer</button>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -615,7 +639,7 @@
                     <svg class="icon" aria-hidden="true"><use href="#i-save"></use></svg>
                     <span data-i18n="booster_claim">Guardar en mi colección</span>
                   </button>
-                  <button class="btn btn-ghost" type="button" data-hub-route="library" id="booster-view-library">
+                  <button class="btn btn-ghost" type="button" data-hub-route="collections" id="booster-view-library">
                     <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
                     <span data-i18n="booster_view_collection">Ver mi colección</span>
                   </button>
@@ -627,38 +651,7 @@
           </section>
 
           <!-- ------------------------------------------------------------
-               Mis cartas
-               ------------------------------------------------------------ -->
-          <section class="hub-panel" data-hub-panel="library" aria-labelledby="library-title" hidden>
-            <header class="hub-view-head">
-              <button class="hub-back" type="button" data-hub-route="home" aria-label="Volver al inicio" data-i18n-aria-label="hub_back_home">
-                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
-              </button>
-              <div class="hub-view-copy">
-                <h1 id="library-title" data-i18n="library_title">Mis cartas</h1>
-                <p data-i18n="library_lede">Tus diseños guardados y todas las cartas del catálogo en un solo lugar.</p>
-              </div>
-              <span class="hub-count-pill" id="library-count">0</span>
-            </header>
-
-            <div class="hub-seg" id="library-tabs" role="tablist" aria-label="Filtrar la biblioteca" data-i18n-aria-label="library_filter_aria">
-              <button class="hub-seg-btn active" type="button" role="tab" aria-selected="true" data-library-tab="all" data-i18n="library_tab_all">Todas</button>
-              <button class="hub-seg-btn" type="button" role="tab" aria-selected="false" data-library-tab="saved" data-i18n="library_tab_saved">Guardadas</button>
-              <button class="hub-seg-btn" type="button" role="tab" aria-selected="false" data-library-tab="catalog" data-i18n="library_tab_catalog">Catálogo</button>
-            </div>
-
-            <div class="hub-card-grid" id="library-grid"></div>
-
-            <div class="hub-empty" id="library-empty" hidden>
-              <span class="hub-empty-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg></span>
-              <h2 id="library-empty-title"></h2>
-              <p id="library-empty-desc"></p>
-              <button class="btn btn-primary btn-sm" type="button" data-open-studio="deck" id="library-empty-action" data-i18n="library_go_save">Guardar una carta</button>
-            </div>
-          </section>
-
-          <!-- ------------------------------------------------------------
-               Colecciones y decks
+               Mis cartas (colecciones y decks)
                ------------------------------------------------------------ -->
           <section class="hub-panel" data-hub-panel="collections" aria-labelledby="collections-title" hidden>
             <header class="hub-view-head">
@@ -871,13 +864,9 @@
         <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>
         <span data-i18n="hub_nav_home">Inicio</span>
       </button>
-      <button class="hub-mobile-btn" type="button" data-hub-route="library">
-        <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
-        <span data-i18n="hub_nav_library">Mis cartas</span>
-      </button>
       <button class="hub-mobile-btn" type="button" data-hub-route="collections">
         <svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg>
-        <span data-i18n="hub_nav_collections">Colecciones</span>
+        <span data-i18n="hub_nav_library">Mis cartas</span>
       </button>
       <button class="hub-mobile-btn" type="button" data-hub-route="explore">
         <svg class="icon" aria-hidden="true"><use href="#i-compass"></use></svg>
@@ -891,7 +880,7 @@
 
     <!-- Acciones rápidas sobre el menú (móvil) -->
     <div class="hub-fab-actions" aria-label="Acciones rápidas" data-i18n-aria-label="hub_quick_actions">
-      <button class="hub-fab-btn" type="button" data-hub-route="library" aria-label="Mis cartas" data-i18n-aria-label="hub_nav_library" title="Mis cartas" data-i18n-title="hub_nav_library">
+      <button class="hub-fab-btn" type="button" data-hub-route="collections" aria-label="Mis cartas" data-i18n-aria-label="hub_nav_library" title="Mis cartas" data-i18n-title="hub_nav_library">
         <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
           <rect x="7.5" y="3.5" width="10" height="14" rx="2.2"/>
           <path d="M4.5 7.5v10a2.5 2.5 0 0 0 2.5 2.5h8"/>
@@ -990,11 +979,6 @@
             <span class="hub-menu-item-copy"><strong data-i18n="hub_nav_home">Inicio</strong></span>
             <svg class="icon hub-menu-chevron" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
           </button>
-          <button class="hub-menu-item" type="button" data-hub-route="library" data-menu-nav>
-            <span class="hub-menu-item-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg></span>
-            <span class="hub-menu-item-copy"><strong data-i18n="hub_nav_library">Mis cartas</strong></span>
-            <svg class="icon hub-menu-chevron" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
-          </button>
           <button class="hub-menu-item" type="button" data-hub-route="booster" data-menu-nav>
             <span class="hub-menu-item-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span>
             <span class="hub-menu-item-copy"><strong data-i18n="hub_nav_booster_full">Sobre diario</strong></span>
@@ -1002,7 +986,7 @@
           </button>
           <button class="hub-menu-item" type="button" data-hub-route="collections" data-menu-nav>
             <span class="hub-menu-item-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg></span>
-            <span class="hub-menu-item-copy"><strong data-i18n="hub_nav_collections">Colecciones</strong></span>
+            <span class="hub-menu-item-copy"><strong data-i18n="hub_nav_library">Mis cartas</strong></span>
             <svg class="icon hub-menu-chevron" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
           </button>
           <button class="hub-menu-item" type="button" data-hub-route="explore" data-menu-nav>
@@ -1298,6 +1282,104 @@
             <input type="file" id="back-file-input" accept="image/png,image/jpeg,image/webp,image/avif" aria-label="Seleccionar imagen trasera" data-i18n-aria-label="ui_select_back">
           </label>
         </div>
+
+        <details class="template-builder" id="template-builder">
+          <summary>
+            <span class="template-summary-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-palette"></use></svg></span>
+            <span class="template-summary-copy">
+              <strong data-i18n="template_title">Crear con plantilla</strong>
+              <small data-i18n="template_lead">Usa un borde, tu artwork y textos para armar una carta desde cero.</small>
+            </span>
+            <svg class="icon template-summary-chevron" aria-hidden="true"><use href="#i-chevron"></use></svg>
+          </summary>
+
+          <div class="template-builder-body">
+            <div class="template-gallery" id="template-gallery" role="group" aria-label="Plantillas" data-i18n-aria-label="template_gallery_aria"></div>
+
+            <div class="template-file-row">
+              <label class="template-file">
+                <svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg>
+                <span data-i18n="template_upload">Subir plantilla</span>
+                <input type="file" id="template-file-input" accept="image/png,image/webp,image/jpeg,image/avif">
+              </label>
+              <label class="template-file">
+                <svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>
+                <span data-i18n="template_artwork_upload">Subir artwork</span>
+                <input type="file" id="template-artwork-input" accept="image/png,image/webp,image/jpeg,image/avif">
+              </label>
+            </div>
+
+            <div class="template-preview">
+              <canvas id="template-canvas" width="896" height="1200" aria-label="Vista previa de la carta" data-i18n-aria-label="template_preview_aria"></canvas>
+            </div>
+
+            <div class="template-controls">
+              <label class="template-control">
+                <span data-i18n="template_art_zoom">Zoom artwork</span>
+                <input type="range" id="template-art-zoom" min="100" max="260" value="130">
+              </label>
+              <label class="template-control">
+                <span data-i18n="template_art_x">Artwork X</span>
+                <input type="range" id="template-art-x" min="-50" max="50" value="0">
+              </label>
+              <label class="template-control">
+                <span data-i18n="template_art_y">Artwork Y</span>
+                <input type="range" id="template-art-y" min="-50" max="50" value="0">
+              </label>
+              <label class="template-control">
+                <span data-i18n="template_zoom">Zoom plantilla</span>
+                <input type="range" id="template-zoom" min="90" max="115" value="100">
+              </label>
+              <label class="template-control">
+                <span data-i18n="template_x">Plantilla X</span>
+                <input type="range" id="template-x" min="-15" max="15" value="0">
+              </label>
+              <label class="template-control">
+                <span data-i18n="template_y">Plantilla Y</span>
+                <input type="range" id="template-y" min="-15" max="15" value="0">
+              </label>
+            </div>
+
+            <div class="template-text-box">
+              <label class="template-text-label" for="template-text" data-i18n="template_text">Texto / emojis</label>
+              <input class="template-text-input" id="template-text" type="text" maxlength="80" placeholder="Escribe un título…" data-i18n-placeholder="template_text_placeholder">
+              <div class="template-emojis" id="template-emojis" role="group" aria-label="Emojis" data-i18n-aria-label="template_emoji_aria">
+                <button type="button" data-template-emoji="✨">✨</button>
+                <button type="button" data-template-emoji="⭐">⭐</button>
+                <button type="button" data-template-emoji="❤️">❤️</button>
+                <button type="button" data-template-emoji="🔥">🔥</button>
+                <button type="button" data-template-emoji="🌙">🌙</button>
+                <button type="button" data-template-emoji="☀️">☀️</button>
+              </div>
+              <div class="template-controls">
+                <label class="template-control">
+                  <span data-i18n="template_text_size">Tamaño</span>
+                  <input type="range" id="template-text-size" min="16" max="110" value="52">
+                </label>
+                <label class="template-control">
+                  <span data-i18n="template_text_x">Texto X</span>
+                  <input type="range" id="template-text-x" min="0" max="100" value="50">
+                </label>
+                <label class="template-control">
+                  <span data-i18n="template_text_y">Texto Y</span>
+                  <input type="range" id="template-text-y" min="0" max="100" value="54">
+                </label>
+                <label class="template-control template-color-control">
+                  <span data-i18n="template_text_color">Color</span>
+                  <input type="color" id="template-text-color" value="#ffffff">
+                </label>
+              </div>
+            </div>
+
+            <div class="template-actions">
+              <button class="btn btn-primary btn-block" type="button" id="template-apply">
+                <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
+                <span data-i18n="template_apply">Usar como anverso</span>
+              </button>
+              <button class="btn btn-ghost btn-sm" type="button" id="template-reset" data-i18n="template_reset">Reiniciar</button>
+            </div>
+          </div>
+        </details>
 
         <h2 class="section-title">
           <svg class="icon" aria-hidden="true"><use href="#i-frame"></use></svg>

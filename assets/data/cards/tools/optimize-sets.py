@@ -19,7 +19,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 DB = ROOT / 'database'
-SETS = ['Champion-Verse', 'Dungeons and History', 'Mew Tarot', 'YGO']
+SETS = ['Champion-Verse', 'Dungeons and History', 'Mew Tarot', 'YGO', 'templates']
 OBSOLETE = ['OG', 'FAN ART']
 FULL_SIZE = (896, 1200)
 THUMB_SIZE = 760
@@ -152,7 +152,8 @@ def optimize_set(folder: Path) -> int:
     for source in sorted(folder.iterdir()):
         if not source.is_file() or source.suffix.lower() not in {'.png', '.jpg', '.jpeg', '.webp'}:
             continue
-        image = Image.open(source).convert('RGB')
+        image = Image.open(source)
+        image = image.convert('RGBA' if 'A' in image.getbands() else 'RGB')
         if image.size != FULL_SIZE:
             image = image.resize(FULL_SIZE, Image.LANCZOS)
         destination = source.with_suffix('.webp')

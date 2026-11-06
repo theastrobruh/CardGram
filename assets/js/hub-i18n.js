@@ -158,8 +158,8 @@
     library_go_save: 'Guardar una carta',
     library_open_studio: 'Abrir el estudio',
 
-    collections_title: 'Colecciones y decks',
-    collections_lede: 'Explora el catálogo o junta tus cartas favoritas en un deck propio.',
+    collections_title: 'Mis cartas',
+    collections_lede: 'Tus cartas, colecciones y decks en un solo lugar.',
     collections_catalog: 'Del catálogo',
     collections_catalog_hint: 'Colecciones disponibles en la carpeta de cartas de esta versión.',
     collections_yours: 'Tus decks',
@@ -395,8 +395,8 @@
     library_go_save: 'Save a card',
     library_open_studio: 'Open the studio',
 
-    collections_title: 'Collections & decks',
-    collections_lede: 'Browse the catalog or gather your favorite cards into a deck of your own.',
+    collections_title: 'My cards',
+    collections_lede: 'Your cards, collections and decks in one place.',
     collections_catalog: 'From the catalog',
     collections_catalog_hint: 'Collections available in this version’s card folder.',
     collections_yours: 'Your decks',
@@ -632,8 +632,8 @@
     library_go_save: 'Karte speichern',
     library_open_studio: 'Studio öffnen',
 
-    collections_title: 'Sammlungen & Decks',
-    collections_lede: 'Durchstöbere den Katalog oder sammle deine Lieblingskarten in einem eigenen Deck.',
+    collections_title: 'Meine Karten',
+    collections_lede: 'Deine Karten, Sammlungen und Decks an einem Ort.',
     collections_catalog: 'Aus dem Katalog',
     collections_catalog_hint: 'Sammlungen, die in dieser Version im Kartenordner liegen.',
     collections_yours: 'Deine Decks',
@@ -910,3 +910,49 @@
     viewer_back: 'Zurück'
   });
 })();
+
+Object.assign(I18N.es, {
+  layout_title: 'Ajustar vista',
+  layout_mode_aria: 'Modo de composición',
+  layout_controlled: 'Controlado',
+  layout_free: 'Libre',
+  layout_left_width: 'Ancho izquierdo',
+  layout_right_width: 'Ancho derecho',
+  layout_height: 'Alto paneles',
+  layout_offset: 'Posición vertical',
+  layout_card_size: 'Tamaño carta',
+  layout_side_cards: 'Cartas laterales',
+  layout_free_hint: 'En modo libre arrastra los tiradores de los paneles.',
+  layout_reset: 'Restablecer',
+  layout_drag: 'Mover elemento'
+});
+Object.assign(I18N.en, {
+  layout_title: 'Adjust view',
+  layout_mode_aria: 'Composition mode',
+  layout_controlled: 'Controlled',
+  layout_free: 'Free',
+  layout_left_width: 'Left width',
+  layout_right_width: 'Right width',
+  layout_height: 'Panel height',
+  layout_offset: 'Vertical position',
+  layout_card_size: 'Card size',
+  layout_side_cards: 'Side cards',
+  layout_free_hint: 'In free mode, drag the panel handles.',
+  layout_reset: 'Reset',
+  layout_drag: 'Move element'
+});
+Object.assign(I18N.de, {
+  layout_title: 'Ansicht anpassen',
+  layout_mode_aria: 'Kompositionsmodus',
+  layout_controlled: 'Kontrolliert',
+  layout_free: 'Frei',
+  layout_left_width: 'Linke Breite',
+  layout_right_width: 'Rechte Breite',
+  layout_height: 'Panelhöhe',
+  layout_offset: 'Vertikale Position',
+  layout_card_size: 'Kartengröße',
+  layout_side_cards: 'Seitenkarten',
+  layout_free_hint: 'Im freien Modus die Griffe der Panels ziehen.',
+  layout_reset: 'Zurücksetzen',
+  layout_drag: 'Element bewegen'
+});

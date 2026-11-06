@@ -96,6 +96,29 @@ const PREVIEW_MICRO = new Map(
   ])
 );
 
+const CARD_TEMPLATES = [
+  { id: 'E1', name: 'E1', src: 'assets/data/cards/database/templates/E1.webp', thumb: 'assets/data/cards/database/templates/thumbs/E1.webp' },
+  { id: 'E2', name: 'E2', src: 'assets/data/cards/database/templates/E2.webp', thumb: 'assets/data/cards/database/templates/thumbs/E2.webp' },
+  { id: 'E3', name: 'E3', src: 'assets/data/cards/database/templates/E3.webp', thumb: 'assets/data/cards/database/templates/thumbs/E3.webp' }
+];
+
+const templateState = {
+  ready: false,
+  templateId: 'E1',
+  template: null,
+  artwork: null,
+  artZoom: 130,
+  artX: 0,
+  artY: 0,
+  templateZoom: 100,
+  templateX: 0,
+  templateY: 0,
+  textSize: 52,
+  textX: 50,
+  textY: 54,
+  textColor: '#ffffff'
+};
+
 const currentCard = { front: DEFAULT_CARD.front, back: DEFAULT_CARD.back, fullArt: DEFAULT_CARD.fullArt };
 const uploadTokens = { front: 0, back: 0 };
 
@@ -1299,7 +1322,258 @@ function syncUI() {
   updateExportLabel();
 }
 
+function loadImageSource(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.decoding = 'async';
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(imageError('read'));
+    image.src = src;
+  });
+}
+
+function renderTemplateCanvas() {
+  const canvas = el.templateCanvas;
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d', { alpha: true });
+  if (!ctx) return;
+
+  const width = canvas.width;
+  const height = canvas.height;
+  ctx.clearRect(0, 0, width, height);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  if (templateState.artwork) {
+    const image = templateState.artwork;
+    const base = Math.max(width / image.width, height / image.height);
+    const scale = base * (templateState.artZoom / 100);
+    const w = image.width * scale;
+    const h = image.height * scale;
+    const x = (width - w) / 2 + (templateState.artX / 100) * width;
+    const y = (height - h) / 2 + (templateState.artY / 100) * height;
+    ctx.drawImage(image, x, y, w, h);
+  }
+
+  if (templateState.template) {
+    const image = templateState.template;
+    const scale = templateState.templateZoom / 100;
+    const w = width * scale;
+    const h = height * scale;
+    const x = (width - w) / 2 + (templateState.templateX / 100) * width;
+    const y = (height - h) / 2 + (templateState.templateY / 100) * height;
+    ctx.drawImage(image, x, y, w, h);
+  }
+
+  const text = el.templateText ? el.templateText.value.trim() : '';
+  if (text) {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `800 ${templateState.textSize}px "Segoe UI Emoji", "Segoe UI", sans-serif`;
+    ctx.fillStyle = templateState.textColor;
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 2;
+    ctx.fillText(text, (templateState.textX / 100) * width, (templateState.textY / 100) * height, width * 0.9);
+    ctx.restore();
+  }
+}
+
+function markTemplateChoice() {
+  if (!el.templateGallery) return;
+  Array.from(el.templateGallery.querySelectorAll('.template-choice')).forEach((button) => {
+    button.classList.toggle('active', button.dataset.templateId === templateState.templateId);
+  });
+}
+
+function setTemplateImage(image, id) {
+  templateState.template = image;
+  templateState.templateId = id || null;
+  markTemplateChoice();
+  renderTemplateCanvas();
+}
+
+async function ensureTemplateBuilder() {
+  if (!el.templateBuilder || templateState.ready) return;
+  templateState.ready = true;
+  try {
+    const [template, artwork] = await Promise.all([
+      loadImageSource(CARD_TEMPLATES[0].src),
+      loadImageSource(DEFAULT_CARD.front)
+    ]);
+    templateState.template = template;
+    templateState.artwork = artwork;
+    renderTemplateCanvas();
+  } catch (error) {
+    console.warn('[CardGram] No se pudo preparar el constructor de plantillas', error);
+  }
+}
+
+function resetTemplateBuilder() {
+  templateState.templateId = 'E1';
+  templateState.artZoom = 130;
+  templateState.artX = 0;
+  templateState.artY = 0;
+  templateState.templateZoom = 100;
+  templateState.templateX = 0;
+  templateState.templateY = 0;
+  templateState.textSize = 52;
+  templateState.textX = 50;
+  templateState.textY = 54;
+  templateState.textColor = '#ffffff';
+  if (el.templateText) el.templateText.value = '';
+  const values = {
+    'template-art-zoom': 130,
+    'template-art-x': 0,
+    'template-art-y': 0,
+    'template-zoom': 100,
+    'template-x': 0,
+    'template-y': 0,
+    'template-text-size': 52,
+    'template-text-x': 50,
+    'template-text-y': 54
+  };
+  Object.entries(values).forEach(([id, value]) => {
+    const input = document.getElementById(id);
+    if (input) input.value = String(value);
+  });
+  const color = document.getElementById('template-text-color');
+  if (color) color.value = '#ffffff';
+
+  Promise.all([
+    loadImageSource(CARD_TEMPLATES[0].src),
+    loadImageSource(DEFAULT_CARD.front)
+  ])
+    .then(([template, artwork]) => {
+      templateState.template = template;
+      templateState.artwork = artwork;
+      markTemplateChoice();
+      renderTemplateCanvas();
+    })
+    .catch(() => {});
+}
+
+function applyTemplateToCard() {
+  if (!el.templateCanvas) return;
+  const dataUrl = el.templateCanvas.toDataURL('image/webp', 0.92);
+  activePresetId = null;
+  syncPresetActive();
+  applyCardImages(dataUrl, currentCard.back, null);
+  toast(t('template_applied'), { type: 'success' });
+}
+
+function setupTemplateBuilder() {
+  if (!el.templateBuilder || !el.templateGallery) return;
+
+  el.templateGallery.replaceChildren(
+    ...CARD_TEMPLATES.map((template) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'template-choice';
+      button.dataset.templateId = template.id;
+      button.title = template.name;
+      const img = document.createElement('img');
+      img.src = template.thumb;
+      img.alt = template.name;
+      img.width = 300;
+      img.height = 402;
+      img.loading = 'lazy';
+      button.appendChild(img);
+      button.addEventListener('click', async () => {
+        try {
+          const image = await loadImageSource(template.src);
+          setTemplateImage(image, template.id);
+        } catch (error) {
+          toast(t('upload_failed'), { type: 'error' });
+        }
+      });
+      return button;
+    })
+  );
+  markTemplateChoice();
+
+  const bindRange = (id, key) => {
+    const input = document.getElementById(id);
+    if (!input) return;
+    input.addEventListener('input', () => {
+      templateState[key] = Number(input.value);
+      renderTemplateCanvas();
+    });
+  };
+  bindRange('template-art-zoom', 'artZoom');
+  bindRange('template-art-x', 'artX');
+  bindRange('template-art-y', 'artY');
+  bindRange('template-zoom', 'templateZoom');
+  bindRange('template-x', 'templateX');
+  bindRange('template-y', 'templateY');
+  bindRange('template-text-size', 'textSize');
+  bindRange('template-text-x', 'textX');
+  bindRange('template-text-y', 'textY');
+
+  const color = document.getElementById('template-text-color');
+  if (color) {
+    color.addEventListener('input', () => {
+      templateState.textColor = color.value;
+      renderTemplateCanvas();
+    });
+  }
+
+  if (el.templateText) {
+    el.templateText.addEventListener('input', renderTemplateCanvas);
+  }
+
+  const emojis = document.getElementById('template-emojis');
+  if (emojis) {
+    emojis.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-template-emoji]');
+      if (!button || !el.templateText) return;
+      el.templateText.value += button.dataset.templateEmoji;
+      renderTemplateCanvas();
+    });
+  }
+
+  if (el.templateFileInput) {
+    el.templateFileInput.addEventListener('change', async () => {
+      const file = el.templateFileInput.files && el.templateFileInput.files[0];
+      el.templateFileInput.value = '';
+      if (!file) return;
+      try {
+        const image = await decodeImage(file);
+        setTemplateImage(image, null);
+      } catch (error) {
+        toast(t('upload_failed'), { type: 'error' });
+      }
+    });
+  }
+
+  if (el.templateArtworkInput) {
+    el.templateArtworkInput.addEventListener('change', async () => {
+      const file = el.templateArtworkInput.files && el.templateArtworkInput.files[0];
+      el.templateArtworkInput.value = '';
+      if (!file) return;
+      try {
+        templateState.artwork = await decodeImage(file);
+        renderTemplateCanvas();
+      } catch (error) {
+        toast(t('upload_failed'), { type: 'error' });
+      }
+    });
+  }
+
+  if (el.templateApply) el.templateApply.addEventListener('click', applyTemplateToCard);
+  if (el.templateReset) el.templateReset.addEventListener('click', resetTemplateBuilder);
+
+  el.templateBuilder.addEventListener('toggle', () => {
+    if (el.templateBuilder.open) {
+      ensureTemplateBuilder();
+      requestAnimationFrame(renderTemplateCanvas);
+    }
+  });
+}
+
 function setupControls() {
+  setupTemplateBuilder();
   if (el.studioPicker) {
     el.studioPicker.addEventListener('change', onStudioPickerChange);
   }
@@ -1885,6 +2159,14 @@ function cacheDom() {
   el.studioPicker = $('#studio-card-picker');
   el.studioSaved = $('#studio-saved');
   el.uploadFront = $('#upload-front');
+  el.templateBuilder = $('#template-builder');
+  el.templateGallery = $('#template-gallery');
+  el.templateCanvas = $('#template-canvas');
+  el.templateFileInput = $('#template-file-input');
+  el.templateArtworkInput = $('#template-artwork-input');
+  el.templateText = $('#template-text');
+  el.templateApply = $('#template-apply');
+  el.templateReset = $('#template-reset');
   el.uploadBack = $('#upload-back');
   el.frontInput = $('#front-file-input');
   el.backInput = $('#back-file-input');
