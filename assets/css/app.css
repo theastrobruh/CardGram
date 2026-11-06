@@ -2786,7 +2786,28 @@ body.cinematic-mode .toast-stack {
   }
 
   .app-header {
-    padding-left: 18px;
+    padding: 16px 14px 10px 16px;
+    gap: 8px;
+  }
+
+  .header-actions {
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .header-actions .icon-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+  }
+
+  .header-actions .icon-btn .icon {
+    width: 15px;
+    height: 15px;
+  }
+
+  #btn-close-drawer {
+    margin-left: 2px;
   }
 
   #sidebar-toggle-btn {
@@ -2872,7 +2893,7 @@ body.cinematic-mode .toast-stack {
   }
 
   .app-header {
-    padding: 18px 14px 10px 62px;
+    padding: 16px 12px 10px 12px;
   }
 
   .brand-title-row h1 {
@@ -3360,4 +3381,92 @@ body.cinematic-mode .bottom-left-bg-wrap {
     left: 14px;
     bottom: 18px;
   }
+}
+
+/* Logo dos líneas: eCard y Studio debajo */
+.brand-title-stacked {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.brand-title-stacked h1 {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.brand-title-stacked .brand-main {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #052b35;
+}
+
+.brand-title-stacked .brand-sub {
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: linear-gradient(120deg, #0f9b9b 0%, #2f8fdd 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Colores e identidad por utilidad en los botones del abanico rápido */
+/* Grupo Card / Diseño (Formato y Arte): Turquesa Aqua */
+.petal-btn.petal-group-card {
+  color: #00877a;
+  background: rgba(230, 255, 250, 0.94);
+  border-color: rgba(124, 235, 221, 0.85);
+  box-shadow: 0 8px 18px rgba(0, 135, 122, 0.22), var(--inset-hi);
+}
+.petal-btn.petal-group-card:hover, .petal-btn.petal-group-card:focus-visible {
+  background: linear-gradient(135deg, #00b4a0, #00877a);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 12px 24px rgba(0, 135, 122, 0.4);
+}
+
+/* Grupo Motion (Velocidad y Secuencia): Índigo / Azul */
+.petal-btn.petal-group-motion {
+  color: #2059c9;
+  background: rgba(238, 244, 255, 0.94);
+  border-color: rgba(175, 204, 255, 0.85);
+  box-shadow: 0 8px 18px rgba(32, 89, 201, 0.22), var(--inset-hi);
+}
+.petal-btn.petal-group-motion:hover, .petal-btn.petal-group-motion:focus-visible {
+  background: linear-gradient(135deg, #3b7cff, #2059c9);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 12px 24px rgba(32, 89, 201, 0.4);
+}
+
+/* Grupo Physics (Gravedad / Oscilación): Ámbar / Dorado */
+.petal-btn.petal-group-physics {
+  color: #b56a00;
+  background: rgba(255, 249, 235, 0.94);
+  border-color: rgba(255, 220, 150, 0.85);
+  box-shadow: 0 8px 18px rgba(181, 106, 0, 0.22), var(--inset-hi);
+}
+.petal-btn.petal-group-physics:hover, .petal-btn.petal-group-physics:focus-visible {
+  background: linear-gradient(135deg, #f5a623, #d97706);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 12px 24px rgba(181, 106, 0, 0.4);
+}
+
+/* Grupo Capture (Captura Foto y Video): Frambuesa / Coral */
+.petal-btn.petal-group-capture {
+  color: #c92a54;
+  background: rgba(255, 240, 245, 0.94);
+  border-color: rgba(255, 182, 201, 0.85);
+  box-shadow: 0 8px 18px rgba(201, 42, 84, 0.22), var(--inset-hi);
+}
+.petal-btn.petal-group-capture:hover, .petal-btn.petal-group-capture:focus-visible {
+  background: linear-gradient(135deg, #ff4d79, #c92a54);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 12px 24px rgba(201, 42, 84, 0.4);
 }

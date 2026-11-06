@@ -12,21 +12,21 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=138">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=138">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=139">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=139">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=138" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=138" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=138" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=138" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=138" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=138" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=138" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=138" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=138" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=138" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=139" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=139" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=139" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=139" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=139" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=139" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=139" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=139" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=139" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=139" defer></script>
 </head>
 <body data-view="hub">
 
@@ -1794,25 +1794,25 @@
 
     <div class="flower-fab-container" id="flower-menu">
       <div class="flower-petals">
-        <button class="petal-btn petal-1" id="petal-speed" type="button" data-tip="Velocidad (8)" title="Velocidad de giro" aria-label="Velocidad de giro">
+        <button class="petal-btn petal-1 petal-group-motion" id="petal-speed" type="button" data-tip="Velocidad (8)" title="Velocidad de giro" aria-label="Velocidad de giro">
           <svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>
         </button>
-        <button class="petal-btn petal-2" id="petal-format" type="button" data-tip="Formato y tamaño" title="Formato y tamaño de carta" aria-label="Formato y tamaño de carta">
+        <button class="petal-btn petal-2 petal-group-card" id="petal-format" type="button" data-tip="Formato y tamaño" title="Formato y tamaño de carta" aria-label="Formato y tamaño de carta">
           <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
         </button>
-        <button class="petal-btn petal-3" id="petal-art" type="button" data-tip="Editar anverso y reverso" title="Editar imagen frontal y trasera" aria-label="Editar frontal y trasera">
+        <button class="petal-btn petal-3 petal-group-card" id="petal-art" type="button" data-tip="Editar anverso y reverso" title="Editar imagen frontal y trasera" aria-label="Editar frontal y trasera">
           <svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg>
         </button>
-        <button class="petal-btn petal-4" id="petal-anim" type="button" data-tip="Alternar animación" title="Alternar animaciones" aria-label="Alternar animaciones de la carta">
+        <button class="petal-btn petal-4 petal-group-motion" id="petal-anim" type="button" data-tip="Alternar animación" title="Alternar animaciones" aria-label="Alternar animaciones de la carta">
           <svg class="icon" aria-hidden="true"><use href="#i-play"></use></svg>
         </button>
-        <button class="petal-btn petal-5" id="petal-gravity" type="button" data-tip="Alternar gravedad" title="Alternar gravedad / oscilación" aria-label="Alternar gravedad">
+        <button class="petal-btn petal-5 petal-group-physics" id="petal-gravity" type="button" data-tip="Alternar gravedad" title="Alternar gravedad / oscilación" aria-label="Alternar gravedad">
           <svg class="icon" aria-hidden="true"><use href="#i-level"></use></svg>
         </button>
-        <button class="petal-btn petal-6" id="petal-snapshot" type="button" data-tip="Capturar foto PNG" title="Hacer captura de pantalla" aria-label="Hacer captura">
+        <button class="petal-btn petal-6 petal-group-capture" id="petal-snapshot" type="button" data-tip="Capturar foto PNG" title="Hacer captura de pantalla" aria-label="Hacer captura">
           <svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg>
         </button>
-        <button class="petal-btn petal-7" id="petal-record" type="button" data-tip="Capturar video" title="Hacer captura de video" aria-label="Hacer captura de video">
+        <button class="petal-btn petal-7 petal-group-capture" id="petal-record" type="button" data-tip="Capturar video" title="Hacer captura de video" aria-label="Hacer captura de video">
           <svg class="icon" aria-hidden="true"><use href="#i-film"></use></svg>
         </button>
       </div>
