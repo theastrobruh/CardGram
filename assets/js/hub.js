@@ -840,13 +840,14 @@ function saveHand() {
   if (hub.els.handDialog && hub.els.handDialog.open) hub.els.handDialog.close();
 }
 
-/* Deja la mano en una sola carta: la protagonista actual. */
+/* Deja la mano en una sola carta: la protagonista actual (sin cerrar el diálogo). */
 function clearHand() {
   const main = favoriteCard();
-  hubProfile.featuredIds = main ? [main.id] : [];
+  hub.handDraft = main ? [main.id] : [];
+  hubProfile.featuredIds = hub.handDraft.slice();
   persistHubProfile();
-  renderFavoriteCard();
-  if (hub.els.handDialog && hub.els.handDialog.open) hub.els.handDialog.close();
+  renderFeaturedStack();
+  renderHandPicker();
 }
 
 function makeExplorerSpotlight(card, index, total) {
@@ -1955,6 +1956,8 @@ function setActivePanel(panel, options = {}) {
     else button.removeAttribute('aria-current');
   });
 
+  if (hub.els.homeFab) hub.els.homeFab.hidden = target === 'home';
+
   if (target === 'home') {
     hub.homeVisits += 1;
     renderFavoriteCard();
@@ -2184,9 +2187,11 @@ function onHubClick(event) {
     return;
   }
 
-  if (target.closest('[data-music-soon]')) {
+  const musicButton = target.closest('[data-music-soon]');
+  if (musicButton) {
     event.preventDefault();
-    toast(t('hub_music_soon'), { type: 'info' });
+    const playing = musicButton.classList.toggle('is-playing');
+    musicButton.setAttribute('aria-pressed', String(playing));
     return;
   }
 
@@ -2707,6 +2712,7 @@ function cacheHubDom() {
   els.playerSummary = hubEl('hub-player-summary');
   els.playerStackEdit = hubEl('hub-player-stack-edit');
   els.mobileHandEdit = hubEl('hub-mobile-hand-edit');
+  els.homeFab = hubEl('hub-home-fab');
   els.handDeck = hubEl('hub-hand-deck');
   els.handDialog = hubEl('hand-dialog');
   els.handForm = hubEl('hand-form');

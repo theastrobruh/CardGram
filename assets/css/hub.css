@@ -171,6 +171,18 @@ dialog {
   transform: translateY(-1px) rotate(-4deg);
 }
 
+.hub-brand-logo {
+  width: 28px;
+  height: 38px;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 6px 12px rgba(6, 55, 74, 0.18));
+  transition: transform 0.3s var(--ease);
+}
+
+.hub-brand:hover .hub-brand-logo {
+  transform: translateY(-1px);
+}
+
 .hub-brand-mark .icon {
   width: 19px;
   height: 19px;
@@ -5343,6 +5355,10 @@ dialog {
     opacity: 0.55;
   }
 
+  .hub-menu-btn {
+    animation: hubNavBreathe 4.4s ease-in-out infinite;
+  }
+
   /* Acciones en flor sobre el botón de menú. */
   .hub-fab-actions {
     position: fixed;
@@ -5407,6 +5423,10 @@ dialog {
     height: 28px;
   }
 
+  .hub-fab-btn-primary:not([hidden]) {
+    animation: hubHomeBreathe 4.4s ease-in-out infinite;
+  }
+
   /* Reproductor de música: adelanto, todavía sin función. */
   .hub-music-btn {
     position: fixed;
@@ -5432,6 +5452,27 @@ dialog {
     width: 16px;
     height: 16px;
     opacity: 0.78;
+  }
+
+  .hub-music-disc {
+    display: none;
+  }
+
+  .hub-music-btn.is-playing .hub-music-note {
+    display: none;
+  }
+
+  .hub-music-btn.is-playing .hub-music-disc {
+    display: block;
+    animation: hubVinylSpin 1.7s linear infinite;
+  }
+
+  .hub-music-btn.is-playing {
+    color: #0a6b78;
+    box-shadow:
+      0 0 0 3px rgba(47, 143, 221, 0.14),
+      0 8px 18px rgba(5, 43, 55, 0.16),
+      inset 0 1px 0 #ffffff;
   }
 
   /* Los avisos flotan por encima del botón y de la franja de privacidad. */
@@ -6380,6 +6421,11 @@ dialog {
     border-radius: 9px;
   }
 
+  .hub-brand-logo {
+    width: 24px;
+    height: 32px;
+  }
+
   .hub-brand-mark .icon {
     width: 14px;
     height: 14px;
@@ -6423,13 +6469,32 @@ dialog {
   }
 
   .hub-header-support {
+    position: relative;
+    overflow: hidden;
     color: #ffffff;
     background: linear-gradient(160deg, #ff9a76 0%, #ff5e5b 100%);
     border-color: rgba(255, 255, 255, 0.72);
     box-shadow: 0 6px 14px rgba(214, 74, 68, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   }
 
-  .hub-header-support .icon {
+  .hub-kofi-ico {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hub-kofi-coffee {
+    animation: kofiCoffee 5.6s ease-in-out infinite;
+  }
+
+  .hub-kofi-heart {
+    animation: kofiHeart 5.6s ease-in-out infinite;
+  }
+
+  .hub-header-support .icon,
+  .hub-kofi-heart svg {
     width: 15px;
     height: 15px;
   }
@@ -6497,3 +6562,44 @@ dialog {
   }
 }
 
+
+/* ==========================================================================
+   Micro-animaciones del lobby (2026)
+   ========================================================================== */
+@keyframes hubNavBreathe {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.045); }
+}
+
+@keyframes hubHomeBreathe {
+  0%, 100% { transform: translateY(-8px) scale(1); }
+  50% { transform: translateY(-10px) scale(1.055); }
+}
+
+@keyframes kofiCoffee {
+  0%, 42% { opacity: 1; transform: scale(1) rotate(0deg); }
+  48%, 92% { opacity: 0; transform: scale(0.5) rotate(-24deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes kofiHeart {
+  0%, 42% { opacity: 0; transform: scale(0.5); }
+  48%, 88% { opacity: 1; transform: scale(1.06); }
+  92% { opacity: 1; transform: scale(0.94); }
+  96%, 100% { opacity: 0; transform: scale(0.5); }
+}
+
+@keyframes hubVinylSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-menu-btn,
+  .hub-fab-btn-primary,
+  .hub-kofi-coffee,
+  .hub-kofi-heart,
+  .hub-music-btn.is-playing .hub-music-disc {
+    animation: none !important;
+  }
+}

@@ -12,8 +12,8 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=81">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=81">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=83">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=83">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
           integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu"
@@ -21,16 +21,16 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"
           integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf"
           crossorigin="anonymous" defer></script>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=81" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=81" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=81" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=81" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=81" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=81" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=81" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=81" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=81" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=81" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=83" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=83" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=83" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=83" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=83" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=83" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=83" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=83" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=83" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=83" defer></script>
 </head>
 <body data-view="hub">
 
@@ -273,8 +273,34 @@
       <header class="hub-topbar">
           <div class="hub-topbar-inner">
             <a class="hub-brand" href="#/home" data-hub-route="home" aria-label="CardGram · Inicio">
-              <span class="hub-brand-mark" aria-hidden="true">
-                <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
+              <span class="spinning-card-logo-container hub-brand-logo" aria-hidden="true" title="CardGram">
+                <span class="spinning-card-inner">
+                  <span class="card-face card-face-front">
+                    <svg class="logo-face-svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M2 19L6 5h12l4 14H2z" stroke="#ffffff" stroke-width="1.4" opacity="0.95" stroke-linejoin="round"></path>
+                      <path d="M4 14.5h16" stroke="#ffffff" stroke-width="1.1" opacity="0.85"></path>
+                      <path d="M5 10h14" stroke="#ffffff" stroke-width="1.1" opacity="0.85"></path>
+                      <path d="M10 5l-2.4 14" stroke="#ffffff" stroke-width="1.1" opacity="0.9"></path>
+                      <path d="M14 5l2.4 14" stroke="#ffffff" stroke-width="1.1" opacity="0.9"></path>
+                      <circle cx="12" cy="10" r="1.3" fill="#ffffff"></circle>
+                    </svg>
+                  </span>
+                  <span class="card-face card-face-back">
+                    <svg class="logo-face-svg" viewBox="0 0 24 24" fill="none">
+                      <path d="M2.5 14.8C3.8 11.2 9.5 8.2 16.2 9.8" stroke="#7cebdd" stroke-width="1.8" stroke-linecap="round" transform="rotate(-24 12 12)"></path>
+                      <circle cx="12" cy="12" r="5.6" fill="url(#hub-saturn-grad)"></circle>
+                      <path d="M21.5 9.2C20.2 12.8 14.5 15.8 7.8 14.2" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" transform="rotate(-24 12 12)"></path>
+                      <ellipse cx="12" cy="12" rx="9.8" ry="3.1" stroke="rgba(255,255,255,0.3)" stroke-width="0.8" transform="rotate(-24 12 12)"></ellipse>
+                      <defs>
+                        <linearGradient id="hub-saturn-grad" x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stop-color="#7cebdd"></stop>
+                          <stop offset="45%" stop-color="#3cc9d8"></stop>
+                          <stop offset="100%" stop-color="#07333f"></stop>
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  </span>
+                </span>
               </span>
               <span class="hub-brand-copy">
                 <strong>Card<span>Gram</span></strong>
@@ -331,7 +357,8 @@
                 <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
               </button>
               <a class="hub-header-btn hub-header-support" href="https://ko-fi.com/theastrobruh" target="_blank" rel="noopener noreferrer" aria-label="Apoyar CardGram en Ko-fi" data-i18n-aria-label="hub_support_kofi_title" title="Apoyar CardGram en Ko-fi" data-i18n-title="hub_support_kofi_title">
-                <svg class="icon" aria-hidden="true"><use href="#i-kofi"></use></svg>
+                <span class="hub-kofi-ico hub-kofi-coffee" aria-hidden="true"><svg class="icon"><use href="#i-kofi"></use></svg></span>
+                <span class="hub-kofi-ico hub-kofi-heart" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20.1 4.9 13a4.6 4.6 0 0 1 6.5-6.5l.6.6.6-.6A4.6 4.6 0 0 1 19.1 13z" fill="currentColor"/></svg></span>
               </a>
             </div>
           </div>
@@ -822,7 +849,7 @@
           <path d="M8.6 4.2V2.8M6.8 3.5h3.6" stroke-linecap="square"/>
         </svg>
       </button>
-      <button class="hub-fab-btn hub-fab-btn-primary" type="button" data-hub-route="home" aria-label="Inicio" data-i18n-aria-label="hub_nav_home" title="Inicio" data-i18n-title="hub_nav_home">
+      <button class="hub-fab-btn hub-fab-btn-primary" id="hub-home-fab" type="button" data-hub-route="home" aria-label="Inicio" data-i18n-aria-label="hub_nav_home" title="Inicio" data-i18n-title="hub_nav_home" hidden>
         <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
           <path d="M3.8 11.2L12 4l8.2 7.2"/>
           <path d="M6.4 10v9.8h11.2V10"/>
@@ -850,13 +877,19 @@
       <svg class="icon" aria-hidden="true"><use href="#i-menu"></use></svg>
     </button>
 
-    <!-- Reproductor de música (próximamente) -->
-    <button class="hub-music-btn" type="button" data-music-soon aria-label="Reproductor de música, próximamente" data-i18n-aria-label="hub_music_soon" title="Reproductor de música, próximamente" data-i18n-title="hub_music_soon">
-      <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+    <!-- Reproductor de música (demo visual) -->
+    <button class="hub-music-btn" type="button" data-music-soon aria-pressed="false" aria-label="Reproductor de música" data-i18n-aria-label="hub_music_soon" title="Reproductor de música" data-i18n-title="hub_music_soon">
+      <svg class="hub-fab-icon hub-music-note" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
         <path d="M9.5 17.5V5.8l8.6-1.8v11.4"/>
         <circle cx="7" cy="17.8" r="2.5" fill="currentColor" stroke="none"/>
         <circle cx="15.6" cy="15.6" r="2.5" fill="currentColor" stroke="none"/>
         <path d="M18.5 7.6l2.6-.6"/>
+      </svg>
+      <svg class="hub-fab-icon hub-music-disc" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="12" cy="12" r="5.4" stroke="currentColor" stroke-width="0.9" opacity="0.55"/>
+        <circle cx="12" cy="12" r="2" fill="currentColor"/>
+        <path d="M12 3a9 9 0 0 1 7.8 4.5" stroke="rgba(255,255,255,0.7)" stroke-width="1.4" stroke-linecap="round"/>
       </svg>
     </button>
 
