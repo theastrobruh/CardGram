@@ -1,8 +1,8 @@
 <div align="center">
 
-<!-- Animated SVG logo — sparkles + pulses on GitHub -->
+<!-- Animated SVG logo — spinning card with 3D flip animation -->
 <a href="https://theastrobruh.github.io/CardGram/">
-  <img src="assets/data/readme/cardgram-logo.svg" alt="CardGram — eCard Studio" width="420"/>
+  <img src="assets/data/readme/cardgram-logo.svg" alt="CardGram — eCard Studio" width="540"/>
 </a>
 
 <br/>

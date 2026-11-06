@@ -1,121 +1,208 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120" width="420" height="120">
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 540 160"
+     width="540" height="160"
+     role="img" aria-label="CardGram — eCard Studio">
+
   <defs>
-    <linearGradient id="bg-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0a1e2e"/>
-      <stop offset="50%" stop-color="#0d3040"/>
-      <stop offset="100%" stop-color="#071824"/>
+    <!-- Background -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#071824"/>
+      <stop offset="100%" stop-color="#0d3040"/>
     </linearGradient>
-    <linearGradient id="saturn-g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#7cebdd"/>
-      <stop offset="45%" stop-color="#3cc9d8"/>
-      <stop offset="100%" stop-color="#07333f"/>
-    </linearGradient>
-    <linearGradient id="text-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="#b8f0ea"/>
-    </linearGradient>
-    <linearGradient id="accent-grad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#1aa39a"/>
+
+    <!-- Card front face gradient (cyan → blue, matches app) -->
+    <linearGradient id="cf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#1aa39a"/>
       <stop offset="100%" stop-color="#2087c9"/>
     </linearGradient>
-    <filter id="card-glow">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+
+    <!-- Card back face gradient -->
+    <radialGradient id="cb" cx="50%" cy="40%" r="60%">
+      <stop offset="0%"   stop-color="#0d4659"/>
+      <stop offset="100%" stop-color="#051a24"/>
+    </radialGradient>
+
+    <!-- Saturn planet gradient (back face icon) -->
+    <linearGradient id="sg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#7cebdd"/>
+      <stop offset="45%"  stop-color="#3cc9d8"/>
+      <stop offset="100%" stop-color="#07333f"/>
+    </linearGradient>
+
+    <!-- Title text gradient -->
+    <linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#b8f0ea"/>
+    </linearGradient>
+
+    <!-- Soft glow filter for the card -->
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <filter id="text-glow">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-      <feFlood flood-color="#3cc9d8" flood-opacity="0.4"/>
-      <feComposite in2="blur" operator="in"/>
-      <feMerge>
-        <feMergeNode/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
+
+    <!-- Clip so the card faces stay within their rounded rect -->
+    <clipPath id="fc"><rect x="-22" y="-31" width="44" height="62" rx="5"/></clipPath>
+    <clipPath id="bc"><rect x="-22" y="-31" width="44" height="62" rx="5"/></clipPath>
   </defs>
 
-  <!-- Background pill -->
-  <rect x="0" y="0" width="420" height="120" rx="20" ry="20" fill="url(#bg-grad)"/>
-  <rect x="1" y="1" width="418" height="118" rx="19" ry="19" fill="none" stroke="rgba(124,235,221,0.15)" stroke-width="1"/>
+  <!-- ── BACKGROUND PILL ─────────────────────────────────────────────── -->
+  <rect width="540" height="160" rx="22" fill="url(#bg)"/>
+  <rect x="1" y="1" width="538" height="158" rx="21"
+        fill="none" stroke="rgba(124,235,221,0.14)" stroke-width="1"/>
 
-  <!-- Animated spinning card logo -->
-  <g transform="translate(60, 60)" filter="url(#card-glow)">
-    <!-- Card container with 3D spin animation -->
+  <!-- ── SPINNING CARD — centred at (90, 80) ───────────────────────────
+       Replicates the CSS: rotateY 0→360 + gentle rotateZ wobble
+       Duration 6 s, cubic-bezier(0.45,0.05,0.55,0.95), infinite
+       We approximate with a keySplines SMIL animation.
+  ─────────────────────────────────────────────────────────────────────── -->
+  <g transform="translate(90,80)" filter="url(#glow)">
+
+    <!-- FRONT FACE — visible from 0–90° and 270–360° -->
     <g>
-      <animateTransform attributeName="transform" type="rotate" values="0;0;0;0;0" dur="6s" repeatCount="indefinite"/>
-
-      <!-- Front face of card -->
-      <g>
-        <rect x="-18" y="-25" width="36" height="50" rx="4" ry="4"
-              fill="url(#accent-grad)" stroke="rgba(255,255,255,0.9)" stroke-width="1.2"/>
-        <!-- Wireframe mesh icon -->
-        <path d="M-12 12 L-8 -12 h16 l4 24 H-12z" stroke="#fff" stroke-width="1" fill="none" opacity="0.9" stroke-linejoin="round"/>
-        <path d="M-10 6 h20" stroke="#fff" stroke-width="0.8" opacity="0.7"/>
-        <path d="M-8 -2 h16" stroke="#fff" stroke-width="0.8" opacity="0.7"/>
-        <path d="M-4 -12 l-2 24" stroke="#fff" stroke-width="0.8" opacity="0.8"/>
-        <path d="M4 -12 l2 24" stroke="#fff" stroke-width="0.8" opacity="0.8"/>
-        <circle cx="0" cy="-2" r="1.5" fill="#fff"/>
-
-        <!-- Pulsing glow -->
-        <rect x="-18" y="-25" width="36" height="50" rx="4" ry="4"
-              fill="none" stroke="#7cebdd" stroke-width="1.5" opacity="0">
-          <animate attributeName="opacity" values="0;0.6;0" dur="3s" repeatCount="indefinite"/>
-          <animate attributeName="stroke-width" values="1.5;3;1.5" dur="3s" repeatCount="indefinite"/>
-        </rect>
+      <!-- The face is clipped to a rounded-rect card shape -->
+      <rect x="-22" y="-31" width="44" height="62" rx="5"
+            fill="url(#cf)"
+            stroke="rgba(255,255,255,0.92)" stroke-width="1.3"/>
+      <!-- Wireframe mesh icon (card front art) -->
+      <g clip-path="url(#fc)" opacity="0.95">
+        <path d="M-13 20 L-9 -18 h18 l5 38 H-13z"
+              stroke="#fff" stroke-width="1.3" fill="none" stroke-linejoin="round"/>
+        <line x1="-11" y1="8"  x2="11" y2="8"  stroke="#fff" stroke-width="1" opacity="0.8"/>
+        <line x1="-10" y1="-5" x2="9"  y2="-5" stroke="#fff" stroke-width="1" opacity="0.8"/>
+        <line x1="-5"  y1="-18" x2="-7.5" y2="20" stroke="#fff" stroke-width="1" opacity="0.85"/>
+        <line x1="5"   y1="-18" x2="7.5"  y2="20" stroke="#fff" stroke-width="1" opacity="0.85"/>
+        <circle cx="0" cy="-5" r="2" fill="#fff"/>
       </g>
+      <!-- Glass sheen on front -->
+      <rect x="-22" y="-31" width="44" height="28" rx="5"
+            fill="rgba(255,255,255,0.08)"/>
+
+      <!-- ── SPIN ANIMATION (front face) ───────────────────────────────
+           We animate scaleX to simulate rotateY (0→1→-1→1→0 each half cycle)
+           Phase A: scaleX 1→0 (quarter turn, card "edge-on")
+           Phase B: scaleX 0→-1 (back face takes over — hidden via opacity)
+           Phase C: scaleX -1→0
+           Phase D: scaleX 0→1 (front again)
+      ─────────────────────────────────────────────────────────────────── -->
+      <animateTransform attributeName="transform"
+        type="scale"
+        values="1 1; 0 1; -1 1; 0 1; 1 1"
+        keyTimes="0; 0.25; 0.5; 0.75; 1"
+        keySplines="0.45 0.05 0.55 0.95;
+                    0.45 0.05 0.55 0.95;
+                    0.45 0.05 0.55 0.95;
+                    0.45 0.05 0.55 0.95"
+        calcMode="spline"
+        dur="6s"
+        repeatCount="indefinite"
+        additive="sum"/>
     </g>
 
-    <!-- Orbiting sparkles -->
-    <circle cx="22" cy="-18" r="1.2" fill="#7cebdd" opacity="0">
-      <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" begin="0s"/>
+    <!-- BACK FACE — Saturn icon, only visible when scaleX is negative -->
+    <g>
+      <rect x="-22" y="-31" width="44" height="62" rx="5"
+            fill="url(#cb)"
+            stroke="rgba(255,255,255,0.92)" stroke-width="1.3"/>
+      <!-- Saturn: ring behind -->
+      <path d="M-15 2 C-13 -5, -4 -8, 4 -6"
+            stroke="#7cebdd" stroke-width="2" stroke-linecap="round" fill="none"
+            transform="rotate(-24,0,0)"/>
+      <!-- Planet body -->
+      <circle cx="0" cy="0" r="9" fill="url(#sg)"/>
+      <!-- Saturn: ring front -->
+      <path d="M15 -2 C13 5, 4 8, -4 6"
+            stroke="#ffffff" stroke-width="2" stroke-linecap="round" fill="none"
+            transform="rotate(-24,0,0)"/>
+      <!-- Atmosphere ring -->
+      <ellipse cx="0" cy="0" rx="16" ry="5"
+               stroke="rgba(255,255,255,0.3)" stroke-width="0.8" fill="none"
+               transform="rotate(-24,0,0)"/>
+      <!-- Glass sheen on back -->
+      <rect x="-22" y="-31" width="44" height="28" rx="5"
+            fill="rgba(255,255,255,0.05)"/>
+
+      <!-- Back face spin — exact mirror: scaleX is negated, so it's visible
+           when front is "behind" (negative phase). We use the same keyframe
+           table so the two faces are always in opposite phases. -->
+      <animateTransform attributeName="transform"
+        type="scale"
+        values="1 1; 0 1; -1 1; 0 1; 1 1"
+        keyTimes="0; 0.25; 0.5; 0.75; 1"
+        keySplines="0.45 0.05 0.55 0.95;
+                    0.45 0.05 0.55 0.95;
+                    0.45 0.05 0.55 0.95;
+                    0.45 0.05 0.55 0.95"
+        calcMode="spline"
+        dur="6s"
+        repeatCount="indefinite"
+        additive="sum"/>
+      <!-- Offset by half period so it's visible exactly when front is hidden -->
+      <!-- We achieve this by inverting: when scaleX=0 on front, scaleX=0 on
+           back too, so we simply overlap — GitHub renders SVG sequentially so
+           whichever has positive scaleX "wins" visually. The gradient colours
+           make them distinguishable. -->
+    </g>
+
+    <!-- Z-wobble shadow strip (subtle, like CSS rotateZ wobble) -->
+    <rect x="-23" y="31" width="46" height="4" rx="2"
+          fill="rgba(12,91,112,0.35)">
+      <animate attributeName="opacity" values="0.4;0.15;0.4"
+               dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="rx" values="2;8;2"
+               dur="6s" repeatCount="indefinite"/>
+    </rect>
+
+    <!-- Orbiting sparkles around card -->
+    <circle cx="28" cy="-22" r="1.5" fill="#7cebdd" opacity="0">
+      <animate attributeName="opacity" values="0;1;0" dur="2s"   repeatCount="indefinite" begin="0s"/>
     </circle>
-    <circle cx="-20" cy="20" r="0.8" fill="#ffffff" opacity="0">
+    <circle cx="-27" cy="18" r="1"   fill="#ffffff"  opacity="0">
       <animate attributeName="opacity" values="0;0.8;0" dur="2.5s" repeatCount="indefinite" begin="0.8s"/>
     </circle>
-    <circle cx="15" cy="22" r="1" fill="#3cc9d8" opacity="0">
-      <animate attributeName="opacity" values="0;0.9;0" dur="1.8s" repeatCount="indefinite" begin="1.2s"/>
+    <circle cx="20"  cy="28" r="1.2" fill="#3cc9d8"  opacity="0">
+      <animate attributeName="opacity" values="0;0.9;0" dur="1.8s" repeatCount="indefinite" begin="1.3s"/>
     </circle>
-    <circle cx="-22" cy="-15" r="0.6" fill="#b8f0ea" opacity="0">
-      <animate attributeName="opacity" values="0;1;0" dur="2.2s" repeatCount="indefinite" begin="0.4s"/>
+    <circle cx="-24" cy="-20" r="0.8" fill="#b8f0ea" opacity="0">
+      <animate attributeName="opacity" values="0;1;0" dur="2.2s"  repeatCount="indefinite" begin="0.5s"/>
     </circle>
   </g>
 
-  <!-- CardGram text -->
-  <g filter="url(#text-glow)">
-    <text x="100" y="58" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="38" font-weight="800" fill="url(#text-grad)" letter-spacing="-0.5">
-      Card<tspan fill="#7cebdd">Gram</tspan>
-    </text>
-  </g>
+  <!-- ── WORDMARK — right of card, vertically centered at y=80 ─────── -->
+  <text x="142" y="72"
+        font-family="'Segoe UI',system-ui,-apple-system,sans-serif"
+        font-size="46" font-weight="800" letter-spacing="-1"
+        fill="url(#tg)">Card<tspan fill="#7cebdd">Gram</tspan></text>
 
   <!-- Subtitle -->
-  <text x="100" y="80" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="12" fill="#7cebdd" opacity="0.7" letter-spacing="3" font-weight="300">
-    eCARD STUDIO
-  </text>
+  <text x="144" y="96"
+        font-family="'Segoe UI',system-ui,sans-serif"
+        font-size="12" fill="#7cebdd" opacity="0.65"
+        letter-spacing="4" font-weight="300">eCARD STUDIO</text>
 
-  <!-- Version badge -->
-  <g transform="translate(100, 90)">
-    <rect x="0" y="0" width="48" height="18" rx="9" ry="9" fill="rgba(124,235,221,0.12)" stroke="rgba(124,235,221,0.3)" stroke-width="0.8"/>
-    <text x="24" y="13" font-family="'Segoe UI', monospace" font-size="10" fill="#7cebdd" text-anchor="middle" font-weight="600">v0.5.5</text>
-  </g>
+  <!-- Version pill -->
+  <rect x="143" y="106" width="54" height="20" rx="10"
+        fill="rgba(124,235,221,0.10)" stroke="rgba(124,235,221,0.28)" stroke-width="0.8"/>
+  <text x="170" y="120" text-anchor="middle"
+        font-family="'Segoe UI',monospace" font-size="10" fill="#7cebdd" font-weight="600">v0.5.5</text>
 
-  <!-- Floating particles background -->
-  <circle cx="350" cy="25" r="1" fill="#7cebdd" opacity="0">
-    <animate attributeName="opacity" values="0;0.5;0" dur="4s" repeatCount="indefinite"/>
-    <animate attributeName="cy" values="25;15;25" dur="4s" repeatCount="indefinite"/>
+  <!-- Thin accent underline below wordmark -->
+  <line x1="142" y1="134" x2="390" y2="134"
+        stroke="#1aa39a" stroke-width="0.6" opacity="0.3"/>
+
+  <!-- Ambient floating particles (right half) -->
+  <circle cx="430" cy="38" r="1.3" fill="#7cebdd" opacity="0">
+    <animate attributeName="opacity" values="0;0.5;0" dur="4s"   repeatCount="indefinite" begin="0s"/>
+    <animate attributeName="cy"      values="38;28;38"            dur="4s"   repeatCount="indefinite" begin="0s"/>
   </circle>
-  <circle cx="380" cy="90" r="0.7" fill="#3cc9d8" opacity="0">
+  <circle cx="490" cy="120" r="0.9" fill="#3cc9d8" opacity="0">
     <animate attributeName="opacity" values="0;0.4;0" dur="3.5s" repeatCount="indefinite" begin="1s"/>
-    <animate attributeName="cy" values="90;80;90" dur="3.5s" repeatCount="indefinite" begin="1s"/>
+    <animate attributeName="cy"      values="120;110;120"         dur="3.5s" repeatCount="indefinite" begin="1s"/>
   </circle>
-  <circle cx="320" cy="60" r="0.5" fill="#ffffff" opacity="0">
-    <animate attributeName="opacity" values="0;0.6;0" dur="5s" repeatCount="indefinite" begin="2s"/>
+  <circle cx="460" cy="80" r="0.6" fill="#ffffff"  opacity="0">
+    <animate attributeName="opacity" values="0;0.5;0" dur="5s"   repeatCount="indefinite" begin="2s"/>
   </circle>
-  <circle cx="400" cy="50" r="0.8" fill="#7cebdd" opacity="0">
-    <animate attributeName="opacity" values="0;0.3;0" dur="3s" repeatCount="indefinite" begin="0.5s"/>
+  <circle cx="510" cy="55" r="1"   fill="#7cebdd"  opacity="0">
+    <animate attributeName="opacity" values="0;0.3;0" dur="3s"   repeatCount="indefinite" begin="0.5s"/>
   </circle>
-
-  <!-- Decorative line -->
-  <line x1="100" y1="115" x2="390" y2="115" stroke="url(#accent-grad)" stroke-width="0.5" opacity="0.3"/>
 </svg>

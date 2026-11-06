@@ -1,95 +1,209 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 760 190"
+     width="760" height="190"
+     role="img" aria-label="CardGram Roadmap">
+
   <defs>
-    <linearGradient id="r-bg" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0a1e2e"/>
+    <!-- Panel background -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#0a1e2e"/>
       <stop offset="100%" stop-color="#0d3040"/>
     </linearGradient>
-    <linearGradient id="r-line" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#1aa39a"/>
-      <stop offset="100%" stop-color="#7cebdd"/>
-    </linearGradient>
-    <linearGradient id="r-done" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1aa39a"/>
+
+    <!-- Completed segment gradient -->
+    <linearGradient id="done-g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#1aa39a"/>
       <stop offset="100%" stop-color="#0d6b5f"/>
     </linearGradient>
-    <linearGradient id="r-wip" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#2087c9"/>
+
+    <!-- Active / WIP segment gradient -->
+    <linearGradient id="wip-g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#2087c9"/>
       <stop offset="100%" stop-color="#155a87"/>
     </linearGradient>
-    <linearGradient id="r-next" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#3cc9d8"/>
+
+    <!-- Planned gradient -->
+    <linearGradient id="plan-g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#3cc9d8"/>
       <stop offset="100%" stop-color="#1a6e78"/>
     </linearGradient>
-    <filter id="r-glow">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
-      <feFlood flood-color="#3cc9d8" flood-opacity="0.3"/>
-      <feComposite in2="blur" operator="in"/>
-      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+
+    <!-- Timeline line gradient (left → right, done → future) -->
+    <linearGradient id="line-g" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#1aa39a"/>
+      <stop offset="50%"  stop-color="#2087c9"/>
+      <stop offset="100%" stop-color="rgba(60,201,216,0.15)"/>
+    </linearGradient>
+
+    <!-- Animated "travelling dot" gradient — reused for the arrow dashes -->
+    <linearGradient id="travel-g" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%"   stop-color="#7cebdd" stop-opacity="0"/>
+      <stop offset="50%"  stop-color="#7cebdd" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#7cebdd" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Glow filter for the active node -->
+    <filter id="active-glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Soft glow for done nodes -->
+    <filter id="done-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
 
-  <!-- Background -->
-  <rect width="800" height="200" rx="16" fill="url(#r-bg)"/>
-  <rect x="1" y="1" width="798" height="198" rx="15" fill="none" stroke="rgba(124,235,221,0.1)" stroke-width="1"/>
+  <!-- ── BACKGROUND ───────────────────────────────────────────────────── -->
+  <rect width="760" height="190" rx="16" fill="url(#bg)"/>
+  <rect x="1" y="1" width="758" height="188" rx="15"
+        fill="none" stroke="rgba(124,235,221,0.1)" stroke-width="1"/>
 
-  <!-- Title -->
-  <text x="400" y="30" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="14" fill="#7cebdd" letter-spacing="4" font-weight="600">🗺️ ROADMAP</text>
+  <!-- ── TITLE ─────────────────────────────────────────────────────────── -->
+  <text x="380" y="28" text-anchor="middle"
+        font-family="'Segoe UI',system-ui,sans-serif"
+        font-size="13" fill="#7cebdd" letter-spacing="5" font-weight="600">🗺️  ROADMAP</text>
 
-  <!-- Timeline line -->
-  <line x1="60" y1="90" x2="740" y2="90" stroke="url(#r-line)" stroke-width="2" opacity="0.4"/>
-  
-  <!-- Animated progress pulse -->
-  <line x1="60" y1="90" x2="420" y2="90" stroke="url(#r-line)" stroke-width="3" opacity="0.8">
-    <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
-  </line>
+  <!-- ══ TIMELINE BASE LINE ════════════════════════════════════════════ -->
+  <!-- Completed portion (node 1 → node 3, x 90 → 450) -->
+  <line x1="90" y1="98" x2="450" y2="98"
+        stroke="url(#line-g)" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
 
-  <!-- Phase 1: Done ✅ -->
-  <g transform="translate(120, 55)" filter="url(#r-glow)">
-    <circle cx="0" cy="35" r="14" fill="url(#r-done)" stroke="#7cebdd" stroke-width="1.5"/>
-    <text x="0" y="40" text-anchor="middle" font-size="14" fill="#fff">✅</text>
-    <text x="0" y="0" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="11" fill="#ffffff" font-weight="700">eCard Studio</text>
-    <text x="0" y="14" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="#7cebdd" opacity="0.8">3D Engine + Export</text>
-    <text x="0" y="70" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="8" fill="#4aeacc" opacity="0.6">v0.3</text>
+  <!-- Future portion (node 3 → node 5, x 450 → 670) dashed -->
+  <line x1="450" y1="98" x2="670" y2="98"
+        stroke="rgba(124,235,221,0.2)" stroke-width="2"
+        stroke-dasharray="6,5" stroke-linecap="round"/>
+
+  <!-- ── TRAVELLING LIGHT along the done portion ──────────────────────
+       A narrow glowing bar that slides from node 1 to node 3 (x 90→450)
+       then fades and jumps back — giving the "data flowing" feel.
+  ─────────────────────────────────────────────────────────────────────── -->
+  <rect y="93" width="80" height="10" rx="5" fill="url(#travel-g)" opacity="0.7">
+    <animate attributeName="x"
+             values="50;390;390;50"
+             keyTimes="0;0.65;0.8;1"
+             dur="3.5s"
+             repeatCount="indefinite"
+             calcMode="spline"
+             keySplines="0.4 0 0.6 1; 0 0 1 1; 0 0 1 1"/>
+    <animate attributeName="opacity"
+             values="0;0.75;0;0"
+             keyTimes="0;0.6;0.75;1"
+             dur="3.5s"
+             repeatCount="indefinite"/>
+  </rect>
+
+  <!-- ── CONNECTOR ARROWS (between nodes) ──────────────────────────── -->
+  <!-- Arrow 1→2 -->
+  <g opacity="0">
+    <path d="M 183 94 L 197 98 L 183 102" fill="#7cebdd" stroke="none"/>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.3;0.7;1"
+             dur="3.5s" repeatCount="indefinite" begin="0.4s"/>
+  </g>
+  <!-- Arrow 2→3 -->
+  <g opacity="0">
+    <path d="M 323 94 L 337 98 L 323 102" fill="#7cebdd" stroke="none"/>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.3;0.7;1"
+             dur="3.5s" repeatCount="indefinite" begin="0.9s"/>
+  </g>
+  <!-- Arrow 3→4 (dashed future) subtle pulse -->
+  <g opacity="0">
+    <path d="M 463 94 L 477 98 L 463 102" fill="rgba(124,235,221,0.4)" stroke="none"/>
+    <animate attributeName="opacity" values="0;0.6;0.6;0" keyTimes="0;0.4;0.7;1"
+             dur="4s" repeatCount="indefinite" begin="0.2s"/>
+  </g>
+  <!-- Arrow 4→5 -->
+  <g opacity="0">
+    <path d="M 603 94 L 617 98 L 603 102" fill="rgba(124,235,221,0.3)" stroke="none"/>
+    <animate attributeName="opacity" values="0;0.5;0.5;0" keyTimes="0;0.4;0.7;1"
+             dur="4s" repeatCount="indefinite" begin="0.6s"/>
   </g>
 
-  <!-- Phase 2: Done ✅ -->
-  <g transform="translate(270, 55)" filter="url(#r-glow)">
-    <circle cx="0" cy="35" r="14" fill="url(#r-done)" stroke="#7cebdd" stroke-width="1.5"/>
-    <text x="0" y="40" text-anchor="middle" font-size="14" fill="#fff">✅</text>
-    <text x="0" y="0" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="11" fill="#ffffff" font-weight="700">Card Hub</text>
-    <text x="0" y="14" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="#7cebdd" opacity="0.8">Lobby + Collections</text>
-    <text x="0" y="70" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="8" fill="#4aeacc" opacity="0.6">v0.5</text>
+  <!-- ══ NODE 1 — eCard Studio ✅ DONE ════════════════════════════════ -->
+  <g transform="translate(90,98)" filter="url(#done-glow)">
+    <!-- Outer ring -->
+    <circle r="20" fill="url(#done-g)" stroke="#7cebdd" stroke-width="1.8"/>
+    <!-- Icon -->
+    <text x="0" y="7" text-anchor="middle" font-size="18">✅</text>
   </g>
+  <!-- Label above -->
+  <text x="90" y="62" text-anchor="middle"
+        font-family="'Segoe UI',sans-serif" font-size="11" fill="#ffffff" font-weight="700">eCard Studio</text>
+  <text x="90" y="75" text-anchor="middle"
+        font-family="'Segoe UI',sans-serif" font-size="9"  fill="#7cebdd" opacity="0.7">3D Engine + Export</text>
+  <!-- Version below -->
+  <text x="90" y="135" text-anchor="middle"
+        font-family="'Segoe UI',monospace" font-size="9" fill="#4aeacc" opacity="0.55">v0.3</text>
 
-  <!-- Phase 3: WIP 🔧 -->
-  <g transform="translate(420, 55)">
-    <circle cx="0" cy="35" r="14" fill="url(#r-wip)" stroke="#4db8ff" stroke-width="1.5">
-      <animate attributeName="stroke-opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
-    </circle>
-    <text x="0" y="40" text-anchor="middle" font-size="14" fill="#fff">🔧</text>
-    <text x="0" y="0" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="11" fill="#ffffff" font-weight="700">Inkra Print</text>
-    <text x="0" y="14" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="#4db8ff" opacity="0.8">Real-Scale Layouts</text>
-    <text x="0" y="70" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="8" fill="#4db8ff" opacity="0.6">v0.6</text>
+  <!-- ══ NODE 2 — Card Hub ✅ DONE ════════════════════════════════════ -->
+  <g transform="translate(230,98)" filter="url(#done-glow)">
+    <circle r="20" fill="url(#done-g)" stroke="#7cebdd" stroke-width="1.8"/>
+    <text x="0" y="7" text-anchor="middle" font-size="18">✅</text>
   </g>
+  <text x="230" y="62" text-anchor="middle"
+        font-family="'Segoe UI',sans-serif" font-size="11" fill="#ffffff" font-weight="700">Card Hub</text>
+  <text x="230" y="75" text-anchor="middle"
+        font-family="'Segoe UI',sans-serif" font-size="9"  fill="#7cebdd" opacity="0.7">Lobby + Collections</text>
+  <text x="230" y="135" text-anchor="middle"
+        font-family="'Segoe UI',monospace" font-size="9" fill="#4aeacc" opacity="0.55">v0.5</text>
 
-  <!-- Phase 4: Next 🌐 -->
-  <g transform="translate(570, 55)">
-    <circle cx="0" cy="35" r="14" fill="url(#r-next)" stroke="rgba(124,235,221,0.4)" stroke-width="1.5" stroke-dasharray="3,3"/>
-    <text x="0" y="40" text-anchor="middle" font-size="14" fill="#fff">🌐</text>
-    <text x="0" y="0" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="11" fill="rgba(255,255,255,0.7)" font-weight="700">Community</text>
-    <text x="0" y="14" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="rgba(124,235,221,0.5)">Share + Drops</text>
-    <text x="0" y="70" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="8" fill="rgba(124,235,221,0.4)">v0.7+</text>
+  <!-- ══ NODE 3 — Inkra Print 🔧 ACTIVE ══════════════════════════════
+       This is where we ARE right now — it pulses and glows.
+  ─────────────────────────────────────────────────────────────────────── -->
+  <!-- Outer pulsing ring (larger, fades in/out) -->
+  <circle cx="450" cy="98" r="30" fill="none" stroke="#4db8ff" stroke-width="2" opacity="0">
+    <animate attributeName="r"       values="22;36;22" dur="2.4s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0;0.7" dur="2.4s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Main node -->
+  <g transform="translate(450,98)" filter="url(#active-glow)">
+    <circle r="22" fill="url(#wip-g)" stroke="#4db8ff" stroke-width="2.2"/>
+    <text x="0" y="8" text-anchor="middle" font-size="20">🔧</text>
   </g>
+  <!-- "YOU ARE HERE" indicator -->
+  <text x="450" y="48" text-anchor="middle"
+        font-family="'Segoe UI',sans-serif" font-size="8" fill="#4db8ff" letter-spacing="1.5" opacity="0">
+    ▲ NOW
+    <animate attributeName="opacity" values="0;1;0" dur="2.4s" repeatCount="indefinite"/>
+  </text>
+  <text x="450" y="60" text-anchor="middle"
+        font-family="'Segoe UI',sans-serif" font-size="11" fill="#ffffff" font-weight="700">Inkra Print</text>
+  <text x="450" y="73" text-anchor="middle"
+        font-family="'Segoe UI',sans-serif" font-size="9"  fill="#4db8ff" opacity="0.8">Real-Scale Layouts</text>
+  <text x="450" y="138" text-anchor="middle"
+        font-family="'Segoe UI',monospace" font-size="9" fill="#4db8ff" opacity="0.5">v0.6</text>
 
-  <!-- Phase 5: Future ✨ -->
-  <g transform="translate(700, 55)">
-    <circle cx="0" cy="35" r="14" fill="rgba(60,201,216,0.15)" stroke="rgba(124,235,221,0.25)" stroke-width="1.5" stroke-dasharray="2,4"/>
-    <text x="0" y="40" text-anchor="middle" font-size="14" fill="rgba(255,255,255,0.5)">✨</text>
-    <text x="0" y="0" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="11" fill="rgba(255,255,255,0.5)" font-weight="700">Marketplace</text>
-    <text x="0" y="14" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="rgba(124,235,221,0.35)">Drops + Trading</text>
-    <text x="0" y="70" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="8" fill="rgba(124,235,221,0.3)">Future</text>
+  <!-- ══ NODE 4 — Community 🌐 PLANNED ════════════════════════════════ -->
+  <g transform="translate(590,98)">
+    <circle r="20" fill="url(#plan-g)" stroke="rgba(124,235,221,0.35)"
+            stroke-width="1.5" stroke-dasharray="4,3"/>
+    <text x="0" y="7" text-anchor="middle" font-size="18" opacity="0.75">🌐</text>
   </g>
+  <text x="590" y="62" text-anchor="middle"
+        font-family="'Segoe UI',sans-serif" font-size="11" fill="rgba(255,255,255,0.65)" font-weight="700">Community</text>
+  <text x="590" y="75" text-anchor="middle"
+        font-family="'Segoe UI',sans-serif" font-size="9"  fill="rgba(124,235,221,0.45)">Share + Drops</text>
+  <text x="590" y="135" text-anchor="middle"
+        font-family="'Segoe UI',monospace" font-size="9" fill="rgba(124,235,221,0.35)">v0.7+</text>
 
-  <!-- Footer note -->
-  <text x="400" y="185" text-anchor="middle" font-family="'Segoe UI', sans-serif" font-size="9" fill="rgba(124,235,221,0.4)" letter-spacing="1">Built with ♥ by theAstroBruh + AI Crew · Support us on Ko-fi</text>
+  <!-- ══ NODE 5 — Marketplace ✨ FUTURE ════════════════════════════════ -->
+  <g transform="translate(700,98)">
+    <circle r="18" fill="rgba(60,201,216,0.08)"
+            stroke="rgba(124,235,221,0.2)" stroke-width="1.3" stroke-dasharray="3,5"/>
+    <text x="0" y="7" text-anchor="middle" font-size="16" opacity="0.5">✨</text>
+  </g>
+  <text x="700" y="62" text-anchor="middle"
+        font-family="'Segoe UI',sans-serif" font-size="11" fill="rgba(255,255,255,0.4)" font-weight="700">Marketplace</text>
+  <text x="700" y="75" text-anchor="middle"
+        font-family="'Segoe UI',sans-serif" font-size="9"  fill="rgba(124,235,221,0.3)">Drops + Trading</text>
+  <text x="700" y="135" text-anchor="middle"
+        font-family="'Segoe UI',monospace" font-size="9" fill="rgba(124,235,221,0.25)">Future</text>
+
+  <!-- ── FOOTER ──────────────────────────────────────────────────────── -->
+  <text x="380" y="174" text-anchor="middle"
+        font-family="'Segoe UI',sans-serif"
+        font-size="9" fill="rgba(124,235,221,0.35)" letter-spacing="0.8">
+    Built with ♥ by theAstroBruh + AI Crew · Support us on Ko-fi
+  </text>
 </svg>
