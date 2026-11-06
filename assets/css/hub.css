@@ -5311,8 +5311,8 @@ dialog {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    width: 68px;
+    height: 68px;
     padding: 0;
     border-radius: 50%;
     color: #07333f;
@@ -5334,8 +5334,8 @@ dialog {
   }
 
   .hub-menu-btn .icon {
-    width: 17px;
-    height: 17px;
+    width: 30px;
+    height: 30px;
     opacity: 0.8;
   }
 
@@ -5347,11 +5347,11 @@ dialog {
   .hub-fab-actions {
     position: fixed;
     left: 50%;
-    bottom: calc(72px + env(safe-area-inset-bottom));
+    bottom: calc(100px + env(safe-area-inset-bottom));
     z-index: 167;
     display: flex;
     align-items: flex-end;
-    gap: 6px;
+    gap: 8px;
     transform: translateX(-50%);
     pointer-events: none;
   }
@@ -5360,8 +5360,8 @@ dialog {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
-    height: 30px;
+    width: 54px;
+    height: 54px;
     padding: 0;
     pointer-events: auto;
     border-radius: 50%;
@@ -5384,27 +5384,27 @@ dialog {
   }
 
   .hub-fab-icon {
-    width: 14px;
-    height: 14px;
+    width: 24px;
+    height: 24px;
   }
 
   .hub-fab-btn-primary {
-    width: 34px;
-    height: 34px;
+    width: 61px;
+    height: 61px;
     color: #ffffff;
     background: linear-gradient(160deg, #45d9c2 0%, #2f8fdd 100%);
     border-color: rgba(255, 255, 255, 0.84);
-    box-shadow: 0 8px 16px rgba(47, 143, 221, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.45);
-    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(47, 143, 221, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    transform: translateY(-8px);
   }
 
   .hub-fab-btn-primary:hover {
-    transform: translateY(-6px);
+    transform: translateY(-10px);
   }
 
   .hub-fab-btn-primary .hub-fab-icon {
-    width: 16px;
-    height: 16px;
+    width: 28px;
+    height: 28px;
   }
 
   /* Reproductor de música: adelanto, todavía sin función. */
@@ -5563,8 +5563,8 @@ dialog {
   }
 
   .hub-menu-btn .icon {
-    width: 17px;
-    height: 17px;
+    width: 30px;
+    height: 30px;
   }
 
 }
@@ -6276,12 +6276,12 @@ dialog {
   }
 
   .hub-hand-nav-prev {
-    left: -18px;
+    left: 2px;
     justify-content: flex-start;
   }
 
   .hub-hand-nav-next {
-    right: -18px;
+    right: 2px;
     justify-content: flex-end;
   }
 
