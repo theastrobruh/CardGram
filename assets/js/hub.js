@@ -831,8 +831,21 @@ function saveHand() {
   }
 
   hubProfile.featuredIds = hub.handDraft.slice(0, 6);
+  /* Si la carta principal ya no está en la mano, pasa a ser la primera elegida. */
+  if (!hubProfile.featuredIds.includes(hubProfile.favoriteCardId)) {
+    hubProfile.favoriteCardId = hubProfile.featuredIds[0];
+  }
   persistHubProfile();
-  renderFeaturedStack();
+  renderFavoriteCard();
+  if (hub.els.handDialog && hub.els.handDialog.open) hub.els.handDialog.close();
+}
+
+/* Deja la mano en una sola carta: la protagonista actual. */
+function clearHand() {
+  const main = favoriteCard();
+  hubProfile.featuredIds = main ? [main.id] : [];
+  persistHubProfile();
+  renderFavoriteCard();
   if (hub.els.handDialog && hub.els.handDialog.open) hub.els.handDialog.close();
 }
 
@@ -2518,6 +2531,10 @@ function setupHubEvents() {
     hub.els.handCancel.addEventListener('click', () => hub.els.handDialog.close());
   }
 
+  if (hub.els.handClear) {
+    hub.els.handClear.addEventListener('click', clearHand);
+  }
+
   if (hub.els.cardInfo) {
     hub.els.cardInfo.addEventListener('click', openCardDetails);
   }
@@ -2697,6 +2714,7 @@ function cacheHubDom() {
   els.handCount = hubEl('hand-count');
   els.handSave = hubEl('hand-save');
   els.handCancel = hubEl('hand-cancel');
+  els.handClear = hubEl('hand-clear');
 
   els.showcase = hubEl('hub-showcase');
   els.card = hubEl('hub-card');

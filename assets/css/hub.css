@@ -6196,6 +6196,12 @@ dialog {
   color: var(--muted);
 }
 
+.hand-clear {
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 0.68rem;
+}
+
 .hub-hand-deck,
 .hub-card-hand-edit,
 .hub-hand-nav {
