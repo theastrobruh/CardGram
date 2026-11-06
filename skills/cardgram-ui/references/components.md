@@ -203,11 +203,11 @@ A 54 px circular primary-gradient button bottom-right. On open, 3–5 petals fan
 
 ## 18. Identity chip (hub ≤980 px)
 
-`.hub-player-panel` becomes a single centred capsule: `width: fit-content; margin: 0 auto; padding: 5px 16px 5px 5px; border-radius: 999px` on a white glass gradient. Its content is **only** the 30 px avatar and `@handle` (0.74rem, 700, `--ink`); `.hub-player-name` is `display: none` here — the name, bio and stats live in the menu sheet.
+At **861–980 px** `.hub-player-panel` is a centred capsule (`width: fit-content; margin: 0 auto; padding: 5px 16px 5px 5px; border-radius: 999px`) holding the 30 px avatar, `@handle` and the compact `cartas·colecciones` summary.
 
-The capsule is a trigger: `.hub-player-open` is an absolutely positioned, transparent button covering it (`z-index: 2`, `border-radius: inherit`), `aria-haspopup="dialog"`, `aria-controls="hub-menu-sheet"`, label `hub_player_open`. It calls `openHubMenu(trigger)` so `openHubSheet` can sync `aria-expanded` and restore focus on close. On desktop the button is `display: none` and the panel shows name + handle + edit as before.
+At **≤860 px** the panel becomes the player's identity circle: `position: fixed; top: 4px; left: 50%`, `72–84 px` diameter, white ring and soft cyan shadow, so it rises above the topbar and the avatar art stays readable from a distance. `.hub-player-identity` and `.hub-player-open` are hidden; the whole circle is `.hub-player-avatar-btn` (`inset: 0; border-radius: 50%`), which opens the profile. The circle keeps its fixed `z-index: 45` above the sticky topbar.
 
-The handle truncates with `text-overflow: ellipsis` at `max-width: 100%` (long handles shrink the pill instead of overflowing).
+Below the topbar, `.hub-mobile-datastrip` (~`.hub-home-panel` top, mobile only) shows **two live data items** — player and collection — in 0.52–0.6rem mono uppercase, separated by a 1 px hairline and centred in two equal columns. `renderMobileData()` rebuilds both lists from real state and i18n (`hub_data_*`); `setupMobileData()` rotates the player every 4.6 s and the collection every 6.2 s with a 180 ms fade, and stays still under `prefers-reduced-motion`. The strip is hidden in landscape (≤560 px tall).
 
 ## 19. Vitrine (hub mobile stage)
 

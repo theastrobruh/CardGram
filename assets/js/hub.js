@@ -111,6 +111,7 @@ const hub = {
   presetsRendered: false,
   lastRoute: '',
   activeSheet: null,
+  mobileData: { player: [], collection: [], playerIndex: 0, collectionIndex: 0 },
   els: {}
 };
 
@@ -167,6 +168,17 @@ function formatHubDate(timestamp) {
     return new Date(timestamp).toLocaleDateString(currentLang || 'en', {
       year: 'numeric',
       month: 'long'
+    });
+  } catch (error) {
+    return new Date(timestamp).getFullYear();
+  }
+}
+
+function formatHubShortDate(timestamp) {
+  try {
+    return new Date(timestamp).toLocaleDateString(currentLang || 'en', {
+      year: 'numeric',
+      month: 'short'
     });
   } catch (error) {
     return new Date(timestamp).getFullYear();
@@ -852,6 +864,67 @@ function setStatValue(node, value, animate) {
   node._hubRaf = requestAnimationFrame(step);
 }
 
+function renderMobileData(stats) {
+  if (!hub.els.mobileDataPlayer && !hub.els.mobileDataCollection) return;
+  const values = stats || hubStats();
+  const data = hub.mobileData;
+
+  data.player = [
+    `@${hubProfile.handle}`,
+    t('hub_data_member', { date: formatHubShortDate(hubProfile.joinedAt) }),
+    t('hub_data_decks', { count: values.decks })
+  ];
+  data.collection = [
+    t('hub_data_cards', { count: values.cards }),
+    t('hub_data_sets', { count: values.collections }),
+    t('hub_data_catalog', { count: values.catalogCards }),
+    t('hub_data_review', { count: values.review })
+  ];
+
+  if (hub.els.mobileDataPlayer) {
+    hub.els.mobileDataPlayer.textContent =
+      data.player[data.playerIndex % data.player.length];
+  }
+  if (hub.els.mobileDataCollection) {
+    hub.els.mobileDataCollection.textContent =
+      data.collection[data.collectionIndex % data.collection.length];
+  }
+}
+
+function swapMobileData(node, text) {
+  if (!node) return;
+
+  if (reduceMotion()) {
+    node.textContent = text;
+    return;
+  }
+
+  node.classList.add('is-swapping');
+  window.setTimeout(() => {
+    node.textContent = text;
+    node.classList.remove('is-swapping');
+  }, 180);
+}
+
+function rotateMobileData(slot) {
+  if (!hub.ready || hub.panel !== 'home' || document.hidden) return;
+  const data = hub.mobileData;
+  const list = data[slot];
+  if (!Array.isArray(list) || list.length < 2) return;
+
+  const key = slot === 'player' ? 'playerIndex' : 'collectionIndex';
+  data[key] = (data[key] + 1) % list.length;
+  const node = slot === 'player' ? hub.els.mobileDataPlayer : hub.els.mobileDataCollection;
+  swapMobileData(node, list[data[key]]);
+}
+
+function setupMobileData() {
+  if (reduceMotion() || hub.mobileDataTimer) return;
+  /* Ritmos distintos: los dos datos no cambian a la vez. */
+  hub.mobileDataTimer = window.setInterval(() => rotateMobileData('player'), 4600);
+  hub.mobileDataTimer2 = window.setInterval(() => rotateMobileData('collection'), 6200);
+}
+
 function renderHubStats(animate) {
   if (!hub.ready) return;
   const stats = hubStats();
@@ -891,6 +964,7 @@ function renderHubStats(animate) {
   }
 
   renderProfileSummary(stats);
+  renderMobileData(stats);
 }
 
 function renderProfileSummary(stats) {
@@ -3398,6 +3472,8 @@ function cacheHubDom() {
   els.playerSince = hubEl('hub-player-since');
   els.playerStack = hubEl('hub-player-stack');
   els.playerSummary = hubEl('hub-player-summary');
+  els.mobileDataPlayer = hubEl('hub-mobile-data-player');
+  els.mobileDataCollection = hubEl('hub-mobile-data-collection');
   els.playerStackEdit = hubEl('hub-player-stack-edit');
   els.mobileHandEdit = hubEl('hub-mobile-hand-edit');
   els.homeFab = hubEl('hub-home-fab');
@@ -3526,6 +3602,7 @@ function setupHub() {
   renderHubIdentity();
   renderFavoriteCard();
   renderHubStats(true);
+  setupMobileData();
   renderCollectionRail();
   renderCardExplorer();
   renderBooster();
