@@ -23,8 +23,10 @@ SETS = ['Champion-Verse', 'Dungeons and History', 'Mew Tarot', 'YGO']
 OBSOLETE = ['OG', 'FAN ART']
 FULL_SIZE = (896, 1200)
 THUMB_SIZE = 760
+MICRO_SIZE = 200
 FULL_QUALITY = 82
 THUMB_QUALITY = 80
+MICRO_QUALITY = 76
 
 FONT_BOLD = Path(r'C:\Windows\Fonts\segoeuib.ttf')
 FONT_LIGHT = Path(r'C:\Windows\Fonts\segoeuil.ttf')
@@ -172,6 +174,14 @@ def optimize_set(folder: Path) -> int:
             thumb = image.copy()
             thumb.thumbnail((THUMB_SIZE, THUMB_SIZE), Image.LANCZOS)
             thumb.save(thumb_path, 'WEBP', quality=THUMB_QUALITY, method=6)
+
+        micro = folder / 'micro'
+        micro.mkdir(parents=True, exist_ok=True)
+        micro_path = micro / f'{source.stem}.webp'
+        if not micro_path.exists() or micro_path.stat().st_mtime < destination.stat().st_mtime:
+            thumb = image.copy()
+            thumb.thumbnail((MICRO_SIZE, MICRO_SIZE), Image.LANCZOS)
+            thumb.save(micro_path, 'WEBP', quality=MICRO_QUALITY, method=6)
         count += 1
 
     # Miniaturas huérfanas de imágenes que ya no están en el set.
@@ -180,6 +190,10 @@ def optimize_set(folder: Path) -> int:
         if thumb.stem not in sources:
             thumb.unlink()
             print(f'{folder.name}/thumbs/{thumb.name}  eliminada (huérfana)')
+    for thumb in (folder / 'micro').glob('*.webp'):
+        if thumb.stem not in sources:
+            thumb.unlink()
+            print(f'{folder.name}/micro/{thumb.name}  eliminada (huérfana)')
 
     return count
 
@@ -191,6 +205,12 @@ def make_shared_thumb() -> None:
     destination = DB / '_shared' / 'thumbs' / 'BACK_CARDGRAM.webp'
     destination.parent.mkdir(parents=True, exist_ok=True)
     thumb.save(destination, 'WEBP', quality=THUMB_QUALITY, method=6)
+
+    micro = Image.open(source).convert('RGB')
+    micro.thumbnail((MICRO_SIZE, MICRO_SIZE), Image.LANCZOS)
+    micro_destination = DB / '_shared' / 'micro' / 'BACK_CARDGRAM.webp'
+    micro_destination.parent.mkdir(parents=True, exist_ok=True)
+    micro.save(micro_destination, 'WEBP', quality=MICRO_QUALITY, method=6)
 
 
 def main() -> int:

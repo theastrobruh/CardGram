@@ -89,6 +89,12 @@ const PREVIEW_FRONT = new Map(
 const PREVIEW_BACK = new Map(
   CATALOG_CARDS.map((card) => [card.back, card.thumbBack || card.back])
 );
+const PREVIEW_MICRO = new Map(
+  CATALOG_CARDS.map((card) => [
+    card.front,
+    (card.thumbFront || card.front).replace('/thumbs/', '/micro/')
+  ])
+);
 
 const currentCard = { front: DEFAULT_CARD.front, back: DEFAULT_CARD.back, fullArt: DEFAULT_CARD.fullArt };
 const uploadTokens = { front: 0, back: 0 };
@@ -758,9 +764,10 @@ async function playSequence() {
 /* --------------------------------------------------------------------------
    Presets
    -------------------------------------------------------------------------- */
-function makePresetChip({ name, active, front, back, onSelect, onDelete }) {
+function makePresetChip({ id, name, active, front, back, onSelect, onDelete }) {
   const chip = document.createElement('div');
   chip.className = `preset-chip${active ? ' active' : ''}`;
+  if (id) chip.dataset.presetId = id;
 
   const main = document.createElement('button');
   main.type = 'button';
@@ -775,8 +782,10 @@ function makePresetChip({ name, active, front, back, onSelect, onDelete }) {
     thumbs.setAttribute('aria-hidden', 'true');
 
     const frontThumb = document.createElement('img');
-    frontThumb.src = PREVIEW_FRONT.get(front) || front;
+    frontThumb.src = PREVIEW_MICRO.get(front) || PREVIEW_FRONT.get(front) || front;
     frontThumb.alt = '';
+    frontThumb.width = 149;
+    frontThumb.height = 200;
     frontThumb.loading = 'lazy';
     frontThumb.decoding = 'async';
 
@@ -809,11 +818,15 @@ function makePresetChip({ name, active, front, back, onSelect, onDelete }) {
 
 function renderPresets() {
   if (!el.presetsBar) return;
+  /* El estudio es perezoso: la barra de presets no se construye (ni descarga
+     sus miniaturas) hasta que la persona entra al estudio. */
+  if (document.body.dataset.view !== 'studio') return;
   el.presetsBar.replaceChildren();
 
   BUILTIN_PRESETS.forEach((preset) => {
     el.presetsBar.appendChild(
       makePresetChip({
+        id: preset.id,
         name: preset.name,
         active: activePresetId === preset.id,
         front: preset.front,
@@ -826,6 +839,7 @@ function renderPresets() {
   presets.forEach((preset) => {
     el.presetsBar.appendChild(
       makePresetChip({
+        id: preset.id,
         name: preset.name,
         active: activePresetId === preset.id,
         front: preset.front,
@@ -834,6 +848,16 @@ function renderPresets() {
         onDelete: () => deletePreset(preset.id)
       })
     );
+  });
+}
+
+function syncPresetActive() {
+  if (!el.presetsBar) return;
+  Array.from(el.presetsBar.querySelectorAll('.preset-chip')).forEach((chip) => {
+    const active = chip.dataset.presetId === activePresetId;
+    chip.classList.toggle('active', active);
+    const main = chip.querySelector('.preset-chip-main');
+    if (main) main.setAttribute('aria-pressed', String(active));
   });
 }
 
@@ -858,14 +882,14 @@ async function applyCardImages(front, back, fullArt) {
 function restoreDefaultCard() {
   const builtin = BUILTIN_PRESETS.find((preset) => preset.cardId === DEFAULT_CARD.id);
   activePresetId = builtin ? builtin.id : 'default';
-  renderPresets();
+  syncPresetActive();
   applyCardImages(DEFAULT_CARD.front, DEFAULT_CARD.back, DEFAULT_CARD.fullArt);
   toast(t('default_restored'), { type: 'success' });
 }
 
 function loadPreset(preset) {
   activePresetId = preset.id;
-  renderPresets();
+  syncPresetActive();
   applyCardImages(preset.front, preset.back, preset.fullArt);
   toast(t('preset_loaded', { name: preset.name }), { type: 'success' });
 }
@@ -2062,7 +2086,6 @@ function init() {
   setupUploads();
   setupKeyboard();
 
-  renderPresets();
   syncUI();
   setActiveScene(1);
 

@@ -39,6 +39,7 @@ assets/data/cards/
 | `*BACKCARD*.webp` | Reverso oficial del set; si no existe se usa `_shared/BACK_CARDGRAM.webp`. |
 | `FRONT_*(FULL-ART).webp` | Variante Full Art opcional del mismo anverso. |
 | `thumbs/*.webp` | Miniatura de 760 px que usa el lobby; el estudio usa el WebP grande. |
+| `micro/*.webp` | Versión de 200 px para rejillas diminutas (menú rápido, álbum, mano). |
 
 ## Optimización
 
@@ -49,8 +50,8 @@ python assets/data/cards/tools/optimize-sets.py
 ```
 
 El script convierte anversos y reversos a 896 × 1200 (calidad 82), genera las
-miniaturas de 760 px y elimina los formatos pesados de origen. Los sets `OG` y
-`FAN ART` se retiraron junto con sus imágenes.
+miniaturas de 760 px, las micro de 200 px y elimina los formatos pesados de
+origen. Los sets `OG` y `FAN ART` se retiraron junto con sus imágenes.
 
 ## Sets y sobre diario
 

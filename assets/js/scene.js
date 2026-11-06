@@ -139,6 +139,14 @@ const Scene = (() => {
 
   const clampNumber = (value, min, max) => Math.min(max, Math.max(min, value));
 
+  /* En pantallas táctiles conviene un DPR algo menor: se nota poco y evita
+     que el móvil renderice el doble de píxeles por fotograma. */
+  function preferredPixelRatio() {
+    const dpr = window.devicePixelRatio || 1;
+    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    return Math.min(dpr, coarse ? 1.5 : 2);
+  }
+
   /* ------------------------------------------------------------------------
      Inicialización
      ------------------------------------------------------------------------ */
@@ -157,7 +165,7 @@ const Scene = (() => {
         alpha: true,
         powerPreference: 'high-performance'
       });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setPixelRatio(preferredPixelRatio());
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = settings.exposure;
       renderer.outputEncoding = THREE.sRGBEncoding;
@@ -220,10 +228,11 @@ const Scene = (() => {
 
       renderer.domElement.addEventListener('webglcontextlost', onContextLost, false);
       renderer.domElement.addEventListener('webglcontextrestored', onContextRestored, false);
+      document.addEventListener('visibilitychange', onVisibilityChange);
 
       clock = new THREE.Clock();
       ready = true;
-      animate();
+      startLoop();
       return true;
     } catch (error) {
       console.error('[CardGram] WebGL init failed', error);
@@ -823,8 +832,12 @@ const Scene = (() => {
      Bucle de render
      ------------------------------------------------------------------------ */
   function animate() {
+    if (!ready || renderPaused || document.hidden) {
+      animationId = 0;
+      return;
+    }
+
     animationId = requestAnimationFrame(animate);
-    if (!ready) return;
 
     const delta = Math.min(clock.getDelta(), 0.05);
     floatTime += delta;
@@ -933,7 +946,7 @@ const Scene = (() => {
     wrapper.style.width = `${width}px`;
     wrapper.style.height = `${height}px`;
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(preferredPixelRatio());
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
@@ -1035,6 +1048,24 @@ const Scene = (() => {
     window.dispatchEvent(new CustomEvent('cardgram:contextrestored'));
   }
 
+  function stopLoop() {
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+      animationId = 0;
+    }
+  }
+
+  function startLoop() {
+    if (!ready || renderPaused || document.hidden || animationId) return;
+    if (clock) clock.getDelta();
+    animate();
+  }
+
+  function onVisibilityChange() {
+    if (document.hidden) stopLoop();
+    else startLoop();
+  }
+
   function setRenderPaused(paused) {
     const next = Boolean(paused);
 
@@ -1053,16 +1084,11 @@ const Scene = (() => {
     renderPaused = next;
 
     if (next) {
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-        animationId = 0;
-      }
+      stopLoop();
       return;
     }
 
-    if (!ready || animationId) return;
-    if (clock) clock.getDelta();
-    animate();
+    startLoop();
   }
 
   function isReady() {

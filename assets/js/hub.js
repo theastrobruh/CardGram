@@ -27,6 +27,70 @@ const HUB_CATALOG = window.CardGramCatalog || {
   collectionOf: () => null
 };
 
+/* Three.js se descarga solo al entrar al estudio (o en reposo, más tarde).
+   Antes competía con las miniaturas del lobby en la carga inicial. */
+const THREE_ASSETS = [
+  {
+    src: 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+    integrity: 'sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu'
+  },
+  {
+    src: 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js',
+    integrity: 'sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf'
+  }
+];
+
+let threeLoadPromise = null;
+
+function ensureThree() {
+  if (window.THREE && window.THREE.OrbitControls) return Promise.resolve(true);
+  if (threeLoadPromise) return threeLoadPromise;
+
+  threeLoadPromise = THREE_ASSETS.reduce(
+    (chain, asset) =>
+      chain.then(
+        () =>
+          new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = asset.src;
+            script.integrity = asset.integrity;
+            script.crossOrigin = 'anonymous';
+            script.async = true;
+            script.onload = resolve;
+            script.onerror = () => reject(new Error(`No se pudo cargar ${asset.src}`));
+            document.head.appendChild(script);
+          })
+      ),
+    Promise.resolve()
+  )
+    .then(() => Boolean(window.THREE && window.THREE.OrbitControls))
+    .catch((error) => {
+      console.warn('[CardGram] Three.js no disponible', error);
+      threeLoadPromise = null;
+      return false;
+    });
+
+  return threeLoadPromise;
+}
+
+function warmThreeInIdle() {
+  const connection = navigator.connection;
+  if (connection && (connection.saveData || /(^|-)2g$|^3g$/.test(connection.effectiveType || ''))) {
+    return;
+  }
+
+  const run = () => {
+    ensureThree().catch(() => {});
+  };
+  window.setTimeout(() => {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(run, { timeout: 4000 });
+    } else {
+      run();
+    }
+  }, 6000);
+}
+
 const hub = {
   ready: false,
   panel: 'home',
@@ -44,6 +108,7 @@ const hub = {
   gachaIds: [],
   handDraft: [],
   opening: false,
+  presetsRendered: false,
   lastRoute: '',
   activeSheet: null,
   els: {}
@@ -69,6 +134,8 @@ function makeHubImage(src, alt) {
   const img = document.createElement('img');
   img.src = src;
   img.alt = alt || '';
+  img.width = 567;
+  img.height = 760;
   img.loading = 'lazy';
   img.decoding = 'async';
   return img;
@@ -137,6 +204,15 @@ function thumbOf(card) {
 
 function backThumbOf(card) {
   return (card && (card.thumbBack || card.back)) || '';
+}
+
+/** Versión de 200 px para rejillas diminutas (menú rápido, álbum, mano). */
+function microUrl(src) {
+  return src ? src.replace('/thumbs/', '/micro/') : src;
+}
+
+function microOf(card) {
+  return microUrl(thumbOf(card));
 }
 
 /** Convierte una ruta de catálogo en su miniatura si existe. */
@@ -526,7 +602,7 @@ function renderBoosterSetButtons(sets) {
       button.disabled = locked && collection.id !== hubBooster.setId;
 
       const art = makeNode('span', 'booster-set-art');
-      art.appendChild(makeHubImage(collection.thumbCover || collection.cover, ''));
+      art.appendChild(makeHubImage(microUrl(collection.thumbCover || collection.cover), ''));
       button.appendChild(art);
 
       const copy = makeNode('span', 'booster-set-copy');
@@ -951,6 +1027,30 @@ function setupCardRatios() {
   }
 }
 
+function syncFavoriteMarks() {
+  if (!hub.root) return;
+  hub.root.querySelectorAll('[data-fav-card]').forEach((button) => {
+    const card = HUB_CATALOG.byId(button.dataset.favCard);
+    if (!card) return;
+    const selected = hubProfile.favoriteCardId === card.id;
+    button.setAttribute('aria-pressed', String(selected));
+    if (button.hasAttribute('aria-label')) {
+      button.setAttribute('aria-label', explorerCardLabel(card, selected));
+    }
+    const art = button.querySelector('.hub-explorer-art');
+    if (!art) return;
+    const mark = art.querySelector('.hub-explorer-selected');
+    if (selected && !mark) {
+      const selectedMark = makeNode('span', 'hub-explorer-selected');
+      selectedMark.setAttribute('aria-hidden', 'true');
+      selectedMark.appendChild(hubIcon('check'));
+      art.appendChild(selectedMark);
+    } else if (!selected && mark) {
+      mark.remove();
+    }
+  });
+}
+
 function renderFavoriteCard() {
   if (!hub.ready) return;
   const card = favoriteCard();
@@ -958,15 +1058,20 @@ function renderFavoriteCard() {
 
   renderFeaturedStack();
 
-  if (hub.els.cardFront) {
-    hub.els.cardFront.src = thumbOf(card);
-    hub.els.cardFront.alt = `${card.name} — ${card.type}`;
+  const frontSrc = thumbOf(card);
+  const backSrc = backThumbOf(card);
+
+  if (hub.els.cardFront && hub.els.cardFront.dataset.src !== frontSrc) {
+    hub.els.cardFront.dataset.src = frontSrc;
+    hub.els.cardFront.src = frontSrc;
     syncCardRatio(hub.els.cardFront);
   }
-  if (hub.els.cardBack) {
-    hub.els.cardBack.src = backThumbOf(card);
-    hub.els.cardBack.alt = `${card.name} — ${t('back_cover')}`;
+  if (hub.els.cardFront) hub.els.cardFront.alt = `${card.name} — ${card.type}`;
+  if (hub.els.cardBack && hub.els.cardBack.dataset.src !== backSrc) {
+    hub.els.cardBack.dataset.src = backSrc;
+    hub.els.cardBack.src = backSrc;
   }
+  if (hub.els.cardBack) hub.els.cardBack.alt = `${card.name} — ${t('back_cover')}`;
   if (hub.els.cardName) hub.els.cardName.textContent = card.name;
 
   const collection = HUB_CATALOG.collectionOf(card);
@@ -1029,21 +1134,18 @@ function renderFavoriteCard() {
     hub.els.card.classList.remove('is-flipped');
     hub.els.card.setAttribute('aria-pressed', 'false');
   }
+
+  syncFavoriteMarks();
 }
 
 function setFavoriteCard(cardId) {
   const card = HUB_CATALOG.byId(cardId);
   if (!card) return;
   hub.explorerShowcase = false;
-  const keepExplorerFocus = Boolean(
-    (hub.els.explorerSpotlight && hub.els.explorerSpotlight.contains(document.activeElement)) ||
-      (hub.els.explorerGrid && hub.els.explorerGrid.contains(document.activeElement))
-  );
   hubProfile.favoriteCardId = card.id;
   persistHubProfile();
   renderFavoriteCard();
   renderHubStats(false);
-  renderCardExplorer({ focusCardId: keepExplorerFocus ? card.id : null });
   if (hub.panel === 'library') renderLibrary();
   if (hub.panel === 'collections') renderCollections();
   if (hub.panel === 'profile') renderProfileForm();
@@ -1090,12 +1192,12 @@ function explorerCardLabel(card, selected) {
   return `${card.name} · ${selected ? t('hub_explorer_selected') : t('hub_explorer_make_favorite')}`;
 }
 
-function makeExplorerArt(card, extraClass) {
+function makeExplorerArt(card, extraClass, useThumb) {
   const art = makeNode(
     'span',
     extraClass ? `hub-explorer-art ${extraClass}` : 'hub-explorer-art'
   );
-  art.appendChild(makeHubImage(thumbOf(card), card.name));
+  art.appendChild(makeHubImage(useThumb ? thumbOf(card) : microOf(card), card.name));
   art.appendChild(
     makeNode('span', 'hub-explorer-badge', card.collectionShortName || card.set)
   );
@@ -1170,11 +1272,21 @@ function renderHandDeck(cards) {
   const prev = cards[(index - 1 + cards.length) % cards.length];
   const next = cards[(index + 1) % cards.length];
   const picks = prev.id === next.id ? [next] : [prev, next];
+  const signature = picks.map((card) => card.id).join('|');
+  const navsVisible = () => {
+    navs.forEach((button) => {
+      button.hidden = false;
+    });
+  };
+
+  if (hub.handDeckSignature === signature && deck.childElementCount) {
+    navsVisible();
+    return;
+  }
+  hub.handDeckSignature = signature;
 
   deck.replaceChildren(...picks.map((card) => makeDeckCard(card)));
-  navs.forEach((button) => {
-    button.hidden = false;
-  });
+  navsVisible();
 }
 
 function cycleHand(direction) {
@@ -1194,7 +1306,13 @@ function renderFeaturedStack() {
   if (!stack) return;
 
   const cards = featuredCards();
+  const signature = `${currentLang}|${cards.map((card) => card.id).join('|')}`;
   stack.dataset.count = String(cards.length);
+  if (hub.featuredSignature === signature && stack.childElementCount) {
+    renderHandDeck(cards);
+    return;
+  }
+  hub.featuredSignature = signature;
   stack.replaceChildren(...cards.map((card) => makeStackCard(card)));
   renderHandDeck(cards);
 }
@@ -1281,7 +1399,7 @@ function makeExplorerSpotlight(card, index, total) {
   feature.setAttribute('aria-pressed', String(selected));
   feature.setAttribute('aria-label', explorerCardLabel(card, selected));
 
-  const art = makeExplorerArt(card, 'hub-explorer-spotlight-art');
+  const art = makeExplorerArt(card, 'hub-explorer-spotlight-art', true);
   art.appendChild(
     makeNode(
       'span',
@@ -1363,6 +1481,16 @@ function renderExplorerViews() {
   });
 }
 
+/** Cambia de vista sin reconstruir las tres rejillas (evita parpadeos). */
+function setExplorerMode(mode, options = {}) {
+  if (!EXPLORER_MODES.includes(mode)) return;
+  if (mode === hub.explorerMode && !options.force) return;
+  hub.explorerMode = mode;
+  renderExplorerModes();
+  renderExplorerViews();
+  if (mode === 'gacha' && options.redrawGacha) refreshGacha();
+}
+
 function makeExplorerAlbumCard(card) {
   const selected = hubProfile.favoriteCardId === card.id;
 
@@ -1435,6 +1563,16 @@ function renderExplorerHand() {
 function refreshGacha() {
   ensureGachaHand(explorerCards(), true);
   renderExplorerHand();
+  hub.explorerSignature = explorerSignature();
+}
+
+function explorerSignature(cards) {
+  return [
+    currentLang,
+    hub.explorerFilter,
+    (cards || explorerCards()).map((card) => card.id).join(','),
+    hub.gachaIds.join(',')
+  ].join('~');
 }
 
 function startExplorerTimers() {
@@ -1444,9 +1582,9 @@ function startExplorerTimers() {
   window.setInterval(() => {
     if (!hub.explorerShowcase || hub.panel !== 'home') return;
     if (document.body.dataset.view !== 'hub') return;
+    if (reduceMotion()) return;
     const next = EXPLORER_MODES[(EXPLORER_MODES.indexOf(hub.explorerMode) + 1) % EXPLORER_MODES.length];
-    hub.explorerMode = next;
-    renderCardExplorer({ redrawGacha: next === 'gacha' });
+    setExplorerMode(next);
   }, 6000);
 
   window.setInterval(() => {
@@ -1467,30 +1605,17 @@ function updateExplorerArrows() {
   }
 }
 
-function renderCardExplorer(options = {}) {
+function renderExplorerCarousel() {
   const spotlight = hub.els.explorerSpotlight;
   if (!spotlight) return;
 
-  renderExplorerFilters();
-  renderExplorerModes();
-
   const cards = explorerCards();
   const dots = hub.els.explorerDots;
-  const grid = hub.els.explorerGrid;
-
-  ensureGachaHand(cards, Boolean(options.redrawGacha));
-  renderExplorerAlbum(cards);
-  renderExplorerHand();
-  renderExplorerViews();
-  startExplorerTimers();
 
   if (!cards.length) {
     hub.explorerIndex = 0;
-    spotlight.replaceChildren(
-      makeNode('p', 'hub-explorer-empty', t('hub_explorer_empty'))
-    );
+    spotlight.replaceChildren(makeNode('p', 'hub-explorer-empty', t('hub_explorer_empty')));
     if (dots) dots.replaceChildren();
-    if (grid) grid.replaceChildren();
     updateExplorerArrows();
     return;
   }
@@ -1498,9 +1623,7 @@ function renderCardExplorer(options = {}) {
   hub.explorerIndex = Math.min(Math.max(hub.explorerIndex, 0), cards.length - 1);
   const active = cards[hub.explorerIndex];
 
-  spotlight.replaceChildren(
-    ...makeExplorerSpotlight(active, hub.explorerIndex, cards.length)
-  );
+  spotlight.replaceChildren(...makeExplorerSpotlight(active, hub.explorerIndex, cards.length));
 
   if (dots) {
     dots.replaceChildren(
@@ -1515,19 +1638,38 @@ function renderCardExplorer(options = {}) {
     );
   }
 
+  updateExplorerArrows();
+}
+
+function renderCardExplorer(options = {}) {
+  const spotlight = hub.els.explorerSpotlight;
+  if (!spotlight) return;
+
+  const cards = explorerCards();
+  ensureGachaHand(cards, Boolean(options.redrawGacha));
+
+  const signature = explorerSignature(cards);
+
+  if (hub.explorerSignature === signature && !options.force) {
+    renderExplorerModes();
+    renderExplorerViews();
+    syncFavoriteMarks();
+    updateExplorerArrows();
+    return;
+  }
+  hub.explorerSignature = signature;
+
+  renderExplorerFilters();
+  renderExplorerModes();
+  renderExplorerAlbum(cards);
+  renderExplorerHand();
+  renderExplorerViews();
+  startExplorerTimers();
+  renderExplorerCarousel();
+
+  const grid = hub.els.explorerGrid;
   if (grid) {
     grid.replaceChildren(...cards.map((card) => makeExplorerPick(card)));
-  }
-
-  updateExplorerArrows();
-
-  if (options.focusCardId && grid) {
-    requestAnimationFrame(() => {
-      const target = Array.from(grid.querySelectorAll('[data-fav-card]')).find(
-        (button) => button.dataset.favCard === options.focusCardId
-      );
-      if (target) target.focus({ preventScroll: true });
-    });
   }
 }
 
@@ -1548,7 +1690,7 @@ function stepExplorer(direction) {
 
   hub.explorerShowcase = false;
   hub.explorerIndex = next;
-  renderCardExplorer();
+  renderExplorerCarousel();
 }
 
 /* --------------------------------------------------------------------------
@@ -1706,8 +1848,8 @@ function makeCollectionCard(collection) {
 
   const stack = makeNode('span', 'collection-stack');
   const sources = [
-    collection.thumbCover || collection.cover,
-    ...collection.cards.map((entry) => thumbOf(entry))
+    microUrl(collection.thumbCover || collection.cover),
+    ...collection.cards.map((entry) => microOf(entry))
   ]
     .filter(Boolean)
     .filter((src, index, list) => list.indexOf(src) === index)
@@ -1759,6 +1901,16 @@ function renderCollectionRail() {
     );
     return;
   }
+  const signature = `${currentLang}|${HUB_CATALOG.collections
+    .map(
+      (collection) =>
+        `${collection.id}:${isCollectionReviewed(collection.id) ? 1 : 0}:${ownedIn(collection.id).length}`
+    )
+    .join('|')}`;
+  if (hub.collectionRailSignature === signature && hub.els.collectionRail.childElementCount) {
+    return;
+  }
+  hub.collectionRailSignature = signature;
   hub.els.collectionRail.replaceChildren(
     ...HUB_CATALOG.collections.map((collection) => makeCollectionCard(collection))
   );
@@ -1870,7 +2022,7 @@ function renderCollectionDetail() {
     hub.els.collectionDetailHead.replaceChildren();
 
     const stack = makeNode('div', 'collection-stack');
-    [collection.thumbCover || collection.cover, ...collection.cards.map((card) => thumbOf(card))]
+    [microUrl(collection.thumbCover || collection.cover), ...collection.cards.map((card) => microOf(card))]
       .filter(Boolean)
       .filter((src, index, list) => list.indexOf(src) === index)
       .slice(0, 3)
@@ -2572,12 +2724,23 @@ async function openStudio(tab) {
   document.body.dataset.view = 'studio';
   document.body.classList.remove('cinematic-mode');
 
+  if (typeof renderPresets === 'function') {
+    renderPresets();
+    hub.presetsRendered = true;
+  }
+
   const firstOpen = !Scene.isReady();
   if (firstOpen) showStudioLoading();
 
   await nextFrame();
 
   if (firstOpen) {
+    const threeReady = await ensureThree();
+    if (!threeReady) {
+      showWebglError();
+      hub.opening = false;
+      return;
+    }
     const ok = Scene.init();
     if (!ok) {
       showWebglError();
@@ -2722,8 +2885,7 @@ function onHubClick(event) {
   if (explorerMode) {
     event.preventDefault();
     hub.explorerShowcase = false;
-    hub.explorerMode = explorerMode.dataset.explorerMode || 'carousel';
-    renderCardExplorer({ redrawGacha: hub.explorerMode === 'gacha' });
+    setExplorerMode(explorerMode.dataset.explorerMode || 'carousel', { redrawGacha: true, force: true });
     return;
   }
 
@@ -2739,7 +2901,7 @@ function onHubClick(event) {
     event.preventDefault();
     hub.explorerShowcase = false;
     hub.explorerIndex = Number(explorerDot.dataset.explorerDot) || 0;
-    renderCardExplorer();
+    renderExplorerCarousel();
     return;
   }
 
@@ -2969,6 +3131,20 @@ function setupHubEvents() {
   if (!hub.root) return;
 
   hub.root.addEventListener('click', onHubClick);
+
+  /* Intención de entrar al estudio: adelanta Three.js mientras se mueve el
+     cursor o se toca el botón, sin cargarlo en la visita normal al lobby. */
+  const prefetchStudio = (event) => {
+    if (threeLoadPromise || (window.THREE && window.THREE.OrbitControls)) return;
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.closest('[data-open-studio], [data-open-favorite], [data-open-card], [data-open-preset]')) {
+      ensureThree().catch(() => {});
+    }
+  };
+  hub.root.addEventListener('pointerover', prefetchStudio, { passive: true });
+  hub.root.addEventListener('touchstart', prefetchStudio, { passive: true });
+  hub.root.addEventListener('focusin', prefetchStudio);
 
   if (hub.els.card) {
     hub.els.card.addEventListener('click', () => {
@@ -3357,6 +3533,7 @@ function setupHub() {
   renderProfileForm();
   renderHubStats(false);
   refreshCardRatios();
+  warmThreeInIdle();
 }
 
 window.addEventListener('load', () => {
