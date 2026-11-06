@@ -282,7 +282,7 @@ dialog {
 .hub-top-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   flex: 0 0 auto;
 }
 
@@ -7273,5 +7273,477 @@ dialog {
 
   .hub-fab-btn-primary:hover {
     transform: translateY(-7px);
+  }
+}
+/* ==========================================================================
+   Escritorio · álbum agrupado, paneles compactos y carta protagonista
+   ========================================================================== */
+
+/* Álbum por colecciones, plegable y cerrado por defecto. */
+.hub-explorer-album {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+.hub-explorer-album-grid {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  padding-right: 2px;
+  scrollbar-width: thin;
+}
+
+.hub-album-group {
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: 13px;
+  background: linear-gradient(158deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.26));
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 12px rgba(8, 62, 82, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: background 0.24s ease, border-color 0.24s ease;
+}
+
+.hub-album-group[open] {
+  background: linear-gradient(158deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.5));
+  border-color: rgba(255, 255, 255, 0.94);
+}
+
+.hub-album-summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 6px 8px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.hub-album-summary::-webkit-details-marker {
+  display: none;
+}
+
+.hub-album-summary:focus-visible {
+  outline: 2px solid var(--aqua-deep);
+  outline-offset: -2px;
+  border-radius: 12px;
+}
+
+.hub-album-art {
+  flex: 0 0 auto;
+  width: 27px;
+  aspect-ratio: 896 / 1200;
+  overflow: hidden;
+  border-radius: 5px;
+  background: rgba(7, 51, 63, 0.1);
+  box-shadow: 0 4px 9px rgba(8, 62, 82, 0.16);
+}
+
+.hub-album-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hub-album-copy {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.hub-album-copy strong {
+  overflow: hidden;
+  font-size: 0.58rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hub-album-copy small {
+  overflow: hidden;
+  font-size: 0.44rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hub-album-count {
+  flex: 0 0 auto;
+  padding: 3px 5px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.44rem;
+  font-weight: 700;
+  color: #0a6b78;
+  background: rgba(124, 235, 221, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.hub-album-chevron {
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: var(--muted);
+  transform: rotate(-90deg);
+  transition: transform 0.24s var(--ease);
+}
+
+.hub-album-chevron .icon {
+  width: 10px;
+  height: 10px;
+}
+
+.hub-album-group[open] .hub-album-chevron {
+  transform: rotate(0deg);
+}
+
+.hub-album-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 0 8px 9px;
+}
+
+@media (min-width: 981px) {
+  .hub-dashboard {
+    grid-template-columns: 172px minmax(0, 1fr) 200px;
+    gap: 16px;
+  }
+
+  .hub-player-panel,
+  .hub-explorer-panel {
+    padding: 14px;
+    border-radius: 22px;
+  }
+
+  .hub-player-head {
+    gap: 8px;
+  }
+
+  .hub-player-avatar {
+    width: 50px;
+    height: 50px;
+    border-width: 2px;
+  }
+
+  .hub-player-avatar .hub-avatar-fallback .icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .hub-player-name {
+    font-size: 1rem;
+    line-height: 1.1;
+  }
+
+  .hub-player-handle {
+    font-size: 0.6rem;
+  }
+
+  .hub-player-bio {
+    font-size: 0.58rem;
+  }
+
+  .hub-player-actions {
+    gap: 5px;
+  }
+
+  .hub-player-actions .btn {
+    min-height: 32px;
+    padding: 0 8px;
+    font-size: 0.58rem;
+  }
+
+  .hub-player-actions .btn .icon {
+    width: 12px;
+    height: 12px;
+  }
+
+  .hub-tool-tag,
+  .hub-tool-external {
+    display: none;
+  }
+
+  .hub-support-links {
+    gap: 4px;
+  }
+
+  .hub-support-btn {
+    gap: 3px;
+    padding: 0 5px;
+    font-size: 0.48rem;
+  }
+
+  .hub-support-btn .icon {
+    width: 10px;
+    height: 10px;
+  }
+
+  .hub-player-privacy {
+    font-size: 0.48rem;
+    line-height: 1.3;
+  }
+
+  /* Carta protagonista del inicio. */
+  .hub-favorite .hub-card-stage {
+    width: clamp(390px, 35vw, 500px);
+  }
+
+  .hub-card-surface {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  /* Mano apilada detrás de la carta principal, como en móvil. */
+  .hub-hand-deck {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .hub-hand-deck-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: clamp(400px, 35vw, 470px);
+    padding: 5px;
+    border-radius: 20px;
+    pointer-events: auto;
+    background: linear-gradient(158deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.5));
+    border: 1px solid rgba(255, 255, 255, 0.92);
+    box-shadow: 0 18px 34px rgba(8, 62, 82, 0.16);
+  }
+
+  .hub-hand-deck-card:nth-child(1) {
+    transform: translate(-54%, -50%) rotate(-7deg) scale(0.99);
+  }
+
+  .hub-hand-deck-card:nth-child(2) {
+    transform: translate(-46%, -50%) rotate(7deg) scale(0.99);
+  }
+
+  .hub-hand-deck-card .hub-explorer-art {
+    border: 0;
+    border-radius: 15px;
+  }
+
+  .hub-card-stage {
+    position: relative;
+    z-index: 2;
+  }
+
+  .hub-explorer-head h2 {
+    font-size: 1.05rem;
+  }
+
+  .hub-explorer-head p {
+    font-size: 0.58rem;
+    line-height: 1.35;
+  }
+
+  .hub-explorer-modes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hub-explorer-hint {
+    font-size: 0.52rem;
+  }
+}
+@media (min-width: 981px) {
+  .hub-favorite .hub-card-stage {
+    width: clamp(400px, 35vw, 470px);
+  }
+
+  .hub-player-edit {
+    display: none;
+  }
+
+  .hub-player-name {
+    font-size: 0.88rem;
+  }
+
+  .hub-player-identity {
+    min-width: 0;
+  }
+
+  .hub-player-handle {
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .hub-album-copy strong {
+    white-space: normal;
+    line-height: 1.1;
+  }
+}
+/* Acciones compactas de la barra superior de escritorio */
+.hub-lang-shell {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.hub-top-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 31px;
+  height: 31px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  color: var(--muted-strong);
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid var(--stroke-soft);
+  box-shadow: var(--inset-hi);
+  text-decoration: none;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s var(--ease), box-shadow 0.2s ease;
+}
+
+.hub-top-icon .icon {
+  width: 15px;
+  height: 15px;
+}
+
+.hub-top-icon:hover {
+  color: var(--aqua-deep);
+  background: rgba(255, 255, 255, 0.72);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm), var(--inset-hi);
+}
+
+.hub-top-icon:active {
+  transform: scale(0.94);
+}
+
+.hub-top-kofi {
+  color: #ffffff;
+  background: linear-gradient(160deg, #ff9a76 0%, #ff5e5b 100%);
+  border-color: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 6px 14px rgba(214, 74, 68, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.hub-top-kofi:hover {
+  color: #ffffff;
+  background: linear-gradient(160deg, #ffab8b 0%, #ff6f6c 100%);
+}
+
+.hub-lang-toggle {
+  width: auto;
+  min-width: 47px;
+  gap: 3px;
+  padding: 0 8px;
+  border-radius: 999px;
+}
+
+.hub-lang-code {
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.hub-lang-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 124px;
+  padding: 5px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.98);
+  box-shadow: 0 16px 32px rgba(5, 43, 55, 0.18), inset 0 1px 0 #ffffff;
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+}
+
+.hub-lang-menu[hidden] {
+  display: none;
+}
+
+.hub-lang-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 9px;
+  color: var(--ink-soft);
+  text-align: left;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.hub-lang-option span {
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  font-weight: 800;
+}
+
+.hub-lang-option small {
+  font-size: 0.6rem;
+  font-weight: 600;
+}
+
+.hub-lang-option:hover,
+.hub-lang-option:focus-visible {
+  background: rgba(124, 235, 221, 0.24);
+}
+
+.hub-lang-option.active {
+  color: #ffffff;
+  background: var(--accent);
+  box-shadow: 0 4px 10px rgba(47, 143, 221, 0.28);
+}
+
+@media (max-width: 980px) {
+  .hub-lang-shell,
+  .hub-top-icon {
+    display: none;
+  }
+}
+.hub-nav-btn {
+  white-space: nowrap;
+}
+/* Columnas laterales más bajas en escritorio (aprox. −40 % de alto). */
+@media (min-width: 981px) {
+  .hub-player-panel,
+  .hub-explorer-panel {
+    height: min(52vh, 470px);
+    min-height: 0;
+    align-self: start;
+  }
+
+  .hub-player-panel {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .hub-explorer-panel {
+    overflow: hidden;
+  }
+}
+/* En escritorio bajo, la nota de privacidad se omite para que el panel
+   respire dentro de su altura reducida. */
+@media (min-width: 981px) and (max-height: 850px) {
+  .hub-player-panel .hub-player-privacy {
+    display: none;
   }
 }

@@ -12,21 +12,21 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=114">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=114">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=124">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=124">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=114" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=114" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=114" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=114" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=114" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=114" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=114" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=114" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=114" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=114" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=124" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=124" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=124" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=124" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=124" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=124" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=124" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=124" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=124" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=124" defer></script>
 </head>
 <body data-view="hub">
 
@@ -336,11 +336,26 @@
                 <svg class="icon sound-on" aria-hidden="true"><use href="#i-sound"></use></svg>
                 <svg class="icon sound-off" aria-hidden="true"><use href="#i-sound-off"></use></svg>
               </button>
-              <div class="hub-lang" id="hub-lang" role="group" aria-label="Idioma" data-i18n-aria-label="hub_lang_aria">
-                <button class="hub-lang-btn active" type="button" data-hub-lang="en" aria-pressed="true">EN</button>
-                <button class="hub-lang-btn" type="button" data-hub-lang="es" aria-pressed="false">ES</button>
-                <button class="hub-lang-btn" type="button" data-hub-lang="de" aria-pressed="false">DE</button>
+              <div class="hub-lang-shell" id="hub-lang">
+                <button class="hub-top-icon hub-lang-toggle" id="hub-lang-toggle" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="hub-lang-menu" aria-label="Idioma" data-i18n-aria-label="hub_lang_aria" title="Idioma" data-i18n-title="hub_lang_aria">
+                  <svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg>
+                  <span class="hub-lang-code" id="hub-lang-code">EN</span>
+                </button>
+                <div class="hub-lang-menu" id="hub-lang-menu" role="menu" hidden>
+                  <button class="hub-lang-option active" type="button" role="menuitemradio" aria-checked="true" data-hub-lang="en"><span>EN</span><small>English</small></button>
+                  <button class="hub-lang-option" type="button" role="menuitemradio" aria-checked="false" data-hub-lang="es"><span>ES</span><small>Español</small></button>
+                  <button class="hub-lang-option" type="button" role="menuitemradio" aria-checked="false" data-hub-lang="de"><span>DE</span><small>Deutsch</small></button>
+                </div>
               </div>
+              <a class="hub-top-icon" href="https://github.com/theastrobruh/CardGram" target="_blank" rel="noopener noreferrer" title="Repositorio de CardGram en GitHub" data-i18n-title="hub_support_github_title" aria-label="Abrir el repositorio de CardGram en GitHub" data-i18n-aria-label="hub_support_github_title">
+                <svg class="icon" aria-hidden="true"><use href="#i-github"></use></svg>
+              </a>
+              <a class="hub-top-icon hub-top-kofi" href="https://ko-fi.com/theastrobruh" target="_blank" rel="noopener noreferrer" title="Apoyar CardGram en Ko-fi" data-i18n-title="hub_support_kofi_title" aria-label="Apoyar CardGram en Ko-fi" data-i18n-aria-label="hub_support_kofi_title">
+                <svg class="icon" aria-hidden="true"><use href="#i-kofi"></use></svg>
+              </a>
+              <a class="hub-top-icon" href="https://beacons.ai/el.astro.verse" target="_blank" rel="noopener noreferrer" title="Perfiles de AstroBruh" data-i18n-title="hub_support_creator_title" aria-label="Abrir los perfiles de AstroBruh" data-i18n-aria-label="hub_support_creator_title">
+                <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+              </a>
               <button class="hub-profile" type="button" data-hub-route="profile" aria-label="Abrir tu perfil" data-i18n-aria-label="hub_profile_open">
                 <span class="hub-avatar" id="hub-avatar">
                   <span class="hub-avatar-fallback" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg></span>
@@ -441,23 +456,6 @@
                   </a>
                 </div>
 
-                <div class="hub-support" aria-label="Apoyar CardGram" data-i18n-aria-label="hub_support_aria">
-                  <div class="hub-support-links">
-                    <a class="hub-support-btn" href="https://github.com/theastrobruh/CardGram" target="_blank" rel="noopener noreferrer" title="Repositorio de CardGram en GitHub" data-i18n-title="hub_support_github_title" aria-label="Abrir el repositorio de CardGram en GitHub" data-i18n-aria-label="hub_support_github_title">
-                      <svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg>
-                      <span data-i18n="hub_support_github">GitHub</span>
-                    </a>
-                    <a class="hub-support-btn hub-support-btn-kofi" href="https://ko-fi.com/theastrobruh" target="_blank" rel="noopener noreferrer" title="Apoyar CardGram en Ko-fi" data-i18n-title="hub_support_kofi_title" aria-label="Apoyar CardGram en Ko-fi" data-i18n-aria-label="hub_support_kofi_title">
-                      <svg class="icon" aria-hidden="true"><use href="#i-kofi"></use></svg>
-                      <span>Ko-fi</span>
-                    </a>
-                    <a class="hub-support-btn" href="https://beacons.ai/el.astro.verse" target="_blank" rel="noopener noreferrer" title="Perfiles de AstroBruh" data-i18n-title="hub_support_creator_title" aria-label="Abrir los perfiles de AstroBruh" data-i18n-aria-label="hub_support_creator_title">
-                      <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
-                      <span data-i18n="hub_support_creator">AstroBruh</span>
-                    </a>
-                  </div>
-                </div>
-
                 <p class="hub-player-privacy">
                   <svg class="icon" aria-hidden="true"><use href="#i-save"></use></svg>
                   <span data-i18n="hub_privacy">Local y privado · tus imágenes no salen de este dispositivo.</span>
@@ -530,26 +528,12 @@
                   <div>
                     <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky" aria-hidden="true"></span><span data-i18n="hub_explorer_kicker">Colección</span></span>
                     <h2 id="hub-explorer-title" data-i18n="hub_explorer_title">Explorador de cartas</h2>
-                    <p data-i18n="hub_explorer_lede">Desliza la colección y elige tu próxima favorita.</p>
-                  </div>
-                  <div class="hub-explorer-nav">
-                    <button class="hub-explorer-arrow" type="button" data-explorer-nav="-1" aria-label="Cartas anteriores" data-i18n-aria-label="hub_explorer_prev" title="Cartas anteriores" data-i18n-title="hub_explorer_prev">
-                      <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
-                    </button>
-                    <button class="hub-explorer-arrow" type="button" data-explorer-nav="1" aria-label="Cartas siguientes" data-i18n-aria-label="hub_explorer_next" title="Cartas siguientes" data-i18n-title="hub_explorer_next">
-                      <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
-                    </button>
+                    <p data-i18n="hub_explorer_lede">Abre un álbum para explorar sus cartas.</p>
                   </div>
                 </header>
 
-                <div class="hub-explorer-filters" id="hub-explorer-filters" role="group" aria-label="Filtrar por colección" data-i18n-aria-label="hub_explorer_filter_aria"></div>
-
                 <div class="hub-explorer-modes" id="hub-explorer-modes" role="group" aria-label="Modo de vista" data-i18n-aria-label="hub_explorer_modes_aria">
-                  <button class="hub-explorer-mode active" type="button" data-explorer-mode="carousel" aria-pressed="true" title="Carrusel" data-i18n-title="hub_explorer_mode_carousel" aria-label="Carrusel" data-i18n-aria-label="hub_explorer_mode_carousel">
-                    <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
-                    <span data-i18n="hub_explorer_mode_carousel">Carrusel</span>
-                  </button>
-                  <button class="hub-explorer-mode" type="button" data-explorer-mode="album" aria-pressed="false" title="Álbum" data-i18n-title="hub_explorer_mode_album" aria-label="Álbum" data-i18n-aria-label="hub_explorer_mode_album">
+                  <button class="hub-explorer-mode active" type="button" data-explorer-mode="album" aria-pressed="true" title="Álbum" data-i18n-title="hub_explorer_mode_album" aria-label="Álbum" data-i18n-aria-label="hub_explorer_mode_album">
                     <svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>
                     <span data-i18n="hub_explorer_mode_album">Álbum</span>
                   </button>
@@ -559,12 +543,7 @@
                   </button>
                 </div>
 
-                <div class="hub-explorer-view hub-explorer-carousel" id="hub-explorer-carousel" tabindex="0" role="group" aria-label="Cartas de la colección" data-i18n-aria-label="hub_explorer_track_aria">
-                  <div class="hub-explorer-spotlight" id="hub-explorer-spotlight"></div>
-                  <div class="hub-explorer-dots" id="hub-explorer-dots"></div>
-                </div>
-
-                <div class="hub-explorer-view hub-explorer-album" id="hub-explorer-album" role="group" aria-label="Álbum de cartas" data-i18n-aria-label="hub_explorer_album_aria" hidden>
+                <div class="hub-explorer-view hub-explorer-album" id="hub-explorer-album" role="group" aria-label="Álbum de cartas" data-i18n-aria-label="hub_explorer_album_aria">
                   <div class="hub-explorer-album-grid" id="hub-explorer-album-grid"></div>
                 </div>
 
@@ -576,11 +555,6 @@
                   <svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg>
                   <span data-i18n="hub_explorer_hint">Toca una carta para convertirla en tu favorita.</span>
                 </p>
-
-                <div class="hub-explorer-quick">
-                  <span class="hub-explorer-quick-label" data-i18n="hub_explorer_menu_label">Menú rápido</span>
-                  <div class="hub-explorer-grid" id="hub-explorer-grid"></div>
-                </div>
               </aside>
             </div>
           </section>

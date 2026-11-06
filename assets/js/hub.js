@@ -102,7 +102,7 @@ const hub = {
   homeVisits: 0,
   explorerFilter: 'all',
   explorerIndex: 0,
-  explorerMode: 'carousel',
+  explorerMode: 'album',
   explorerShowcase: true,
   explorerTimers: false,
   gachaIds: [],
@@ -1321,7 +1321,7 @@ function makeDeckCard(card) {
     'aria-label',
     explorerCardLabel(card, hubProfile.favoriteCardId === card.id)
   );
-  button.appendChild(makeExplorerArt(card));
+  button.appendChild(makeExplorerArt(card, null, true));
   return button;
 }
 
@@ -1331,7 +1331,19 @@ function renderHandDeck(cards) {
   if (!deck) return;
 
   const navs = document.querySelectorAll('[data-hand-nav]');
-  if (cards.length < 2) {
+
+  /* La vitrina siempre enseña una pila: si la mano elegida tiene una sola
+     carta, se completan los huecos con cartas del catálogo. */
+  let deckCards = cards.slice();
+  if (deckCards.length && deckCards.length < 3) {
+    const used = new Set(deckCards.map((card) => card.id));
+    const extras = HUB_CATALOG.cards
+      .filter((card) => !used.has(card.id))
+      .slice(0, 3 - deckCards.length);
+    deckCards = deckCards.concat(extras);
+  }
+
+  if (deckCards.length < 2) {
     deck.replaceChildren();
     navs.forEach((button) => {
       button.hidden = true;
@@ -1340,11 +1352,11 @@ function renderHandDeck(cards) {
   }
 
   const current = favoriteCard();
-  let index = cards.findIndex((card) => current && card.id === current.id);
+  let index = deckCards.findIndex((card) => current && card.id === current.id);
   if (index < 0) index = 0;
 
-  const prev = cards[(index - 1 + cards.length) % cards.length];
-  const next = cards[(index + 1) % cards.length];
+  const prev = deckCards[(index - 1 + deckCards.length) % deckCards.length];
+  const next = deckCards[(index + 1) % deckCards.length];
   const picks = prev.id === next.id ? [next] : [prev, next];
   const signature = picks.map((card) => card.id).join('|');
   const navsVisible = () => {
@@ -1517,7 +1529,7 @@ function makeExplorerPick(card) {
   return button;
 }
 
-const EXPLORER_MODES = ['carousel', 'album', 'gacha'];
+const EXPLORER_MODES = ['album', 'gacha'];
 
 function shuffleList(list) {
   const copy = list.slice();
@@ -1545,7 +1557,6 @@ function renderExplorerModes() {
 
 function renderExplorerViews() {
   const views = {
-    carousel: hub.els.explorerCarousel,
     album: hub.els.explorerAlbum,
     gacha: hub.els.explorerGacha
   };
@@ -1596,15 +1607,62 @@ function renderExplorerAlbum(cards) {
   if (!album) return;
 
   if (!cards.length) {
-    album.classList.remove('is-quad');
-    album.replaceChildren(
-      makeNode('p', 'hub-explorer-empty', t('hub_explorer_empty'))
-    );
+    album.replaceChildren(makeNode('p', 'hub-explorer-empty', t('hub_explorer_empty')));
     return;
   }
 
-  album.replaceChildren(...cards.map((card) => makeExplorerAlbumCard(card)));
-  album.classList.toggle('is-quad', cards.length <= 4);
+  const openGroups = new Set(
+    Array.from(album.querySelectorAll('details[data-album-group][open]')).map(
+      (node) => node.dataset.albumGroup
+    )
+  );
+  const groups = HUB_CATALOG.collections
+    .map((collection) => ({
+      collection,
+      cards: cards.filter((card) => card.collectionId === collection.id)
+    }))
+    .filter((group) => group.cards.length);
+
+  album.replaceChildren(
+    ...groups.map((group) => makeExplorerAlbumGroup(group, openGroups.has(group.collection.id)))
+  );
+}
+
+function makeExplorerAlbumGroup(group, open) {
+  const { collection } = group;
+  const owned = ownedIn(collection.id).length;
+  const details = document.createElement('details');
+  details.className = 'hub-album-group';
+  details.dataset.albumGroup = collection.id;
+  if (open) details.open = true;
+
+  const summary = document.createElement('summary');
+  summary.className = 'hub-album-summary';
+  summary.setAttribute('aria-label', collection.name);
+
+  const art = makeNode('span', 'hub-album-art');
+  art.appendChild(makeHubImage(microUrl(collection.thumbCover || collection.cover), ''));
+
+  const copy = makeNode('span', 'hub-album-copy');
+  copy.appendChild(makeNode('strong', null, collection.name));
+  const progress = t('collections_set_size', {
+    count: collection.cards.length,
+    total: collection.setSize || collection.cards.length
+  });
+  copy.appendChild(
+    makeNode('small', null, `${progress} · ${owned}/${collection.cards.length}`)
+  );
+
+  const chevron = makeNode('span', 'hub-album-chevron');
+  chevron.appendChild(hubIcon('chevron'));
+
+  summary.append(art, copy, chevron);
+  details.appendChild(summary);
+
+  const grid = makeNode('div', 'hub-album-grid');
+  grid.append(...group.cards.map((card) => makeExplorerAlbumCard(card)));
+  details.appendChild(grid);
+  return details;
 }
 
 function ensureGachaHand(cards, force) {
@@ -1652,14 +1710,6 @@ function explorerSignature(cards) {
 function startExplorerTimers() {
   if (hub.explorerTimers) return;
   hub.explorerTimers = true;
-
-  window.setInterval(() => {
-    if (!hub.explorerShowcase || hub.panel !== 'home') return;
-    if (document.body.dataset.view !== 'hub') return;
-    if (reduceMotion()) return;
-    const next = EXPLORER_MODES[(EXPLORER_MODES.indexOf(hub.explorerMode) + 1) % EXPLORER_MODES.length];
-    setExplorerMode(next);
-  }, 6000);
 
   window.setInterval(() => {
     if (hub.explorerMode !== 'gacha' || hub.panel !== 'home') return;
@@ -1716,8 +1766,8 @@ function renderExplorerCarousel() {
 }
 
 function renderCardExplorer(options = {}) {
-  const spotlight = hub.els.explorerSpotlight;
-  if (!spotlight) return;
+  const album = hub.els.explorerAlbumGrid;
+  if (!album) return;
 
   const cards = explorerCards();
   ensureGachaHand(cards, Boolean(options.redrawGacha));
@@ -1728,23 +1778,15 @@ function renderCardExplorer(options = {}) {
     renderExplorerModes();
     renderExplorerViews();
     syncFavoriteMarks();
-    updateExplorerArrows();
     return;
   }
   hub.explorerSignature = signature;
 
-  renderExplorerFilters();
   renderExplorerModes();
   renderExplorerAlbum(cards);
   renderExplorerHand();
   renderExplorerViews();
   startExplorerTimers();
-  renderExplorerCarousel();
-
-  const grid = hub.els.explorerGrid;
-  if (grid) {
-    grid.replaceChildren(...cards.map((card) => makeExplorerPick(card)));
-  }
 }
 
 function setExplorerFilter(filterId) {
@@ -2549,7 +2591,32 @@ function updateLangButtons() {
     const active = button.dataset.hubLang === currentLang;
     button.classList.toggle('active', active);
     button.setAttribute('aria-pressed', String(active));
+    button.setAttribute('aria-checked', String(active));
   });
+  if (hub.els.langCode) {
+    hub.els.langCode.textContent = String(currentLang || 'en').toUpperCase();
+  }
+}
+
+function setHubLangMenu(open, options = {}) {
+  const menu = hub.els.langMenu;
+  const toggle = hub.els.langToggle;
+  if (!menu || !toggle) return;
+
+  const next = Boolean(open);
+  menu.hidden = !next;
+  toggle.setAttribute('aria-expanded', String(next));
+
+  if (next && options.focus !== false) {
+    const active =
+      menu.querySelector('.hub-lang-option.active') ||
+      menu.querySelector('.hub-lang-option');
+    if (active) {
+      requestAnimationFrame(() => active.focus({ preventScroll: true }));
+    }
+  } else if (!next && options.restoreFocus) {
+    toggle.focus({ preventScroll: true });
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -2989,7 +3056,7 @@ function onHubClick(event) {
   if (explorerMode) {
     event.preventDefault();
     hub.explorerShowcase = false;
-    setExplorerMode(explorerMode.dataset.explorerMode || 'carousel', { redrawGacha: true, force: true });
+    setExplorerMode(explorerMode.dataset.explorerMode || 'album', { redrawGacha: true, force: true });
     return;
   }
 
@@ -3016,9 +3083,16 @@ function onHubClick(event) {
     return;
   }
 
+  if (target.closest('#hub-lang-toggle')) {
+    event.preventDefault();
+    setHubLangMenu(hub.els.langMenu ? hub.els.langMenu.hidden : false);
+    return;
+  }
+
   const langButton = target.closest('[data-hub-lang]');
   if (langButton) {
     applyLanguage(langButton.dataset.hubLang);
+    setHubLangMenu(false, { restoreFocus: true });
     return;
   }
 
@@ -3418,6 +3492,33 @@ function setupHubEvents() {
     hub.els.btnHomeHubFloating.addEventListener('click', () => navigate('home'));
   }
 
+  if (hub.els.langMenu) {
+    hub.els.langMenu.addEventListener('keydown', (event) => {
+      const options = Array.from(hub.els.langMenu.querySelectorAll('.hub-lang-option'));
+      const index = options.indexOf(document.activeElement);
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        const step = event.key === 'ArrowDown' ? 1 : -1;
+        const next = options[(index + step + options.length) % options.length];
+        if (next) next.focus();
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        setHubLangMenu(false, { restoreFocus: true });
+      }
+    });
+  }
+
+  document.addEventListener('click', (event) => {
+    if (!hub.els.langMenu || hub.els.langMenu.hidden) return;
+    if (hub.els.lang && hub.els.lang.contains(event.target)) return;
+    setHubLangMenu(false);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !hub.els.langMenu || hub.els.langMenu.hidden) return;
+    setHubLangMenu(false, { restoreFocus: true });
+  });
+
   window.setInterval(updateBoosterClock, 1000);
 }
 
@@ -3467,6 +3568,9 @@ function cacheHubDom() {
   hub.scroll = hubEl('hub-scroll');
 
   els.lang = hubEl('hub-lang');
+  els.langToggle = hubEl('hub-lang-toggle');
+  els.langMenu = hubEl('hub-lang-menu');
+  els.langCode = hubEl('hub-lang-code');
   els.menuBtn = hubEl('hub-menu-btn');
   els.menu = hubEl('hub-menu-sheet');
   els.menuPanel = document.querySelector('.hub-menu-panel');
