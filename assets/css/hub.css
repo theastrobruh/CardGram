@@ -5369,15 +5369,15 @@ dialog {
   /* ---- Botón de menú (solo icono) ---- */
   .hub-menu-btn {
     position: fixed;
-    left: 50%;
+    left: 16px;
     bottom: calc(24px + env(safe-area-inset-bottom));
-    transform: translateX(-50%);
+    transform: none;
     z-index: 168;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 52px;
+    height: 52px;
     padding: 0;
     border-radius: 50%;
     color: #07333f;
@@ -5390,17 +5390,17 @@ dialog {
   }
 
   .hub-menu-btn:hover {
-    transform: translateX(-50%) translateY(-1px);
+    transform: translateY(-1px);
     box-shadow: 0 18px 34px rgba(5, 43, 55, 0.24), inset 0 1px 0 rgba(255, 255, 255, 1);
   }
 
   .hub-menu-btn:active {
-    transform: translateX(-50%) translateY(0) scale(0.96);
+    transform: translateY(0) scale(0.96);
   }
 
   .hub-menu-btn .icon {
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     opacity: 0.8;
   }
 
@@ -5420,7 +5420,7 @@ dialog {
     z-index: 167;
     display: flex;
     align-items: flex-end;
-    gap: 5px;
+    gap: 7px;
     transform: translateX(-50%);
     pointer-events: none;
   }
@@ -5429,8 +5429,8 @@ dialog {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 42px;
+    height: 42px;
     padding: 0;
     pointer-events: auto;
     border-radius: 50%;
@@ -5453,13 +5453,13 @@ dialog {
   }
 
   .hub-fab-icon {
-    width: 14px;
-    height: 14px;
+    width: 19px;
+    height: 19px;
   }
 
   .hub-fab-btn-primary {
-    width: 36px;
-    height: 36px;
+    width: 47px;
+    height: 47px;
     color: #ffffff;
     background: linear-gradient(160deg, #45d9c2 0%, #2f8fdd 100%);
     border-color: rgba(255, 255, 255, 0.84);
@@ -5472,8 +5472,8 @@ dialog {
   }
 
   .hub-fab-btn-primary .hub-fab-icon {
-    width: 16px;
-    height: 16px;
+    width: 21px;
+    height: 21px;
   }
 
   .hub-fab-btn-primary:not([hidden]) {
@@ -5652,17 +5652,19 @@ dialog {
     padding: 0 16px;
   }
 
-  /* En apaisado el botón sube a la barra superior para no invadir la carta. */
+  /* El botón de menú comparte la esquina inferior izquierda en todas las
+     orientaciones; la música queda en la esquina opuesta. */
   .hub-menu-btn {
-    top: calc(9px + env(safe-area-inset-top));
-    bottom: auto;
-    width: 44px;
-    height: 44px;
+    top: auto;
+    bottom: calc(24px + env(safe-area-inset-bottom));
+    left: 16px;
+    width: 52px;
+    height: 52px;
   }
 
   .hub-menu-btn .icon {
-    width: 30px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
   }
 
 }
@@ -6721,8 +6723,8 @@ dialog {
    Micro-animaciones del lobby (2026)
    ========================================================================== */
 @keyframes hubNavBreathe {
-  0%, 100% { transform: translateX(-50%) scale(1); }
-  50% { transform: translateX(-50%) scale(1.045); }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
 }
 
 @keyframes hubHomeBreathe {
