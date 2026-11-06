@@ -12,21 +12,21 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=125">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=125">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=126">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=126">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=125" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=125" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=125" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=125" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=125" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=125" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=125" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=125" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=125" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=125" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=126" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=126" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=126" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=126" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=126" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=126" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=126" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=126" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=126" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=126" defer></script>
 </head>
 <body data-view="hub">
 
@@ -1062,6 +1062,60 @@
         <p class="hub-card-sheet-lore" id="hub-card-sheet-lore"></p>
       </div>
     </div>
+
+    <!-- Visor individual de carta a pantalla completa -->
+    <div class="card-viewer" id="card-viewer" role="dialog" aria-modal="true" aria-labelledby="card-viewer-name" hidden>
+      <div class="card-viewer-backdrop" data-viewer-close></div>
+
+      <div class="card-viewer-shell">
+        <header class="card-viewer-top">
+          <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky" aria-hidden="true"></span><span data-i18n="viewer_kicker">Vista de carta</span></span>
+          <div class="card-viewer-tools">
+            <button class="btn btn-ghost btn-sm" type="button" id="card-viewer-details" data-viewer-details aria-pressed="true">
+              <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
+              <span data-i18n="viewer_hide_details">Ocultar detalles</span>
+            </button>
+            <button class="btn btn-ghost btn-sm" type="button" id="card-viewer-flip" data-viewer-flip>
+              <svg class="icon" aria-hidden="true"><use href="#i-rotate"></use></svg>
+              <span data-i18n="viewer_flip">Girar</span>
+            </button>
+            <button class="icon-btn card-viewer-close" type="button" data-viewer-close aria-label="Cerrar la vista" data-i18n-aria-label="viewer_close">
+              <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="card-viewer-body">
+          <div class="card-viewer-stage">
+            <button class="card-viewer-card" id="card-viewer-card" type="button" aria-label="Girar la carta" data-i18n-aria-label="viewer_flip">
+              <span class="card-viewer-inner">
+                <span class="card-viewer-face card-viewer-front">
+                  <img id="card-viewer-front" alt="" width="896" height="1200">
+                </span>
+                <span class="card-viewer-face card-viewer-back">
+                  <img id="card-viewer-back" alt="" width="896" height="1200">
+                </span>
+              </span>
+            </button>
+          </div>
+
+          <aside class="card-viewer-info" id="card-viewer-info">
+            <span class="card-viewer-collection" id="card-viewer-collection"></span>
+            <h2 id="card-viewer-name"></h2>
+            <p class="card-viewer-type" id="card-viewer-type"></p>
+            <div class="card-viewer-chips" id="card-viewer-chips"></div>
+            <p class="card-viewer-lore" id="card-viewer-lore"></p>
+            <div class="card-viewer-actions">
+              <button class="btn btn-primary btn-sm" type="button" id="card-viewer-edit" data-viewer-edit>
+                <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+                <span data-i18n="viewer_edit">Editar en el estudio</span>
+              </button>
+              <button class="btn btn-ghost btn-sm" type="button" data-viewer-close data-i18n="viewer_back">Volver</button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
@@ -1193,11 +1247,20 @@
       <section class="tab-pane active" id="tab-deck" role="tabpanel" aria-labelledby="tab-btn-deck">
         <h2 class="section-title">
           <svg class="icon" aria-hidden="true"><use href="#i-palette"></use></svg>
-          <span data-i18n="sec_design">Diseños y presets</span>
+          <span data-i18n="sec_design">Tu carta</span>
         </h2>
-        <p class="section-hint" data-i18n="sec_design_hint">Elige un preset guardado o carga el anverso y el reverso de tu carta.</p>
+        <p class="section-hint" data-i18n="sec_design_hint">Carga tu arte o elige una carta de la colección para empezar.</p>
 
-        <div class="card-presets-bar" id="card-presets-bar" role="group" aria-label="Presets de cartas" data-i18n-aria-label="ui_presets"></div>
+        <div class="studio-picker">
+          <label class="studio-picker-label" for="studio-card-picker" data-i18n="studio_pick_card">Carta de la colección</label>
+          <select id="studio-card-picker" class="select-block"></select>
+          <p class="control-note" data-i18n="studio_pick_hint">Elige una carta como base. Siempre puedes subir tus propias imágenes.</p>
+        </div>
+
+        <div class="studio-saved" id="studio-saved" hidden>
+          <span class="studio-saved-label" data-i18n="studio_saved">Mis diseños guardados</span>
+          <div class="card-presets-bar" id="card-presets-bar" role="group" aria-label="Presets de cartas" data-i18n-aria-label="ui_presets"></div>
+        </div>
 
         <div class="control-row fullart-row" id="fullart-row">
           <div class="fullart-copy">

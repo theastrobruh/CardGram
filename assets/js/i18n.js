@@ -56,8 +56,8 @@ const I18N = {
     ui_export_progress: 'Progreso de exportación',
     ui_bg_group: 'Fondo del escenario',
 
-    sec_design: 'Diseños y presets',
-    sec_design_hint: 'Elige un preset guardado o carga el anverso y el reverso de tu carta.',
+    sec_design: 'Tu carta',
+    sec_design_hint: 'Carga tu arte o elige una carta de la colección para empezar.',
     front_short: 'Frontal',
     front_cover: 'Anverso',
     back_short: 'Trasera',
@@ -263,8 +263,8 @@ const I18N = {
     ui_export_progress: 'Export progress',
     ui_bg_group: 'Stage background',
 
-    sec_design: 'Designs & presets',
-    sec_design_hint: 'Pick a saved preset or load the front and back of your card.',
+    sec_design: 'Your card',
+    sec_design_hint: 'Upload your art or pick a card from the collection to begin.',
     front_short: 'Front',
     front_cover: 'Front side',
     back_short: 'Back',
@@ -470,8 +470,8 @@ const I18N = {
     ui_export_progress: 'Exportfortschritt',
     ui_bg_group: 'Bühnenhintergrund',
 
-    sec_design: 'Designs & Presets',
-    sec_design_hint: 'Wähle ein gespeichertes Preset oder lade Vorder- und Rückseite deiner Karte.',
+    sec_design: 'Deine Karte',
+    sec_design_hint: 'Lade deine Kunst hoch oder wähle eine Karte aus der Sammlung.',
     front_short: 'Vorne',
     front_cover: 'Vorderseite',
     back_short: 'Hinten',
@@ -653,3 +653,22 @@ function t(key, vars) {
   }
   return value;
 }
+
+Object.assign(I18N.es, {
+  studio_pick_card: 'Carta de la colección',
+  studio_pick_hint: 'Elige una carta como base. Siempre puedes subir tus propias imágenes.',
+  studio_saved: 'Mis diseños guardados',
+  studio_new_card_option: 'Nueva carta (sube tu arte)'
+});
+Object.assign(I18N.en, {
+  studio_pick_card: 'Card from the collection',
+  studio_pick_hint: 'Pick a card as your base. You can always upload your own images.',
+  studio_saved: 'My saved designs',
+  studio_new_card_option: 'New card (upload your art)'
+});
+Object.assign(I18N.de, {
+  studio_pick_card: 'Karte aus der Sammlung',
+  studio_pick_hint: 'Wähle eine Karte als Basis. Du kannst jederzeit eigene Bilder hochladen.',
+  studio_saved: 'Meine gespeicherten Designs',
+  studio_new_card_option: 'Neue Karte (Kunst hochladen)'
+});

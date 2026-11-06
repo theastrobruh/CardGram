@@ -874,4 +874,39 @@
     hub_new_card_hint: 'Lade ein Vorderseitenbild hoch, um deine Karte neu zu beginnen.',
     hub_github_project: 'Projekt auf GitHub'
   });
+
+  /* Biblioteca y visor individual */
+  Object.assign(I18N.es, {
+    library_view: 'Ver',
+    library_edit: 'Editar',
+    viewer_kicker: 'Vista de carta',
+    viewer_close: 'Cerrar la vista',
+    viewer_flip: 'Girar carta',
+    viewer_hide_details: 'Ocultar detalles',
+    viewer_show_details: 'Mostrar detalles',
+    viewer_edit: 'Editar en el estudio',
+    viewer_back: 'Volver'
+  });
+  Object.assign(I18N.en, {
+    library_view: 'View',
+    library_edit: 'Edit',
+    viewer_kicker: 'Card view',
+    viewer_close: 'Close card view',
+    viewer_flip: 'Flip card',
+    viewer_hide_details: 'Hide details',
+    viewer_show_details: 'Show details',
+    viewer_edit: 'Edit in studio',
+    viewer_back: 'Back'
+  });
+  Object.assign(I18N.de, {
+    library_view: 'Ansehen',
+    library_edit: 'Bearbeiten',
+    viewer_kicker: 'Kartenansicht',
+    viewer_close: 'Kartenansicht schließen',
+    viewer_flip: 'Karte drehen',
+    viewer_hide_details: 'Details ausblenden',
+    viewer_show_details: 'Details anzeigen',
+    viewer_edit: 'Im Studio bearbeiten',
+    viewer_back: 'Zurück'
+  });
 })();

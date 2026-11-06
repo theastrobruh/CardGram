@@ -7758,3 +7758,311 @@ dialog {
     align-self: center;
   }
 }
+/* ==========================================================================
+   Visor individual de carta · pantalla completa
+   ========================================================================== */
+.card-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 270;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  color: var(--ink);
+}
+
+.card-viewer[hidden] {
+  display: none;
+}
+
+.card-viewer-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 60% at 50% 35%, rgba(7, 51, 63, 0.18), rgba(3, 22, 30, 0.72)),
+    rgba(3, 22, 30, 0.55);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+}
+
+.card-viewer-shell {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  padding: clamp(14px, 3vw, 28px);
+}
+
+.card-viewer-top {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 0 0 auto;
+  color: #eafffb;
+}
+
+.card-viewer-top .hub-panel-eyebrow {
+  color: rgba(234, 255, 251, 0.8);
+}
+
+.card-viewer-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-viewer-tools .btn {
+  color: #eafffb;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.card-viewer-tools .btn:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.card-viewer-close {
+  color: #eafffb;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.card-viewer-body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 330px);
+  align-items: center;
+  gap: clamp(18px, 4vw, 48px);
+  flex: 1;
+  min-height: 0;
+  padding: 4px clamp(0px, 2vw, 24px) 8px;
+}
+
+.card-viewer-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+}
+
+.card-viewer-card {
+  position: relative;
+  width: min(560px, 78vw, 54vh);
+  aspect-ratio: 896 / 1200;
+  padding: 0;
+  border: 0;
+  perspective: 1800px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.card-viewer-inner {
+  position: absolute;
+  inset: 0;
+  display: block;
+  transform-style: preserve-3d;
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-viewer-card.is-flipped .card-viewer-inner {
+  transform: rotateY(180deg);
+}
+
+.card-viewer-face {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  border-radius: 22px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow:
+    0 34px 70px rgba(0, 10, 16, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.card-viewer-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-viewer-back {
+  transform: rotateY(180deg);
+}
+
+.card-viewer-info {
+  display: flex;
+  min-height: 0;
+  max-height: min(72vh, 620px);
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding: clamp(18px, 2.4vw, 26px);
+  border-radius: 24px;
+  background: linear-gradient(158deg, rgba(255, 255, 255, 0.92), rgba(228, 250, 252, 0.72));
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 30px 60px rgba(0, 10, 16, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.card-viewer-collection {
+  font-size: 0.54rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #0a6b78;
+}
+
+.card-viewer-info h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.card-viewer-type {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--muted-strong);
+}
+
+.card-viewer-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.card-viewer-lore {
+  margin: 4px 0 0;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.card-viewer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.card-viewer.is-cinema .card-viewer-info {
+  display: none;
+}
+
+.card-viewer.is-cinema .card-viewer-body {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.card-viewer.is-cinema .card-viewer-card {
+  width: min(620px, 84vw, 62vh);
+}
+
+@media (max-width: 860px) {
+  .card-viewer-shell {
+    padding: 12px;
+  }
+
+  .card-viewer-top {
+    align-items: flex-start;
+  }
+
+  .card-viewer-tools .btn span {
+    display: none;
+  }
+
+  .card-viewer-tools .btn {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+  }
+
+  .card-viewer-body {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    gap: 12px;
+    padding: 10px 0 0;
+  }
+
+  .card-viewer-card,
+  .card-viewer.is-cinema .card-viewer-card {
+    width: min(78vw, 48vh);
+  }
+
+  .card-viewer-info {
+    max-height: 30vh;
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .card-viewer-info h2 {
+    font-size: 1.3rem;
+  }
+
+  .card-viewer-lore {
+    font-size: 0.64rem;
+  }
+
+  .card-viewer.is-cinema .card-viewer-card {
+    width: min(84vw, 62vh);
+  }
+}
+/* My Cards · agrupación y acceso al visor */
+body.viewer-open {
+  overflow: hidden;
+}
+
+.library-group-head {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 10px 2px 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.56);
+}
+
+.library-group-head strong {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.library-group-head span {
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.media-card-view {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.media-card-view:focus-visible {
+  outline: 2px solid var(--aqua-deep);
+  outline-offset: -3px;
+}
+
+.media-card-thumb .media-fav,
+.media-card-thumb .media-badge {
+  z-index: 2;
+}

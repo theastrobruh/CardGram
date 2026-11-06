@@ -2807,3 +2807,33 @@ body.cinematic-mode .toast-stack {
     background: rgba(255, 255, 255, 0.96);
   }
 }
+
+/* Estudio · inicio limpio para elegir carta o partir de cero */
+.studio-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0 0 12px;
+}
+
+.studio-picker-label,
+.studio-saved-label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted-strong);
+}
+
+.studio-saved {
+  margin-bottom: 12px;
+}
+
+.studio-saved-label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.studio-saved .card-presets-bar {
+  margin-top: 0;
+}

@@ -112,6 +112,9 @@ const hub = {
   newCardRequested: false,
   lastRoute: '',
   activeSheet: null,
+  viewerCard: null,
+  viewerTrigger: null,
+  viewerCinema: false,
   mobileData: { player: [], collection: [], playerIndex: 0, collectionIndex: 0 },
   els: {}
 };
@@ -1830,6 +1833,13 @@ function createMediaCard(options) {
   const thumb = makeNode('div', 'media-card-thumb');
   thumb.appendChild(makeHubImage(image, name));
 
+  const view = makeNode('button', 'media-card-view');
+  view.type = 'button';
+  view.setAttribute('aria-label', `${t('library_view')}: ${name}`);
+  if (kind === 'catalog') view.dataset.viewCard = id;
+  else if (kind === 'preset') view.dataset.viewPreset = id;
+  thumb.appendChild(view);
+
   if (kind === 'catalog') {
     const fav = makeNode('button', `media-fav${isFavorite ? ' active' : ''}`);
     fav.type = 'button';
@@ -1850,7 +1860,13 @@ function createMediaCard(options) {
   article.appendChild(body);
 
   const actions = makeNode('div', 'media-card-actions');
-  const open = makeHubButton('btn btn-primary btn-sm', t('library_open'));
+  const viewButton = makeHubButton('btn btn-primary btn-sm', t('library_view'));
+  if (kind === 'catalog') viewButton.dataset.viewCard = id;
+  else if (kind === 'preset') viewButton.dataset.viewPreset = id;
+  if (preview) viewButton.dataset.openCard = id;
+  actions.appendChild(viewButton);
+
+  const open = makeHubButton('btn btn-ghost btn-sm', t('library_edit'));
   if (kind === 'catalog') open.dataset.openCard = id;
   else open.dataset.openPreset = id;
   if (preview) open.dataset.openCard = id;
@@ -1876,9 +1892,11 @@ function renderLibrary() {
   const showSaved = filter === 'all' || filter === 'saved';
   const showCatalog = filter === 'all' || filter === 'catalog';
   const nodes = [];
+  let cardCount = 0;
 
   if (showSaved && Array.isArray(presets)) {
     presets.forEach((preset) => {
+      cardCount += 1;
       nodes.push(
         createMediaCard({
           kind: 'preset',
@@ -1894,29 +1912,39 @@ function renderLibrary() {
   }
 
   if (showCatalog) {
-    HUB_CATALOG.cards.forEach((card) => {
-      const collection = HUB_CATALOG.collectionOf(card);
-      nodes.push(
-        createMediaCard({
-          kind: 'catalog',
-          id: card.id,
-          name: card.name,
-          subtitle: `${collection ? collection.name : card.collectionName} · ${card.set}`,
-          image: thumbOf(card),
-          badge: collection ? collection.shortName : t('library_catalog_badge'),
-          isFavorite: hubProfile.favoriteCardId === card.id
-        })
+    HUB_CATALOG.collections.forEach((collection) => {
+      if (!collection.cards.length) return;
+      const heading = makeNode('div', 'library-group-head');
+      heading.appendChild(makeNode('strong', null, collection.name));
+      heading.appendChild(
+        makeNode('span', null, countLabel('hub_collection_cards', collection.cards.length))
       );
+      nodes.push(heading);
+
+      collection.cards.forEach((card) => {
+        cardCount += 1;
+        nodes.push(
+          createMediaCard({
+            kind: 'catalog',
+            id: card.id,
+            name: card.name,
+            subtitle: `${collection.name} · ${card.set}`,
+            image: thumbOf(card),
+            badge: collection.shortName,
+            isFavorite: hubProfile.favoriteCardId === card.id
+          })
+        );
+      });
     });
   }
 
   hub.els.libraryGrid.replaceChildren(...nodes);
 
   if (hub.els.libraryCount) {
-    hub.els.libraryCount.textContent = countLabel('library_count', nodes.length);
+    hub.els.libraryCount.textContent = countLabel('library_count', cardCount);
   }
 
-  const isEmpty = nodes.length === 0;
+  const isEmpty = cardCount === 0;
   if (hub.els.libraryEmpty) hub.els.libraryEmpty.hidden = !isEmpty;
   if (isEmpty) {
     const isSaved = filter === 'saved';
@@ -2716,6 +2744,102 @@ function openCardDetails() {
   openHubSheet(hub.els.cardSheet, hub.els.cardInfo);
 }
 
+function presetViewerCard(preset) {
+  return {
+    id: preset.id,
+    name: preset.name,
+    front: preset.front,
+    back: preset.back,
+    fullArt: preset.fullArt || null,
+    collectionName: t('library_saved_badge'),
+    set: '',
+    type: '',
+    rarity: '',
+    stats: null,
+    lore: '',
+    isPreset: true
+  };
+}
+
+function setViewerCinema(on) {
+  if (!hub.els.viewer) return;
+  hub.viewerCinema = Boolean(on);
+  hub.els.viewer.classList.toggle('is-cinema', hub.viewerCinema);
+  if (hub.els.viewerDetails) {
+    hub.els.viewerDetails.setAttribute('aria-pressed', String(!hub.viewerCinema));
+    const label = hub.els.viewerDetails.querySelector('span');
+    if (label) {
+      label.textContent = hub.viewerCinema ? t('viewer_show_details') : t('viewer_hide_details');
+    }
+  }
+}
+
+function flipViewerCard() {
+  if (!hub.els.viewerCard) return;
+  hub.els.viewerCard.classList.toggle('is-flipped');
+}
+
+function openCardViewer(target, trigger) {
+  if (!hub.els.viewer) return;
+  const card = typeof target === 'string' ? HUB_CATALOG.byId(target) : target;
+  if (!card) return;
+
+  hub.viewerCard = card;
+  hub.viewerTrigger = trigger || document.activeElement;
+  hub.els.viewerCard.classList.remove('is-flipped');
+  setViewerCinema(false);
+
+  if (hub.els.viewerFront) {
+    hub.els.viewerFront.src = card.front;
+    hub.els.viewerFront.alt = card.name;
+  }
+  if (hub.els.viewerBack) {
+    hub.els.viewerBack.src = card.back;
+    hub.els.viewerBack.alt = `${card.name} — ${t('back_cover')}`;
+  }
+  if (hub.els.viewerName) hub.els.viewerName.textContent = card.name;
+  if (hub.els.viewerCollection) {
+    hub.els.viewerCollection.textContent = [card.collectionName, card.set]
+      .filter(Boolean)
+      .join(' · ');
+  }
+  if (hub.els.viewerType) hub.els.viewerType.textContent = card.type || '';
+  if (hub.els.viewerLore) hub.els.viewerLore.textContent = card.lore || '';
+  if (hub.els.viewerChips) {
+    const chips = [];
+    if (card.rarity) chips.push(card.rarity);
+    if (card.attribute || card.type) chips.push(card.attribute || card.type);
+    Object.keys(card.stats || {}).forEach((key) => chips.push(`${key} ${card.stats[key]}`));
+    hub.els.viewerChips.replaceChildren(...chips.map((text) => makeNode('span', 'hub-chip', text)));
+  }
+
+  if (hub.els.viewerEdit) {
+    hub.els.viewerEdit.onclick = () => {
+      closeCardViewer({ restoreFocus: false, silent: true });
+      if (card.isPreset) openSavedPreset(card.id);
+      else openCatalogCard(card.id);
+    };
+  }
+
+  hub.els.viewer.hidden = false;
+  document.body.classList.add('viewer-open');
+  requestAnimationFrame(() => {
+    if (hub.els.viewerClose) hub.els.viewerClose.focus({ preventScroll: true });
+  });
+}
+
+function closeCardViewer(options = {}) {
+  if (!hub.els.viewer || hub.els.viewer.hidden) return;
+  hub.els.viewer.hidden = true;
+  document.body.classList.remove('viewer-open');
+  if (options.restoreFocus !== false) {
+    const trigger = hub.viewerTrigger;
+    if (trigger && typeof trigger.focus === 'function') trigger.focus({ preventScroll: true });
+  }
+  hub.viewerCard = null;
+  hub.viewerTrigger = null;
+}
+
 function setActivePanel(panel, options = {}) {
   const target = HUB_PANELS.includes(panel) ? panel : 'home';
   hub.panel = target;
@@ -3052,6 +3176,41 @@ function onHubClick(event) {
     return;
   }
 
+  if (target.closest('[data-viewer-close]')) {
+    event.preventDefault();
+    closeCardViewer();
+    return;
+  }
+
+  if (target.closest('[data-viewer-details]')) {
+    event.preventDefault();
+    setViewerCinema(!hub.viewerCinema);
+    return;
+  }
+
+  if (target.closest('[data-viewer-flip]') || target.closest('#card-viewer-card')) {
+    event.preventDefault();
+    flipViewerCard();
+    return;
+  }
+
+  const viewCard = target.closest('[data-view-card]');
+  if (viewCard) {
+    event.preventDefault();
+    openCardViewer(viewCard.dataset.viewCard, viewCard);
+    return;
+  }
+
+  const viewPreset = target.closest('[data-view-preset]');
+  if (viewPreset) {
+    event.preventDefault();
+    const preset = Array.isArray(presets)
+      ? presets.find((entry) => entry.id === viewPreset.dataset.viewPreset)
+      : null;
+    if (preset) openCardViewer(presetViewerCard(preset), viewPreset);
+    return;
+  }
+
   const explorerMode = target.closest('[data-explorer-mode]');
   if (explorerMode) {
     event.preventDefault();
@@ -3325,12 +3484,22 @@ function setupHubEvents() {
   hub.root.addEventListener('focusin', prefetchStudio);
 
   if (hub.els.card) {
+    let lastCardTap = 0;
     hub.els.card.addEventListener('click', () => {
       /* Un arrastre no debe voltear la carta al soltar. */
       if (cardSuppressClick) {
         cardSuppressClick = false;
         return;
       }
+      const now = performance.now();
+      if (now - lastCardTap < 340) {
+        lastCardTap = 0;
+        hub.els.card.classList.remove('is-flipped');
+        hub.els.card.setAttribute('aria-pressed', 'false');
+        openCardViewer(hubProfile.favoriteCardId, hub.els.card);
+        return;
+      }
+      lastCardTap = now;
       const flipped = hub.els.card.classList.toggle('is-flipped');
       hub.els.card.setAttribute('aria-pressed', String(flipped));
       if (window.Sound) window.Sound.play('flip');
@@ -3519,6 +3688,13 @@ function setupHubEvents() {
     setHubLangMenu(false, { restoreFocus: true });
   });
 
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    if (!hub.els.viewer || hub.els.viewer.hidden) return;
+    event.preventDefault();
+    closeCardViewer();
+  });
+
   window.setInterval(updateBoosterClock, 1000);
 }
 
@@ -3592,6 +3768,18 @@ function cacheHubDom() {
   els.cardSheetSub = hubEl('hub-card-sheet-sub');
   els.cardSheetChips = hubEl('hub-card-sheet-chips');
   els.cardSheetLore = hubEl('hub-card-sheet-lore');
+  els.viewer = hubEl('card-viewer');
+  els.viewerCard = hubEl('card-viewer-card');
+  els.viewerFront = hubEl('card-viewer-front');
+  els.viewerBack = hubEl('card-viewer-back');
+  els.viewerName = hubEl('card-viewer-name');
+  els.viewerCollection = hubEl('card-viewer-collection');
+  els.viewerType = hubEl('card-viewer-type');
+  els.viewerChips = hubEl('card-viewer-chips');
+  els.viewerLore = hubEl('card-viewer-lore');
+  els.viewerDetails = hubEl('card-viewer-details');
+  els.viewerEdit = hubEl('card-viewer-edit');
+  els.viewerClose = document.querySelector('.card-viewer-close');
   els.topName = hubEl('hub-profile-name');
   els.topHandle = hubEl('hub-profile-handle');
   els.avatar = hubEl('hub-avatar');

@@ -821,21 +821,29 @@ function renderPresets() {
   /* El estudio es perezoso: la barra de presets no se construye (ni descarga
      sus miniaturas) hasta que la persona entra al estudio. */
   if (document.body.dataset.view !== 'studio') return;
+
+  if (el.studioPicker) {
+    el.studioPicker.replaceChildren();
+    const empty = document.createElement('option');
+    empty.value = '';
+    empty.textContent = t('studio_new_card_option');
+    el.studioPicker.appendChild(empty);
+
+    const collections = (CATALOG && CATALOG.collections) || [];
+    collections.forEach((collection) => {
+      const group = document.createElement('optgroup');
+      group.label = collection.name;
+      collection.cards.forEach((card) => {
+        const option = document.createElement('option');
+        option.value = card.id;
+        option.textContent = `${card.name} · ${card.set}`;
+        group.appendChild(option);
+      });
+      el.studioPicker.appendChild(group);
+    });
+  }
+
   el.presetsBar.replaceChildren();
-
-  BUILTIN_PRESETS.forEach((preset) => {
-    el.presetsBar.appendChild(
-      makePresetChip({
-        id: preset.id,
-        name: preset.name,
-        active: activePresetId === preset.id,
-        front: preset.front,
-        back: preset.back,
-        onSelect: () => loadPreset(preset)
-      })
-    );
-  });
-
   presets.forEach((preset) => {
     el.presetsBar.appendChild(
       makePresetChip({
@@ -849,16 +857,36 @@ function renderPresets() {
       })
     );
   });
+  if (el.studioSaved) el.studioSaved.hidden = presets.length === 0;
+  syncPresetActive();
 }
 
 function syncPresetActive() {
-  if (!el.presetsBar) return;
-  Array.from(el.presetsBar.querySelectorAll('.preset-chip')).forEach((chip) => {
-    const active = chip.dataset.presetId === activePresetId;
-    chip.classList.toggle('active', active);
-    const main = chip.querySelector('.preset-chip-main');
-    if (main) main.setAttribute('aria-pressed', String(active));
-  });
+  if (el.presetsBar) {
+    Array.from(el.presetsBar.querySelectorAll('.preset-chip')).forEach((chip) => {
+      const active = chip.dataset.presetId === activePresetId;
+      chip.classList.toggle('active', active);
+      const main = chip.querySelector('.preset-chip-main');
+      if (main) main.setAttribute('aria-pressed', String(active));
+    });
+  }
+
+  if (el.studioPicker) {
+    const builtin = BUILTIN_PRESETS.find((preset) => preset.id === activePresetId);
+    el.studioPicker.value = builtin ? builtin.cardId : '';
+  }
+}
+
+function onStudioPickerChange() {
+  if (!el.studioPicker) return;
+  const cardId = el.studioPicker.value;
+  if (!cardId) {
+    beginNewCard();
+    if (el.uploadFront) el.uploadFront.focus();
+    return;
+  }
+  const preset = BUILTIN_PRESETS.find((entry) => entry.cardId === cardId);
+  if (preset) loadPreset(preset);
 }
 
 async function applyCardImages(front, back, fullArt) {
@@ -1272,6 +1300,10 @@ function syncUI() {
 }
 
 function setupControls() {
+  if (el.studioPicker) {
+    el.studioPicker.addEventListener('change', onStudioPickerChange);
+  }
+
   setupSegmented('seg-corners', (value) => {
     state.corners = value;
     if (Scene.isReady()) Scene.applySettings({ corners: value });
@@ -1850,6 +1882,8 @@ function cacheDom() {
   el.helpClose = $('#help-close');
 
   el.presetsBar = $('#card-presets-bar');
+  el.studioPicker = $('#studio-card-picker');
+  el.studioSaved = $('#studio-saved');
   el.uploadFront = $('#upload-front');
   el.uploadBack = $('#upload-back');
   el.frontInput = $('#front-file-input');
