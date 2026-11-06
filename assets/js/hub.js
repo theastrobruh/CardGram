@@ -25,7 +25,10 @@ const HUB_LAYOUT_DEFAULT = {
   rightX: 0,
   rightY: 0,
   heroX: 0,
-  heroY: 0
+  heroY: 0,
+  leftExpanded: false,
+  rightExpanded: false,
+  heroExpanded: false
 };
 
 const HUB_PANELS = ['home', 'booster', 'collections', 'explore', 'profile'];
@@ -848,6 +851,9 @@ function sanitizeLayout(raw) {
   number('rightY', -300, 300);
   number('heroX', -500, 500);
   number('heroY', -300, 300);
+  data.leftExpanded = Boolean(raw.leftExpanded);
+  data.rightExpanded = Boolean(raw.rightExpanded);
+  data.heroExpanded = Boolean(raw.heroExpanded);
   return data;
 }
 
@@ -859,12 +865,25 @@ function applyHubLayout() {
   const panel = document.querySelector('.hub-home-panel');
   if (!panel) return;
   const free = hubLayout.mode === 'free';
+  const leftExp = Boolean(hubLayout.leftExpanded);
+  const rightExp = Boolean(hubLayout.rightExpanded);
+  const heroExp = Boolean(hubLayout.heroExpanded);
+
   panel.dataset.layoutMode = hubLayout.mode;
-  panel.style.setProperty('--side-w-left', `${hubLayout.leftWidth}px`);
-  panel.style.setProperty('--side-w-right', `${hubLayout.rightWidth}px`);
-  panel.style.setProperty('--side-h', `${hubLayout.height}px`);
+  panel.dataset.leftExpanded = String(leftExp);
+  panel.dataset.rightExpanded = String(rightExp);
+  panel.dataset.heroExpanded = String(heroExp);
+
+  const effLeftW = leftExp ? Math.max(hubLayout.leftWidth, 380) : hubLayout.leftWidth;
+  const effRightW = rightExp ? Math.max(hubLayout.rightWidth, 440) : hubLayout.rightWidth;
+  const effHeight = (leftExp || rightExp) ? Math.max(hubLayout.height, 620) : hubLayout.height;
+  const effHeroScale = heroExp ? Math.max(hubLayout.cardSize / 100, 1.22) : (hubLayout.cardSize / 100);
+
+  panel.style.setProperty('--side-w-left', `${effLeftW}px`);
+  panel.style.setProperty('--side-w-right', `${effRightW}px`);
+  panel.style.setProperty('--side-h', `${effHeight}px`);
   panel.style.setProperty('--side-offset', `${hubLayout.offset}px`);
-  panel.style.setProperty('--hero-scale', String(hubLayout.cardSize / 100));
+  panel.style.setProperty('--hero-scale', String(effHeroScale));
   panel.style.setProperty('--side-card-scale', String(hubLayout.sideCards / 100));
   panel.style.setProperty('--left-x', `${free ? hubLayout.leftX : 0}px`);
   panel.style.setProperty('--left-y', `${free ? hubLayout.leftY : 0}px`);
@@ -872,6 +891,23 @@ function applyHubLayout() {
   panel.style.setProperty('--right-y', `${free ? hubLayout.rightY : 0}px`);
   panel.style.setProperty('--hero-x', `${free ? hubLayout.heroX : 0}px`);
   panel.style.setProperty('--hero-y', `${free ? hubLayout.heroY : 0}px`);
+
+  const syncGripState = (key, isExp) => {
+    const grip = document.querySelector(`[data-layout-grip="${key}"]`);
+    if (!grip) return;
+    if (isExp) {
+      grip.setAttribute('data-grip-expanded', 'true');
+      grip.setAttribute('aria-label', t('layout_shrink'));
+      grip.title = t('layout_shrink');
+    } else {
+      grip.removeAttribute('data-grip-expanded');
+      grip.setAttribute('aria-label', t('layout_enlarge'));
+      grip.title = t('layout_enlarge');
+    }
+  };
+  syncGripState('left', leftExp);
+  syncGripState('right', rightExp);
+  syncGripState('hero', heroExp);
 
   const values = {
     'layout-left-width': hubLayout.leftWidth,
@@ -942,10 +978,11 @@ function setupLayoutEditor() {
     });
   }
 
+  const heroHost = document.querySelector('.hub-card-stage') || document.querySelector('.hub-favorite');
   const grips = [
     ['left', document.querySelector('.hub-player-panel')],
     ['right', document.querySelector('.hub-explorer-panel')],
-    ['hero', document.querySelector('.hub-favorite')]
+    ['hero', heroHost]
   ];
   grips.forEach(([key, host]) => {
     if (!host || host.querySelector(`[data-layout-grip="${key}"]`)) return;
@@ -953,44 +990,81 @@ function setupLayoutEditor() {
     grip.type = 'button';
     grip.className = 'hub-layout-grip';
     grip.dataset.layoutGrip = key;
-    grip.setAttribute('aria-label', t('layout_drag'));
-    grip.title = t('layout_drag');
+    grip.setAttribute('aria-label', t('layout_enlarge'));
+    grip.title = t('layout_enlarge');
     host.appendChild(grip);
+
+    let didDrag = false;
+    let startX = 0;
+    let startY = 0;
+    const DRAG_THRESHOLD = 5;
+
     grip.addEventListener('pointerdown', (event) => {
       if (hubLayout.mode !== 'free') return;
-      event.preventDefault();
-      const start = { x: event.clientX, y: event.clientY };
+      didDrag = false;
+      startX = event.clientX;
+      startY = event.clientY;
+      const start = { x: startX, y: startY };
       const base = key === 'left'
         ? { x: hubLayout.leftX, y: hubLayout.leftY }
         : key === 'right'
           ? { x: hubLayout.rightX, y: hubLayout.rightY }
           : { x: hubLayout.heroX, y: hubLayout.heroY };
-      grip.setPointerCapture(event.pointerId);
 
       const move = (moveEvent) => {
         const dx = moveEvent.clientX - start.x;
         const dy = moveEvent.clientY - start.y;
-        if (key === 'left') {
-          hubLayout.leftX = base.x + dx;
-          hubLayout.leftY = base.y + dy;
-        } else if (key === 'right') {
-          hubLayout.rightX = base.x + dx;
-          hubLayout.rightY = base.y + dy;
-        } else {
-          hubLayout.heroX = base.x + dx;
-          hubLayout.heroY = base.y + dy;
+        if (!didDrag && Math.hypot(dx, dy) > DRAG_THRESHOLD) {
+          didDrag = true;
+          grip.classList.add('is-dragging');
+          try { grip.setPointerCapture(event.pointerId); } catch (_) {}
         }
-        applyHubLayout();
+        if (didDrag) {
+          moveEvent.preventDefault();
+          if (key === 'left') {
+            hubLayout.leftX = base.x + dx;
+            hubLayout.leftY = base.y + dy;
+          } else if (key === 'right') {
+            hubLayout.rightX = base.x + dx;
+            hubLayout.rightY = base.y + dy;
+          } else {
+            hubLayout.heroX = base.x + dx;
+            hubLayout.heroY = base.y + dy;
+          }
+          applyHubLayout();
+        }
       };
       const end = () => {
-        grip.removeEventListener('pointermove', move);
-        grip.removeEventListener('pointerup', end);
-        grip.removeEventListener('pointercancel', end);
-        persistHubLayout();
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', end);
+        window.removeEventListener('pointercancel', end);
+        grip.classList.remove('is-dragging');
+        if (didDrag) {
+          persistHubLayout();
+          setTimeout(() => { didDrag = false; }, 80);
+        }
       };
-      grip.addEventListener('pointermove', move);
-      grip.addEventListener('pointerup', end);
-      grip.addEventListener('pointercancel', end);
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', end);
+      window.addEventListener('pointercancel', end);
+    });
+
+    grip.addEventListener('click', (event) => {
+      event.preventDefault();
+      if (hubLayout.mode !== 'free') return;
+      if (didDrag) return;
+      if (typeof Sound !== 'undefined' && Sound.play) {
+        Sound.play('tap');
+      }
+      if (key === 'left') {
+        hubLayout.leftExpanded = !hubLayout.leftExpanded;
+      } else if (key === 'right') {
+        hubLayout.rightExpanded = !hubLayout.rightExpanded;
+      } else {
+        hubLayout.heroExpanded = !hubLayout.heroExpanded;
+      }
+      applyHubLayout();
+      persistHubLayout();
     });
   });
 }

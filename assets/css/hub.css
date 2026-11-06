@@ -8214,39 +8214,76 @@ body.viewer-open {
 .hub-layout-grip {
   display: none;
   position: absolute;
-  top: 6px;
-  left: 50%;
-  z-index: 30;
+  top: 14px;
+  right: 14px;
+  z-index: 45;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 18px;
+  width: 32px;
+  height: 32px;
   padding: 0;
-  border-radius: 999px;
-  color: #0a6b78;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.98);
-  box-shadow: 0 4px 10px rgba(8, 62, 82, 0.14);
-  transform: translateX(-50%);
-  cursor: grab;
+  border-radius: 50%;
+  color: #086371;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(124, 235, 221, 0.65);
+  box-shadow: 0 3px 12px rgba(8, 62, 82, 0.16),
+              inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  cursor: pointer;
   touch-action: none;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.25s, transform 0.15s, color 0.2s;
 }
 
 .hub-layout-grip::before {
   content: "";
-  width: 18px;
-  height: 3px;
-  border-radius: 999px;
+  width: 15px;
+  height: 15px;
   background: currentColor;
-  opacity: 0.55;
+  opacity: 0.75;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7'/%3E%3C/svg%3E") center/contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7'/%3E%3C/svg%3E") center/contain no-repeat;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.hub-layout-grip:active {
+.hub-layout-grip[data-grip-expanded]::before {
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 14h6v6M14 4h6v6'/%3E%3Cpath d='M20 10l-6 6M4 20l6-6'/%3E%3C/svg%3E") center/contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 14h6v6M14 4h6v6'/%3E%3Cpath d='M20 10l-6 6M4 20l6-6'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+
+.hub-layout-grip:hover {
+  color: #03454f;
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(124, 235, 221, 0.95);
+  box-shadow: 0 4px 16px rgba(8, 62, 82, 0.24),
+              0 0 0 3px rgba(124, 235, 221, 0.22);
+  transform: scale(1.08);
+}
+
+.hub-layout-grip:active,
+.hub-layout-grip.is-dragging {
   cursor: grabbing;
+  transform: scale(0.94);
+}
+
+.hub-player-panel .hub-layout-grip {
+  top: 14px;
+  right: 14px;
+}
+
+.hub-explorer-panel .hub-layout-grip {
+  top: 14px;
+  right: 14px;
+}
+
+.hub-card-stage .hub-layout-grip {
+  top: 10px;
+  right: 10px;
 }
 
 .hub-favorite .hub-layout-grip {
-  top: 2px;
+  top: 10px;
+  right: 10px;
 }
 
 @media (min-width: 981px) {
@@ -8267,16 +8304,21 @@ body.viewer-open {
 
   .hub-dashboard {
     grid-template-columns: var(--side-w-left) minmax(0, 1fr) var(--side-w-right);
+    transition: grid-template-columns 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  .hub-player-panel {
-    height: var(--side-h);
-    transform: translate3d(var(--left-x), calc(var(--side-offset) + var(--left-y)), 0);
-  }
-
+  .hub-player-panel,
   .hub-explorer-panel {
     height: var(--side-h);
-    transform: translate3d(var(--right-x), calc(var(--side-offset) + var(--right-y)), 0);
+    transform: translate3d(var(--left-x), calc(var(--side-offset) + var(--left-y)), 0);
+    transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+                height 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+                box-shadow 0.3s ease;
+  }
+
+  .hub-home-panel[data-left-expanded="true"] .hub-player-panel,
+  .hub-home-panel[data-right-expanded="true"] .hub-explorer-panel {
+    box-shadow: 0 28px 64px rgba(8, 62, 82, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.96);
   }
 
   .hub-favorite {
@@ -8287,6 +8329,7 @@ body.viewer-open {
   .hub-hand-deck-card {
     width: min(calc(clamp(380px, 35vw, 470px) * var(--hero-scale)), 100%);
     max-width: 100%;
+    transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   .hub-player-actions {
