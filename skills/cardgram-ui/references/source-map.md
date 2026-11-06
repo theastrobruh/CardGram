@@ -184,7 +184,7 @@ Rule: every visible key needs **three** entries. `data-i18n`, `data-i18n-aria-la
 - **One document, two views.** `body[data-view="hub|studio"]` toggles the shells. The Hub renders first; the 3D engine is lazy (`openStudio` → `Scene.init`).
 - **Hash router.** `#/home`, `#/library`, `#/collections`, `#/collections/<id>`, `#/collections/deck/<id>`, `#/explore`, `#/profile`, `#/studio/<tab>`.
 - **State is local.** `cardgram.settings.v1`, `cardgram.presets.v2`, `cardgram.scenes.v1`, `cardgram.profile.v1`, `cardgram.hub.v1`, `cardgram.sound.v1`. No backend, no telemetry.
-- **Sound is hybrid.** `sound.js` owns one lazy `AudioContext`, a compressor, a noise buffer and the named palette. Five cues (`tap`, `flip`, `open`, `tab`, `error`) play local WAV samples from `assets/data/sounds/`; the rest stay synthesized. `toast()` and hub sheet/card handlers call `Sound.play()`.
+- **Sound is hybrid.** `sound.js` owns one lazy `AudioContext`, a compressor, a noise buffer and the named palette. Five cues (`tap`, `favorite`, `nav`, `open`, `error`) play local WAV samples from `assets/data/sounds/`; the rest stay synthesized. `toast()` and hub sheet/card handlers call `Sound.play()`.
 - **Catalog is static.** `catalog.js` exposes `collections`, `cards`, `featured`, `byId`, `collectionOf`; thumbnails in `thumbs/`.
 - **Studio ↔ scene bridge.** `app.js` calls `Scene.*`; `scene.js` never touches the DOM outside its container.
 - **Card geometry** adapts to `CARD_FORMATS` (auto = front texture ratio) inside a fixed 1.35 × 1.89 bounding box, so the camera never needs to re-frame.

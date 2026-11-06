@@ -21,19 +21,21 @@
     close: 0.12,
     flip: 0.18,
     cardSettle: 0.2,
+    favorite: 0.25,
     success: 0.35,
     reward: 0.35,
     error: 0.3,
-    primary: 0.1
+    primary: 0.1,
+    nav: 0.08
   };
 
   /* Muestras puntuales: sustituyen únicamente al gesto con el mismo nombre.
      El resto de la paleta sigue siendo sintetizada. */
   const SAMPLES = {
     tap: { src: 'assets/data/sounds/click - tap.wav', gain: 0.55 },
-    flip: { src: 'assets/data/sounds/favorite-card-select.wav', gain: 0.6 },
+    favorite: { src: 'assets/data/sounds/favorite-card-select.wav', gain: 0.6 },
+    nav: { src: 'assets/data/sounds/options click.wav', gain: 0.45 },
     open: { src: 'assets/data/sounds/menu-button-select.wav', gain: 0.6 },
-    tab: { src: 'assets/data/sounds/options click.wav', gain: 0.55 },
     error: { src: 'assets/data/sounds/warning-alert.wav', gain: 0.65 }
   };
   const samplePool = Object.create(null);
@@ -339,18 +341,18 @@
       tone({ freq: 392, type: 'triangle', dur: 0.14, gain: 0.012, delay: 0.05 });
     },
 
-    /* La carta gira: papel y un chirp de chip. */
+    /* La carta gira: papel y un chirp de chip, deliberadamente suaves. */
     flip() {
-      air({ from: 900, to: 3000, dur: 0.3, gain: 0.028, q: 1.1 });
-      tone({ freq: 220, to: 660, type: 'square', dur: 0.09, gain: 0.007 });
-      tone({ freq: 440, to: 330, type: 'triangle', dur: 0.12, gain: 0.009, delay: 0.04 });
+      air({ from: 900, to: 3000, dur: 0.24, gain: 0.011, q: 1.1 });
+      tone({ freq: 220, to: 660, type: 'square', dur: 0.07, gain: 0.003 });
+      tone({ freq: 440, to: 330, type: 'triangle', dur: 0.1, gain: 0.004, delay: 0.04 });
     },
 
-    /* La carta vuelve a su sitio. */
+    /* La carta vuelve a su sitio: un roce apenas audible. */
     cardSettle() {
-      air({ from: 1500, to: 420, dur: 0.24, gain: 0.018, q: 0.9 });
-      tone({ freq: 240, type: 'triangle', dur: 0.12, gain: 0.012 });
-      tone({ freq: 160, type: 'square', dur: 0.08, gain: 0.005 });
+      air({ from: 1500, to: 420, dur: 0.2, gain: 0.007, q: 0.9 });
+      tone({ freq: 240, type: 'triangle', dur: 0.1, gain: 0.005 });
+      tone({ freq: 160, type: 'square', dur: 0.07, gain: 0.002 });
     },
 
     /* Acción principal: fanfarria breve de cuatro notas. */
@@ -530,7 +532,13 @@
 
     if (node.closest('[data-open-studio], [data-new-deck]')) return 'open';
 
-    if (node.closest('[data-hub-route], [data-open-favorite], [data-open-card], [data-fav-card]')) {
+    /* Seleccionar la carta favorita tiene su propia muestra. */
+    if (node.closest('[data-fav-card]')) return 'favorite';
+
+    /* Menú de navegación (topbar y hoja móvil): única casa de "options click". */
+    if (node.closest('.hub-nav-btn, .hub-menu-item')) return 'nav';
+
+    if (node.closest('[data-hub-route], [data-open-favorite], [data-open-card]')) {
       return 'navigate';
     }
 

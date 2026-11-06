@@ -97,7 +97,7 @@ For bulk edits use `[System.IO.File]::ReadAllText/WriteAllText` with `UTF8Encodi
 - **State is local.** Settings, presets, scenes, hub data and profile live in `localStorage` under `cardgram.*.v*`. No backend; the only network call is the Three.js CDN.
 - **No new dependencies** and no build step unless the user asks.
 - **Preserve accessibility.** `aria-pressed`/`aria-selected`/`aria-current`, focus-visible, sheet focus trap, `prefers-reduced-motion`.
-- **Sound is a garnish.** Five named gestures (`tap`, `flip`, `open`, `tab`, `error`) play the local samples in `assets/data/sounds/`; the rest of the palette is synthesized. Unlocked by the first gesture, never louder than the UI, always mutable from the hub and the studio. Mark one-off transitions `data-sound="none"` and play their sound from the transition function so a click never doubles.
+- **Sound is a garnish.** Five named gestures (`tap`, `favorite`, `nav`, `open`, `error`) play the local samples in `assets/data/sounds/`; the rest of the palette is synthesized. Unlocked by the first gesture, never louder than the UI, always mutable from the hub and the studio. Mark one-off transitions `data-sound="none"` and play their sound from the transition function so a click never doubles.
 
 ## Gotchas that cost time
 
