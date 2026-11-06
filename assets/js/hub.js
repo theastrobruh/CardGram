@@ -3375,10 +3375,10 @@ async function openStudio(tab) {
   }
 
   Scene.setRenderPaused(false);
-  state.scale = 60;
+  state.scale = 100;
   if (Scene.isReady()) {
     Scene.centerCamera();
-    Scene.applySettings({ posX: 0, posY: 0 });
+    Scene.applySettings({ posX: 0, posY: 0, camDistance: 6.8 });
   }
   syncUI();
   scheduleResize();

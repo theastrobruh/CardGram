@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    CardGram — v0.5.5 · Motor 3D
    Escena Three.js, geometría procedural de la carta, materiales, fondos,
    cámara, transiciones y utilidades de exportación.
@@ -20,7 +20,7 @@ const Scene = (() => {
     speed: 0.5,
     spinDir: 1,
     float: 'organic',
-    camDistance: 4.6,
+    camDistance: 6.8,
     posY: 0,
     posX: 0,
     fov: 38,
@@ -970,16 +970,23 @@ const Scene = (() => {
     let width;
     let height;
 
+    const isMobileMode = window.matchMedia && window.matchMedia('(max-width: 860px)').matches;
+
     if (cinematic) {
       width = window.innerWidth;
       height = window.innerHeight;
+    } else if (isMobileMode) {
+      // En modo móvil/responsivo ocupa toda la pantalla disponible entre las dos barras
+      width = availableWidth;
+      height = availableHeight;
     } else if (aspect === 'fill') {
-      width = availableWidth * scale;
-      height = availableHeight * scale;
+      width = availableWidth;
+      height = availableHeight;
     } else {
       const ratio = ASPECTS[aspect] || ASPECTS['9:16'];
-      const maxWidth = availableWidth * scale;
-      const maxHeight = availableHeight * scale;
+      // En escritorio ocupa todo el espacio libre al lado del sidebar
+      const maxWidth = availableWidth;
+      const maxHeight = availableHeight;
       if (maxWidth / maxHeight > ratio) {
         height = maxHeight;
         width = height * ratio;

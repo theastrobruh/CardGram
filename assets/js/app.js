@@ -35,7 +35,7 @@ const DEFAULTS = {
   speed: 0.5,
   spinDir: 1,
   float: 'organic',
-  camDistance: 4.6,
+  camDistance: 6.8,
   posY: 0,
   posX: 0,
   fov: 38,
@@ -43,7 +43,7 @@ const DEFAULTS = {
   lightWarmth: 0.0,
   tilt: 1,
   aspect: '9:16',
-  scale: 60,
+  scale: 100,
   bg: 'aqua',
   duration: 10,
   fullArtAnim: true,
@@ -1887,10 +1887,20 @@ function setupFlower() {
 
   // Botón de cámara en la posición opuesta a cinemático
   if (el.btnCameraStage) {
-    el.btnCameraStage.addEventListener('click', () => {
-      if (el.cameraDialog) {
+    el.btnCameraStage.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (!el.cameraDialog) return;
+      if (el.cameraDialog.open) {
+        el.cameraDialog.close();
+      } else {
         syncCameraDialogUI();
-        el.cameraDialog.showModal();
+        el.cameraDialog.show();
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (el.cameraDialog && el.cameraDialog.open && !el.cameraDialog.contains(event.target) && !el.btnCameraStage.contains(event.target)) {
+        el.cameraDialog.close();
       }
     });
   }
@@ -1915,7 +1925,7 @@ function setupFlower() {
           posX: 0,
           posY: 0,
           fov: 38,
-          camDistance: 4.6,
+          camDistance: 6.8,
           lightIntensity: 1.0,
           lightWarmth: 0.0
         });
