@@ -5070,7 +5070,7 @@ dialog {
   .hub-player-open {
     display: block;
     position: absolute;
-    inset: 0 0 0 42px;
+    inset: 0 0 0 50px;
     z-index: 2;
     width: auto;
     height: 100%;
@@ -5086,8 +5086,8 @@ dialog {
     top: 50%;
     left: 3px;
     z-index: 3;
-    width: 34px;
-    height: 34px;
+    width: 42px;
+    height: 42px;
     padding: 0;
     border: 0;
     border-radius: 50%;
@@ -5112,15 +5112,15 @@ dialog {
   }
 
   .hub-player-avatar {
-    width: 30px;
-    height: 30px;
+    width: 38px;
+    height: 38px;
     border-width: 2px;
     box-shadow: 0 4px 10px rgba(6, 55, 74, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
 
   .hub-player-avatar .hub-avatar-fallback .icon {
-    width: 15px;
-    height: 15px;
+    width: 19px;
+    height: 19px;
   }
 
   .hub-player-identity {
@@ -5376,8 +5376,8 @@ dialog {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 68px;
-    height: 68px;
+    width: 40px;
+    height: 40px;
     padding: 0;
     border-radius: 50%;
     color: #07333f;
@@ -5399,8 +5399,8 @@ dialog {
   }
 
   .hub-menu-btn .icon {
-    width: 30px;
-    height: 30px;
+    width: 18px;
+    height: 18px;
     opacity: 0.8;
   }
 
@@ -5416,11 +5416,11 @@ dialog {
   .hub-fab-actions {
     position: fixed;
     left: 50%;
-    bottom: calc(100px + env(safe-area-inset-bottom));
+    bottom: calc(72px + env(safe-area-inset-bottom));
     z-index: 167;
     display: flex;
     align-items: flex-end;
-    gap: 8px;
+    gap: 5px;
     transform: translateX(-50%);
     pointer-events: none;
   }
@@ -5429,8 +5429,8 @@ dialog {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 54px;
-    height: 54px;
+    width: 32px;
+    height: 32px;
     padding: 0;
     pointer-events: auto;
     border-radius: 50%;
@@ -5453,13 +5453,13 @@ dialog {
   }
 
   .hub-fab-icon {
-    width: 24px;
-    height: 24px;
+    width: 14px;
+    height: 14px;
   }
 
   .hub-fab-btn-primary {
-    width: 61px;
-    height: 61px;
+    width: 36px;
+    height: 36px;
     color: #ffffff;
     background: linear-gradient(160deg, #45d9c2 0%, #2f8fdd 100%);
     border-color: rgba(255, 255, 255, 0.84);
@@ -5472,8 +5472,8 @@ dialog {
   }
 
   .hub-fab-btn-primary .hub-fab-icon {
-    width: 28px;
-    height: 28px;
+    width: 16px;
+    height: 16px;
   }
 
   .hub-fab-btn-primary:not([hidden]) {
@@ -6569,8 +6569,8 @@ dialog {
     left: 50%;
     right: auto;
     z-index: 45;
-    width: clamp(72px, 19.5vw, 84px);
-    height: clamp(72px, 19.5vw, 84px);
+    width: clamp(94px, 24.5vw, 106px);
+    height: clamp(94px, 24.5vw, 106px);
     max-width: none;
     margin: 0;
     padding: 0;
@@ -6603,8 +6603,8 @@ dialog {
   }
 
   .hub-player-avatar .hub-avatar-fallback .icon {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
   }
 
   .hub-player-identity {
@@ -6648,7 +6648,7 @@ dialog {
     gap: clamp(10px, 3.4vw, 18px);
     width: min(100%, 430px);
     margin: 0 auto;
-    padding: clamp(24px, 5.6vw, 32px) 6px 2px;
+    padding: clamp(46px, 11.8vw, 58px) 6px 2px;
     font-family: var(--mono);
     font-size: clamp(0.52rem, 1.55vw, 0.6rem);
     font-weight: 700;
@@ -7258,4 +7258,18 @@ dialog {
 
 .media-card-missing .media-card-body h3 {
   color: var(--muted-strong);
+}
+/* El inicio móvil ya no muestra la fecha de alta en el menú. */
+.hub-menu-since {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .hub-fab-btn-primary {
+    transform: translateY(-5px);
+  }
+
+  .hub-fab-btn-primary:hover {
+    transform: translateY(-7px);
+  }
 }

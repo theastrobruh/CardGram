@@ -879,6 +879,11 @@ async function applyCardImages(front, back, fullArt) {
   }
 }
 
+function beginNewCard() {
+  activePresetId = null;
+  syncPresetActive();
+}
+
 function restoreDefaultCard() {
   const builtin = BUILTIN_PRESETS.find((preset) => preset.cardId === DEFAULT_CARD.id);
   activePresetId = builtin ? builtin.id : 'default';

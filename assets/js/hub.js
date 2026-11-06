@@ -109,6 +109,7 @@ const hub = {
   handDraft: [],
   opening: false,
   presetsRendered: false,
+  newCardRequested: false,
   lastRoute: '',
   activeSheet: null,
   mobileData: { player: [], collection: [], playerIndex: 0, collectionIndex: 0 },
@@ -871,7 +872,6 @@ function renderMobileData(stats) {
 
   data.player = [
     `@${hubProfile.handle}`,
-    t('hub_data_member', { date: formatHubShortDate(hubProfile.joinedAt) }),
     t('hub_data_decks', { count: values.decks })
   ];
   data.collection = [
@@ -2853,6 +2853,27 @@ async function openStudio(tab) {
   activateTab(HUB_STUDIO_TABS[tab] || 'tab-deck');
   scheduleResize();
   hub.opening = false;
+
+  if (hub.newCardRequested) {
+    hub.newCardRequested = false;
+    if (typeof beginNewCard === 'function') beginNewCard();
+    if (typeof isMobile === 'function' && isMobile() && typeof setSidebar === 'function') {
+      setSidebar(true, { persist: false });
+    }
+    requestAnimationFrame(() => {
+      window.setTimeout(() => {
+        const upload = document.getElementById('upload-front');
+        if (upload) {
+          upload.scrollIntoView({
+            block: 'center',
+            behavior: reduceMotion() ? 'auto' : 'smooth'
+          });
+          upload.focus({ preventScroll: true });
+        }
+      }, 220);
+      toast(t('hub_new_card_hint'), { type: 'info', duration: 4200 });
+    });
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -2915,6 +2936,15 @@ function onHubClick(event) {
     event.preventDefault();
     const playing = musicButton.classList.toggle('is-playing');
     musicButton.setAttribute('aria-pressed', String(playing));
+    return;
+  }
+
+  const newCardButton = target.closest('[data-new-card]');
+  if (newCardButton) {
+    event.preventDefault();
+    closeHubMenu({ restoreFocus: false, silent: true });
+    hub.newCardRequested = true;
+    navigate('studio/deck');
     return;
   }
 
