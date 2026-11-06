@@ -7747,3 +7747,14 @@ dialog {
     display: none;
   }
 }
+/* Columnas laterales 25 % más anchas y centradas verticalmente. */
+@media (min-width: 981px) {
+  .hub-dashboard {
+    grid-template-columns: 215px minmax(0, 1fr) 250px;
+  }
+
+  .hub-player-panel,
+  .hub-explorer-panel {
+    align-self: center;
+  }
+}
