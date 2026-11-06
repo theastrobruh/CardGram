@@ -38,9 +38,9 @@ CardGram is built by **[theAstroBruh](https://github.com/theastrobruh)** (Creati
 
 | | Agent | Role | Personality |
 |---|---|---|---|
-| 🔷 | **Gemini** | Lead Engineer & Architect | The meticulous one. Brown hair, blue eyes, freckles, braces, reading glasses. Writes clean code, catches edge cases, loves design systems. |
-| 🔶 | **DeepSeek** | Senior Developer & UX Strategist | The sharp executive. Dark bob hair, focused gaze, blazer-over-tee energy. Cuts through complexity, ships features fast. |
-| ⬜ | **MiMo** | Junior Dev & QA Intern | The everyday dev. Messy hair, hoodie, tablet in hand. Runs the tests, files the bugs, learns something new every sprint. |
+| 🔷 | **Gemini** | Lead Engineer & Architect | The meticulous one. Writes clean code, catches edge cases, loves design systems. |
+| 🔶 | **DeepSeek** | Senior Developer & UX Strategist | The sharp executive. Cuts through complexity, ships features fast. |
+| ⬜ | **MiMo** | Junior Dev & QA Intern | The everyday dev. Runs the tests, files the bugs, learns something new every sprint. |
 
 > *Every feature, every pixel, every line of code — crafted through human vision + AI collaboration.*
 
