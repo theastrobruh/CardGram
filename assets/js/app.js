@@ -56,11 +56,11 @@ const CATALOG_CARDS =
     ? CATALOG.cards
     : [
         {
-          id: 'og-azura-lone-wanderer',
-          name: 'Azura, Lone Wanderer',
-          front: 'assets/data/cards/database/OG/FRONT_A_00_AZURA_LONE-WANDERER.png',
-          back: 'assets/data/cards/database/OG/BACK_A_00.png',
-          fullArt: 'assets/data/cards/database/OG/FRONT_A_00_AZURA_LONE-WANDERER(FULL-ART).png'
+          id: 'mew-tarot-00',
+          name: 'The Fool',
+          front: 'assets/data/cards/database/Mew Tarot/00 - The Fool.webp',
+          back: 'assets/data/cards/database/_shared/BACK_CARDGRAM.webp',
+          fullArt: null
         }
       ];
 
@@ -158,7 +158,8 @@ const STORAGE_MIGRATIONS = [
   ['cardgram.presets.v2', 'presets.v2'],
   ['cardgram.scenes.v1', 'scenes.v1'],
   ['cardgram.profile.v1', 'profile.v1'],
-  ['cardgram.hub.v1', 'hub.v1']
+  ['cardgram.hub.v1', 'hub.v1'],
+  ['cardgram.booster.v1', 'booster.v1']
 ];
 
 const storage = {
@@ -222,28 +223,31 @@ function migrateLegacyStorage() {
   });
 }
 
-/* Rutas anteriores a la estructura por colecciones (v0.4.4 y anteriores). */
+/* Rutas anteriores a la estructura por colecciones: se redirigen a los sets
+   activos para que los presets guardados no apunten a archivos retirados. */
 const DB_CARDS = 'assets/data/cards/database';
+const LEGACY_FRONT = `${DB_CARDS}/Mew Tarot/00 - The Fool.webp`;
+const LEGACY_BACK = `${DB_CARDS}/_shared/BACK_CARDGRAM.webp`;
 const LEGACY_IMAGE_PATHS = {
-  'assets/card_front - base.png': `${DB_CARDS}/OG/FRONT_A_00_AZURA_LONE-WANDERER.png`,
-  'assets/card_front - base - ALT-1.png': `${DB_CARDS}/OG/FRONT_A_00_AZURA_LONE-WANDERER.png`,
-  'assets/card_front - base - ALT-2.png': `${DB_CARDS}/OG/FRONT_A_02_AZURA SS.png`,
-  'assets/card_front - base - ALT-3.png': `${DB_CARDS}/OG/FRONT_A_03-The-Devil.png`,
-  'assets/card_back - base.png': `${DB_CARDS}/OG/BACK_A_00.png`,
-  'assets/card_back - ALT-1.png': `${DB_CARDS}/OG/BACK_A_00.png`,
-  'assets/card_back - ALT-2.png': `${DB_CARDS}/OG/BACK_A_02.png`,
-  'assets/card_back - ALT-3.png': `${DB_CARDS}/OG/BACK_A_03.png`,
-  'assets/data/cards/OG/SET-01/FRONT-01.png': `${DB_CARDS}/OG/FRONT_A_00_AZURA_LONE-WANDERER.png`,
-  'assets/data/cards/OG/SET-01/BACK-BASE.png': `${DB_CARDS}/OG/BACK_A_00.png`,
-  'assets/data/cards/OG/SET-02/FRONT-01.png': `${DB_CARDS}/OG/FRONT_A_02_AZURA SS.png`,
-  'assets/data/cards/OG/SET-02/BACK-BASE.png': `${DB_CARDS}/OG/BACK_A_02.png`,
-  'assets/data/cards/OG/SET-03/FRONT-01.png': `${DB_CARDS}/OG/FRONT_A_03-The-Devil.png`,
-  'assets/data/cards/OG/SET-03/BACK-BASE.png': `${DB_CARDS}/OG/BACK_A_03.png`,
-  'assets/data/cards/SET_01/FRONT_A_02_AZURA SS.png': `${DB_CARDS}/OG/FRONT_A_02_AZURA SS.png`,
-  'assets/data/cards/SET_01/BACK_A_02.png': `${DB_CARDS}/OG/BACK_A_02.png`,
-  'assets/data/cards/YGO/FRONT-DMG_01.png': `${DB_CARDS}/YGO/FRONT_YGO_01.png`,
-  'assets/data/cards/YGO/FRONT-DMG_02 (FULL ART).png': `${DB_CARDS}/YGO/FRONT_YGO_01(FULL-ART).png`,
-  'assets/data/cards/YGO/BACK-BASE.png': `${DB_CARDS}/YGO/BACK_YGO_01.png`
+  'assets/card_front - base.png': LEGACY_FRONT,
+  'assets/card_front - base - ALT-1.png': LEGACY_FRONT,
+  'assets/card_front - base - ALT-2.png': `${DB_CARDS}/Mew Tarot/01 - The Magician.webp`,
+  'assets/card_front - base - ALT-3.png': `${DB_CARDS}/Mew Tarot/02 - The High Priestess.webp`,
+  'assets/card_back - base.png': LEGACY_BACK,
+  'assets/card_back - ALT-1.png': LEGACY_BACK,
+  'assets/card_back - ALT-2.png': LEGACY_BACK,
+  'assets/card_back - ALT-3.png': LEGACY_BACK,
+  'assets/data/cards/OG/SET-01/FRONT-01.png': LEGACY_FRONT,
+  'assets/data/cards/OG/SET-01/BACK-BASE.png': LEGACY_BACK,
+  'assets/data/cards/OG/SET-02/FRONT-01.png': `${DB_CARDS}/Mew Tarot/01 - The Magician.webp`,
+  'assets/data/cards/OG/SET-02/BACK-BASE.png': LEGACY_BACK,
+  'assets/data/cards/OG/SET-03/FRONT-01.png': `${DB_CARDS}/Mew Tarot/02 - The High Priestess.webp`,
+  'assets/data/cards/OG/SET-03/BACK-BASE.png': LEGACY_BACK,
+  'assets/data/cards/SET_01/FRONT_A_02_AZURA SS.png': `${DB_CARDS}/Mew Tarot/01 - The Magician.webp`,
+  'assets/data/cards/SET_01/BACK_A_02.png': LEGACY_BACK,
+  'assets/data/cards/YGO/FRONT-DMG_01.png': `${DB_CARDS}/YGO/FRONT_YGO_01.webp`,
+  'assets/data/cards/YGO/FRONT-DMG_02 (FULL ART).png': `${DB_CARDS}/YGO/FRONT_YGO_01(FULL-ART).webp`,
+  'assets/data/cards/YGO/BACK-BASE.png': `${DB_CARDS}/YGO/BACK_YGO_01.webp`
 };
 
 function safeImageUrl(value) {

@@ -4,23 +4,30 @@ Estructura pensada para crecer por colecciones sin tocar el código del estudio.
 
 ```text
 assets/data/cards/
-├── catalog.js          ← manifiesto que lee la web app
+├── catalog.js              ← manifiesto que lee la web app
 ├── tools/
-│   └── make-thumbs.py  ← genera las miniaturas WebP del lobby
-└── database/           ← única carpeta de imágenes de cartas
-    ├── OG/
-    │   ├── FRONT_A_00_AZURA_LONE-WANDERER.png
-    │   ├── FRONT_A_00_AZURA_LONE-WANDERER(FULL-ART).png
-    │   ├── BACK_A_00.png
+│   ├── optimize-sets.py    ← convierte a WebP, genera miniaturas y reversos
+│   └── make-thumbs.py      ← regenera solo las miniaturas del lobby
+└── database/               ← única carpeta de imágenes de cartas
+    ├── _shared/
+    │   ├── BACK_CARDGRAM.webp
     │   └── thumbs/
-    ├── FAN ART/
-    │   ├── FRONT_DBZ-01_SUPER_SAIYAN.png
-    │   ├── BACK_DBZ.png
+    ├── Mew Tarot/          ← 22/22 cartas · set completo
+    │   ├── 00 - BACKCARD-MEWTAROT.webp
+    │   ├── 00 - The Fool.webp   (896 × 1200)
+    │   └── thumbs/00 - The Fool.webp
+    ├── Champion-Verse/     ← 13/22 cartas · faltan 9 por revelar
+    │   ├── 00-BACKCARD-CHAMPION-VERSE.webp
+    │   ├── S00_VEGITO.webp
     │   └── thumbs/
-    └── YGO/
-        ├── FRONT_YGO_01.png
-        ├── FRONT_YGO_01(FULL-ART).png
-        ├── BACK_YGO_01.png
+    ├── Dungeons and History/ ← 6/22 cartas · faltan 16 por revelar
+    │   ├── 00_BACKCARD_DUNGEONSANDHISTORY.webp
+    │   ├── DH_00_AZURA.webp
+    │   └── thumbs/
+    └── YGO/                ← 3 cartas · único set con Full Art
+        ├── FRONT_YGO_01.webp
+        ├── FRONT_YGO_01(FULL-ART).webp
+        ├── BACK_YGO_01.webp
         └── thumbs/
 ```
 
@@ -28,65 +35,58 @@ assets/data/cards/
 
 | Archivo | Uso |
 | --- | --- |
-| `FRONT_*.png` | Anverso (1792 × 2400). |
-| `BACK_*.png` | Reverso de la carta o de la colección. |
-| `FRONT_* (FULL-ART).png` | Variante Full Art opcional del mismo anverso. |
-| `thumbs/*.webp` | Miniatura de 760 px que usa el lobby; el estudio usa el PNG. |
+| `FRONT_*.webp` / `<nombre>.webp` | Anverso optimizado a 896 × 1200. |
+| `*BACKCARD*.webp` | Reverso oficial del set; si no existe se usa `_shared/BACK_CARDGRAM.webp`. |
+| `FRONT_*(FULL-ART).webp` | Variante Full Art opcional del mismo anverso. |
+| `thumbs/*.webp` | Miniatura de 760 px que usa el lobby; el estudio usa el WebP grande. |
 
-## Miniaturas
+## Optimización
 
-El hub, la biblioteca y las rejillas de colecciones cargan `thumbs/*.webp`
-para no descargar varios MB por tarjeta. El estudio 3D siempre usa el PNG
-original. Después de añadir imágenes nuevas:
+Todo el catálogo se sirve en WebP. Para reprocesar los sets activos:
 
 ```bash
-python assets/data/cards/tools/make-thumbs.py --root assets/data/cards/database
+python assets/data/cards/tools/optimize-sets.py
 ```
+
+El script convierte anversos y reversos a 896 × 1200 (calidad 82), genera las
+miniaturas de 760 px y elimina los formatos pesados de origen. Los sets `OG` y
+`FAN ART` se retiraron junto con sus imágenes.
+
+## Sets y sobre diario
+
+- `Mew Tarot` está completo: 22 de 22 cartas.
+- `Champion-Verse` y `Dungeons and History` están en construcción: se declaran
+  con `setSize: 22`, por lo que el hub muestra cuántas cartas faltan.
+- `YGO` no entra en el sobre diario (`booster: false`) porque es el set de
+  exhibición de Full Art.
+
+El sobre diario entrega 4 cartas aleatorias del set que elija el usuario, una
+vez al día, y guarda la colección en `localStorage` (`cardgram.booster.v1`).
 
 ## Añadir una colección
 
-1. Crea la carpeta `assets/data/cards/database/<COLECCION>/`.
-2. Copia los anversos y reversos con los nombres de arriba.
-3. Añade la colección al array `collections` de `catalog.js`:
+1. Crea la carpeta `assets/data/cards/database/<COLECCION>/` en WebP.
+2. Añade la colección al array `newSets` de `catalog.js`:
 
 ```js
 {
   id: 'nueva',
+  folder: 'Nueva Colección',
   name: 'Nueva Colección',
   shortName: 'NUEVA',
-  tagline: {
-    en: 'A short line for the hub.',
-    es: 'Una línea corta para el hub.',
-    de: 'Eine kurze Zeile für das Lobby.'
-  },
-  description: {
-    en: 'Collection presentation text.',
-    es: 'Texto de presentación de la colección.',
-    de: 'Vorstellungstext der Sammlung.'
-  },
+  setSize: 22,
+  booster: true,
+  complete: false,
   accent: ['#7cebdd', '#2f8fdd'],
-  cover: 'assets/data/cards/database/NUEVA/FRONT_01.png',
-  thumbCover: 'assets/data/cards/database/NUEVA/thumbs/FRONT_01.webp',
+  tagline: { en: '…', es: '…', de: '…' },
+  description: { en: '…', es: '…', de: '…' },
+  backs: { full: '…', thumb: '…' },
   cards: [
-    {
-      id: 'nueva-01',
-      set: 'SET-01',
-      number: '001',
-      name: 'Nombre de la carta',
-      type: 'Tipo — Subtipo',
-      rarity: 'Rare',
-      front: 'assets/data/cards/database/NUEVA/FRONT_01.png',
-      back: 'assets/data/cards/database/NUEVA/BACK_01.png',
-      thumbFront: 'assets/data/cards/database/NUEVA/thumbs/FRONT_01.webp',
-      thumbBack: 'assets/data/cards/database/NUEVA/thumbs/BACK_01.webp',
-      fullArt: null,
-      stats: { ATK: 2000, DEF: 1700 },
-      lore: 'Texto de sabor.'
-    }
+    ['FRONT_01', 'Nombre', 'Tipo — Subtipo', 'Rare', { ATK: 2000, DEF: 1700 }, 'Texto de sabor.']
   ]
 }
 ```
 
-El hub, la biblioteca, los presets integrados y el selector de carta favorita
-se actualizan solos. Las rutas deben empezar por `assets/` y las imágenes se
-cargan desde el mismo origen (sin peticiones externas).
+El hub, la biblioteca, el sobre diario, los presets integrados y el selector de
+carta favorita se actualizan solos. Las rutas deben empezar por `assets/` y las
+imágenes se cargan desde el mismo origen (sin peticiones externas).

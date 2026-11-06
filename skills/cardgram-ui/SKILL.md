@@ -18,7 +18,7 @@ Current version: **v0.5.5** (`data-version`, the `?v=` query strings and `APP_VE
 | `assets/css/hub.css` | Lobby: topbar, dashboard, card showcase, library, collections, profile, ambient, mobile hero, sheets | Anything in the hub |
 | `assets/js/scene.js` | Three.js: renderer, geometry, materials, card formats, camera, snapshot/video | 3D or exports |
 | `assets/js/app.js` | Studio state, settings, controls, presets, uploads, resize, keyboard, export UI | Studio behaviour |
-| `assets/js/hub.js` | Lobby state, routing, cards, library, decks, profile, tabs, sheets, lazy studio boot | Hub behaviour |
+| `assets/js/hub.js` | Lobby state, routing, cards, daily pack, library, decks, profile, tabs, sheets, lazy studio boot | Hub behaviour |
 | `assets/js/ambient.js` | Samples the card art and writes `--ambient-*` | Background tint |
 | `assets/js/i18n.js` | Studio dictionary ES/EN/DE + language switch | Studio strings |
 | `assets/js/hub-i18n.js` | Hub dictionary, merged into `I18N` on load | Hub strings |
@@ -57,6 +57,8 @@ The project is the source of truth: if a reference disagrees with the code, trus
 | Click / hover / success sounds | `sound.js` palette + `classify()` | `data-sound` on the node, `toast()` in `app.js` |
 | Sound on-off UI | `[data-sound-toggle]` in `index.html` | `sound.js` `syncButtons`, `components.md` §23 |
 | Any visible string | `i18n.js` (studio) or `hub-i18n.js` (hub) | `data-i18n*` attributes |
+| Collection progress / new set | `catalog.js` `setSize` + `hub.js` `makeCollectionCard` | `hub-i18n.js` |
+| Daily pack | `hub.js` `renderBooster` / `openBoosterPack` / `claimBoosterPack` | `hub.css` §22, `index.html` `[data-hub-panel="booster"]`, `hub-i18n.js` |
 | New catalog card | `assets/data/cards/<COLLECTION>/…` + `catalog.js` | `thumbs/` (WebP) |
 
 ## Run and verify

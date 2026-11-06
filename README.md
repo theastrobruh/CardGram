@@ -15,6 +15,7 @@
 ### 🏛️ Immersive Lobby (v0.5.5)
 - **Slow, cinematic entrance** — your favorite card settles in over a soft glass veil before the lobby content
 - **Live stats** — saved cards, catalog collections, collections left to review, decks and rendered exports
+- **Daily pack** — 4 random cards once a day from the set you choose; Mew Tarot is complete (22/22), Champion-Verse (13/22) and Dungeons and History (6/22) show their missing cards, and YGO stays as the Full Art showcase set
 - **My cards** — saved presets plus the full catalog, with favorite selection and one-tap open in the studio
 - **Collections & decks** — collections read from the segmented card folders, plus user-created decks with covers and card lists
 - **Profile** — local avatar upload (square crop), creator name, handle, bio and favorite card

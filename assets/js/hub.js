@@ -7,10 +7,11 @@
 
 const HUB_STORAGE = {
   profile: 'cardgram.profile.v1',
-  data: 'cardgram.hub.v1'
+  data: 'cardgram.hub.v1',
+  booster: 'cardgram.booster.v1'
 };
 
-const HUB_PANELS = ['home', 'library', 'collections', 'explore', 'profile'];
+const HUB_PANELS = ['home', 'booster', 'library', 'collections', 'explore', 'profile'];
 const HUB_STUDIO_TABS = {
   deck: 'tab-deck',
   '3d': 'tab-3d',
@@ -272,12 +273,427 @@ function sanitizeHubData(raw) {
   return data;
 }
 
+/* --------------------------------------------------------------------------
+   Sobre diario
+   -------------------------------------------------------------------------- */
+function dayKey(date = new Date()) {
+  const value = date instanceof Date ? date : new Date(date);
+  return [
+    value.getFullYear(),
+    String(value.getMonth() + 1).padStart(2, '0'),
+    String(value.getDate()).padStart(2, '0')
+  ].join('-');
+}
+
+function previousDayKey() {
+  const date = new Date();
+  date.setDate(date.getDate() - 1);
+  return dayKey(date);
+}
+
+function nextBoosterReset() {
+  const reset = new Date();
+  reset.setHours(24, 0, 0, 0);
+  return reset.getTime();
+}
+
+function formatCountdown(ms) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const hours = String(Math.floor(total / 3600)).padStart(2, '0');
+  const minutes = String(Math.floor((total % 3600) / 60)).padStart(2, '0');
+  const seconds = String(total % 60).padStart(2, '0');
+  return `${hours}:${minutes}:${seconds}`;
+}
+
+function ownedIn(collectionId) {
+  const list = hubBooster.owned[collectionId];
+  return Array.isArray(list) ? list : [];
+}
+
+function boosterSets() {
+  return HUB_CATALOG.collections.filter((collection) => collection.booster !== false && collection.cards.length);
+}
+
+function sanitizeBooster(raw) {
+  const data = {
+    day: null,
+    setId: null,
+    picks: [],
+    claimed: false,
+    owned: {},
+    streak: 0,
+    lastClaim: null
+  };
+
+  if (!raw || typeof raw !== 'object') return data;
+
+  if (typeof raw.day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw.day)) data.day = raw.day;
+
+  const validSets = new Set(HUB_CATALOG.collections.map((collection) => collection.id));
+  if (typeof raw.setId === 'string' && validSets.has(raw.setId)) data.setId = raw.setId;
+
+  if (Array.isArray(raw.picks)) {
+    data.picks = raw.picks
+      .filter((id) => HUB_CATALOG.byId(id))
+      .slice(0, 4);
+  }
+
+  data.claimed = Boolean(raw.claimed);
+
+  if (raw.owned && typeof raw.owned === 'object') {
+    HUB_CATALOG.collections.forEach((collection) => {
+      const list = raw.owned[collection.id];
+      if (!Array.isArray(list)) return;
+      data.owned[collection.id] = Array.from(
+        new Set(
+          list.filter((id) => {
+            const card = HUB_CATALOG.byId(id);
+            return card && card.collectionId === collection.id;
+          })
+        )
+      );
+    });
+  }
+
+  const streak = Number(raw.streak);
+  data.streak = Number.isFinite(streak) && streak > 0 ? Math.min(9999, Math.floor(streak)) : 0;
+  if (typeof raw.lastClaim === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(raw.lastClaim)) {
+    data.lastClaim = raw.lastClaim;
+  }
+
+  return data;
+}
+
+/** Reinicia solo la parte diaria; la colección y la racha se conservan. */
+function ensureBoosterDay() {
+  const today = dayKey();
+  if (hubBooster.day === today) return false;
+
+  hubBooster.day = today;
+  hubBooster.setId = null;
+  hubBooster.picks = [];
+  hubBooster.claimed = false;
+  persistBooster();
+  return true;
+}
+
+function boosterCardIsNew(cardId) {
+  const card = HUB_CATALOG.byId(cardId);
+  if (!card) return false;
+  return !ownedIn(card.collectionId).includes(cardId);
+}
+
+function drawBoosterCards(collectionId) {
+  const collection = HUB_CATALOG.collections.find((entry) => entry.id === collectionId);
+  if (!collection || !collection.cards.length) return [];
+
+  const owned = new Set(ownedIn(collectionId));
+  const fresh = collection.cards.filter((card) => !owned.has(card.id));
+  const picked = [];
+  const takeFrom = (pool) => {
+    const available = pool.filter((card) => !picked.includes(card.id));
+    while (available.length && picked.length < 4) {
+      const index = Math.floor(Math.random() * available.length);
+      picked.push(available.splice(index, 1)[0].id);
+    }
+  };
+
+  takeFrom(fresh);
+  takeFrom(collection.cards);
+
+  /* Con sets de menos de 4 cartas se repite alguna; nunca queda un hueco. */
+  while (picked.length < 4 && collection.cards.length) {
+    picked.push(collection.cards[picked.length % collection.cards.length].id);
+  }
+
+  return picked;
+}
+
+function openBoosterPack() {
+  ensureBoosterDay();
+  if (hubBooster.claimed || hubBooster.picks.length) return;
+
+  const setId = hubBooster.setId || (boosterSets()[0] && boosterSets()[0].id);
+  if (!setId) return;
+
+  const collection = HUB_CATALOG.collections.find((entry) => entry.id === setId);
+  if (!collection) return;
+
+  hubBooster.setId = setId;
+  hubBooster.picks = drawBoosterCards(setId);
+  hubBooster.reveal = true;
+  persistBooster();
+  renderBooster();
+  if (window.Sound) window.Sound.play('success');
+}
+
+function claimBoosterPack() {
+  ensureBoosterDay();
+  if (!hubBooster.picks.length || hubBooster.claimed) return;
+
+  const collection = HUB_CATALOG.collections.find((entry) => entry.id === hubBooster.setId);
+  if (!collection) return;
+
+  const owned = new Set(ownedIn(collection.id));
+  let added = 0;
+  hubBooster.picks.forEach((cardId) => {
+    const card = HUB_CATALOG.byId(cardId);
+    if (!card || card.collectionId !== collection.id || owned.has(cardId)) return;
+    owned.add(cardId);
+    added += 1;
+  });
+
+  hubBooster.owned[collection.id] = Array.from(owned);
+  hubBooster.claimed = true;
+  hubBooster.day = dayKey();
+  hubBooster.streak =
+    hubBooster.lastClaim === previousDayKey() ? Math.min(9999, hubBooster.streak + 1) : 1;
+  hubBooster.lastClaim = hubBooster.day;
+  persistBooster();
+
+  renderBooster();
+  renderCollectionRail();
+  if (hub.panel === 'collections') renderCollections();
+  toast(t('booster_claim_toast', { count: added, set: collection.name }), {
+    type: 'success',
+    duration: 4200
+  });
+  if (window.Sound) window.Sound.play('success');
+}
+
+function makeBoosterCard(cardId, options = {}) {
+  const card = HUB_CATALOG.byId(cardId);
+  const article = makeNode('article', 'booster-card');
+  const inner = makeNode('div', 'booster-card-inner');
+
+  const backFace = makeNode('div', 'booster-card-face booster-card-back');
+  const backCollection = HUB_CATALOG.collectionOf(card);
+  backFace.appendChild(
+    makeHubImage(
+      (backCollection && backCollection.cards[0] && backCollection.cards[0].thumbBack) ||
+        (card && card.thumbBack) ||
+        '',
+      ''
+    )
+  );
+
+  const frontFace = makeNode('div', 'booster-card-face booster-card-front');
+  frontFace.appendChild(makeHubImage(card ? thumbOf(card) : '', card ? card.name : ''));
+  frontFace.appendChild(makeNode('span', 'booster-card-name', card ? card.name : ''));
+
+  inner.append(backFace, frontFace);
+  article.appendChild(inner);
+
+  if (card && boosterCardIsNew(card.id)) article.classList.add('is-new');
+
+  if (options.open) {
+    article.classList.add('is-open');
+  } else if (!options.reveal) {
+    article.classList.add('is-locked');
+  }
+
+  return article;
+}
+
+function makeBoosterPlaceholder() {
+  return makeNode('div', 'booster-card-placeholder');
+}
+
+/** Sobre cerrado: cuatro reversos a la espera de abrirse. */
+function makeSealedBoosterCard(collection) {
+  const article = makeNode('article', 'booster-card is-locked');
+  const inner = makeNode('div', 'booster-card-inner');
+  const backFace = makeNode('div', 'booster-card-face booster-card-back');
+  const sample = collection && collection.cards[0];
+  backFace.appendChild(makeHubImage(sample ? sample.thumbBack : '', ''));
+  inner.appendChild(backFace);
+  article.appendChild(inner);
+  return article;
+}
+
+function renderBoosterSetButtons(sets) {
+  const container = hub.els.boosterSets;
+  if (!container) return;
+
+  const locked = hubBooster.claimed || hubBooster.picks.length > 0;
+
+  container.replaceChildren(
+    ...sets.map((collection) => {
+      const owned = ownedIn(collection.id).length;
+      const total = collection.cards.length;
+      const button = makeHubButton('booster-set', null, { boosterSet: collection.id });
+      button.setAttribute('aria-pressed', String(collection.id === hubBooster.setId));
+      button.disabled = locked && collection.id !== hubBooster.setId;
+
+      const art = makeNode('span', 'booster-set-art');
+      art.appendChild(makeHubImage(collection.thumbCover || collection.cover, ''));
+      button.appendChild(art);
+
+      const copy = makeNode('span', 'booster-set-copy');
+      copy.appendChild(makeNode('strong', null, collection.name));
+      copy.appendChild(
+        makeNode('small', null, t('booster_progress_owned', { owned, total }))
+      );
+
+      const meter = makeNode('span', 'booster-set-meter');
+      const fill = makeNode('span');
+      fill.style.width = `${total ? Math.round((owned / total) * 100) : 0}%`;
+      meter.appendChild(fill);
+      copy.appendChild(meter);
+      button.appendChild(copy);
+
+      let badgeText;
+      if (collection.id === hubBooster.setId && locked) badgeText = t('booster_set_locked');
+      else if (!collection.complete) badgeText = t('booster_set_size', { count: total, total: collection.setSize });
+      else if (owned >= total) badgeText = t('booster_set_complete');
+      else badgeText = t('booster_set_size', { count: total, total: collection.setSize });
+      button.appendChild(makeNode('span', 'booster-set-badge', badgeText));
+
+      return button;
+    })
+  );
+}
+
+function renderBooster() {
+  if (!hub.ready || !hub.els.boosterPanel) return;
+  ensureBoosterDay();
+
+  const sets = boosterSets();
+  if (!hubBooster.setId && sets.length) {
+    hubBooster.setId = sets[0].id;
+  }
+  const collection = HUB_CATALOG.collections.find((entry) => entry.id === hubBooster.setId) || null;
+
+  renderBoosterSetButtons(sets);
+
+  if (hub.els.boosterStreakValue) hub.els.boosterStreakValue.textContent = String(hubBooster.streak || 0);
+  if (hub.els.boosterStreakLabel) {
+    hub.els.boosterStreakLabel.textContent =
+      hubBooster.streak === 1 ? t('booster_streak_short_one') : t('booster_streak_short');
+  }
+
+  const owned = collection ? ownedIn(collection.id).length : 0;
+  const total = collection ? collection.cards.length : 0;
+  const setLabel = collection ? collection.name : '';
+
+  if (hub.els.boosterStatusTitle && hub.els.boosterStatusCopy) {
+    if (hubBooster.claimed) {
+      hub.els.boosterStatusTitle.textContent = t('booster_status_claimed_title');
+      hub.els.boosterStatusCopy.textContent = t('booster_status_claimed_copy', { set: setLabel });
+    } else if (hubBooster.picks.length) {
+      hub.els.boosterStatusTitle.textContent = t('booster_status_opened_title');
+      hub.els.boosterStatusCopy.textContent = t('booster_status_opened_copy', { set: setLabel });
+    } else {
+      hub.els.boosterStatusTitle.textContent = t('booster_ready_title');
+      hub.els.boosterStatusCopy.textContent = t('booster_ready_copy');
+    }
+  }
+
+  if (hub.els.boosterProgress) {
+    const chips = [];
+    if (collection) {
+      chips.push(
+        makeNode(
+          'span',
+          'hub-chip',
+          t('booster_progress_owned', { owned, total })
+        )
+      );
+      if (!collection.complete) {
+        chips.push(
+          makeNode(
+            'span',
+            'hub-chip',
+            t('booster_set_size', { count: total, total: collection.setSize })
+          )
+        );
+      } else if (owned >= total) {
+        chips.push(makeNode('span', 'hub-chip', t('collections_set_complete')));
+      }
+    }
+    hub.els.boosterProgress.replaceChildren(...chips);
+  }
+
+  if (hub.els.boosterPackTitle) {
+    hub.els.boosterPackTitle.textContent = collection
+      ? collection.name
+      : t('booster_pack_empty');
+  }
+
+  if (hub.els.boosterPackChip) {
+    if (collection) {
+      hub.els.boosterPackChip.hidden = false;
+      hub.els.boosterPackChip.textContent = t('booster_chip_available', { count: total });
+    } else {
+      hub.els.boosterPackChip.hidden = true;
+    }
+  }
+
+  if (hub.els.boosterCards) {
+    const cards = hub.els.boosterCards;
+    if (!sets.length) {
+      cards.replaceChildren(makeNode('p', 'hub-detail-hint', t('booster_no_set')));
+    } else if (!hubBooster.picks.length) {
+      cards.replaceChildren(
+        ...Array.from({ length: 4 }, () =>
+          collection ? makeSealedBoosterCard(collection) : makeBoosterPlaceholder()
+        )
+      );
+    } else {
+      const reveal = hubBooster.reveal === true;
+      hubBooster.reveal = false;
+      cards.replaceChildren(
+        ...hubBooster.picks.map((id) =>
+          makeBoosterCard(id, { open: !reveal, reveal })
+        )
+      );
+      if (reveal) {
+        requestAnimationFrame(() => {
+          Array.from(cards.children).forEach((node, index) => {
+            window.setTimeout(() => {
+              node.classList.remove('is-locked');
+              node.classList.add('is-open');
+            }, index * 150);
+          });
+        });
+      }
+    }
+  }
+
+  if (hub.els.boosterOpen) {
+    hub.els.boosterOpen.hidden = hubBooster.picks.length > 0 || hubBooster.claimed;
+    hub.els.boosterOpen.disabled = !collection || hubBooster.claimed;
+  }
+  if (hub.els.boosterClaim) {
+    hub.els.boosterClaim.hidden = !hubBooster.picks.length || hubBooster.claimed;
+  }
+  if (hub.els.boosterHint) {
+    if (hubBooster.claimed) hub.els.boosterHint.textContent = t('booster_claimed_today');
+    else if (hubBooster.picks.length) hub.els.boosterHint.textContent = t('booster_claim_hint');
+    else hub.els.boosterHint.textContent = t('booster_open_hint');
+  }
+}
+
+function updateBoosterClock() {
+  if (hub.panel !== 'booster') return;
+  if (hubBooster.day && hubBooster.day !== dayKey()) {
+    renderBooster();
+    return;
+  }
+  if (!hub.els.boosterHint || !hubBooster.claimed) return;
+  hub.els.boosterHint.textContent = t('booster_next_in', {
+    time: formatCountdown(nextBoosterReset() - Date.now())
+  });
+}
+
 let hubProfile = sanitizeHubProfile(null);
 let hubData = sanitizeHubData(null);
+let hubBooster = sanitizeBooster(null);
 
 function loadHubState() {
   hubProfile = sanitizeHubProfile(storage.read(HUB_STORAGE.profile, null));
   hubData = sanitizeHubData(storage.read(HUB_STORAGE.data, null));
+  hubBooster = sanitizeBooster(storage.read(HUB_STORAGE.booster, null));
 }
 
 function persistHubProfile() {
@@ -288,6 +704,12 @@ function persistHubProfile() {
 
 function persistHubData() {
   const ok = storage.write(HUB_STORAGE.data, hubData);
+  if (!ok) toast(t('storage_error'), { type: 'error', duration: 5000 });
+  return ok;
+}
+
+function persistBooster() {
+  const ok = storage.write(HUB_STORAGE.booster, hubBooster);
   if (!ok) toast(t('storage_error'), { type: 'error', duration: 5000 });
   return ok;
 }
@@ -1303,8 +1725,24 @@ function makeCollectionCard(collection) {
 
   const meta = makeNode('span', 'collection-meta');
   meta.appendChild(
-    makeNode('span', null, countLabel('hub_collection_cards', collection.cards.length))
+    makeNode(
+      'span',
+      null,
+      collection.setSize
+        ? t('collections_set_size', { count: collection.cards.length, total: collection.setSize })
+        : countLabel('hub_collection_cards', collection.cards.length)
+    )
   );
+  if (collection.setSize) {
+    meta.appendChild(
+      makeNode('span', 'collection-progress', t('collections_owned', { count: ownedIn(collection.id).length }))
+    );
+  }
+  if (!collection.complete) {
+    meta.appendChild(
+      makeNode('span', 'collection-progress collection-progress-warn', t('collections_set_missing', { count: collection.missing }))
+    );
+  }
   if (!isCollectionReviewed(collection.id)) {
     meta.appendChild(makeNode('span', 'badge-new', t('hub_new')));
   }
@@ -1359,6 +1797,30 @@ function renderCollectionsOverview() {
   }
 
   if (hub.els.decksEmpty) hub.els.decksEmpty.hidden = hubData.decks.length > 0;
+}
+
+function createMissingCard(collection) {
+  const article = makeNode('article', 'media-card media-card-missing');
+  const thumb = makeNode('div', 'media-card-thumb media-missing-thumb');
+  thumb.appendChild(hubIcon('sparkles'));
+  article.appendChild(thumb);
+
+  const body = makeNode('div', 'media-card-body');
+  body.appendChild(
+    makeNode('h3', null, t('collections_missing_card_title', { count: collection.missing }))
+  );
+  body.appendChild(
+    makeNode(
+      'p',
+      null,
+      t('collections_missing_card_desc', {
+        count: collection.cards.length,
+        total: collection.setSize
+      })
+    )
+  );
+  article.appendChild(body);
+  return article;
 }
 
 function renderCollections() {
@@ -1426,6 +1888,27 @@ function renderCollectionDetail() {
     meta.appendChild(
       makeNode('span', 'hub-chip', countLabel('hub_collection_cards', collection.cards.length))
     );
+    if (collection.setSize) {
+      meta.appendChild(
+        makeNode(
+          'span',
+          'hub-chip',
+          t('collections_set_size', { count: collection.cards.length, total: collection.setSize })
+        )
+      );
+      meta.appendChild(
+        makeNode('span', 'hub-chip', t('collections_owned', { count: ownedIn(collection.id).length }))
+      );
+      meta.appendChild(
+        makeNode(
+          'span',
+          'hub-chip',
+          collection.complete
+            ? t('collections_set_complete')
+            : t('collections_set_missing', { count: collection.missing })
+        )
+      );
+    }
     if (!isCollectionReviewed(collection.id)) {
       meta.appendChild(makeNode('span', 'badge-new', t('hub_new')));
     }
@@ -1445,6 +1928,7 @@ function renderCollectionDetail() {
         isFavorite: hubProfile.favoriteCardId === card.id
       })
     );
+    if (collection.missing > 0) nodes.push(createMissingCard(collection));
     hub.els.collectionDetailGrid.replaceChildren(...nodes);
   }
 }
@@ -1966,6 +2450,8 @@ function setActivePanel(panel, options = {}) {
     renderCardExplorer();
   } else if (target === 'library') {
     renderLibrary();
+  } else if (target === 'booster') {
+    renderBooster();
   } else if (target === 'collections') {
     renderCollections();
   } else if (target === 'explore') {
@@ -2207,6 +2693,28 @@ function onHubClick(event) {
     event.preventDefault();
     const card = favoriteCard();
     if (card) openCatalogCard(card.id);
+    return;
+  }
+
+  const boosterSet = target.closest('[data-booster-set]');
+  if (boosterSet) {
+    event.preventDefault();
+    if (hubBooster.claimed || hubBooster.picks.length) return;
+    hubBooster.setId = boosterSet.dataset.boosterSet;
+    persistBooster();
+    renderBooster();
+    return;
+  }
+
+  if (target.closest('#booster-open')) {
+    event.preventDefault();
+    openBoosterPack();
+    return;
+  }
+
+  if (target.closest('#booster-claim')) {
+    event.preventDefault();
+    claimBoosterPack();
     return;
   }
 
@@ -2629,6 +3137,8 @@ function setupHubEvents() {
   if (hub.els.btnHomeHubFloating) {
     hub.els.btnHomeHubFloating.addEventListener('click', () => navigate('home'));
   }
+
+  window.setInterval(updateBoosterClock, 1000);
 }
 
 /* --------------------------------------------------------------------------
@@ -2639,6 +3149,7 @@ function refreshHubData() {
   renderHubStats(false);
   renderCardExplorer();
   if (hub.panel === 'library') renderLibrary();
+  if (hub.panel === 'booster') renderBooster();
   if (hub.panel === 'collections') renderCollections();
   if (hub.panel === 'profile') renderProfileSummary();
 }
@@ -2652,6 +3163,7 @@ function refreshHubLocale() {
   renderCollectionRail();
   renderCardExplorer();
   if (hub.panel === 'library') renderLibrary();
+  if (hub.panel === 'booster') renderBooster();
   if (hub.panel === 'collections') renderCollections();
   if (hub.panel === 'explore') renderExplore();
   if (hub.panel === 'profile') renderProfileSummary();
@@ -2747,6 +3259,20 @@ function cacheHubDom() {
   els.explorerPrev = document.querySelector('[data-explorer-nav="-1"]');
   els.explorerNext = document.querySelector('[data-explorer-nav="1"]');
 
+  els.boosterPanel = document.querySelector('[data-hub-panel="booster"]');
+  els.boosterStreakValue = hubEl('booster-streak-value');
+  els.boosterStreakLabel = hubEl('booster-streak-label');
+  els.boosterStatusTitle = hubEl('booster-status-title');
+  els.boosterStatusCopy = hubEl('booster-status-copy');
+  els.boosterProgress = hubEl('booster-progress');
+  els.boosterSets = hubEl('booster-sets');
+  els.boosterPackTitle = hubEl('booster-pack-title');
+  els.boosterPackChip = hubEl('booster-pack-chip');
+  els.boosterCards = hubEl('booster-cards');
+  els.boosterOpen = hubEl('booster-open');
+  els.boosterClaim = hubEl('booster-claim');
+  els.boosterHint = hubEl('booster-hint');
+
   els.statCards = hubEl('stat-cards');
   els.statCardsSub = hubEl('stat-cards-sub');
   els.statCollections = hubEl('stat-collections');
@@ -2826,6 +3352,7 @@ function setupHub() {
   renderHubStats(true);
   renderCollectionRail();
   renderCardExplorer();
+  renderBooster();
   setLibraryTab('all', { render: false });
   renderProfileForm();
   renderHubStats(false);

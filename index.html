@@ -12,8 +12,8 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=89">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=89">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=101">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=101">
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
           integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu"
@@ -21,16 +21,16 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"
           integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf"
           crossorigin="anonymous" defer></script>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=89" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=89" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=89" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=89" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=89" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=89" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=89" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=89" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=89" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=89" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=101" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=101" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=101" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=101" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=101" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=101" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=101" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=101" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=101" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=101" defer></script>
 </head>
 <body data-view="hub">
 
@@ -317,6 +317,10 @@
                 <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
                 <span data-i18n="hub_nav_library">Mis cartas</span>
               </button>
+              <button class="hub-nav-btn" type="button" data-hub-route="booster">
+                <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+                <span data-i18n="hub_nav_booster">Sobre</span>
+              </button>
               <button class="hub-nav-btn" type="button" data-hub-route="collections">
                 <svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg>
                 <span data-i18n="hub_nav_collections">Colecciones</span>
@@ -467,10 +471,10 @@
                         <button class="hub-card" id="hub-card" type="button" data-sound="none" aria-pressed="false" aria-label="Girar la carta" data-i18n-aria-label="hub_card_flip" title="Arrastra para girar · Toca para voltear" data-i18n-title="hub_card_hint">
                           <span class="hub-card-inner">
                             <span class="hub-card-face hub-card-front">
-                              <img id="hub-card-front" src="assets/data/cards/database/OG/thumbs/FRONT_A_00_AZURA_LONE-WANDERER.webp" alt="" width="1792" height="2400" decoding="async" fetchpriority="high">
+                              <img id="hub-card-front" src="assets/data/cards/database/Mew Tarot/thumbs/00 - The Fool.webp" alt="" width="567" height="760" decoding="async" fetchpriority="high">
                             </span>
                             <span class="hub-card-face hub-card-back">
-                              <img id="hub-card-back" src="assets/data/cards/database/OG/thumbs/BACK_A_00.webp" alt="" width="1792" height="2400" decoding="async">
+                              <img id="hub-card-back" src="assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp" alt="" width="567" height="760" decoding="async">
                             </span>
                           </span>
                         </button>
@@ -481,12 +485,12 @@
                   <div class="hub-card-meta">
                     <div class="hub-card-tags" id="hub-card-tags" aria-label="Identificadores de la carta" data-i18n-aria-label="card_tags_aria"></div>
                     <div class="hub-card-title-row">
-                      <h2 class="hub-card-name" id="hub-card-name" aria-live="polite">Shadowblade Kinetic</h2>
+                      <h2 class="hub-card-name" id="hub-card-name" aria-live="polite">The Fool</h2>
                       <button class="hub-card-info" id="hub-card-info" type="button" data-sound="none" aria-haspopup="dialog" aria-expanded="false" aria-controls="hub-card-sheet" aria-label="Ver etiquetas y detalles de la carta" data-i18n-aria-label="card_details_open" title="Ver etiquetas y detalles de la carta" data-i18n-title="card_details_open">
                         <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
                       </button>
                     </div>
-                    <p class="hub-card-sub" id="hub-card-sub">OG Collection · SET-01</p>
+                    <p class="hub-card-sub" id="hub-card-sub">Mew Tarot · MEW-00</p>
                     <div class="hub-card-chips" id="hub-card-chips"></div>
                     <div class="hub-card-actions">
                       <button class="btn btn-primary hub-card-open" type="button" data-open-favorite>
@@ -566,6 +570,73 @@
                   <div class="hub-explorer-grid" id="hub-explorer-grid"></div>
                 </div>
               </aside>
+            </div>
+          </section>
+
+          <!-- ------------------------------------------------------------
+               Sobre diario
+               ------------------------------------------------------------ -->
+          <section class="hub-panel hub-booster-panel" data-hub-panel="booster" aria-labelledby="booster-title" hidden>
+            <header class="hub-view-head">
+              <button class="hub-back" type="button" data-hub-route="home" aria-label="Volver al inicio" data-i18n-aria-label="hub_back_home">
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+              </button>
+              <div class="hub-view-copy">
+                <h1 id="booster-title" data-i18n="booster_title">Sobre diario</h1>
+                <p data-i18n="booster_lede">Cuatro cartas nuevas cada día. Elige el set y abre tu sobre.</p>
+              </div>
+              <div class="booster-streak" id="booster-streak" title="Racha de días" data-i18n-title="booster_streak_label">
+                <span class="booster-streak-flame" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span>
+                <strong id="booster-streak-value">0</strong>
+                <span id="booster-streak-label" data-i18n="booster_streak_short">días</span>
+              </div>
+            </header>
+
+            <div class="booster-layout">
+              <aside class="booster-aside">
+                <div class="booster-status" id="booster-status">
+                  <span class="hub-panel-eyebrow"><span class="hub-live-dot" aria-hidden="true"></span><span data-i18n="booster_today">Hoy</span></span>
+                  <h2 id="booster-status-title" data-i18n="booster_ready_title">Tu sobre está listo</h2>
+                  <p id="booster-status-copy" data-i18n="booster_ready_copy">Elige un set. Recibirás 4 cartas al azar de ese set.</p>
+                  <div class="booster-progress" id="booster-progress" aria-live="polite"></div>
+                </div>
+
+                <div class="booster-sets" id="booster-sets" role="group" aria-label="Sets disponibles" data-i18n-aria-label="booster_sets_aria"></div>
+
+                <p class="booster-note">
+                  <svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg>
+                  <span data-i18n="booster_ygo_note">Yu-Gi-Oh! es el set de exhibición Full Art y no entra en el sobre diario.</span>
+                </p>
+              </aside>
+
+              <div class="booster-stage">
+                <div class="booster-stage-head">
+                  <div>
+                    <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky" aria-hidden="true"></span><span data-i18n="booster_pack_label">Sobre</span></span>
+                    <h2 id="booster-pack-title" data-i18n="booster_pack_empty">Elige un set para empezar</h2>
+                  </div>
+                  <span class="hub-chip" id="booster-pack-chip" hidden></span>
+                </div>
+
+                <div class="booster-cards" id="booster-cards" aria-live="polite"></div>
+
+                <div class="booster-actions">
+                  <button class="btn btn-primary" type="button" id="booster-open" disabled>
+                    <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+                    <span data-i18n="booster_open">Abrir sobre</span>
+                  </button>
+                  <button class="btn btn-primary" type="button" id="booster-claim" hidden>
+                    <svg class="icon" aria-hidden="true"><use href="#i-save"></use></svg>
+                    <span data-i18n="booster_claim">Guardar en mi colección</span>
+                  </button>
+                  <button class="btn btn-ghost" type="button" data-hub-route="library" id="booster-view-library">
+                    <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
+                    <span data-i18n="booster_view_collection">Ver mi colección</span>
+                  </button>
+                </div>
+
+                <p class="booster-hint" id="booster-hint" data-i18n="booster_hint">El sobre se abre una vez al día. Las cartas se guardan en este navegador.</p>
+              </div>
             </div>
           </section>
 
@@ -938,6 +1009,11 @@
             <span class="hub-menu-item-copy"><strong data-i18n="hub_nav_library">Mis cartas</strong></span>
             <svg class="icon hub-menu-chevron" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
           </button>
+          <button class="hub-menu-item" type="button" data-hub-route="booster" data-menu-nav>
+            <span class="hub-menu-item-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span>
+            <span class="hub-menu-item-copy"><strong data-i18n="hub_nav_booster_full">Sobre diario</strong></span>
+            <svg class="icon hub-menu-chevron" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </button>
           <button class="hub-menu-item" type="button" data-hub-route="collections" data-menu-nav>
             <span class="hub-menu-item-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg></span>
             <span class="hub-menu-item-copy"><strong data-i18n="hub_nav_collections">Colecciones</strong></span>
@@ -995,7 +1071,7 @@
           </button>
         </header>
 
-        <p class="hub-card-sheet-sub" id="hub-card-sheet-sub">OG Collection · SET-01</p>
+        <p class="hub-card-sheet-sub" id="hub-card-sheet-sub">Mew Tarot · MEW-00</p>
         <div class="hub-card-sheet-chips" id="hub-card-sheet-chips"></div>
         <p class="hub-card-sheet-lore" id="hub-card-sheet-lore"></p>
       </div>
@@ -1154,7 +1230,7 @@
 
         <div class="upload-group">
           <label class="upload-box" id="upload-front" for="front-file-input" tabindex="0" role="button">
-            <img id="front-preview-img" src="assets/data/cards/database/OG/thumbs/FRONT_A_00_AZURA_LONE-WANDERER.webp" alt="Previsualización del anverso" data-i18n-alt="ui_front_alt">
+            <img id="front-preview-img" src="assets/data/cards/database/Mew Tarot/thumbs/00 - The Fool.webp" alt="Previsualización del anverso" data-i18n-alt="ui_front_alt">
             <span class="upload-badge"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg><span data-i18n="front_short">Frontal</span></span>
             <span class="upload-overlay">
               <span class="upload-label"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg><span data-i18n="front_cover">Anverso</span></span>
@@ -1164,7 +1240,7 @@
           </label>
 
           <label class="upload-box" id="upload-back" for="back-file-input" tabindex="0" role="button">
-            <img id="back-preview-img" src="assets/data/cards/database/OG/thumbs/BACK_A_00.webp" alt="Previsualización del reverso" data-i18n-alt="ui_back_alt">
+            <img id="back-preview-img" src="assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp" alt="Previsualización del reverso" data-i18n-alt="ui_back_alt">
             <span class="upload-badge"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg><span data-i18n="back_short">Trasera</span></span>
             <span class="upload-overlay">
               <span class="upload-label"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg><span data-i18n="back_cover">Reverso</span></span>
