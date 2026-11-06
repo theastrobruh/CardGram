@@ -922,11 +922,9 @@ Object.assign(I18N.es, {
   layout_offset: 'Posición vertical',
   layout_card_size: 'Tamaño carta',
   layout_side_cards: 'Cartas laterales',
-  layout_free_hint: 'En modo libre haz clic en el círculo de cada ventana para agrandarla/achicarla, o arrástralo para moverla.',
+  layout_free_hint: 'En modo libre arrastra los tiradores de los paneles.',
   layout_reset: 'Restablecer',
-  layout_drag: 'Mover elemento',
-  layout_enlarge: 'Agrandar ventana',
-  layout_shrink: 'Achicar ventana'
+  layout_drag: 'Mover elemento'
 });
 Object.assign(I18N.en, {
   layout_title: 'Adjust view',
@@ -939,11 +937,9 @@ Object.assign(I18N.en, {
   layout_offset: 'Vertical position',
   layout_card_size: 'Card size',
   layout_side_cards: 'Side cards',
-  layout_free_hint: 'In free mode, click the circle on each window to enlarge/shrink it, or drag it to move.',
+  layout_free_hint: 'In free mode, drag the panel handles.',
   layout_reset: 'Reset',
-  layout_drag: 'Move element',
-  layout_enlarge: 'Enlarge window',
-  layout_shrink: 'Shrink window'
+  layout_drag: 'Move element'
 });
 Object.assign(I18N.de, {
   layout_title: 'Ansicht anpassen',
@@ -956,9 +952,7 @@ Object.assign(I18N.de, {
   layout_offset: 'Vertikale Position',
   layout_card_size: 'Kartengröße',
   layout_side_cards: 'Seitenkarten',
-  layout_free_hint: 'Im freien Modus auf den Kreis jedes Fensters klicken, um es zu vergrößern/verkleinern, oder ziehen zum Bewegen.',
+  layout_free_hint: 'Im freien Modus die Griffe der Panels ziehen.',
   layout_reset: 'Zurücksetzen',
-  layout_drag: 'Element bewegen',
-  layout_enlarge: 'Fenster vergrößern',
-  layout_shrink: 'Fenster verkleinern'
+  layout_drag: 'Element bewegen'
 });

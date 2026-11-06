@@ -8307,18 +8307,56 @@ body.viewer-open {
     transition: grid-template-columns 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  .hub-player-panel,
-  .hub-explorer-panel {
-    height: var(--side-h);
+  .hub-player-panel {
+    height: var(--side-h-left, var(--side-h));
     transform: translate3d(var(--left-x), calc(var(--side-offset) + var(--left-y)), 0);
     transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
                 height 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
                 box-shadow 0.3s ease;
   }
 
-  .hub-home-panel[data-left-expanded="true"] .hub-player-panel,
+  .hub-explorer-panel {
+    height: var(--side-h-right, var(--side-h));
+    transform: translate3d(var(--right-x), calc(var(--side-offset) + var(--right-y)), 0);
+    transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+                height 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+                box-shadow 0.3s ease;
+  }
+
+  .hub-home-panel[data-left-expanded="true"] .hub-player-panel {
+    box-shadow: 0 28px 64px rgba(8, 62, 82, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.96);
+    z-index: 25;
+  }
+
+  .hub-home-panel[data-left-expanded="true"] .hub-player-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+    animation: fadeIn 0.3s ease;
+  }
+
   .hub-home-panel[data-right-expanded="true"] .hub-explorer-panel {
-    box-shadow: 0 28px 64px rgba(8, 62, 82, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.96);
+    box-shadow: 0 28px 64px rgba(8, 62, 82, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.96);
+    z-index: 25;
+  }
+
+  .hub-home-panel[data-right-expanded="true"] .hub-explorer-album-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+
+  .hub-home-panel[data-hero-expanded="true"] .hub-favorite {
+    z-index: 26;
+  }
+
+  .hub-home-panel[data-layout-mode="free"] .hub-player-head,
+  .hub-home-panel[data-layout-mode="free"] .hub-explorer-head {
+    cursor: grab;
+  }
+
+  .hub-home-panel[data-layout-mode="free"] .hub-player-head:active,
+  .hub-home-panel[data-layout-mode="free"] .hub-explorer-head:active {
+    cursor: grabbing;
   }
 
   .hub-favorite {

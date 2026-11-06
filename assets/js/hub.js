@@ -874,14 +874,17 @@ function applyHubLayout() {
   panel.dataset.rightExpanded = String(rightExp);
   panel.dataset.heroExpanded = String(heroExp);
 
-  const effLeftW = leftExp ? Math.max(hubLayout.leftWidth, 380) : hubLayout.leftWidth;
-  const effRightW = rightExp ? Math.max(hubLayout.rightWidth, 440) : hubLayout.rightWidth;
-  const effHeight = (leftExp || rightExp) ? Math.max(hubLayout.height, 620) : hubLayout.height;
-  const effHeroScale = heroExp ? Math.max(hubLayout.cardSize / 100, 1.22) : (hubLayout.cardSize / 100);
+  const effLeftW = leftExp ? Math.max(hubLayout.leftWidth, 390) : hubLayout.leftWidth;
+  const effLeftH = leftExp ? Math.max(hubLayout.height, 620) : hubLayout.height;
+  const effRightW = rightExp ? Math.max(hubLayout.rightWidth, 460) : hubLayout.rightWidth;
+  const effRightH = rightExp ? Math.max(hubLayout.height, 620) : hubLayout.height;
+  const effHeroScale = heroExp ? Math.max(hubLayout.cardSize / 100, 1.25) : (hubLayout.cardSize / 100);
 
   panel.style.setProperty('--side-w-left', `${effLeftW}px`);
+  panel.style.setProperty('--side-h-left', `${effLeftH}px`);
   panel.style.setProperty('--side-w-right', `${effRightW}px`);
-  panel.style.setProperty('--side-h', `${effHeight}px`);
+  panel.style.setProperty('--side-h-right', `${effRightH}px`);
+  panel.style.setProperty('--side-h', `${Math.max(effLeftH, effRightH)}px`);
   panel.style.setProperty('--side-offset', `${hubLayout.offset}px`);
   panel.style.setProperty('--hero-scale', String(effHeroScale));
   panel.style.setProperty('--side-card-scale', String(hubLayout.sideCards / 100));
@@ -984,6 +987,85 @@ function setupLayoutEditor() {
     ['right', document.querySelector('.hub-explorer-panel')],
     ['hero', heroHost]
   ];
+
+  function toggleWindowExpand(key) {
+    if (typeof Sound !== 'undefined' && Sound.play) {
+      Sound.play('tap');
+    }
+    let isNowExpanded = false;
+    if (key === 'left') {
+      hubLayout.leftExpanded = !hubLayout.leftExpanded;
+      isNowExpanded = hubLayout.leftExpanded;
+    } else if (key === 'right') {
+      hubLayout.rightExpanded = !hubLayout.rightExpanded;
+      isNowExpanded = hubLayout.rightExpanded;
+    } else {
+      hubLayout.heroExpanded = !hubLayout.heroExpanded;
+      isNowExpanded = hubLayout.heroExpanded;
+    }
+    applyHubLayout();
+    persistHubLayout();
+    if (typeof toast === 'function') {
+      toast(isNowExpanded ? (t('layout_toast_enlarged') || 'Ventana agrandada') : (t('layout_toast_shrunk') || 'Ventana restaurada'), { duration: 1600 });
+    }
+  }
+
+  function attachWindowDrag(dragHandle, key) {
+    if (!dragHandle) return;
+    dragHandle.addEventListener('pointerdown', (event) => {
+      if (hubLayout.mode !== 'free') return;
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      if (event.target.closest('button:not(.hub-layout-grip), a, input')) return;
+
+      const start = { x: event.clientX, y: event.clientY };
+      const base = key === 'left'
+        ? { x: hubLayout.leftX, y: hubLayout.leftY }
+        : key === 'right'
+          ? { x: hubLayout.rightX, y: hubLayout.rightY }
+          : { x: hubLayout.heroX, y: hubLayout.heroY };
+
+      let moved = false;
+      const onMove = (moveEvt) => {
+        const dx = moveEvt.clientX - start.x;
+        const dy = moveEvt.clientY - start.y;
+        if (!moved && Math.hypot(dx, dy) >= 6) {
+          moved = true;
+          dragHandle.classList.add('is-dragging');
+        }
+        if (moved) {
+          moveEvt.preventDefault();
+          if (key === 'left') {
+            hubLayout.leftX = base.x + dx;
+            hubLayout.leftY = base.y + dy;
+          } else if (key === 'right') {
+            hubLayout.rightX = base.x + dx;
+            hubLayout.rightY = base.y + dy;
+          } else {
+            hubLayout.heroX = base.x + dx;
+            hubLayout.heroY = base.y + dy;
+          }
+          applyHubLayout();
+        }
+      };
+
+      const onUp = () => {
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+        window.removeEventListener('pointercancel', onUp);
+        dragHandle.classList.remove('is-dragging');
+        if (moved) persistHubLayout();
+      };
+
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onUp);
+    });
+  }
+
+  // Permite arrastrar los paneles desde sus cabeceras en modo libre
+  attachWindowDrag(document.querySelector('.hub-player-head'), 'left');
+  attachWindowDrag(document.querySelector('.hub-explorer-head'), 'right');
+
   grips.forEach(([key, host]) => {
     if (!host || host.querySelector(`[data-layout-grip="${key}"]`)) return;
     const grip = document.createElement('button');
@@ -997,10 +1079,12 @@ function setupLayoutEditor() {
     let didDrag = false;
     let startX = 0;
     let startY = 0;
-    const DRAG_THRESHOLD = 5;
+    const DRAG_THRESHOLD = 8;
 
     grip.addEventListener('pointerdown', (event) => {
       if (hubLayout.mode !== 'free') return;
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+      event.stopPropagation();
       didDrag = false;
       startX = event.clientX;
       startY = event.clientY;
@@ -1011,13 +1095,14 @@ function setupLayoutEditor() {
           ? { x: hubLayout.rightX, y: hubLayout.rightY }
           : { x: hubLayout.heroX, y: hubLayout.heroY };
 
+      try { grip.setPointerCapture(event.pointerId); } catch (_) {}
+
       const move = (moveEvent) => {
         const dx = moveEvent.clientX - start.x;
         const dy = moveEvent.clientY - start.y;
-        if (!didDrag && Math.hypot(dx, dy) > DRAG_THRESHOLD) {
+        if (!didDrag && Math.hypot(dx, dy) >= DRAG_THRESHOLD) {
           didDrag = true;
           grip.classList.add('is-dragging');
-          try { grip.setPointerCapture(event.pointerId); } catch (_) {}
         }
         if (didDrag) {
           moveEvent.preventDefault();
@@ -1034,37 +1119,34 @@ function setupLayoutEditor() {
           applyHubLayout();
         }
       };
-      const end = () => {
-        window.removeEventListener('pointermove', move);
-        window.removeEventListener('pointerup', end);
-        window.removeEventListener('pointercancel', end);
+
+      const end = (endEvent) => {
+        try { grip.releasePointerCapture(event.pointerId); } catch (_) {}
+        grip.removeEventListener('pointermove', move);
+        grip.removeEventListener('pointerup', end);
+        grip.removeEventListener('pointercancel', end);
         grip.classList.remove('is-dragging');
+
         if (didDrag) {
           persistHubLayout();
-          setTimeout(() => { didDrag = false; }, 80);
+          setTimeout(() => { didDrag = false; }, 60);
+        } else {
+          // Si no arrastró: fue un clic limpio -> Agrandar / Achicar
+          toggleWindowExpand(key);
         }
       };
-      window.addEventListener('pointermove', move);
-      window.addEventListener('pointerup', end);
-      window.addEventListener('pointercancel', end);
+
+      grip.addEventListener('pointermove', move);
+      grip.addEventListener('pointerup', end);
+      grip.addEventListener('pointercancel', end);
     });
 
     grip.addEventListener('click', (event) => {
+      event.stopPropagation();
       event.preventDefault();
       if (hubLayout.mode !== 'free') return;
       if (didDrag) return;
-      if (typeof Sound !== 'undefined' && Sound.play) {
-        Sound.play('tap');
-      }
-      if (key === 'left') {
-        hubLayout.leftExpanded = !hubLayout.leftExpanded;
-      } else if (key === 'right') {
-        hubLayout.rightExpanded = !hubLayout.rightExpanded;
-      } else {
-        hubLayout.heroExpanded = !hubLayout.heroExpanded;
-      }
-      applyHubLayout();
-      persistHubLayout();
+      toggleWindowExpand(key);
     });
   });
 }
@@ -3652,6 +3734,7 @@ function setupCardInteraction() {
   const MAX_TILT_Y = 68;
 
   function startDrag(event) {
+    if (event.target.closest('.hub-layout-grip, [data-layout-grip]')) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     if (cardGesture.pointerId !== null) return;
 
