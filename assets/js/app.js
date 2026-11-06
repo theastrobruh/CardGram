@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    CardGram — v0.5.5 · Aplicación
    Estado, persistencia, presets, cargas, interfaz, accesibilidad e inicio.
    ========================================================================== */
@@ -37,9 +37,13 @@ const DEFAULTS = {
   float: 'organic',
   camDistance: 4.6,
   posY: 0,
+  posX: 0,
+  fov: 38,
+  lightIntensity: 1.0,
+  lightWarmth: 0.0,
   tilt: 1,
   aspect: '9:16',
-  scale: 100,
+  scale: 60,
   bg: 'aqua',
   duration: 10,
   fullArtAnim: true,
@@ -313,11 +317,15 @@ function sanitizeSettings(raw) {
   result.edgeColor = ['black', 'gold', 'silver', 'white'].includes(raw.edgeColor) ? raw.edgeColor : DEFAULTS.edgeColor;
   result.gloss = number(raw.gloss, 0.05, 0.9, DEFAULTS.gloss);
   result.exposure = number(raw.exposure, 0.4, 1.4, DEFAULTS.exposure);
-  result.speed = [0, 0.5, 1, 1.5, 2.5].includes(Number(raw.speed)) ? Number(raw.speed) : DEFAULTS.speed;
+  result.speed = [0, 0.25, 0.5, 0.75, 1, 1.5, 2, 2.5].includes(Number(raw.speed)) ? Number(raw.speed) : DEFAULTS.speed;
   result.spinDir = Number(raw.spinDir) === -1 ? -1 : 1;
   result.float = ['organic', 'subtle', 'breathe', 'dramatic', 'off'].includes(raw.float) ? raw.float : DEFAULTS.float;
   result.camDistance = number(raw.camDistance, 2, 8, DEFAULTS.camDistance);
   result.posY = number(raw.posY, -1.5, 1.5, DEFAULTS.posY);
+  result.posX = number(raw.posX, -2.0, 2.0, DEFAULTS.posX);
+  result.fov = number(raw.fov, 15, 90, DEFAULTS.fov);
+  result.lightIntensity = number(raw.lightIntensity, 0.2, 2.5, DEFAULTS.lightIntensity);
+  result.lightWarmth = number(raw.lightWarmth, -1.0, 1.0, DEFAULTS.lightWarmth);
   result.tilt = number(raw.tilt, 0, 2.5, DEFAULTS.tilt);
   result.aspect = ['9:16', '1:1', '16:9', 'fill'].includes(raw.aspect) ? raw.aspect : DEFAULTS.aspect;
   result.scale = number(raw.scale, 50, 100, DEFAULTS.scale);
@@ -408,6 +416,10 @@ function serializableState() {
     float: state.float,
     camDistance: state.camDistance,
     posY: state.posY,
+    posX: state.posX,
+    fov: state.fov,
+    lightIntensity: state.lightIntensity,
+    lightWarmth: state.lightWarmth,
     tilt: state.tilt,
     aspect: state.aspect,
     scale: state.scale,
@@ -1717,6 +1729,18 @@ function setFlower(open) {
   el.flowerTrigger.setAttribute('aria-expanded', String(open));
 }
 
+function syncSpeedUI() {
+  if (el.speedPills) {
+    el.speedPills.forEach((pill) => {
+      const pillSpeed = Number(pill.getAttribute('data-speed'));
+      pill.classList.toggle('active', pillSpeed === state.speed);
+    });
+  }
+  if (el.petalSpeed) {
+    el.petalSpeed.setAttribute('data-tip', state.speed === 0 ? t('speed_off') : t('speed_label', { val: state.speed }));
+  }
+}
+
 function setupFlower() {
   el.flowerTrigger.addEventListener('click', (event) => {
     event.stopPropagation();
@@ -1724,55 +1748,270 @@ function setupFlower() {
       fabDragged = false;
       return;
     }
-    setFlower(!el.flowerMenu.classList.contains('open'));
-  });
-
-  document.addEventListener('click', (event) => {
-    if (el.flowerMenu.classList.contains('open') && !el.flowerMenu.contains(event.target)) {
-      setFlower(false);
+    const willOpen = !el.flowerMenu.classList.contains('open');
+    setFlower(willOpen);
+    if (!willOpen && el.speedSubpopup) {
+      el.speedSubpopup.hidden = true;
     }
   });
 
-  el.petalCenter.addEventListener('click', () => {
-    if (Scene.isReady()) Scene.centerCamera();
-    state.posY = 0;
-    setRange(el.rangePosY, el.valPosY, state.posY, (value) => value.toFixed(2));
-    persistSettings();
-    toast(t('camera_centered'), { type: 'success' });
-    setFlower(false);
+  document.addEventListener('click', (event) => {
+    if (el.flowerMenu && el.flowerMenu.classList.contains('open') && !el.flowerMenu.contains(event.target)) {
+      setFlower(false);
+      if (el.speedSubpopup) el.speedSubpopup.hidden = true;
+    }
   });
 
-  el.petalReverse.addEventListener('click', () => {
-    state.spinDir *= -1;
-    el.selectSpinDir.value = String(state.spinDir);
-    if (Scene.isReady()) Scene.applySettings({ spinDir: state.spinDir });
-    persistSettings();
-    toast(t('spin_reversed'), { type: 'info' });
-    setFlower(false);
-  });
+  // 1. Botón velocidad (abre/cierra subpopup de 8 velocidades, switch y OFF)
+  if (el.petalSpeed) {
+    el.petalSpeed.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (el.speedSubpopup) {
+        el.speedSubpopup.hidden = !el.speedSubpopup.hidden;
+        syncSpeedUI();
+      }
+    });
+  }
 
-  el.petalLevel.addEventListener('click', () => {
-    state.tilt = state.tilt === 0 ? 1 : 0;
-    setRange(el.rangeTilt, el.valTilt, state.tilt, (value) => value.toFixed(1));
-    if (Scene.isReady()) Scene.applySettings({ tilt: state.tilt });
-    persistSettings();
-    toast(t('tilt_leveled'), { type: 'info' });
-    setFlower(false);
-  });
+  if (el.speedPills) {
+    el.speedPills.forEach((pill) => {
+      pill.addEventListener('click', (event) => {
+        event.stopPropagation();
+        state.speed = Number(pill.getAttribute('data-speed'));
+        if (el.selectSpeed) el.selectSpeed.value = String(state.speed);
+        if (Scene.isReady()) Scene.applySettings({ speed: state.speed });
+        syncSpeedUI();
+        persistSettings();
+        toast(t('speed_label', { val: state.speed }), { type: 'info' });
+      });
+    });
+  }
 
-  el.petalTurbo.addEventListener('click', () => {
-    state.speed = state.speed === 0 ? 2.5 : 0;
-    el.selectSpeed.value = String(state.speed);
-    if (Scene.isReady()) Scene.applySettings({ speed: state.speed });
-    persistSettings();
-    toast(state.speed === 0 ? t('turbo_off') : t('turbo_on'), { type: 'info' });
-    setFlower(false);
-  });
+  if (el.speedDirBtn) {
+    el.speedDirBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      state.spinDir *= -1;
+      if (el.selectSpinDir) el.selectSpinDir.value = String(state.spinDir);
+      if (Scene.isReady()) Scene.applySettings({ spinDir: state.spinDir });
+      persistSettings();
+      toast(state.spinDir === 1 ? t('speed_dir_cw') : t('speed_dir_ccw'), { type: 'info' });
+    });
+  }
 
-  el.petalSavePose.addEventListener('click', () => {
-    savePose(activeScene);
-    setFlower(false);
-  });
+  if (el.speedOffBtn) {
+    el.speedOffBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      state.speed = 0;
+      if (el.selectSpeed) el.selectSpeed.value = '0';
+      if (Scene.isReady()) Scene.applySettings({ speed: 0 });
+      syncSpeedUI();
+      persistSettings();
+      toast(t('speed_off'), { type: 'info' });
+    });
+  }
+
+  // 2. Botón formato y tamaño de carta
+  if (el.petalFormat) {
+    el.petalFormat.addEventListener('click', () => {
+      setFlower(false);
+      if (el.speedSubpopup) el.speedSubpopup.hidden = true;
+      activateTab('tab-3d');
+      if (isMobile()) setSidebar(true);
+      if (el.selectCardFormat) {
+        el.selectCardFormat.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.selectCardFormat.focus();
+      }
+    });
+  }
+
+  // 3. Botón editar frontal y trasera
+  if (el.petalArt) {
+    el.petalArt.addEventListener('click', () => {
+      setFlower(false);
+      if (el.speedSubpopup) el.speedSubpopup.hidden = true;
+      activateTab('tab-deck');
+      if (isMobile()) setSidebar(true);
+      const frontBox = $('#upload-front');
+      if (frontBox) {
+        frontBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        frontBox.focus();
+      }
+    });
+  }
+
+  // 4. Botón alternar animaciones de la carta
+  if (el.petalAnim) {
+    el.petalAnim.addEventListener('click', () => {
+      setFlower(false);
+      if (el.speedSubpopup) el.speedSubpopup.hidden = true;
+      if (typeof playSceneSequence === 'function') {
+        playSceneSequence();
+      } else {
+        const nextScene = (activeScene % 3) + 1;
+        applyScene(nextScene);
+      }
+    });
+  }
+
+  // 5. Botón alternar gravedad / oscilación
+  if (el.petalGravity) {
+    el.petalGravity.addEventListener('click', () => {
+      const order = ['organic', 'subtle', 'breathe', 'dramatic', 'off'];
+      const currentIndex = order.indexOf(state.float);
+      const nextFloat = order[(currentIndex + 1) % order.length];
+      state.float = nextFloat;
+      if (el.selectFloating) el.selectFloating.value = nextFloat;
+      if (Scene.isReady()) Scene.applySettings({ float: nextFloat });
+      persistSettings();
+      toast(`${t('floating')}: ${t('float_' + nextFloat)}`, { type: 'info' });
+    });
+  }
+
+  // 6. Botón hacer captura
+  if (el.petalSnapshot) {
+    el.petalSnapshot.addEventListener('click', () => {
+      setFlower(false);
+      if (el.speedSubpopup) el.speedSubpopup.hidden = true;
+      exportSnapshot();
+    });
+  }
+
+  // 7. Botón hacer captura de video
+  if (el.petalRecord) {
+    el.petalRecord.addEventListener('click', () => {
+      setFlower(false);
+      if (el.speedSubpopup) el.speedSubpopup.hidden = true;
+      exportVideo();
+    });
+  }
+
+  // Botón de cámara en la posición opuesta a cinemático
+  if (el.btnCameraStage) {
+    el.btnCameraStage.addEventListener('click', () => {
+      if (el.cameraDialog) {
+        syncCameraDialogUI();
+        el.cameraDialog.showModal();
+      }
+    });
+  }
+
+  if (el.dlgCamClose) {
+    el.dlgCamClose.addEventListener('click', () => {
+      if (el.cameraDialog) el.cameraDialog.close();
+    });
+  }
+
+  if (el.dlgCamReset) {
+    el.dlgCamReset.addEventListener('click', () => {
+      state.posX = 0;
+      state.posY = 0;
+      state.fov = 38;
+      state.camDistance = 4.6;
+      state.lightIntensity = 1.0;
+      state.lightWarmth = 0.0;
+      if (Scene.isReady()) {
+        Scene.centerCamera();
+        Scene.applySettings({
+          posX: 0,
+          posY: 0,
+          fov: 38,
+          camDistance: 4.6,
+          lightIntensity: 1.0,
+          lightWarmth: 0.0
+        });
+      }
+      syncCameraDialogUI();
+      persistSettings();
+      toast(t('camera_centered'), { type: 'success' });
+    });
+  }
+
+  setupCameraDialogControls();
+}
+
+function syncCameraDialogUI() {
+  if (el.dlgPosY) {
+    el.dlgPosY.value = String(state.posY || 0);
+    if (el.valDlgPosY) el.valDlgPosY.textContent = Number(state.posY || 0).toFixed(2);
+  }
+  if (el.dlgPosX) {
+    el.dlgPosX.value = String(state.posX || 0);
+    if (el.valDlgPosX) el.valDlgPosX.textContent = Number(state.posX || 0).toFixed(2);
+  }
+  if (el.dlgFov) {
+    el.dlgFov.value = String(state.fov || 38);
+    if (el.valDlgFov) el.valDlgFov.textContent = `${Math.round(state.fov || 38)}°`;
+  }
+  if (el.dlgCamDist) {
+    el.dlgCamDist.value = String(state.camDistance || 4.6);
+    if (el.valDlgCamDist) el.valDlgCamDist.textContent = Number(state.camDistance || 4.6).toFixed(1);
+  }
+  if (el.dlgLightIntensity) {
+    el.dlgLightIntensity.value = String(state.lightIntensity !== undefined ? state.lightIntensity : 1.0);
+    if (el.valDlgLightIntensity) el.valDlgLightIntensity.textContent = `${Number(state.lightIntensity !== undefined ? state.lightIntensity : 1.0).toFixed(2)}x`;
+  }
+  if (el.dlgLightWarmth) {
+    el.dlgLightWarmth.value = String(state.lightWarmth || 0);
+    if (el.valDlgLightWarmth) el.valDlgLightWarmth.textContent = Number(state.lightWarmth || 0).toFixed(1);
+  }
+}
+
+function setupCameraDialogControls() {
+  if (el.dlgPosY) {
+    el.dlgPosY.addEventListener('input', () => {
+      state.posY = Number(el.dlgPosY.value);
+      if (el.valDlgPosY) el.valDlgPosY.textContent = state.posY.toFixed(2);
+      if (el.rangePosY) setRange(el.rangePosY, el.valPosY, state.posY, (v) => v.toFixed(2));
+      if (Scene.isReady()) Scene.applySettings({ posY: state.posY });
+      persistSettings();
+    });
+  }
+
+  if (el.dlgPosX) {
+    el.dlgPosX.addEventListener('input', () => {
+      state.posX = Number(el.dlgPosX.value);
+      if (el.valDlgPosX) el.valDlgPosX.textContent = state.posX.toFixed(2);
+      if (Scene.isReady()) Scene.applySettings({ posX: state.posX });
+      persistSettings();
+    });
+  }
+
+  if (el.dlgFov) {
+    el.dlgFov.addEventListener('input', () => {
+      state.fov = Number(el.dlgFov.value);
+      if (el.valDlgFov) el.valDlgFov.textContent = `${Math.round(state.fov)}°`;
+      if (Scene.isReady()) Scene.applySettings({ fov: state.fov });
+      persistSettings();
+    });
+  }
+
+  if (el.dlgCamDist) {
+    el.dlgCamDist.addEventListener('input', () => {
+      state.camDistance = Number(el.dlgCamDist.value);
+      if (el.valDlgCamDist) el.valDlgCamDist.textContent = state.camDistance.toFixed(1);
+      if (el.rangeCamDist) setRange(el.rangeCamDist, el.valCamDist, state.camDistance, (v) => v.toFixed(1));
+      if (Scene.isReady()) Scene.applySettings({ camDistance: state.camDistance });
+      persistSettings();
+    });
+  }
+
+  if (el.dlgLightIntensity) {
+    el.dlgLightIntensity.addEventListener('input', () => {
+      state.lightIntensity = Number(el.dlgLightIntensity.value);
+      if (el.valDlgLightIntensity) el.valDlgLightIntensity.textContent = `${state.lightIntensity.toFixed(2)}x`;
+      if (Scene.isReady()) Scene.applySettings({ lightIntensity: state.lightIntensity });
+      persistSettings();
+    });
+  }
+
+  if (el.dlgLightWarmth) {
+    el.dlgLightWarmth.addEventListener('input', () => {
+      state.lightWarmth = Number(el.dlgLightWarmth.value);
+      if (el.valDlgLightWarmth) el.valDlgLightWarmth.textContent = state.lightWarmth.toFixed(1);
+      if (Scene.isReady()) Scene.applySettings({ lightWarmth: state.lightWarmth });
+      persistSettings();
+    });
+  }
 }
 
 function fabBounds() {
@@ -2217,11 +2456,35 @@ function cacheDom() {
 
   el.flowerMenu = $('#flower-menu');
   el.flowerTrigger = $('#flower-trigger');
-  el.petalCenter = $('#petal-center');
-  el.petalReverse = $('#petal-reverse');
-  el.petalLevel = $('#petal-level');
-  el.petalTurbo = $('#petal-turbo');
-  el.petalSavePose = $('#petal-save-pose');
+  el.petalSpeed = $('#petal-speed');
+  el.petalFormat = $('#petal-format');
+  el.petalArt = $('#petal-art');
+  el.petalAnim = $('#petal-anim');
+  el.petalGravity = $('#petal-gravity');
+  el.petalSnapshot = $('#petal-snapshot');
+  el.petalRecord = $('#petal-record');
+
+  el.speedSubpopup = $('#speed-subpopup');
+  el.speedDirBtn = $('#speed-dir-btn');
+  el.speedOffBtn = $('#speed-off-btn');
+  el.speedPills = $$('.speed-pill-btn');
+
+  el.btnCameraStage = $('#btn-camera-stage');
+  el.cameraDialog = $('#camera-dialog');
+  el.dlgPosY = $('#dlg-pos-y');
+  el.valDlgPosY = $('#val-dlg-pos-y');
+  el.dlgPosX = $('#dlg-pos-x');
+  el.valDlgPosX = $('#val-dlg-pos-x');
+  el.dlgFov = $('#dlg-fov');
+  el.valDlgFov = $('#val-dlg-fov');
+  el.dlgCamDist = $('#dlg-cam-dist');
+  el.valDlgCamDist = $('#val-dlg-cam-dist');
+  el.dlgLightIntensity = $('#dlg-light-intensity');
+  el.valDlgLightIntensity = $('#val-dlg-light-intensity');
+  el.dlgLightWarmth = $('#dlg-light-warmth');
+  el.valDlgLightWarmth = $('#val-dlg-light-warmth');
+  el.dlgCamReset = $('#dlg-cam-reset');
+  el.dlgCamClose = $('#dlg-cam-close');
 
   el.toastStack = $('#toast-stack');
   el.presetDialog = $('#preset-dialog');
@@ -2304,6 +2567,8 @@ function setupChrome() {
   });
 
   let pointerStart = { x: 0, y: 0, time: 0 };
+  let lastCinematicTap = { x: 0, y: 0, time: 0 };
+
   el.viewport.addEventListener('pointerdown', (event) => {
     pointerStart = { x: event.clientX, y: event.clientY, time: performance.now() };
     el.viewportHint.classList.add('hidden');
@@ -2313,15 +2578,23 @@ function setupChrome() {
     if (!document.body.classList.contains('cinematic-mode')) return;
     const dist = Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y);
     const duration = performance.now() - pointerStart.time;
-    // Detección de tap limpio en móvil (menos de 20px de movimiento y menos de 350ms)
-    if (dist < 20 && duration < 350) {
-      exitCinematic();
+    const now = performance.now();
+
+    // Detección de doble tap o doble click para salir del modo cinemático
+    if (dist < 25 && duration < 350) {
+      const doubleTapDist = Math.hypot(event.clientX - lastCinematicTap.x, event.clientY - lastCinematicTap.y);
+      const timeDiff = now - lastCinematicTap.time;
+      if (timeDiff > 40 && timeDiff < 450 && doubleTapDist < 40) {
+        lastCinematicTap = { x: 0, y: 0, time: 0 };
+        exitCinematic();
+        return;
+      }
+      lastCinematicTap = { x: event.clientX, y: event.clientY, time: now };
     }
   });
 
-  el.viewport.addEventListener('click', (event) => {
+  el.viewport.addEventListener('dblclick', (event) => {
     if (!document.body.classList.contains('cinematic-mode')) return;
-    if (Math.hypot(event.clientX - pointerStart.x, event.clientY - pointerStart.y) > 20) return;
     exitCinematic();
   });
 

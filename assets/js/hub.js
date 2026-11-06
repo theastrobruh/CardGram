@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    CardGram — v0.5.5 · Hub / Lobby
    Vista de entrada, estadísticas, biblioteca, colecciones, decks, perfil y
    arranque perezoso del motor 3D. El editor solo se inicializa al entrar.
@@ -3375,6 +3375,11 @@ async function openStudio(tab) {
   }
 
   Scene.setRenderPaused(false);
+  state.scale = 60;
+  if (Scene.isReady()) {
+    Scene.centerCamera();
+    Scene.applySettings({ posX: 0, posY: 0 });
+  }
   syncUI();
   scheduleResize();
 

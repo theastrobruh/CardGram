@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    CardGram — Aqua Glass Studio · v0.4.5
    Sistema visual: Frutiger Aero / glassmorphism luminoso
    ========================================================================== */
@@ -312,6 +312,16 @@ body.sidebar-open-mobile #sidebar-toggle-btn .icon-close {
 
 body.sidebar-collapsed #sidebar-toggle-btn .icon-menu {
   display: block;
+}
+
+#btn-camera-stage {
+  position: fixed;
+  top: 22px;
+  right: 70px;
+  z-index: 120;
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
 }
 
 #btn-cinematic {
@@ -2028,11 +2038,12 @@ input[type="range"]::-moz-range-thumb {
    12. Menú radial
    -------------------------------------------------------------------------- */
 .flower-fab-container {
-  --petal-dir-x: -1;
+  --petal-dir-x: 0;
   --petal-dir-y: -1;
   position: absolute;
-  right: 26px;
-  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 24px;
   z-index: 40;
   width: 54px;
   height: 54px;
@@ -2145,12 +2156,110 @@ input[type="range"]::-moz-range-thumb {
   pointer-events: auto;
 }
 
-/* Abanico de cuarto de círculo; se voltea según la posición del FAB. */
-.flower-fab-container.open .petal-1 { transform: translate(calc(100px * var(--petal-dir-x)), 0) scale(1); transition-delay: 0.02s; }
-.flower-fab-container.open .petal-2 { transform: translate(calc(92px * var(--petal-dir-x)), calc(38px * var(--petal-dir-y))) scale(1); transition-delay: 0.05s; }
-.flower-fab-container.open .petal-3 { transform: translate(calc(71px * var(--petal-dir-x)), calc(71px * var(--petal-dir-y))) scale(1); transition-delay: 0.08s; }
-.flower-fab-container.open .petal-4 { transform: translate(calc(38px * var(--petal-dir-x)), calc(92px * var(--petal-dir-y))) scale(1); transition-delay: 0.11s; }
-.flower-fab-container.open .petal-5 { transform: translate(0, calc(100px * var(--petal-dir-y))) scale(1); transition-delay: 0.14s; }
+/* Abanico simétrico desplegado hacia arriba (7 opciones) */
+.flower-fab-container.open .petal-1 { transform: translate(-108px, -42px) scale(1); transition-delay: 0.02s; }
+.flower-fab-container.open .petal-2 { transform: translate(-78px, -86px) scale(1); transition-delay: 0.04s; }
+.flower-fab-container.open .petal-3 { transform: translate(-38px, -118px) scale(1); transition-delay: 0.06s; }
+.flower-fab-container.open .petal-4 { transform: translate(0px, -128px) scale(1); transition-delay: 0.08s; }
+.flower-fab-container.open .petal-5 { transform: translate(38px, -118px) scale(1); transition-delay: 0.10s; }
+.flower-fab-container.open .petal-6 { transform: translate(78px, -86px) scale(1); transition-delay: 0.12s; }
+.flower-fab-container.open .petal-7 { transform: translate(108px, -42px) scale(1); transition-delay: 0.14s; }
+
+/* Subpopup de velocidad */
+.speed-subpopup {
+  position: absolute;
+  bottom: calc(100% + 140px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.96);
+  border-radius: 18px;
+  padding: 10px 12px;
+  box-shadow: 0 12px 32px rgba(6, 45, 60, 0.22), var(--inset-hi);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 50;
+  width: 260px;
+}
+.speed-subpopup[hidden] {
+  display: none !important;
+}
+.speed-subpopup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.speed-subpopup-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.speed-subpopup-tools {
+  display: flex;
+  gap: 6px;
+}
+.speed-dir-btn, .speed-off-btn {
+  background: rgba(7, 51, 63, 0.08);
+  border: 1px solid rgba(7, 51, 63, 0.12);
+  border-radius: 8px;
+  padding: 3px 8px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.speed-dir-btn .icon {
+  width: 14px;
+  height: 14px;
+}
+.speed-dir-btn:hover, .speed-off-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+.speed-pills {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+.speed-pill-btn {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(7, 51, 63, 0.12);
+  border-radius: 8px;
+  padding: 5px 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: center;
+}
+.speed-pill-btn.active, .speed-pill-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Diálogo de cámara */
+.camera-dialog-card {
+  max-width: 440px;
+  width: 90vw;
+}
+.camera-dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
 
 .petal-btn::after {
   content: attr(data-tip);
@@ -2540,6 +2649,9 @@ dialog::backdrop {
 body.cinematic-mode #sidebar,
 body.cinematic-mode #sidebar-toggle-btn,
 body.cinematic-mode #btn-cinematic,
+body.cinematic-mode #btn-camera-stage,
+body.cinematic-mode #btn-home-hub-floating,
+body.cinematic-mode #btn-cinematic-exit,
 body.cinematic-mode .flower-fab-container,
 body.cinematic-mode .stage-chips,
 body.cinematic-mode .viewport-hint,
@@ -2666,6 +2778,11 @@ body.cinematic-mode .toast-stack {
   .flower-fab-container {
     right: 20px;
     bottom: 20px;
+  }
+
+  #btn-camera-stage {
+    top: 18px;
+    right: 64px;
   }
 
   #btn-cinematic,

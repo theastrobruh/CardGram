@@ -22,6 +22,10 @@ const Scene = (() => {
     float: 'organic',
     camDistance: 4.6,
     posY: 0,
+    posX: 0,
+    fov: 38,
+    lightIntensity: 1.0,
+    lightWarmth: 0.0,
     tilt: 1,
     bg: 'aqua'
   };
@@ -90,6 +94,11 @@ const Scene = (() => {
   let matFront = null;
   let matBack = null;
   let matEdge = null;
+
+  let lightAmbient = null;
+  let lightKey = null;
+  let lightFill = null;
+  let lightRim = null;
 
   let frontTexture = null;
   let backTexture = null;
@@ -242,20 +251,45 @@ const Scene = (() => {
   }
 
   function buildLighting() {
-    const ambient = new THREE.AmbientLight(0xffffff, 0.4);
-    scene.add(ambient);
+    lightAmbient = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(lightAmbient);
 
-    const key = new THREE.DirectionalLight(0xfff8ee, 1.2);
-    key.position.set(3, 4, 4);
-    scene.add(key);
+    lightKey = new THREE.DirectionalLight(0xfff8ee, 1.2);
+    lightKey.position.set(3, 4, 4);
+    scene.add(lightKey);
 
-    const fill = new THREE.DirectionalLight(0xbcd7ff, 0.55);
-    fill.position.set(-3, -1, 3);
-    scene.add(fill);
+    lightFill = new THREE.DirectionalLight(0xbcd7ff, 0.55);
+    lightFill.position.set(-3, -1, 3);
+    scene.add(lightFill);
 
-    const rim = new THREE.DirectionalLight(0xd8fff9, 0.9);
-    rim.position.set(0, 4, -3);
-    scene.add(rim);
+    lightRim = new THREE.DirectionalLight(0xd8fff9, 0.9);
+    lightRim.position.set(0, 4, -3);
+    scene.add(lightRim);
+
+    updateLighting();
+  }
+
+  function updateLighting() {
+    if (!lightAmbient || !lightKey || !lightFill || !lightRim) return;
+    const mult = Number.isFinite(settings.lightIntensity) ? settings.lightIntensity : 1.0;
+    const warmth = Number.isFinite(settings.lightWarmth) ? settings.lightWarmth : 0.0;
+
+    lightAmbient.intensity = 0.4 * mult;
+    lightKey.intensity = 1.2 * mult;
+    lightFill.intensity = 0.55 * mult;
+    lightRim.intensity = 0.9 * mult;
+
+    if (warmth > 0) {
+      lightKey.color.setRGB(1.0, 0.97 - warmth * 0.15, 0.93 - warmth * 0.35);
+      lightFill.color.setRGB(0.74 + warmth * 0.2, 0.84, 1.0 - warmth * 0.2);
+    } else if (warmth < 0) {
+      const cool = -warmth;
+      lightKey.color.setRGB(0.92 - cool * 0.1, 0.97, 1.0);
+      lightFill.color.setRGB(0.65, 0.82, 1.0);
+    } else {
+      lightKey.color.setHex(0xfff8ee);
+      lightFill.color.setHex(0xbcd7ff);
+    }
   }
 
   function createEnvironmentTexture() {
@@ -307,6 +341,15 @@ const Scene = (() => {
 
     if (next.camDistance !== undefined && Number(next.camDistance) !== previous.camDistance) {
       setCameraDistance(next.camDistance);
+    }
+
+    if (next.fov !== undefined && camera) {
+      camera.fov = clampNumber(Number(next.fov) || 38, 15, 90);
+      camera.updateProjectionMatrix();
+    }
+
+    if (next.lightIntensity !== undefined || next.lightWarmth !== undefined) {
+      updateLighting();
     }
 
     if (next.gloss !== undefined) setGloss(settings.gloss);
@@ -822,10 +865,15 @@ const Scene = (() => {
   function centerCamera() {
     if (!ready) return;
     isTransitioning = false;
+    settings.posX = 0;
+    settings.posY = 0;
+    if (cardGroup) {
+      cardGroup.position.set(0, 0, 0);
+      cardGroup.rotation.set(0, 0, 0);
+    }
     camera.position.set(0, 0, settings.camDistance);
     controls.target.set(0, 0, 0);
     controls.update();
-    cardGroup.rotation.set(0, 0, 0);
   }
 
   /* ------------------------------------------------------------------------
@@ -898,7 +946,8 @@ const Scene = (() => {
 
     cardGroup.rotation.x = rotX;
     cardGroup.rotation.z = rotZ;
-    cardGroup.position.y = settings.posY + offsetY;
+    cardGroup.position.x = Number(settings.posX) || 0;
+    cardGroup.position.y = (Number(settings.posY) || 0) + offsetY;
   }
 
   /* ------------------------------------------------------------------------

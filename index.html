@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -12,21 +12,21 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=133">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=133">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=134">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=134">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=133" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=133" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=133" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=133" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=133" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=133" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=133" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=133" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=133" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=133" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=134" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=134" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=134" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=134" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=134" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=134" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=134" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=134" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=134" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=134" defer></script>
 </head>
 <body data-view="hub">
 
@@ -1113,6 +1113,10 @@
     <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>
   </button>
 
+  <button id="btn-camera-stage" class="icon-btn" type="button" aria-haspopup="dialog" aria-controls="camera-dialog" aria-label="Ajustes de cámara e iluminación" data-i18n-aria-label="ui_camera_dialog" title="Ajustes de cámara e iluminación" data-i18n-title="ui_camera_dialog">
+    <svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg>
+  </button>
+
   <button id="btn-cinematic" class="icon-btn" type="button" aria-label="Activar modo cinemático" data-i18n-aria-label="ui_cinematic" title="Modo cinemático (C)" data-i18n-title="ui_cinematic_title">
     <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
   </button>
@@ -1557,11 +1561,15 @@
         <div class="control-row">
           <label for="select-speed"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg><span data-i18n="spin_speed">Velocidad</span></label>
           <select id="select-speed">
-            <option value="0" data-i18n="spin_static">Pausado</option>
-            <option value="0.5" selected data-i18n="spin_slow">Lento</option>
-            <option value="1" data-i18n="spin_normal">Normal</option>
-            <option value="1.5" data-i18n="spin_dynamic">Dinámico</option>
-            <option value="2.5" data-i18n="spin_turbo">Turbo</option>
+            <option value="0">0x (Pausado)</option>
+            <option value="0.25">0.25x</option>
+            <option value="0.5" selected>0.5x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1">1.0x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2.0x</option>
+            <option value="2.5">2.5x</option>
           </select>
         </div>
 
@@ -1762,22 +1770,52 @@
 
     <div class="flower-fab-container" id="flower-menu">
       <div class="flower-petals">
-        <button class="petal-btn petal-1" id="petal-center" type="button" data-tip="Centrar cámara" data-i18n-tip="reset_camera" title="Centrar cámara" data-i18n-title="reset_camera" aria-label="Centrar cámara" data-i18n-aria-label="reset_camera">
-          <svg class="icon" aria-hidden="true"><use href="#i-target"></use></svg>
+        <button class="petal-btn petal-1" id="petal-speed" type="button" data-tip="Velocidad (8)" title="Velocidad de giro" aria-label="Velocidad de giro">
+          <svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>
         </button>
-        <button class="petal-btn petal-2" id="petal-reverse" type="button" data-tip="Invertir giro" data-i18n-tip="ui_reverse" title="Invertir giro" data-i18n-title="ui_reverse" aria-label="Invertir sentido de giro" data-i18n-aria-label="ui_reverse">
-          <svg class="icon" aria-hidden="true"><use href="#i-rotate"></use></svg>
+        <button class="petal-btn petal-2" id="petal-format" type="button" data-tip="Formato y tamaño" title="Formato y tamaño de carta" aria-label="Formato y tamaño de carta">
+          <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
         </button>
-        <button class="petal-btn petal-3" id="petal-level" type="button" data-tip="Nivelar inclinación" data-i18n-tip="ui_level" title="Nivelar inclinación" data-i18n-title="ui_level" aria-label="Nivelar inclinación" data-i18n-aria-label="ui_level">
+        <button class="petal-btn petal-3" id="petal-art" type="button" data-tip="Editar anverso y reverso" title="Editar imagen frontal y trasera" aria-label="Editar frontal y trasera">
+          <svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg>
+        </button>
+        <button class="petal-btn petal-4" id="petal-anim" type="button" data-tip="Alternar animación" title="Alternar animaciones" aria-label="Alternar animaciones de la carta">
+          <svg class="icon" aria-hidden="true"><use href="#i-play"></use></svg>
+        </button>
+        <button class="petal-btn petal-5" id="petal-gravity" type="button" data-tip="Alternar gravedad" title="Alternar gravedad / oscilación" aria-label="Alternar gravedad">
           <svg class="icon" aria-hidden="true"><use href="#i-level"></use></svg>
         </button>
-        <button class="petal-btn petal-4" id="petal-turbo" type="button" data-tip="Giro turbo" data-i18n-tip="ui_turbo" title="Giro turbo" data-i18n-title="ui_turbo" aria-label="Alternar giro turbo" data-i18n-aria-label="ui_turbo">
-          <svg class="icon" aria-hidden="true"><use href="#i-bolt"></use></svg>
+        <button class="petal-btn petal-6" id="petal-snapshot" type="button" data-tip="Capturar foto PNG" title="Hacer captura de pantalla" aria-label="Hacer captura">
+          <svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg>
         </button>
-        <button class="petal-btn petal-5" id="petal-save-pose" type="button" data-tip="Guardar pose" data-i18n-tip="save_pose" title="Guardar pose en Toma 1" data-i18n-title="save_pose" aria-label="Guardar pose" data-i18n-aria-label="save_pose">
-          <svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>
+        <button class="petal-btn petal-7" id="petal-record" type="button" data-tip="Capturar video" title="Hacer captura de video" aria-label="Hacer captura de video">
+          <svg class="icon" aria-hidden="true"><use href="#i-film"></use></svg>
         </button>
       </div>
+
+      <!-- Menú popup de velocidad (8 velocidades + switch de dirección + botón OFF) -->
+      <div class="speed-subpopup" id="speed-subpopup" hidden>
+        <div class="speed-subpopup-header">
+          <span class="speed-subpopup-title" data-i18n="spin_speed">Velocidad</span>
+          <div class="speed-subpopup-tools">
+            <button class="speed-dir-btn" id="speed-dir-btn" type="button" title="Invertir sentido" aria-label="Invertir sentido">
+              <svg class="icon" aria-hidden="true"><use href="#i-rotate"></use></svg>
+            </button>
+            <button class="speed-off-btn" id="speed-off-btn" type="button" title="Detener giro" aria-label="Detener giro">OFF</button>
+          </div>
+        </div>
+        <div class="speed-pills" id="speed-pills">
+          <button type="button" class="speed-pill-btn" data-speed="0.25">0.25x</button>
+          <button type="button" class="speed-pill-btn active" data-speed="0.5">0.5x</button>
+          <button type="button" class="speed-pill-btn" data-speed="0.75">0.75x</button>
+          <button type="button" class="speed-pill-btn" data-speed="1">1.0x</button>
+          <button type="button" class="speed-pill-btn" data-speed="1.25">1.25x</button>
+          <button type="button" class="speed-pill-btn" data-speed="1.5">1.5x</button>
+          <button type="button" class="speed-pill-btn" data-speed="2">2.0x</button>
+          <button type="button" class="speed-pill-btn" data-speed="2.5">2.5x</button>
+        </div>
+      </div>
+
       <button class="flower-main-trigger" id="flower-trigger" type="button" aria-label="Abrir acciones rápidas" data-i18n-aria-label="ui_quick_actions" aria-expanded="false" aria-controls="flower-menu" title="Acciones rápidas" data-i18n-title="ui_quick_actions_title">
         <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
       </button>
@@ -1862,6 +1900,73 @@
         <button class="btn btn-primary" id="hand-save" type="submit" data-i18n="hub_hand_save">Guardar mano</button>
       </div>
     </form>
+  </dialog>
+
+  <dialog id="camera-dialog" aria-labelledby="camera-dialog-title">
+    <div class="dialog-card camera-dialog-card">
+      <div class="dialog-head">
+        <span class="dialog-icon"><svg class="icon" aria-hidden="true"><use href="#i-camera"></use></svg></span>
+        <div>
+          <h2 class="dialog-title" id="camera-dialog-title" data-i18n="cam_dialog_title">Cámara e iluminación</h2>
+          <p class="dialog-desc" data-i18n="cam_dialog_desc">Controla altura, posición, perspectiva, fov e iluminación de la escena.</p>
+        </div>
+      </div>
+
+      <div class="camera-dialog-body">
+        <div class="control-row control-row-col">
+          <div class="header-line">
+            <label for="dlg-pos-y"><svg class="icon" aria-hidden="true"><use href="#i-level"></use></svg><span data-i18n="pos_y">Posición vertical</span></label>
+            <output class="slider-val" id="val-dlg-pos-y" for="dlg-pos-y">0.00</output>
+          </div>
+          <input type="range" id="dlg-pos-y" min="-1.5" max="1.5" step="0.05" value="0">
+        </div>
+
+        <div class="control-row control-row-col">
+          <div class="header-line">
+            <label for="dlg-pos-x"><svg class="icon" aria-hidden="true"><use href="#i-chevron"></use></svg><span data-i18n="pos_x">Posición horizontal</span></label>
+            <output class="slider-val" id="val-dlg-pos-x" for="dlg-pos-x">0.00</output>
+          </div>
+          <input type="range" id="dlg-pos-x" min="-1.5" max="1.5" step="0.05" value="0">
+        </div>
+
+        <div class="control-row control-row-col">
+          <div class="header-line">
+            <label for="dlg-fov"><svg class="icon" aria-hidden="true"><use href="#i-expand"></use></svg><span data-i18n="cam_fov">Perspectiva / FOV</span></label>
+            <output class="slider-val" id="val-dlg-fov" for="dlg-fov">38°</output>
+          </div>
+          <input type="range" id="dlg-fov" min="20" max="75" step="1" value="38">
+        </div>
+
+        <div class="control-row control-row-col">
+          <div class="header-line">
+            <label for="dlg-cam-dist"><svg class="icon" aria-hidden="true"><use href="#i-sliders"></use></svg><span data-i18n="cam_dist">Distancia de cámara</span></label>
+            <output class="slider-val" id="val-dlg-cam-dist" for="dlg-cam-dist">4.6</output>
+          </div>
+          <input type="range" id="dlg-cam-dist" min="2" max="8" step="0.1" value="4.6">
+        </div>
+
+        <div class="control-row control-row-col">
+          <div class="header-line">
+            <label for="dlg-light-intensity"><svg class="icon" aria-hidden="true"><use href="#i-sun"></use></svg><span data-i18n="light_intensity">Intensidad de luz</span></label>
+            <output class="slider-val" id="val-dlg-light-intensity" for="dlg-light-intensity">1.0x</output>
+          </div>
+          <input type="range" id="dlg-light-intensity" min="0.3" max="2.0" step="0.05" value="1.0">
+        </div>
+
+        <div class="control-row control-row-col">
+          <div class="header-line">
+            <label for="dlg-light-warmth"><svg class="icon" aria-hidden="true"><use href="#i-palette"></use></svg><span data-i18n="light_warmth">Calidez de iluminación</span></label>
+            <output class="slider-val" id="val-dlg-light-warmth" for="dlg-light-warmth">0.0</output>
+          </div>
+          <input type="range" id="dlg-light-warmth" min="-1.0" max="1.0" step="0.1" value="0.0">
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn btn-ghost" id="dlg-cam-reset" type="button" data-i18n="reset_camera">Centrar cámara</button>
+        <button class="btn btn-primary" id="dlg-cam-close" type="button" data-i18n="got_it">Listo</button>
+      </div>
+    </div>
   </dialog>
 
   <dialog id="help-dialog" aria-labelledby="help-title">

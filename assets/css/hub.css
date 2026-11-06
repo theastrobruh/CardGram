@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    CardGram — v0.4.5 · Hub / Lobby
    Pantalla de entrada, biblioteca, colecciones, explorador y perfil.
    Reutiliza los tokens visuales de app.css (Aqua Glass Studio).
@@ -15,6 +15,7 @@ body[data-view="hub"] {
 body[data-view="hub"] #sidebar,
 body[data-view="hub"] #sidebar-toggle-btn,
 body[data-view="hub"] #sidebar-backdrop,
+body[data-view="hub"] #btn-camera-stage,
 body[data-view="hub"] #btn-cinematic,
 body[data-view="hub"] #btn-cinematic-exit,
 body[data-view="hub"] #cinematic-exit-tip,
