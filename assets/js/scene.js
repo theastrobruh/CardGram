@@ -186,7 +186,7 @@ const Scene = (() => {
       controls.dampingFactor = 0.06;
       controls.enablePan = false;
       controls.minDistance = 2;
-      controls.maxDistance = 9;
+      controls.maxDistance = 14;
       controls.rotateSpeed = 0.8;
       controls.zoomSpeed = 0.75;
       controls.target.set(0, 0, 0);
@@ -419,9 +419,38 @@ const Scene = (() => {
     matEdge.needsUpdate = true;
   }
 
+  let customBgTexture = null;
+
+  function applyCustomBackground(dataUrl) {
+    if (!dataUrl) return;
+    settings.bg = 'custom';
+    if (!scene) return;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      if (customBgTexture) customBgTexture.dispose();
+      customBgTexture = new THREE.Texture(img);
+      customBgTexture.needsUpdate = true;
+      customBgTexture.encoding = THREE.sRGBEncoding;
+      scene.background = customBgTexture;
+      if (wrapper) {
+        wrapper.classList.remove('bg-transparent');
+        wrapper.style.backgroundImage = `url("${dataUrl}")`;
+        wrapper.style.backgroundSize = 'cover';
+        wrapper.style.backgroundPosition = 'center';
+      }
+    };
+    img.src = dataUrl;
+  }
+
   function applyBackground(key) {
     settings.bg = key;
     if (!scene) return;
+
+    if (key === 'custom' && customBgTexture) {
+      scene.background = customBgTexture;
+      return;
+    }
 
     const definition = BACKGROUNDS[key];
     if (!definition) {
@@ -429,12 +458,14 @@ const Scene = (() => {
       if (wrapper) {
         wrapper.classList.add('bg-transparent');
         wrapper.style.background = '';
+        wrapper.style.backgroundImage = '';
       }
       return;
     }
 
     if (wrapper) {
       wrapper.classList.remove('bg-transparent');
+      wrapper.style.backgroundImage = '';
       wrapper.style.background = definition.css;
     }
     scene.background = getBackgroundTexture(key);
@@ -477,7 +508,7 @@ const Scene = (() => {
   }
 
   function setCameraDistance(value) {
-    const distance = clampNumber(Number(value) || DEFAULTS.camDistance, 2, 9);
+    const distance = clampNumber(Number(value) || DEFAULTS.camDistance, 2, 14);
     settings.camDistance = distance;
     if (!camera || !controls) return;
 
@@ -858,7 +889,7 @@ const Scene = (() => {
     isTransitioning = true;
 
     const distance = transTargetCam.distanceTo(transTargetCtrl);
-    settings.camDistance = clampNumber(distance, 2, 9);
+    settings.camDistance = clampNumber(distance, 2, 14);
     return { distance: settings.camDistance };
   }
 

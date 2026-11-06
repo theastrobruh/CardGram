@@ -320,7 +320,7 @@ function sanitizeSettings(raw) {
   result.speed = [0, 0.25, 0.5, 0.75, 1, 1.5, 2, 2.5].includes(Number(raw.speed)) ? Number(raw.speed) : DEFAULTS.speed;
   result.spinDir = Number(raw.spinDir) === -1 ? -1 : 1;
   result.float = ['organic', 'subtle', 'breathe', 'dramatic', 'off'].includes(raw.float) ? raw.float : DEFAULTS.float;
-  result.camDistance = number(raw.camDistance, 2, 8, DEFAULTS.camDistance);
+  result.camDistance = number(raw.camDistance, 2, 14, DEFAULTS.camDistance);
   result.posY = number(raw.posY, -1.5, 1.5, DEFAULTS.posY);
   result.posX = number(raw.posX, -2.0, 2.0, DEFAULTS.posX);
   result.fov = number(raw.fov, 15, 90, DEFAULTS.fov);
@@ -1695,6 +1695,48 @@ function setupControls() {
   el.btnSaveCardPreset.addEventListener('click', openPresetDialog);
   el.btnRestoreCard.addEventListener('click', restoreDefaultCard);
   el.btnPlayScenes.addEventListener('click', playSequence);
+
+  if (el.btnQuickBg && el.quickBgPopup) {
+    el.btnQuickBg.addEventListener('click', (e) => {
+      e.stopPropagation();
+      el.quickBgPopup.hidden = !el.quickBgPopup.hidden;
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!el.quickBgPopup.hidden && !el.quickBgPopup.contains(e.target) && !el.btnQuickBg.contains(e.target)) {
+        el.quickBgPopup.hidden = true;
+      }
+    });
+
+    $$('.quick-bg-opt').forEach((opt) => {
+      opt.addEventListener('click', () => {
+        const bg = opt.getAttribute('data-bg');
+        state.bg = bg;
+        setSwatch('bg-grid', bg);
+        if (Scene.isReady()) Scene.applySettings({ bg });
+        persistSettings();
+        el.quickBgPopup.hidden = true;
+        toast(`${t('sec_env')}: ${bg}`, { type: 'info' });
+      });
+    });
+  }
+
+  if (el.customBgInput) {
+    el.customBgInput.addEventListener('change', () => {
+      const file = el.customBgInput.files && el.customBgInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        if (Scene.isReady() && typeof Scene.applyCustomBackground === 'function') {
+          Scene.applyCustomBackground(dataUrl);
+        }
+        if (el.quickBgPopup) el.quickBgPopup.hidden = true;
+        toast(t('upload_ok'), { type: 'success' });
+      };
+      reader.readAsDataURL(file);
+    });
+  }
 }
 
 function setupScenes() {
@@ -2495,6 +2537,9 @@ function cacheDom() {
   el.valDlgLightWarmth = $('#val-dlg-light-warmth');
   el.dlgCamReset = $('#dlg-cam-reset');
   el.dlgCamClose = $('#dlg-cam-close');
+  el.btnQuickBg = $('#btn-quick-bg');
+  el.quickBgPopup = $('#quick-bg-popup');
+  el.customBgInput = $('#custom-bg-input');
 
   el.toastStack = $('#toast-stack');
   el.presetDialog = $('#preset-dialog');

@@ -3376,9 +3376,12 @@ async function openStudio(tab) {
 
   Scene.setRenderPaused(false);
   state.scale = 100;
+  const isMobileResponsive = typeof isMobile === 'function' ? isMobile() : (window.innerWidth <= 860);
+  const entryCamDist = isMobileResponsive ? 9.6 : 6.8;
+  state.camDistance = entryCamDist;
   if (Scene.isReady()) {
     Scene.centerCamera();
-    Scene.applySettings({ posX: 0, posY: 0, camDistance: 6.8 });
+    Scene.applySettings({ posX: 0, posY: 0, camDistance: entryCamDist });
   }
   syncUI();
   scheduleResize();
@@ -3482,7 +3485,7 @@ function onHubClick(event) {
     const card = favoriteCard();
     if (card) {
       closeHubMenu({ restoreFocus: false, silent: true });
-      openCatalogCard(card.id, 'canvas');
+      openCatalogCard(card.id, 'deck');
     }
     return;
   }

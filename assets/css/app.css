@@ -3237,3 +3237,127 @@ body.cinematic-mode .toast-stack {
   gap: 6px;
   padding-top: 2px;
 }
+
+/* Mini botón flotante en esquina inferior izquierda para cambiar fondo */
+.bottom-left-bg-wrap {
+  position: absolute;
+  left: 20px;
+  bottom: 24px;
+  z-index: 45;
+}
+
+.mini-bg-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 16px rgba(7, 51, 63, 0.18), var(--inset-hi);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.mini-bg-btn:hover {
+  transform: scale(1.08);
+  background: #ffffff;
+  color: var(--accent);
+}
+
+.mini-bg-btn .icon {
+  width: 17px;
+  height: 17px;
+}
+
+.quick-bg-popup {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  width: 210px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.98);
+  border-radius: 16px;
+  padding: 10px 12px;
+  box-shadow: 0 10px 28px rgba(7, 51, 63, 0.2), var(--inset-hi);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 50;
+  animation: dialogIn 0.2s var(--ease) both;
+}
+
+.quick-bg-popup[hidden] {
+  display: none !important;
+}
+
+.quick-bg-title {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.quick-bg-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.quick-bg-opt {
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(7, 51, 63, 0.15);
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.quick-bg-opt:hover {
+  transform: scale(1.06);
+  border-color: var(--accent);
+}
+
+.quick-bg-upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(7, 51, 63, 0.06);
+  border: 1px dashed rgba(7, 51, 63, 0.22);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.quick-bg-upload-label:hover {
+  background: rgba(47, 143, 221, 0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.quick-bg-upload-label .icon {
+  width: 14px;
+  height: 14px;
+}
+
+body.cinematic-mode .bottom-left-bg-wrap {
+  display: none !important;
+}
+
+@media (max-width: 860px) {
+  .bottom-left-bg-wrap {
+    left: 14px;
+    bottom: 18px;
+  }
+}
