@@ -3377,7 +3377,7 @@ async function openStudio(tab) {
   Scene.setRenderPaused(false);
   state.scale = 100;
   const isMobileResponsive = typeof isMobile === 'function' ? isMobile() : (window.innerWidth <= 860);
-  const entryCamDist = isMobileResponsive ? 9.6 : 6.8;
+  const entryCamDist = isMobileResponsive ? 3.8 : 4.6;
   state.camDistance = entryCamDist;
   if (Scene.isReady()) {
     Scene.centerCamera();
