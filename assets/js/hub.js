@@ -9,7 +9,8 @@ const HUB_STORAGE = {
   profile: 'cardgram.profile.v1',
   data: 'cardgram.hub.v1',
   booster: 'cardgram.booster.v1',
-  layout: 'cardgram.layout.v1'
+  layout: 'cardgram.layout.v1',
+  home: 'cardgram.home.v1'
 };
 
 const HUB_LAYOUT_DEFAULT = {
@@ -29,6 +30,16 @@ const HUB_LAYOUT_DEFAULT = {
   leftExpanded: false,
   rightExpanded: false,
   heroExpanded: false
+};
+
+const HUB_HOME_DEFAULT = {
+  drawSource: 'all',
+  drawCount: 3,
+  deckSource: 'all',
+  handIds: [],
+  drawCursor: 0,
+  dropCardId: null,
+  loose: []
 };
 
 const HUB_PANELS = ['home', 'booster', 'collections', 'explore', 'profile'];
@@ -1012,6 +1023,7 @@ function persistBooster() {
    Composición libre del inicio de escritorio
    -------------------------------------------------------------------------- */
 let hubLayout = { ...HUB_LAYOUT_DEFAULT };
+let hubHome = { ...HUB_HOME_DEFAULT };
 
 function sanitizeLayout(raw) {
   const data = { ...HUB_LAYOUT_DEFAULT };
@@ -1923,11 +1935,306 @@ function cycleHand(direction) {
   if (next) setFavoriteCard(next.id);
 }
 
+function sanitizeHome(raw) {
+  const data = { ...HUB_HOME_DEFAULT };
+  if (!raw || typeof raw !== 'object') return data;
+  const sources = new Set(['all']);
+  HUB_CATALOG.collections.forEach((collection) => sources.add(`set:${collection.id}`));
+  const decks = Array.isArray(hubData.decks) ? hubData.decks : [];
+  decks.forEach((deck) => sources.add(`deck:${deck.id}`));
+  if (typeof raw.drawSource === 'string') data.drawSource = sources.has(raw.drawSource) ? raw.drawSource : 'all';
+  if (typeof raw.deckSource === 'string') data.deckSource = sources.has(raw.deckSource) ? raw.deckSource : 'all';
+  const count = Number(raw.drawCount);
+  data.drawCount = Number.isFinite(count) ? Math.min(5, Math.max(1, Math.floor(count))) : 3;
+  if (Array.isArray(raw.handIds)) {
+    data.handIds = raw.handIds.filter((id) => HUB_CATALOG.byId(id)).slice(0, 5);
+  }
+  const cursor = Number(raw.drawCursor);
+  data.drawCursor = Number.isFinite(cursor) && cursor >= 0 ? Math.floor(cursor) : 0;
+  if (typeof raw.dropCardId === 'string' && HUB_CATALOG.byId(raw.dropCardId)) {
+    data.dropCardId = raw.dropCardId;
+  }
+  if (Array.isArray(raw.loose)) {
+    data.loose = raw.loose
+      .filter((entry) => entry && typeof entry.id === 'string' && HUB_CATALOG.byId(entry.id))
+      .slice(0, 6)
+      .map((entry) => ({
+        id: entry.id,
+        x: Math.min(0.92, Math.max(0.02, Number(entry.x) || 0.5)),
+        y: Math.min(0.82, Math.max(0.05, Number(entry.y) || 0.5))
+      }));
+  }
+  return data;
+}
+
+function homeSourceOptions() {
+  const options = [{ value: 'all', label: t('home_source_all') }];
+  HUB_CATALOG.collections.forEach((collection) => {
+    options.push({ value: `set:${collection.id}`, label: collection.name });
+  });
+  if (Array.isArray(hubData.decks)) {
+    hubData.decks.forEach((deck) => {
+      options.push({ value: `deck:${deck.id}`, label: `${deck.emoji || '🃏'} ${deck.name}` });
+    });
+  }
+  return options;
+}
+
+function homeSourceCards(source) {
+  if (source.startsWith('set:')) {
+    const collection = HUB_CATALOG.collections.find((entry) => entry.id === source.slice(4));
+    return collection ? collection.cards.slice() : [];
+  }
+  if (source.startsWith('deck:')) {
+    const deck = hubData.decks.find((entry) => entry.id === source.slice(5));
+    if (deck) {
+      const ids = Array.from(new Set([...(deck.cardIds || []), ...((deck.side && deck.side.cardIds) || [])]));
+      const cards = ids.map((id) => HUB_CATALOG.byId(id)).filter(Boolean);
+      if (cards.length) return cards;
+    }
+  }
+  const owned = [];
+  HUB_CATALOG.collections.forEach((collection) => {
+    ownedIn(collection.id).forEach((id) => {
+      if (!owned.includes(id)) owned.push(id);
+    });
+  });
+  const cards = owned.map((id) => HUB_CATALOG.byId(id)).filter(Boolean);
+  return cards.length ? cards : HUB_CATALOG.cards.slice();
+}
+
+function homeHandCards() {
+  return hubHome.handIds.map((id) => HUB_CATALOG.byId(id)).filter(Boolean);
+}
+
+function saveHome() {
+  storage.write(HUB_STORAGE.home, hubHome);
+}
+
+function drawHomeHand(options = {}) {
+  const cards = homeSourceCards(hubHome.drawSource);
+  if (!cards.length) return;
+  const count = Math.min(hubHome.drawCount, cards.length);
+  const hand = [];
+  for (let index = 0; index < count; index += 1) {
+    hand.push(cards[(hubHome.drawCursor + index) % cards.length].id);
+  }
+  hubHome.drawCursor = (hubHome.drawCursor + count) % cards.length;
+  hubHome.handIds = hand;
+  saveHome();
+  renderFeaturedStack();
+  renderHomeTable();
+  if (!options.silent) {
+    if (window.Sound) window.Sound.play('flip');
+    toast(t('home_draw_toast', { count }), { type: 'info' });
+  }
+}
+
+function homeDropCard() {
+  if (!hubHome.dropCardId) return null;
+  return HUB_CATALOG.byId(hubHome.dropCardId);
+}
+
+function drawHomeDeckCard() {
+  const cards = homeSourceCards(hubHome.deckSource);
+  if (!cards.length) {
+    toast(t('home_deck_empty'), { type: 'warning' });
+    return;
+  }
+  let card = cards[Math.floor(Math.random() * cards.length)];
+  if (cards.length > 1 && hubHome.dropCardId === card.id) {
+    card = cards.find((entry) => entry.id !== hubHome.dropCardId) || card;
+  }
+  hubHome.dropCardId = card.id;
+  saveHome();
+  renderHomeTable();
+  if (window.Sound) window.Sound.play('flip');
+}
+
+function addHomeLooseCard() {
+  const card = homeDropCard();
+  if (!card) return;
+  if (hubHome.loose.length >= 6) {
+    toast(t('home_loose_full'), { type: 'warning' });
+    return;
+  }
+  if (hubHome.loose.some((entry) => entry.id === card.id)) {
+    toast(t('home_loose_duplicate'), { type: 'info' });
+  }
+  hubHome.loose.push({
+    id: card.id,
+    x: Math.min(0.9, 0.58 + Math.random() * 0.18),
+    y: Math.min(0.78, 0.35 + Math.random() * 0.3)
+  });
+  hubHome.dropCardId = null;
+  saveHome();
+  renderHomeTable();
+  if (window.Sound) window.Sound.play('success');
+}
+
+function removeHomeLooseCard(index) {
+  hubHome.loose.splice(index, 1);
+  saveHome();
+  renderHomeTable();
+}
+
+function makeHomeLooseCard(entry, index) {
+  const card = HUB_CATALOG.byId(entry.id);
+  if (!card) return null;
+  const button = makeNode('div', 'home-loose-card');
+  button.tabIndex = 0;
+  button.setAttribute('role', 'button');
+  button.style.left = `${entry.x * 100}%`;
+  button.style.top = `${entry.y * 100}%`;
+  button.dataset.looseIndex = String(index);
+  button.setAttribute('aria-label', card.name);
+  button.appendChild(makeHubImage(thumbOf(card), card.name));
+
+  const remove = makeNode('button', 'home-loose-remove');
+  remove.type = 'button';
+  remove.dataset.looseRemove = String(index);
+  remove.setAttribute('aria-label', t('home_loose_remove'));
+  remove.appendChild(hubIcon('close'));
+  button.appendChild(remove);
+
+  let startX = 0;
+  let startY = 0;
+  let originX = entry.x;
+  let originY = entry.y;
+  let moved = false;
+  let dragging = false;
+
+  button.addEventListener('pointerdown', (event) => {
+    if (event.target.closest('[data-loose-remove]')) return;
+    event.preventDefault();
+    dragging = true;
+    moved = false;
+    startX = event.clientX;
+    startY = event.clientY;
+    originX = entry.x;
+    originY = entry.y;
+    button.classList.add('is-dragging');
+    button.setPointerCapture(event.pointerId);
+  });
+
+  button.addEventListener('pointermove', (event) => {
+    if (!dragging) return;
+    const panel = document.querySelector('.hub-home-panel');
+    if (!panel) return;
+    const rect = panel.getBoundingClientRect();
+    const dx = (event.clientX - startX) / rect.width;
+    const dy = (event.clientY - startY) / rect.height;
+    if (Math.abs(event.clientX - startX) > 4 || Math.abs(event.clientY - startY) > 4) moved = true;
+    entry.x = Math.min(0.94, Math.max(0, originX + dx));
+    entry.y = Math.min(0.9, Math.max(0, originY + dy));
+    button.style.left = `${entry.x * 100}%`;
+    button.style.top = `${entry.y * 100}%`;
+  });
+
+  const finish = () => {
+    if (!dragging) return;
+    dragging = false;
+    button.classList.remove('is-dragging');
+    saveHome();
+  };
+  button.addEventListener('pointerup', finish);
+  button.addEventListener('pointercancel', finish);
+  button.addEventListener('click', (event) => {
+    if (event.target.closest('[data-loose-remove]')) {
+      event.preventDefault();
+      removeHomeLooseCard(index);
+      return;
+    }
+    if (!moved) openCardViewer(card.id, button);
+  });
+  button.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openCardViewer(card.id, button);
+    }
+  });
+  return button;
+}
+
+function renderHomeTable() {
+  if (!hub.ready) return;
+  const options = homeSourceOptions();
+
+  const fillSelect = (id, value) => {
+    const select = document.getElementById(id);
+    if (!select) return;
+    select.replaceChildren(
+      ...options.map((option) => {
+        const node = document.createElement('option');
+        node.value = option.value;
+        node.textContent = option.label;
+        return node;
+      })
+    );
+    select.value = options.some((option) => option.value === value) ? value : 'all';
+  };
+  fillSelect('home-draw-source', hubHome.drawSource);
+  fillSelect('home-deck-source', hubHome.deckSource);
+  const countSelect = document.getElementById('home-draw-count');
+  if (countSelect) countSelect.value = String(hubHome.drawCount);
+
+  const drawLabel = document.getElementById('home-draw-label');
+  if (drawLabel) drawLabel.textContent = t('home_draw_hint_count', { count: hubHome.drawCount });
+
+  const deckCards = homeSourceCards(hubHome.deckSource);
+  if (hub.els.homeDeckCount) hub.els.homeDeckCount.textContent = String(deckCards.length);
+  if (hub.els.homeDeckSourceLabel) {
+    const option = options.find((entry) => entry.value === hubHome.deckSource);
+    hub.els.homeDeckSourceLabel.textContent = option ? option.label : t('home_source_all');
+  }
+  if (hub.els.homeDeckFace) {
+    const sample = deckCards[0];
+    hub.els.homeDeckFace.replaceChildren(
+      makeHubImage(
+        sample ? sample.thumbBack : 'assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp',
+        ''
+      )
+    );
+  }
+
+  const drop = hub.els.homeDropArea;
+  if (drop) {
+    const card = homeDropCard();
+    drop.classList.toggle('is-filled', Boolean(card));
+    drop.replaceChildren();
+    if (card) {
+      drop.appendChild(makeHubImage(thumbOf(card), card.name));
+    } else {
+      drop.appendChild(makeNode('span', 'home-drop-empty', t('home_drop_empty')));
+    }
+  }
+
+  const layer = hub.els.homeLooseLayer;
+  if (layer) {
+    layer.replaceChildren(
+      ...hubHome.loose
+        .map((entry, index) => makeHomeLooseCard(entry, index))
+        .filter(Boolean)
+    );
+  }
+}
+
+function initHomeTable() {
+  hubHome = sanitizeHome(storage.read(HUB_STORAGE.home, null));
+  if (!hubHome.handIds.length) {
+    const cards = homeSourceCards(hubHome.drawSource);
+    hubHome.handIds = cards.slice(0, Math.min(hubHome.drawCount, cards.length)).map((card) => card.id);
+    saveHome();
+  }
+  renderHomeTable();
+}
+
 function renderFeaturedStack() {
   const stack = hub.els.playerStack;
   if (!stack) return;
 
-  let cards = featuredCards();
+  let cards = homeHandCards();
+  if (!cards.length) cards = featuredCards();
   if (cards.length && cards.length < 3) {
     const used = new Set(cards.map((card) => card.id));
     const extras = HUB_CATALOG.cards
@@ -1935,7 +2242,7 @@ function renderFeaturedStack() {
       .slice(0, 3 - cards.length);
     cards = cards.concat(extras);
   }
-  cards = cards.slice(0, 3);
+  cards = cards.slice(0, 5);
 
   const signature = `${currentLang}|${cards.map((card) => card.id).join('|')}`;
   stack.dataset.count = String(cards.length);
@@ -3893,6 +4200,7 @@ function setActivePanel(panel, options = {}) {
   if (target === 'home') {
     hub.homeVisits += 1;
     renderFavoriteCard();
+    renderHomeTable();
     renderHubStats(options.animateStats === true);
     renderCollectionRail();
     renderCardExplorer();
@@ -4836,6 +5144,43 @@ function setupHubEvents() {
     });
   }
 
+  if (hub.els.homeDrawBtn) hub.els.homeDrawBtn.addEventListener('click', () => drawHomeHand());
+  if (hub.els.homeDeckStack) hub.els.homeDeckStack.addEventListener('click', drawHomeDeckCard);
+  if (hub.els.homeDropArea) hub.els.homeDropArea.addEventListener('click', addHomeLooseCard);
+  if (hub.els.homeLooseClear) {
+    hub.els.homeLooseClear.addEventListener('click', () => {
+      hubHome.loose = [];
+      saveHome();
+      renderHomeTable();
+    });
+  }
+
+  const drawSource = document.getElementById('home-draw-source');
+  if (drawSource) {
+    drawSource.addEventListener('change', () => {
+      hubHome.drawSource = drawSource.value;
+      hubHome.drawCursor = 0;
+      hubHome.handIds = [];
+      drawHomeHand({ silent: true });
+    });
+  }
+  const drawCount = document.getElementById('home-draw-count');
+  if (drawCount) {
+    drawCount.addEventListener('change', () => {
+      hubHome.drawCount = Math.min(5, Math.max(1, Number(drawCount.value) || 3));
+      drawHomeHand({ silent: true });
+    });
+  }
+  const deckSource = document.getElementById('home-deck-source');
+  if (deckSource) {
+    deckSource.addEventListener('change', () => {
+      hubHome.deckSource = deckSource.value;
+      hubHome.dropCardId = null;
+      saveHome();
+      renderHomeTable();
+    });
+  }
+
   if (hub.els.deckCancel) {
     hub.els.deckCancel.addEventListener('click', () => hub.els.deckDialog.close());
   }
@@ -5128,6 +5473,15 @@ function cacheHubDom() {
   els.btnHomeHub = hubEl('btn-home-hub');
   els.btnHomeHubFloating = hubEl('btn-home-hub-floating');
   els.flowerMenu = hubEl('flower-menu');
+  els.homeDrawBtn = hubEl('home-draw-btn');
+  els.homeDrawLabel = hubEl('home-draw-label');
+  els.homeDeckStack = hubEl('home-deck-stack');
+  els.homeDeckFace = hubEl('home-deck-face');
+  els.homeDeckCount = hubEl('home-deck-count');
+  els.homeDeckSourceLabel = hubEl('home-deck-source-label');
+  els.homeDropArea = hubEl('home-drop-area');
+  els.homeLooseLayer = hubEl('home-loose-layer');
+  els.homeLooseClear = hubEl('home-loose-clear');
 }
 
 function setupHub() {
@@ -5139,6 +5493,7 @@ function setupHub() {
   setupHubEvents();
   setupCardRatios();
   setupLayoutEditor();
+  initHomeTable();
 
   hub.ready = true;
   updateLangButtons();
@@ -5148,6 +5503,7 @@ function setupHub() {
   setupMobileData();
   renderCollectionRail();
   renderCardExplorer();
+  renderHomeTable();
   renderBooster();
   setLibraryTab('all', { render: false });
   renderProfileForm();

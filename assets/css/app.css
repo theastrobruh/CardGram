@@ -3975,3 +3975,41 @@ body.cinematic-mode .fx-rail {
     left: 42px;
   }
 }
+/* Música dentro del eCard Studio */
+#btn-studio-music {
+  position: fixed;
+  top: 22px;
+  left: 122px;
+  z-index: 220;
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+}
+
+#btn-studio-music .studio-music-note,
+#btn-studio-music .studio-music-disc {
+  width: 17px;
+  height: 17px;
+}
+
+#btn-studio-music .studio-music-disc {
+  display: none;
+}
+
+#btn-studio-music.is-playing .studio-music-note {
+  display: none;
+}
+
+#btn-studio-music.is-playing .studio-music-disc {
+  display: block;
+  animation: hubVinylSpin 1.7s linear infinite;
+}
+
+@media (max-width: 980px) {
+  #btn-studio-music {
+    top: 18px;
+    left: 110px;
+    width: 38px;
+    height: 38px;
+  }
+}

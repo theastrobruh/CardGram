@@ -1311,3 +1311,36 @@ Object.assign(I18N.de, {
 Object.assign(I18N.es, { music_scene_studio: 'eCard Studio' });
 Object.assign(I18N.en, { music_scene_studio: 'eCard Studio' });
 Object.assign(I18N.de, { music_scene_studio: 'eCard Studio' });
+Object.assign(I18N.es, {
+  home_draw: 'DRAW', home_draw_hint: 'Roba 3 cartas de tu colección',
+  home_draw_hint_count: 'Roba {count} cartas de tu fuente', home_draw_toast: 'Robaste {count} cartas',
+  home_drop_empty: 'Drop Area', home_deck_draw_aria: 'Sacar una carta del deck',
+  home_deck_kicker: 'Deck', home_deck_label: 'Tu colección',
+  home_deck_hint: 'Toca el deck para sacar una carta.', home_deck_empty: 'Esta fuente no tiene cartas.',
+  home_draw_source: 'Fuente del Draw', home_draw_count: 'Cartas por Draw',
+  home_deck_source: 'Fuente del Deck', home_clear_loose: 'Recoger cartas sueltas',
+  home_loose_full: 'Ya tienes 6 cartas sueltas en la mesa.', home_loose_duplicate: 'Esa carta ya está en la mesa.',
+  home_loose_remove: 'Recoger carta', home_source_all: 'Colección completa'
+});
+Object.assign(I18N.en, {
+  home_draw: 'DRAW', home_draw_hint: 'Draw 3 cards from your collection',
+  home_draw_hint_count: 'Draw {count} cards from your source', home_draw_toast: 'Drew {count} cards',
+  home_drop_empty: 'Drop Area', home_deck_draw_aria: 'Draw a card from the deck',
+  home_deck_kicker: 'Deck', home_deck_label: 'Your collection',
+  home_deck_hint: 'Tap the deck to draw a card.', home_deck_empty: 'This source has no cards.',
+  home_draw_source: 'Draw source', home_draw_count: 'Cards per draw',
+  home_deck_source: 'Deck source', home_clear_loose: 'Collect loose cards',
+  home_loose_full: 'You already have 6 loose cards on the table.', home_loose_duplicate: 'That card is already on the table.',
+  home_loose_remove: 'Collect card', home_source_all: 'Full collection'
+});
+Object.assign(I18N.de, {
+  home_draw: 'DRAW', home_draw_hint: 'Ziehe 3 Karten aus deiner Sammlung',
+  home_draw_hint_count: 'Ziehe {count} Karten aus deiner Quelle', home_draw_toast: '{count} Karten gezogen',
+  home_drop_empty: 'Ablage', home_deck_draw_aria: 'Eine Karte aus dem Deck ziehen',
+  home_deck_kicker: 'Deck', home_deck_label: 'Deine Sammlung',
+  home_deck_hint: 'Tippe auf das Deck, um eine Karte zu ziehen.', home_deck_empty: 'Diese Quelle hat keine Karten.',
+  home_draw_source: 'Draw-Quelle', home_draw_count: 'Karten pro Draw',
+  home_deck_source: 'Deck-Quelle', home_clear_loose: 'Lose Karten einsammeln',
+  home_loose_full: 'Du hast bereits 6 lose Karten auf dem Tisch.', home_loose_duplicate: 'Diese Karte liegt bereits auf dem Tisch.',
+  home_loose_remove: 'Karte einsammeln', home_source_all: 'Gesamte Sammlung'
+});

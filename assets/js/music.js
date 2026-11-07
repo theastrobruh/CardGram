@@ -413,6 +413,11 @@
     if (panel && !panel.hidden) closePanel();
   });
 
+  const musicPanel = document.getElementById('music-panel');
+  if (musicPanel && musicPanel.parentElement !== document.body) {
+    document.body.appendChild(musicPanel);
+  }
+
   syncButtons();
   unlockOnGesture();
   loadPlaylist();

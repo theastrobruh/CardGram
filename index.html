@@ -12,22 +12,22 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=160">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=160">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=165">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=165">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=160" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=160" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=160" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=160" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=160" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=160" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=160" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=160" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=160" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=160" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=160" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=165" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=165" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=165" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=165" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=165" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=165" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=165" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=165" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=165" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=165" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=165" defer></script>
 </head>
 <body data-view="hub">
 
@@ -445,6 +445,14 @@
                   </button>
                 </div>
 
+                <div class="home-hand-controls">
+                  <button class="home-draw-btn" id="home-draw-btn" type="button">
+                    <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
+                    <span data-i18n="home_draw">DRAW</span>
+                  </button>
+                  <span class="home-hand-hint" id="home-draw-label" data-i18n="home_draw_hint">Roba 3 cartas de tu colección</span>
+                </div>
+
                 <div class="hub-player-actions">
                   <button class="btn btn-primary hub-player-cta" type="button" data-open-studio="deck">
                     <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
@@ -532,6 +540,24 @@
 
               <!-- Explorador de cartas -->
               <aside class="hub-explorer-panel" aria-labelledby="hub-explorer-title">
+                <div class="home-deck-widget" id="home-deck-widget">
+                  <div class="home-drop-area" id="home-drop-area">
+                    <span class="home-drop-empty" data-i18n="home_drop_empty">Drop Area</span>
+                  </div>
+                  <button class="home-deck-stack" id="home-deck-stack" type="button" aria-label="Sacar una carta del deck" data-i18n-aria-label="home_deck_draw_aria">
+                    <span class="home-deck-layer home-deck-layer-1" aria-hidden="true"></span>
+                    <span class="home-deck-layer home-deck-layer-2" aria-hidden="true"></span>
+                    <span class="home-deck-layer home-deck-layer-3" aria-hidden="true"></span>
+                    <span class="home-deck-face" id="home-deck-face"></span>
+                    <span class="home-deck-count" id="home-deck-count">0</span>
+                  </button>
+                  <div class="home-deck-copy">
+                    <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky" aria-hidden="true"></span><span data-i18n="home_deck_kicker">Deck</span></span>
+                    <strong id="home-deck-source-label" data-i18n="home_deck_label">Tu colección</strong>
+                    <span data-i18n="home_deck_hint">Toca el deck para sacar una carta.</span>
+                  </div>
+                </div>
+
                 <header class="hub-explorer-head">
                   <div>
                     <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky" aria-hidden="true"></span><span data-i18n="hub_explorer_kicker">Colección</span></span>
@@ -566,6 +592,8 @@
               </aside>
             </div>
 
+            <div class="home-loose-layer" id="home-loose-layer" aria-live="polite"></div>
+
             <div class="hub-layout-dock" id="hub-layout-dock">
               <button class="hub-layout-toggle" id="hub-layout-toggle" type="button" aria-expanded="false" aria-controls="hub-layout-panel" aria-label="Configuración" data-i18n-aria-label="settings_title" title="Configuración" data-i18n-title="settings_title">
                 <svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg>
@@ -598,6 +626,23 @@
                 </div>
 
                 <span class="hub-settings-label hub-settings-section" data-i18n="settings_layout">Composición</span>
+
+                <label class="hub-layout-control"><span data-i18n="home_draw_source">Fuente del Draw</span>
+                  <select class="home-setting-select" id="home-draw-source"></select>
+                </label>
+                <label class="hub-layout-control"><span data-i18n="home_draw_count">Cartas por Draw</span>
+                  <select class="home-setting-select" id="home-draw-count">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3" selected>3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
+                </label>
+                <label class="hub-layout-control"><span data-i18n="home_deck_source">Fuente del Deck</span>
+                  <select class="home-setting-select" id="home-deck-source"></select>
+                </label>
+                <button class="btn btn-ghost btn-sm home-loose-clear" id="home-loose-clear" type="button" data-i18n="home_clear_loose">Recoger cartas sueltas</button>
 
                 <div class="hub-layout-modes" role="group" aria-label="Modo de diseño" data-i18n-aria-label="layout_mode_aria">
                   <button class="hub-layout-mode active" type="button" data-layout-mode="controlled" aria-pressed="true" data-i18n="layout_controlled">Controlado</button>
@@ -1956,6 +2001,20 @@
     </div>
     <button id="btn-home-hub-floating" class="icon-btn studio-tool-btn" type="button" aria-label="Volver al lobby" data-i18n-aria-label="hub_back_studio" title="Volver al lobby" data-i18n-title="hub_back_studio">
       <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>
+    </button>
+    <button id="btn-studio-music" class="icon-btn studio-tool-btn" type="button" data-music-open aria-pressed="false" aria-label="Música" data-i18n-aria-label="music_title" title="Música" data-i18n-title="music_title">
+      <svg class="studio-music-note" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+        <path d="M9.5 17.5V5.8l8.6-1.8v11.4"/>
+        <circle cx="7" cy="17.8" r="2.5" fill="currentColor" stroke="none"/>
+        <circle cx="15.6" cy="15.6" r="2.5" fill="currentColor" stroke="none"/>
+        <path d="M18.5 7.6l2.6-.6"/>
+      </svg>
+      <svg class="studio-music-disc" viewBox="0 0 24 24" aria-hidden="true" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="12" cy="12" r="5.4" stroke="currentColor" stroke-width="0.9" opacity="0.55"/>
+        <circle cx="12" cy="12" r="2" fill="currentColor"/>
+        <path d="M12 3a9 9 0 0 1 7.8 4.5" stroke="rgba(255,255,255,0.7)" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
     </button>
     <div class="bottom-right-cfg-wrap">
       <button id="btn-quick-cfg" class="icon-btn mini-cfg-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="quick-cfg-popup" aria-label="Configuración" title="Configuración de idioma y sonido">
