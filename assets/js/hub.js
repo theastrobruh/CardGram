@@ -900,10 +900,25 @@ let shopVendorTimer = 0;
 let shopVendorIndex = 0;
 let shopVendorActive = 0;
 let shopVendorInitialized = false;
+let shopPackArt = {};
+let shopPackArtLoaded = false;
+
+function loadShopPackArt() {
+  if (shopPackArtLoaded) return;
+  shopPackArtLoaded = true;
+  fetch('assets/data/shop_assets/packs/manifest.json', { cache: 'no-store' })
+    .then((response) => (response.ok ? response.json() : null))
+    .then((data) => {
+      shopPackArt = data && data.packs && typeof data.packs === 'object' ? data.packs : {};
+      if (hub.ready) renderShopRecommended(boosterSets());
+    })
+    .catch(() => {});
+}
 
 function initShopScene() {
   if (shopVendorInitialized) return;
   shopVendorInitialized = true;
+  loadShopPackArt();
   SHOP_VENDOR_SPRITES.forEach((src) => {
     const image = new Image();
     image.src = src;
@@ -935,7 +950,14 @@ function renderShopRecommended(sets) {
       const button = makeHubButton('shop-pack', null, { boosterSet: collection.id });
       button.classList.toggle('is-active', collection.id === hubBooster.setId);
       const art = makeNode('span', 'shop-pack-art');
-      art.appendChild(makeHubImage(collection.thumbCover || collection.cover || collection.cards[0]?.thumbFront || '', collection.name));
+      const customArt = shopPackArt[collection.id];
+      if (customArt) {
+        art.classList.add('is-custom');
+        art.appendChild(makeHubImage(customArt, collection.name));
+      } else {
+        art.classList.add('is-cover');
+        art.appendChild(makeHubImage(collection.thumbCover || collection.cover || collection.cards[0]?.thumbFront || '', collection.name));
+      }
       button.appendChild(art);
       button.appendChild(makeNode('strong', null, collection.name));
       button.appendChild(makeNode('small', null, countLabel('explore_pack_cards', collection.cards.length)));
@@ -1006,6 +1028,23 @@ function renderBooster() {
 
   if (hub.els.boosterPackTitle) {
     hub.els.boosterPackTitle.textContent = collection ? collection.name : t('booster_pack_empty');
+  }
+
+  if (hub.els.shopPackPercent) {
+    const owned = collection ? ownedIn(collection.id).length : 0;
+    const total = collection ? collection.cards.length : 0;
+    hub.els.shopPackPercent.textContent = `${total ? Math.round((owned / total) * 100) : 0}%`;
+  }
+  if (hub.els.shopRareCards) {
+    const rare = collection
+      ? collection.cards
+          .slice()
+          .sort((a, b) => cardRarity(a).weight - cardRarity(b).weight)
+          .slice(0, 3)
+      : [];
+    hub.els.shopRareCards.replaceChildren(
+      ...rare.map((card) => makeHubImage(thumbOf(card), `${card.name} · ${t(`rarity_${cardRarity(card).id}`)}`))
+    );
   }
 
   if (hub.els.boosterPackChip) {
@@ -5533,6 +5572,8 @@ function cacheHubDom() {
   els.shopNpcA = hubEl('shop-npc-a');
   els.shopNpcB = hubEl('shop-npc-b');
   els.shopSpeech = hubEl('shop-speech-text');
+  els.shopPackPercent = hubEl('shop-pack-percent');
+  els.shopRareCards = hubEl('shop-rare-cards');
   els.mobileDaily = hubEl('hub-mobile-daily');
   els.boosterStreakValue = hubEl('booster-streak-value');
   els.boosterStreakLabel = hubEl('booster-streak-label');

@@ -1401,3 +1401,6 @@ Object.assign(I18N.de, {
 Object.assign(I18N.es, { home_back: 'Reverso del mazo', home_back_shared: 'CardGram clásico' });
 Object.assign(I18N.en, { home_back: 'Deck back', home_back_shared: 'Classic CardGram' });
 Object.assign(I18N.de, { home_back: 'Deck-Rückseite', home_back_shared: 'Klassisches CardGram' });
+Object.assign(I18N.es, { shop_completion: 'completado' });
+Object.assign(I18N.en, { shop_completion: 'complete' });
+Object.assign(I18N.de, { shop_completion: 'abgeschlossen' });

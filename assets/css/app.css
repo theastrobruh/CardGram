@@ -4013,3 +4013,7 @@ body.cinematic-mode .fx-rail {
     height: 38px;
   }
 }
+/* El aviso de salida cinematográfica no debe bloquear los controles del Studio */
+#cinematic-exit-tip {
+  pointer-events: none;
+}

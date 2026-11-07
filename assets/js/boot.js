@@ -103,9 +103,15 @@
     try {
       const response = await fetch('assets/data/loading/manifest.json', { cache: 'no-store' });
       const data = response.ok ? await response.json() : null;
-      const custom = data && Array.isArray(data.images)
-        ? data.images.filter((src) => typeof src === 'string')
-        : [];
+      const desktop = window.matchMedia('(min-width: 981px)').matches;
+      const selected = data && Array.isArray(desktop ? data.desktop : data.mobile)
+        ? (desktop ? data.desktop : data.mobile)
+        : null;
+      const custom = selected
+        ? selected.filter((src) => typeof src === 'string')
+        : data && Array.isArray(data.images)
+          ? data.images.filter((src) => typeof src === 'string')
+          : [];
       carousel.push(...(custom.length ? custom : fallback));
       images = carousel.concat(extra);
     } catch (error) {
