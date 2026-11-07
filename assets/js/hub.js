@@ -32,6 +32,12 @@ const HUB_LAYOUT_DEFAULT = {
 };
 
 const HUB_PANELS = ['home', 'booster', 'collections', 'explore', 'profile'];
+
+const DECK_EMOJIS = [
+  '🃏', '🔥', '🌙', '⭐', '✨', '🐉', '🦊', '🐱',
+  '⚔️', '🛡️', '🌌', '🍀', '👑', '💎', '🌊', '🌪️',
+  '☀️', '🪐', '🎴', '🧿', '🦄', '🐺', '🗡️', '🏆'
+];
 const HUB_STUDIO_TABS = {
   deck: 'tab-deck',
   '3d': 'tab-3d',
@@ -117,6 +123,7 @@ const hub = {
   libraryTab: 'all',
   collectionId: null,
   deckId: null,
+  deckZone: 'main',
   draftAvatar: null,
   deckCoverId: null,
   homeVisits: 0,
@@ -125,6 +132,8 @@ const hub = {
   explorerMode: 'album',
   explorerShowcase: true,
   explorerTimers: false,
+  exploreCreatorId: null,
+  explorePackId: null,
   gachaIds: [],
   handDraft: [],
   opening: false,
@@ -364,18 +373,30 @@ function sanitizeHubData(raw) {
         while (usedIds.has(id)) id = uid();
         usedIds.add(id);
 
-        const cover = HUB_CATALOG.byId(item.coverId) || HUB_CATALOG.cards[0] || null;
+        const cover = HUB_CATALOG.byId(item.coverId) || HUB_CATALOG.byId(Array.isArray(item.cardIds) ? item.cardIds[0] : null) || HUB_CATALOG.cards[0] || null;
         const cardIds = Array.isArray(item.cardIds)
-          ? Array.from(new Set(item.cardIds.filter((cardId) => HUB_CATALOG.byId(cardId))))
+          ? item.cardIds.filter((cardId) => HUB_CATALOG.byId(cardId)).slice(0, 60)
           : [];
+        const sideRaw = item.side && typeof item.side === 'object' ? item.side : {};
+        const sideCardIds = Array.isArray(sideRaw.cardIds)
+          ? sideRaw.cardIds.filter((cardId) => HUB_CATALOG.byId(cardId)).slice(0, 20)
+          : [];
+        const copyLimitRaw = Number(item.copyLimit);
+        const copyLimit = Number.isFinite(copyLimitRaw) ? Math.min(6, Math.max(2, Math.floor(copyLimitRaw))) : 3;
         const createdAt = Number(item.createdAt);
 
         return {
           id,
           name,
+          emoji: typeof item.emoji === 'string' && item.emoji ? item.emoji.slice(0, 8) : '🃏',
           description: String(item.description || '').trim().slice(0, 120),
           coverId: cover ? cover.id : null,
           cardIds,
+          side: {
+            name: String(sideRaw.name || 'Side Deck').trim().slice(0, 32) || 'Side Deck',
+            cardIds: sideCardIds
+          },
+          copyLimit,
           createdAt: Number.isFinite(createdAt) && createdAt > 0 ? createdAt : Date.now()
         };
       })
@@ -2436,14 +2457,16 @@ function renderCollectionsOverview() {
       button.appendChild(cover);
 
       const body = makeNode('span', 'deck-body');
-      body.appendChild(makeNode('span', 'deck-title', deck.name));
+      body.appendChild(makeNode('span', 'deck-title', `${deck.emoji || '🃏'} ${deck.name}`));
       body.appendChild(
-        makeNode('span', 'deck-desc', deck.description || t('collections_deck_no_description'))
+        makeNode(
+          'span',
+          'deck-desc',
+          `${countLabel('collections_deck_cards', deck.cardIds.length)} · ${countLabel('deck_side_cards', deck.side ? deck.side.cardIds.length : 0)}`
+        )
       );
       const meta = makeNode('span', 'deck-meta');
-      meta.appendChild(
-        makeNode('span', null, countLabel('collections_deck_cards', deck.cardIds.length))
-      );
+      meta.appendChild(makeNode('span', null, t('deck_copy_limit_short', { count: deck.copyLimit || 3 })));
       body.appendChild(meta);
       button.appendChild(body);
       return button;
@@ -2589,6 +2612,103 @@ function renderCollectionDetail() {
   }
 }
 
+function deckZoneCards(deck, zone) {
+  if (zone === 'side') {
+    if (!deck.side) deck.side = { name: 'Side Deck', cardIds: [] };
+    return deck.side.cardIds;
+  }
+  return deck.cardIds;
+}
+
+function deckZoneLimit(zone) {
+  return zone === 'side' ? 20 : 60;
+}
+
+function deckZoneName(deck, zone) {
+  return zone === 'side' ? deck.side.name || 'Side Deck' : t('deck_main');
+}
+
+function deckCopyLimit(deck) {
+  return Math.min(6, Math.max(2, Number(deck.copyLimit) || 3));
+}
+
+function deckCardCounts(cardIds) {
+  const counts = new Map();
+  cardIds.forEach((id) => counts.set(id, (counts.get(id) || 0) + 1));
+  return counts;
+}
+
+function persistDeckChange() {
+  persistHubData();
+  renderDeckDetail();
+  renderHubStats(false);
+}
+
+function makeDeckPoolCard(card, deck, zone) {
+  const article = makeNode('article', 'deck-pool-card');
+  article.appendChild(makeHubImage(thumbOf(card), card.name));
+
+  const copy = makeNode('div', 'deck-pool-copy');
+  copy.appendChild(makeNode('strong', null, card.name));
+  copy.appendChild(makeNode('span', null, card.set));
+  article.appendChild(copy);
+
+  const cards = deckZoneCards(deck, zone);
+  const count = cards.filter((id) => id === card.id).length;
+  const add = makeNode('button', 'deck-pool-add');
+  add.type = 'button';
+  add.dataset.deckAddCard = card.id;
+  add.disabled = cards.length >= deckZoneLimit(zone) || count >= deckCopyLimit(deck);
+  add.setAttribute('aria-label', t('deck_add_card_label', { name: card.name }));
+  add.title = t('deck_add_card_label', { name: card.name });
+  add.appendChild(hubIcon('plus'));
+  article.appendChild(add);
+  return article;
+}
+
+function makeDeckSelectedRow(card, count, deck, zone) {
+  const row = makeNode('div', 'deck-selected-row');
+  row.appendChild(makeHubImage(thumbOf(card), card.name));
+
+  const copy = makeNode('div', 'deck-selected-copy');
+  copy.appendChild(makeNode('strong', null, card.name));
+  copy.appendChild(makeNode('span', null, `${card.set} · ${count}/${deckCopyLimit(deck)}`));
+  row.appendChild(copy);
+
+  const qty = makeNode('div', 'deck-qty');
+  const minus = makeNode('button');
+  minus.type = 'button';
+  minus.dataset.deckQty = '-1';
+  minus.dataset.deckCard = card.id;
+  minus.dataset.deckZone = zone;
+  minus.setAttribute('aria-label', t('deck_remove_copy'));
+  minus.textContent = '−';
+  qty.appendChild(minus);
+
+  qty.appendChild(makeNode('span', null, String(count)));
+
+  const plus = makeNode('button');
+  plus.type = 'button';
+  plus.dataset.deckQty = '1';
+  plus.dataset.deckCard = card.id;
+  plus.dataset.deckZone = zone;
+  plus.disabled = deckZoneCards(deck, zone).length >= deckZoneLimit(zone) || count >= deckCopyLimit(deck);
+  plus.setAttribute('aria-label', t('deck_add_copy'));
+  plus.appendChild(hubIcon('plus'));
+  qty.appendChild(plus);
+  row.appendChild(qty);
+
+  const remove = makeNode('button', 'deck-selected-remove');
+  remove.type = 'button';
+  remove.dataset.deckRemoveCard = card.id;
+  remove.dataset.deckZone = zone;
+  remove.setAttribute('aria-label', t('collections_remove'));
+  remove.title = t('collections_remove');
+  remove.appendChild(hubIcon('trash'));
+  row.appendChild(remove);
+  return row;
+}
+
 function renderDeckDetail() {
   const deck = hubData.decks.find((entry) => entry.id === hub.deckId);
   if (!deck) {
@@ -2597,116 +2717,193 @@ function renderDeckDetail() {
     return;
   }
 
-  const coverCard = HUB_CATALOG.byId(deck.coverId) || HUB_CATALOG.cards[0];
+  if (!deck.side) deck.side = { name: 'Side Deck', cardIds: [] };
   const body = hub.els.deckDetailBody;
   if (!body) return;
+
+  const zone = hub.deckZone === 'side' ? 'side' : 'main';
   body.replaceChildren();
 
-  const head = makeNode('div', 'deck-detail-head');
-  const cover = makeNode('div', 'deck-cover');
-  if (coverCard) cover.appendChild(makeHubImage(thumbOf(coverCard), ''));
-  head.appendChild(cover);
-
-  const copy = makeNode('div', 'deck-detail-copy');
-  copy.appendChild(makeNode('h1', null, deck.name));
-  copy.appendChild(
-    makeNode('p', null, deck.description || t('collections_deck_no_description'))
+  const head = makeNode('div', 'deck-builder-head');
+  const title = makeNode('div', 'deck-builder-title');
+  title.appendChild(makeNode('span', 'deck-builder-emoji', deck.emoji || '🃏'));
+  const titleCopy = makeNode('div');
+  titleCopy.appendChild(makeNode('h1', null, deck.name));
+  titleCopy.appendChild(
+    makeNode(
+      'p',
+      null,
+      `${countLabel('collections_deck_cards', deck.cardIds.length)} / 60 · ${deck.side.name || 'Side Deck'} ${deck.side.cardIds.length}/20`
+    )
   );
-  const meta = makeNode('div', 'hub-detail-meta');
-  meta.appendChild(
-    makeNode('span', 'hub-chip', countLabel('collections_deck_cards', deck.cardIds.length))
-  );
-  copy.appendChild(meta);
-  head.appendChild(copy);
+  title.appendChild(titleCopy);
+  head.appendChild(title);
 
-  const headActions = makeNode('div', 'hub-detail-actions');
+  const tools = makeNode('div', 'deck-builder-tools');
+  const limitLabel = makeNode('label', 'deck-limit-control');
+  limitLabel.appendChild(makeNode('span', null, t('deck_copy_limit')));
+  const limitSelect = document.createElement('select');
+  limitSelect.dataset.deckCopyLimit = '1';
+  for (let value = 2; value <= 6; value += 1) {
+    const option = document.createElement('option');
+    option.value = String(value);
+    option.textContent = String(value);
+    limitSelect.appendChild(option);
+  }
+  limitSelect.value = String(deckCopyLimit(deck));
+  limitLabel.appendChild(limitSelect);
+  tools.appendChild(limitLabel);
+
   const deleteButton = makeHubButton('btn btn-ghost btn-sm btn-danger', t('collections_delete_deck'));
   deleteButton.dataset.deckDelete = deck.id;
   deleteButton.appendChild(hubIcon('trash'));
-  headActions.appendChild(deleteButton);
-  head.appendChild(headActions);
+  tools.appendChild(deleteButton);
+  head.appendChild(tools);
   body.appendChild(head);
 
-  const list = makeNode('div', 'deck-card-list');
-  if (deck.cardIds.length === 0) {
-    body.appendChild(makeNode('div', 'deck-empty-inline', t('collections_deck_empty')));
-  } else {
-    deck.cardIds.forEach((cardId) => {
-      const card = HUB_CATALOG.byId(cardId);
-      if (!card) return;
-      const chip = makeNode('span', 'deck-card-chip');
-      chip.appendChild(makeHubImage(thumbOf(card), card.name));
-      chip.appendChild(makeNode('span', null, card.name));
-
-      const remove = makeNode('button');
-      remove.type = 'button';
-      remove.dataset.deckRemoveCard = card.id;
-      remove.setAttribute('aria-label', t('collections_remove'));
-      remove.title = t('collections_remove');
-      remove.appendChild(hubIcon('close'));
-      chip.appendChild(remove);
-      list.appendChild(chip);
-    });
-    body.appendChild(list);
-  }
-
-  const addRow = makeNode('div', 'deck-add-row');
-  const label = makeNode('label', null, t('collections_add_card'));
-  label.setAttribute('for', 'deck-add-select');
-  addRow.appendChild(label);
-
-  const select = document.createElement('select');
-  select.id = 'deck-add-select';
-  const available = HUB_CATALOG.cards.filter((card) => !deck.cardIds.includes(card.id));
-  if (available.length === 0) {
-    const option = document.createElement('option');
-    option.value = '';
-    option.textContent = t('collections_no_more_cards');
-    select.appendChild(option);
-    select.disabled = true;
-  } else {
-    available.forEach((card) => {
-      const option = document.createElement('option');
-      option.value = card.id;
-      option.textContent = `${card.name} · ${card.set}`;
-      select.appendChild(option);
-    });
-  }
-  addRow.appendChild(select);
-
-  const addButton = makeHubButton('btn btn-primary btn-sm', t('collections_add'), {
-    deckAdd: '1'
+  const split = makeNode('div', 'deck-builder-split');
+  const selected = makeNode('section', 'deck-builder-selected');
+  const tabs = makeNode('div', 'deck-zone-tabs');
+  ['main', 'side'].forEach((zoneId) => {
+    const button = makeNode('button', `deck-zone-tab${zone === zoneId ? ' active' : ''}`);
+    button.type = 'button';
+    button.dataset.deckZoneTab = zoneId;
+    button.appendChild(
+      makeNode('span', null, zoneId === 'side' ? deck.side.name || 'Side Deck' : t('deck_main'))
+    );
+    button.appendChild(
+      makeNode(
+        'span',
+        'deck-zone-count',
+        `${deckZoneCards(deck, zoneId).length}/${deckZoneLimit(zoneId)}`
+      )
+    );
+    tabs.appendChild(button);
   });
-  addButton.appendChild(hubIcon('plus'));
-  addButton.disabled = available.length === 0;
-  addRow.appendChild(addButton);
-  body.appendChild(addRow);
+  selected.appendChild(tabs);
+
+  if (zone === 'side') {
+    const sideName = document.createElement('input');
+    sideName.className = 'deck-side-name';
+    sideName.type = 'text';
+    sideName.maxLength = 32;
+    sideName.value = deck.side.name || 'Side Deck';
+    sideName.dataset.deckSideName = '1';
+    sideName.setAttribute('aria-label', t('deck_side_rename'));
+    sideName.placeholder = t('deck_side_rename');
+    selected.appendChild(sideName);
+  }
+
+  const cards = deckZoneCards(deck, zone);
+  const counts = deckCardCounts(cards);
+  const list = makeNode('div', 'deck-selected-list');
+  if (!counts.size) {
+    list.appendChild(makeNode('p', 'deck-builder-empty', t('deck_builder_empty')));
+  } else {
+    counts.forEach((count, cardId) => {
+      const card = HUB_CATALOG.byId(cardId);
+      if (card) list.appendChild(makeDeckSelectedRow(card, count, deck, zone));
+    });
+  }
+  selected.appendChild(list);
+  split.appendChild(selected);
+
+  const pool = makeNode('section', 'deck-builder-pool');
+  const poolHead = makeNode('div', 'deck-pool-head');
+  poolHead.appendChild(makeNode('strong', null, t('deck_pool_title')));
+  poolHead.appendChild(
+    makeNode('span', null, t('deck_pool_target', { zone: deckZoneName(deck, zone) }))
+  );
+  pool.appendChild(poolHead);
+
+  const poolGrid = makeNode('div', 'deck-pool-grid');
+  poolGrid.replaceChildren(
+    ...HUB_CATALOG.cards.map((card) => makeDeckPoolCard(card, deck, zone))
+  );
+  pool.appendChild(poolGrid);
+  split.appendChild(pool);
+  body.appendChild(split);
 }
 
-function addSelectedDeckCard() {
+function addDeckCardToZone(cardId, zone) {
   const deck = hubData.decks.find((entry) => entry.id === hub.deckId);
-  const select = document.getElementById('deck-add-select');
-  if (!deck || !select) return;
+  const card = HUB_CATALOG.byId(cardId);
+  if (!deck || !card) return;
 
-  const cardId = select.value;
-  if (!cardId || deck.cardIds.includes(cardId)) return;
+  const zoneKey = zone === 'side' ? 'side' : 'main';
+  const cards = deckZoneCards(deck, zoneKey);
+  if (cards.length >= deckZoneLimit(zoneKey)) {
+    toast(t('deck_full', { max: deckZoneLimit(zoneKey) }), { type: 'warning' });
+    return;
+  }
+  if (cards.filter((id) => id === cardId).length >= deckCopyLimit(deck)) {
+    toast(t('deck_copy_limit_reached', { max: deckCopyLimit(deck) }), { type: 'warning' });
+    return;
+  }
 
-  deck.cardIds.push(cardId);
-  persistHubData();
-  renderDeckDetail();
-  renderHubStats(false);
-  toast(t('toast_deck_card_added'), { type: 'success' });
+  cards.push(cardId);
+  if (!deck.coverId) deck.coverId = cardId;
+  persistDeckChange();
 }
 
-async function removeDeckCard(cardId) {
+function changeDeckCardQty(cardId, zone, delta) {
   const deck = hubData.decks.find((entry) => entry.id === hub.deckId);
   if (!deck) return;
+  if (delta > 0) {
+    addDeckCardToZone(cardId, zone);
+    return;
+  }
 
-  deck.cardIds = deck.cardIds.filter((id) => id !== cardId);
+  const cards = deckZoneCards(deck, zone === 'side' ? 'side' : 'main');
+  const index = cards.lastIndexOf(cardId);
+  if (index < 0) return;
+  cards.splice(index, 1);
+  persistDeckChange();
+}
+
+function removeDeckCard(cardId, zone) {
+  const deck = hubData.decks.find((entry) => entry.id === hub.deckId);
+  if (!deck) return;
+  const cards = deckZoneCards(deck, zone === 'side' ? 'side' : 'main');
+  deck[zone === 'side' ? 'side' : 'cardIds'] = zone === 'side'
+    ? { ...deck.side, cardIds: cards.filter((id) => id !== cardId) }
+    : cards.filter((id) => id !== cardId);
+  persistDeckChange();
+  toast(t('toast_deck_card_removed'), { type: 'info' });
+}
+
+function setDeckCopyLimit(value) {
+  const deck = hubData.decks.find((entry) => entry.id === hub.deckId);
+  if (!deck) return;
+  deck.copyLimit = Math.min(6, Math.max(2, Number(value) || 3));
+  ['main', 'side'].forEach((zone) => {
+    const cards = deckZoneCards(deck, zone);
+    const counts = new Map();
+    cards.forEach((id) => counts.set(id, (counts.get(id) || 0) + 1));
+    if ([...counts.values()].some((count) => count > deck.copyLimit)) {
+      const trimmed = [];
+      const used = new Map();
+      cards.forEach((id) => {
+        const count = used.get(id) || 0;
+        if (count < deck.copyLimit) {
+          trimmed.push(id);
+          used.set(id, count + 1);
+        }
+      });
+      if (zone === 'side') deck.side.cardIds = trimmed;
+      else deck.cardIds = trimmed;
+    }
+  });
+  persistDeckChange();
+  toast(t('deck_copy_limit_set', { count: deck.copyLimit }), { type: 'info' });
+}
+
+function renameDeckSide(value) {
+  const deck = hubData.decks.find((entry) => entry.id === hub.deckId);
+  if (!deck) return;
+  deck.side.name = String(value || '').trim().slice(0, 32) || 'Side Deck';
   persistHubData();
   renderDeckDetail();
-  renderHubStats(false);
-  toast(t('toast_deck_card_removed'), { type: 'info' });
 }
 
 async function deleteDeck(deckId) {
@@ -2729,43 +2926,38 @@ async function deleteDeck(deckId) {
   navigate('collections');
 }
 
+function renderDeckEmojiOptions() {
+  if (!hub.els.deckEmojiOptions) return;
+  hub.els.deckEmojiOptions.replaceChildren();
+
+  DECK_EMOJIS.forEach((emoji, index) => {
+    const label = document.createElement('label');
+    label.className = 'deck-emoji-option';
+    label.title = emoji;
+
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'deck-emoji';
+    input.value = emoji;
+    input.checked = index === 0;
+
+    label.appendChild(input);
+    label.appendChild(makeNode('span', null, emoji));
+    hub.els.deckEmojiOptions.appendChild(label);
+  });
+}
+
 function openDeckDialog() {
   if (!hub.els.deckDialog) return;
 
   hub.els.deckName.value = '';
-  hub.els.deckDesc.value = '';
-  hub.deckCoverId = defaultFavoriteId() || (HUB_CATALOG.cards[0] ? HUB_CATALOG.cards[0].id : null);
-  renderDeckCoverOptions();
+  renderDeckEmojiOptions();
 
   if (!hub.els.deckDialog.open) hub.els.deckDialog.showModal();
   setTimeout(() => {
     hub.els.deckName.focus();
     hub.els.deckName.select();
   }, 50);
-}
-
-function renderDeckCoverOptions() {
-  if (!hub.els.deckCoverOptions) return;
-  hub.els.deckCoverOptions.replaceChildren();
-
-  HUB_CATALOG.cards.forEach((card) => {
-    const label = document.createElement('label');
-    label.className = 'deck-cover-option';
-    label.title = card.name;
-
-    const input = document.createElement('input');
-    input.type = 'radio';
-    input.name = 'deck-cover';
-    input.value = card.id;
-    input.checked = card.id === hub.deckCoverId;
-
-    label.appendChild(input);
-    label.appendChild(makeHubImage(thumbOf(card), card.name));
-    label.addEventListener('change', () => {
-      hub.deckCoverId = card.id;
-    });
-    hub.els.deckCoverOptions.appendChild(label);
-  });
 }
 
 function createDeckFromForm() {
@@ -2776,15 +2968,18 @@ function createDeckFromForm() {
     return;
   }
 
-  const checked = hub.els.deckForm.querySelector('input[name="deck-cover"]:checked');
-  const coverId = checked ? checked.value : hub.deckCoverId;
+  const checked = hub.els.deckForm.querySelector('input[name="deck-emoji"]:checked');
+  const emoji = checked ? checked.value : DECK_EMOJIS[0];
+  const coverId = defaultFavoriteId() || (HUB_CATALOG.cards[0] ? HUB_CATALOG.cards[0].id : null);
 
   const deck = {
     id: uid(),
     name,
-    description: hub.els.deckDesc.value.trim().slice(0, 120),
-    coverId: HUB_CATALOG.byId(coverId) ? coverId : defaultFavoriteId(),
+    emoji,
+    coverId,
     cardIds: [],
+    side: { name: t('deck_side_default'), cardIds: [] },
+    copyLimit: 3,
     createdAt: Date.now()
   };
 
@@ -2794,6 +2989,7 @@ function createDeckFromForm() {
     return;
   }
 
+  hub.deckZone = 'main';
   hub.els.deckDialog.close();
   renderHubStats(false);
   toast(t('toast_deck_created', { name: deck.name }), { type: 'success' });
@@ -2803,46 +2999,104 @@ function createDeckFromForm() {
 /* --------------------------------------------------------------------------
    Explorar (preparado)
    -------------------------------------------------------------------------- */
-function renderExplore() {
-  if (!hub.ready || !hub.els.explorePreview) return;
-  const community = window.CardGramCommunity;
+function explorePacks() {
+  return HUB_CATALOG.collections.filter((collection) => collection.cards.length);
+}
 
-  if (community && community.isEnabled()) {
-    community
-      .fetchCards()
-      .then((feed) => {
-        if (!feed || !Array.isArray(feed.cards) || !feed.cards.length) return;
-        const nodes = feed.cards.map((card) =>
-          createMediaCard({
-            kind: 'catalog',
-            id: card.id,
-            name: card.name,
-            subtitle: card.creatorName || '',
-            image: thumbOf(card),
-            badge: t('explore_preview_label'),
-            isFavorite: false,
-            preview: true
-          })
-        );
-        hub.els.explorePreview.replaceChildren(...nodes);
-      })
-      .catch(() => {});
+function makeExploreCreatorCard() {
+  const button = makeHubButton('explore-creator', null, { exploreCreator: 'theastrobruh' });
+  const avatar = makeNode('span', 'explore-creator-avatar');
+  avatar.appendChild(hubIcon('user'));
+  button.appendChild(avatar);
+
+  const copy = makeNode('span', 'explore-creator-copy');
+  copy.appendChild(makeNode('strong', null, 'theAstroBruh'));
+  copy.appendChild(makeNode('span', null, '@theastrobruh'));
+  const packs = explorePacks();
+  const totalCards = packs.reduce((sum, collection) => sum + collection.cards.length, 0);
+  copy.appendChild(
+    makeNode('span', 'explore-creator-meta', t('explore_creator_meta', { packs: packs.length, cards: totalCards }))
+  );
+  button.appendChild(copy);
+  button.appendChild(hubIcon('arrow-right'));
+  return button;
+}
+
+function makeExplorePackCard(collection) {
+  const button = makeHubButton('explore-pack', null, { explorePack: collection.id });
+  const cover = makeNode('span', 'explore-pack-cover');
+  const card = collection.cards[0];
+  if (card) cover.appendChild(makeHubImage(card.thumbFront || card.front, collection.name));
+  button.appendChild(cover);
+
+  const body = makeNode('span', 'explore-pack-body');
+  body.appendChild(makeNode('strong', null, collection.name));
+  body.appendChild(makeNode('span', null, countLabel('explore_pack_cards', collection.cards.length)));
+  body.appendChild(makeNode('span', 'explore-pack-link', t('explore_pack_open')));
+  button.appendChild(body);
+  return button;
+}
+
+function renderExplorePackDetail(collection) {
+  const head = hub.els.explorePackHead;
+  if (head) {
+    head.replaceChildren();
+    const copy = makeNode('div', 'explore-pack-detail-copy');
+    copy.appendChild(makeNode('span', 'hub-panel-eyebrow', 'theAstroBruh'));
+    copy.appendChild(makeNode('h2', null, collection.name));
+    copy.appendChild(
+      makeNode('p', null, t('explore_pack_detail_lede', { count: collection.cards.length }))
+    );
+    head.appendChild(copy);
+  }
+
+  if (hub.els.explorePackCards) {
+    hub.els.explorePackCards.replaceChildren(
+      ...collection.cards.map((card) =>
+        createMediaCard({
+          kind: 'catalog',
+          id: card.id,
+          name: card.name,
+          subtitle: `${collection.name} · ${card.set}`,
+          image: card.thumbFront || card.front,
+          badge: collection.shortName,
+          isFavorite: hubProfile.favoriteCardId === card.id,
+          preview: true
+        })
+      )
+    );
+  }
+}
+
+function renderExplore() {
+  if (!hub.ready || !hub.els.exploreCreators) return;
+
+  const packs = explorePacks();
+  const creatorOpen = hub.exploreCreatorId === 'theastrobruh';
+  const pack = creatorOpen ? packs.find((collection) => collection.id === hub.explorePackId) : null;
+
+  if (hub.els.explorePacksBlock) hub.els.explorePacksBlock.hidden = !creatorOpen || Boolean(pack);
+  if (hub.els.explorePackDetail) hub.els.explorePackDetail.hidden = !pack;
+  if (hub.els.exploreCreators) hub.els.exploreCreators.hidden = creatorOpen;
+  if (hub.els.exploreCreatorsBlock) hub.els.exploreCreatorsBlock.hidden = creatorOpen;
+
+  if (hub.els.explorePackCount) {
+    hub.els.explorePackCount.textContent = countLabel('explore_pack_count', packs.length);
+  }
+
+  if (!creatorOpen) {
+    hub.els.exploreCreators.replaceChildren(makeExploreCreatorCard());
     return;
   }
 
-  const nodes = HUB_CATALOG.cards.map((card) => {
-    const collection = HUB_CATALOG.collectionOf(card);
-    return createMediaCard({
-      kind: 'catalog',
-      id: card.id,
-      name: card.name,
-      subtitle: `${collection ? collection.name : card.collectionName} · ${t('explore_preview_label')}`,
-      image: card.thumbFront || card.front,
-      badge: t('explore_preview_label'),
-      isFavorite: hubProfile.favoriteCardId === card.id
-    });
-  });
-  hub.els.explorePreview.replaceChildren(...nodes);
+  if (pack) {
+    renderExplorePackDetail(pack);
+    return;
+  }
+
+  if (hub.els.explorePacks) {
+    hub.els.explorePacks.replaceChildren(...packs.map((collection) => makeExplorePackCard(collection)));
+  }
 }
 
 /* --------------------------------------------------------------------------
@@ -3203,6 +3457,10 @@ function closeCardViewer(options = {}) {
 function setActivePanel(panel, options = {}) {
   const target = panel === 'library' ? 'collections' : HUB_PANELS.includes(panel) ? panel : 'home';
   hub.panel = target;
+  if (target !== 'explore') {
+    hub.exploreCreatorId = null;
+    hub.explorePackId = null;
+  }
   document.body.classList.toggle('is-home-route', target === 'home');
   if (window.Music) window.Music.setScene(target === 'collections' ? 'my-cards' : 'home');
 
@@ -3587,6 +3845,38 @@ function onHubClick(event) {
     return;
   }
 
+  const exploreCreator = target.closest('[data-explore-creator]');
+  if (exploreCreator) {
+    event.preventDefault();
+    hub.exploreCreatorId = exploreCreator.dataset.exploreCreator;
+    hub.explorePackId = null;
+    renderExplore();
+    return;
+  }
+
+  const explorePack = target.closest('[data-explore-pack]');
+  if (explorePack) {
+    event.preventDefault();
+    hub.explorePackId = explorePack.dataset.explorePack;
+    renderExplore();
+    return;
+  }
+
+  if (target.closest('[data-explore-creators-back]')) {
+    event.preventDefault();
+    hub.exploreCreatorId = null;
+    hub.explorePackId = null;
+    renderExplore();
+    return;
+  }
+
+  if (target.closest('[data-explore-packs-back]')) {
+    event.preventDefault();
+    hub.explorePackId = null;
+    renderExplore();
+    return;
+  }
+
   const explorerMode = target.closest('[data-explorer-mode]');
   if (explorerMode) {
     event.preventDefault();
@@ -3683,15 +3973,35 @@ function onHubClick(event) {
     return;
   }
 
-  const removeCard = target.closest('[data-deck-remove-card]');
-  if (removeCard) {
-    removeDeckCard(removeCard.dataset.deckRemoveCard);
+  const deckZone = target.closest('[data-deck-zone-tab]');
+  if (deckZone) {
+    event.preventDefault();
+    hub.deckZone = deckZone.dataset.deckZoneTab === 'side' ? 'side' : 'main';
+    renderDeckDetail();
     return;
   }
 
-  const addCard = target.closest('[data-deck-add]');
-  if (addCard) {
-    addSelectedDeckCard();
+  const addDeckCard = target.closest('[data-deck-add-card]');
+  if (addDeckCard) {
+    event.preventDefault();
+    addDeckCardToZone(addDeckCard.dataset.deckAddCard, hub.deckZone);
+    return;
+  }
+
+  const deckQty = target.closest('[data-deck-qty]');
+  if (deckQty) {
+    event.preventDefault();
+    changeDeckCardQty(
+      deckQty.dataset.deckCard,
+      deckQty.dataset.deckZone || hub.deckZone,
+      Number(deckQty.dataset.deckQty) || 0
+    );
+    return;
+  }
+
+  const removeCard = target.closest('[data-deck-remove-card]');
+  if (removeCard) {
+    removeDeckCard(removeCard.dataset.deckRemoveCard, removeCard.dataset.deckZone || hub.deckZone);
     return;
   }
 
@@ -3845,6 +4155,15 @@ function setupHubEvents() {
   if (!hub.root) return;
 
   hub.root.addEventListener('click', onHubClick);
+  hub.root.addEventListener('change', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.matches('[data-deck-copy-limit]')) {
+      setDeckCopyLimit(target.value);
+    } else if (target.matches('[data-deck-side-name]')) {
+      renameDeckSide(target.value);
+    }
+  });
 
   /* Intención de entrar al estudio: adelanta Three.js mientras se mueve el
      cursor o se toca el botón, sin cargarlo en la visita normal al lobby. */
@@ -4255,7 +4574,14 @@ function cacheHubDom() {
   els.btnNewDeck = hubEl('btn-new-deck');
   els.btnNewDeck2 = hubEl('btn-new-deck-2');
 
-  els.explorePreview = hubEl('explore-preview');
+  els.exploreCreators = hubEl('explore-creators');
+  els.exploreCreatorsBlock = hubEl('explore-creators-block');
+  els.explorePacksBlock = hubEl('explore-packs-block');
+  els.explorePacks = hubEl('explore-packs');
+  els.explorePackDetail = hubEl('explore-pack-detail');
+  els.explorePackHead = hubEl('explore-pack-detail-head');
+  els.explorePackCards = hubEl('explore-pack-cards');
+  els.explorePackCount = hubEl('explore-pack-count');
 
   els.profileForm = hubEl('profile-form');
   els.profileName = hubEl('profile-name');
@@ -4278,8 +4604,7 @@ function cacheHubDom() {
   els.deckDialog = hubEl('deck-dialog');
   els.deckForm = hubEl('deck-form');
   els.deckName = hubEl('deck-name');
-  els.deckDesc = hubEl('deck-desc');
-  els.deckCoverOptions = hubEl('deck-cover-options');
+  els.deckEmojiOptions = hubEl('deck-emoji-options');
   els.deckCancel = hubEl('deck-dialog-cancel');
 
   els.btnHomeHub = hubEl('btn-home-hub');

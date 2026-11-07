@@ -12,22 +12,22 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=151">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=151">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=154">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=154">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=151" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=151" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=151" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=151" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=151" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=151" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=151" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=151" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=151" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=151" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=151" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=154" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=154" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=154" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=154" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=154" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=154" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=154" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=154" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=154" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=154" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=154" defer></script>
 </head>
 <body data-view="hub">
 
@@ -766,45 +766,80 @@
               </button>
               <div class="hub-view-copy">
                 <h1 id="explore-title" data-i18n="explore_title">Explorar</h1>
-                <p data-i18n="explore_lede">El escaparate de cartas y decks creados por otras personas.</p>
+                <p data-i18n="explore_lede">Packs de la comunidad y el camino de CardGram.</p>
               </div>
-              <span class="hub-soon-pill"><span class="hub-soon-dot" aria-hidden="true"></span><span data-i18n="explore_soon">Próximamente</span></span>
+              <span class="hub-count-pill" id="explore-pack-count">4 packs</span>
             </header>
 
-            <div class="hub-soon">
-              <span class="hub-soon-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-compass"></use></svg></span>
-              <div class="hub-soon-copy">
-                <h2 data-i18n="explore_soon_title">La comunidad está tomando forma</h2>
-                <p data-i18n="explore_soon_desc">Estamos preparando el feed público para descubrir cartas de otros creadores, con me gusta, guardados y perfiles. El diseño ya está listo; la red llega en la próxima actualización.</p>
+            <section class="explore-block" id="explore-creators-block">
+              <div class="hub-section-head">
+                <div>
+                  <h2 data-i18n="explore_creators_title">Packs &amp; Boosters</h2>
+                  <p data-i18n="explore_creators_lede">Creadores que ya ofrecen sobres a la comunidad. Toca uno para ver sus packs.</p>
+                </div>
               </div>
-              <ul class="hub-soon-list">
-                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg><span data-i18n="explore_feature_cards">Cartas de otros creadores</span></li>
-                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg><span data-i18n="explore_feature_decks">Decks destacados</span></li>
-                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg><span data-i18n="explore_feature_creators">Perfiles de creadores</span></li>
-                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg><span data-i18n="explore_feature_publish">Publicar tus cartas</span></li>
-              </ul>
-            </div>
+              <div class="explore-creator-list" id="explore-creators"></div>
+            </section>
 
-            <div class="explore-toolbar" aria-hidden="true">
-              <div class="explore-search">
-                <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
-                <span data-i18n="explore_search_placeholder">Buscar cartas, creadores o colecciones</span>
+            <section class="explore-block" id="explore-packs-block" hidden>
+              <button class="hub-back-inline" type="button" data-explore-creators-back>
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+                <span data-i18n="explore_back_creators">Volver a creadores</span>
+              </button>
+              <div class="explore-block-head">
+                <div>
+                  <h2 data-i18n="explore_packs_title">Packs de theAstroBruh</h2>
+                  <p data-i18n="explore_packs_lede">Cuatro colecciones listas para abrir y completar.</p>
+                </div>
               </div>
-              <div class="hub-seg hub-seg-static">
-                <span class="hub-seg-btn active" data-i18n="explore_filter_all">Todo</span>
-                <span class="hub-seg-btn" data-i18n="explore_filter_trending">Tendencia</span>
-                <span class="hub-seg-btn" data-i18n="explore_filter_new">Reciente</span>
-              </div>
-            </div>
+              <div class="explore-pack-grid" id="explore-packs"></div>
+            </section>
 
-            <div class="hub-section-head hub-section-head-row">
-              <div>
-                <h2 data-i18n="explore_preview_label">Vista previa</h2>
-                <p data-i18n="explore_preview_hint">Así se verá el feed público. Mientras tanto, puedes abrir estas cartas en tu estudio.</p>
+            <section class="explore-block" id="explore-pack-detail" hidden>
+              <button class="hub-back-inline" type="button" data-explore-packs-back>
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+                <span data-i18n="explore_back_packs">Volver a packs</span>
+              </button>
+              <div id="explore-pack-detail-head"></div>
+              <div class="hub-card-grid" id="explore-pack-cards"></div>
+            </section>
+
+            <section class="explore-roadmap">
+              <div class="explore-roadmap-head">
+                <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky" aria-hidden="true"></span><span data-i18n="explore_roadmap_kicker">Roadmap</span></span>
+                <h2 data-i18n="explore_roadmap_title">Lo que ya existe y lo que viene</h2>
+                <p data-i18n="explore_roadmap_lede">CardGram reúne creación 3D, impresión y una comunidad de colecciones tipo gacha.</p>
               </div>
-              <span class="hub-soon-pill hub-soon-pill-soft" data-i18n="explore_coming">Muy pronto</span>
-            </div>
-            <div class="hub-card-grid hub-preview-grid" id="explore-preview"></div>
+              <div class="explore-roadmap-grid">
+                <article class="roadmap-card is-shipped">
+                  <span class="roadmap-status" data-i18n="roadmap_available">Disponible</span>
+                  <h3>Inkra</h3>
+                  <p data-i18n="roadmap_inkra_desc">Impresión de cartas a escala real para llevar tus diseños al papel.</p>
+                </article>
+                <article class="roadmap-card is-shipped">
+                  <span class="roadmap-status" data-i18n="roadmap_available">Disponible</span>
+                  <h3>eCard Studio</h3>
+                  <p data-i18n="roadmap_studio_desc">Crea cartas en 3D, usa plantillas, ajusta arte y exporta tus renders.</p>
+                </article>
+                <article class="roadmap-card is-beta">
+                  <span class="roadmap-status" data-i18n="roadmap_beta">Beta</span>
+                  <h3>Booster Drops</h3>
+                  <p data-i18n="roadmap_boosters_desc">Sobres diarios con cartas de las colecciones de la comunidad.</p>
+                </article>
+                <article class="roadmap-card is-next">
+                  <span class="roadmap-status">v0.8.8</span>
+                  <h3 data-i18n="roadmap_community_title">Comunidad y creadores</h3>
+                  <p data-i18n="roadmap_community_desc">El esqueleto social para que cada persona publique sus sets y cree sus propios Boosters Drops.</p>
+                  <ul class="roadmap-list">
+                    <li data-i18n="roadmap_feature_sets">Subir sets de cartas propios</li>
+                    <li data-i18n="roadmap_feature_boosters">Crear Boosters Drops configurables</li>
+                    <li data-i18n="roadmap_feature_ratios">Definir ratios y rarezas</li>
+                    <li data-i18n="roadmap_feature_collect">Completar colecciones de otros usuarios</li>
+                  </ul>
+                </article>
+              </div>
+              <p class="explore-roadmap-note" data-i18n="explore_roadmap_note">Crear, imprimir y compartir: las tres experiencias de CardGram en un solo lugar.</p>
+            </section>
           </section>
 
           <!-- ------------------------------------------------------------
@@ -1958,15 +1993,13 @@
         <span class="dialog-icon"><svg class="icon" aria-hidden="true"><use href="#i-layers"></use></svg></span>
         <div>
           <h2 class="dialog-title" id="deck-dialog-title" data-i18n="deck_dialog_title">Crear un deck</h2>
-          <p class="dialog-desc" id="deck-dialog-desc" data-i18n="deck_dialog_desc">Dale un nombre y una portada. Después podrás añadir cartas del catálogo.</p>
+          <p class="dialog-desc" id="deck-dialog-desc" data-i18n="deck_dialog_desc">Ponle un nombre y elige un emoji. Luego armarás el deck carta por carta.</p>
         </div>
       </div>
       <label class="dialog-label" for="deck-name" data-i18n="deck_name">Nombre del deck</label>
       <input class="dialog-input" id="deck-name" name="deck-name" type="text" maxlength="48" autocomplete="off" spellcheck="false" placeholder="Mi primera serie" data-i18n-placeholder="deck_name_placeholder">
-      <label class="dialog-label deck-desc-label" for="deck-desc" data-i18n="deck_desc">Descripción</label>
-      <textarea class="dialog-input dialog-textarea" id="deck-desc" name="deck-desc" rows="2" maxlength="120" placeholder="Una idea, un tema o un objetivo para este deck." data-i18n-placeholder="deck_desc_placeholder"></textarea>
-      <span class="dialog-label" id="deck-cover-label" data-i18n="deck_cover">Portada</span>
-      <div class="deck-cover-options" id="deck-cover-options" role="radiogroup" aria-labelledby="deck-cover-label"></div>
+      <span class="dialog-label" id="deck-emoji-label" data-i18n="deck_emoji">Emoji del deck</span>
+      <div class="deck-emoji-grid" id="deck-emoji-options" role="radiogroup" aria-labelledby="deck-emoji-label"></div>
       <div class="dialog-actions">
         <button class="btn btn-ghost" id="deck-dialog-cancel" type="button" data-i18n="cancel">Cancelar</button>
         <button class="btn btn-primary" id="deck-dialog-create" type="submit" data-i18n="deck_create">Crear deck</button>
