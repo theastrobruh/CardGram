@@ -12,22 +12,22 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=154">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=154">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=157">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=157">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=154" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=154" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=154" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=154" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=154" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=154" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=154" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=154" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=154" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=154" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=154" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=157" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=157" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=157" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=157" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=157" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=157" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=157" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=157" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=157" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=157" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=157" defer></script>
 </head>
 <body data-view="hub">
 
@@ -652,7 +652,7 @@
 
                 <p class="booster-note">
                   <svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg>
-                  <span data-i18n="booster_ygo_note">Yu-Gi-Oh! es el set de exhibición Full Art y no entra en el sobre diario.</span>
+                  <span data-i18n="booster_six_note">Cada sobre contiene 6 cartas y las rarezas altas tienen efectos especiales.</span>
                 </p>
               </aside>
 
@@ -706,14 +706,40 @@
             </header>
 
             <div id="collections-overview">
-              <section class="hub-section" aria-labelledby="collections-catalog-title">
+              <section class="hub-section" aria-labelledby="collections-owned-title">
                 <div class="hub-section-head">
                   <div>
-                    <h2 id="collections-catalog-title" data-i18n="collections_catalog">Del catálogo</h2>
-                    <p data-i18n="collections_catalog_hint">Colecciones disponibles en la carpeta de cartas de esta versión.</p>
+                    <h2 id="collections-owned-title" data-i18n="collections_owned">Obtenidas de Boosters Pack</h2>
+                    <p data-i18n="collections_owned_hint">Solo las cartas que has desbloqueado en tus sobres.</p>
                   </div>
                 </div>
-                <div class="hub-collection-grid" id="collections-grid"></div>
+                <div class="hub-card-grid" id="owned-grid"></div>
+                <div class="hub-empty" id="owned-empty" hidden>
+                  <span class="hub-empty-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span>
+                  <h2 data-i18n="collections_owned_empty">Aún no tienes cartas de sobres</h2>
+                  <p data-i18n="collections_owned_empty_desc">Abre tus Boosters Drops diarios para empezar tu colección.</p>
+                  <button class="btn btn-primary btn-sm" type="button" data-hub-route="booster" data-i18n="collections_go_boosters">Abrir sobres</button>
+                </div>
+              </section>
+
+              <section class="hub-section" aria-labelledby="collections-created-title">
+                <div class="hub-section-head">
+                  <div>
+                    <h2 id="collections-created-title" data-i18n="collections_created">Creadas por ti</h2>
+                    <p data-i18n="collections_created_hint">Tus diseños guardados desde eCard Studio.</p>
+                  </div>
+                  <button class="hub-text-btn" type="button" data-open-studio="deck">
+                    <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
+                    <span data-i18n="collections_create_card">Crear carta</span>
+                  </button>
+                </div>
+                <div class="hub-card-grid" id="created-grid"></div>
+                <div class="hub-empty" id="created-empty" hidden>
+                  <span class="hub-empty-icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-palette"></use></svg></span>
+                  <h2 data-i18n="collections_created_empty">Todavía no has creado cartas</h2>
+                  <p data-i18n="collections_created_empty_desc">Abre eCard Studio y guarda tu primer diseño.</p>
+                  <button class="btn btn-primary btn-sm" type="button" data-open-studio="deck" data-i18n="collections_go_studio">Ir al estudio</button>
+                </div>
               </section>
 
               <section class="hub-section" aria-labelledby="collections-yours-title">
@@ -1169,6 +1195,37 @@
               <button class="btn btn-ghost btn-sm" type="button" data-viewer-close data-i18n="viewer_back">Volver</button>
             </div>
           </aside>
+        </div>
+      </div>
+    </div>
+
+    <!-- Apertura animada de sobres -->
+    <div class="pack-overlay" id="pack-overlay" role="dialog" aria-modal="true" aria-labelledby="pack-overlay-title" hidden>
+      <div class="pack-overlay-backdrop" data-pack-close></div>
+      <div class="pack-overlay-shell">
+        <header class="pack-overlay-head">
+          <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky" aria-hidden="true"></span><span data-i18n="pack_overlay_kicker">Booster Drop</span></span>
+          <h2 id="pack-overlay-title" data-i18n="pack_overlay_title">Abriendo tu sobre</h2>
+          <button class="icon-btn pack-overlay-close" type="button" data-pack-close aria-label="Cerrar" data-i18n-aria-label="cancel">
+            <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+          </button>
+        </header>
+
+        <div class="pack-seal-wrap" id="pack-seal-wrap">
+          <div class="pack-seal" id="pack-seal">
+            <span class="pack-seal-brand">CardGram</span>
+            <img id="pack-seal-img" alt="" width="300" height="420">
+            <span class="pack-seal-name" id="pack-seal-name"></span>
+            <span class="pack-seal-shine" aria-hidden="true"></span>
+          </div>
+          <p class="pack-seal-hint" data-i18n="pack_overlay_sealed">El sobre está vibrando…</p>
+        </div>
+
+        <div class="pack-reveal-grid" id="pack-reveal-grid" aria-live="polite"></div>
+
+        <div class="pack-overlay-actions">
+          <button class="btn btn-ghost btn-sm" type="button" id="pack-reveal-all" data-i18n="pack_reveal_all">Revelar todo</button>
+          <button class="btn btn-primary" type="button" id="pack-save" hidden data-i18n="pack_save">Guardar en mi colección</button>
         </div>
       </div>
     </div>
@@ -1985,6 +2042,27 @@
         <button class="btn btn-primary" id="confirm-ok" type="submit" value="confirm" data-i18n="confirm">Restaurar</button>
       </div>
     </form>
+  </dialog>
+
+  <dialog id="deck-cover-dialog" aria-labelledby="deck-cover-title">
+    <div class="dialog-card deck-cover-dialog">
+      <div class="dialog-head">
+        <span class="dialog-icon"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg></span>
+        <div>
+          <h2 class="dialog-title" id="deck-cover-title" data-i18n="deck_cover_title">Portada del deck</h2>
+          <p class="dialog-desc" data-i18n="deck_cover_desc">Elige una carta del deck o sube tu propia imagen.</p>
+        </div>
+      </div>
+      <div class="deck-cover-picker" id="deck-cover-grid"></div>
+      <div class="dialog-actions deck-cover-actions">
+        <label class="btn btn-ghost deck-cover-upload">
+          <svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>
+          <span data-i18n="deck_cover_upload">Subir imagen</span>
+          <input type="file" id="deck-cover-upload" accept="image/png,image/jpeg,image/webp,image/avif">
+        </label>
+        <button class="btn btn-ghost" id="deck-cover-cancel" type="button" data-i18n="cancel">Cancelar</button>
+      </div>
+    </div>
   </dialog>
 
   <dialog id="deck-dialog" aria-labelledby="deck-dialog-title">
