@@ -12,21 +12,22 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=142">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=142">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=147">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=147">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=142" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=142" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=142" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=142" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=142" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=142" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=142" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=142" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=142" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=142" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=147" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=147" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=147" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=147" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=147" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=147" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=147" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=147" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=147" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=147" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=147" defer></script>
 </head>
 <body data-view="hub">
 
@@ -358,8 +359,8 @@
               <a class="hub-top-icon hub-top-kofi" href="https://ko-fi.com/theastrobruh" target="_blank" rel="noopener noreferrer" title="Apoyar CardGram en Ko-fi" data-i18n-title="hub_support_kofi_title" aria-label="Apoyar CardGram en Ko-fi" data-i18n-aria-label="hub_support_kofi_title">
                 <svg class="icon" aria-hidden="true"><use href="#i-kofi"></use></svg>
               </a>
-              <a class="hub-top-icon" href="https://beacons.ai/el.astro.verse" target="_blank" rel="noopener noreferrer" title="Perfiles de AstroBruh" data-i18n-title="hub_support_creator_title" aria-label="Abrir los perfiles de AstroBruh" data-i18n-aria-label="hub_support_creator_title">
-                <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+              <a class="hub-top-icon" href="https://github.com/theastrobruh/CardGram" target="_blank" rel="noopener noreferrer" title="Repositorio de CardGram en GitHub" data-i18n-title="hub_support_github_title" aria-label="Abrir el repositorio de CardGram en GitHub" data-i18n-aria-label="hub_support_github_title">
+                <svg class="icon" aria-hidden="true"><use href="#i-github"></use></svg>
               </a>
               <button class="hub-profile" type="button" data-hub-route="profile" aria-label="Abrir tu perfil" data-i18n-aria-label="hub_profile_open">
                 <span class="hub-avatar" id="hub-avatar">
@@ -566,12 +567,39 @@
             </div>
 
             <div class="hub-layout-dock" id="hub-layout-dock">
-              <button class="hub-layout-toggle" id="hub-layout-toggle" type="button" aria-expanded="false" aria-controls="hub-layout-panel" aria-label="Ajustar vista" data-i18n-aria-label="layout_title" title="Ajustar vista" data-i18n-title="layout_title">
-                <svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>
-                <span data-i18n="layout_title">Ajustar vista</span>
+              <button class="hub-layout-toggle" id="hub-layout-toggle" type="button" aria-expanded="false" aria-controls="hub-layout-panel" aria-label="Configuración" data-i18n-aria-label="settings_title" title="Configuración" data-i18n-title="settings_title">
+                <svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg>
+                <span data-i18n="settings_title">Configuración</span>
               </button>
 
               <div class="hub-layout-panel" id="hub-layout-panel" hidden>
+                <div class="hub-settings-row">
+                  <span class="hub-settings-label" data-i18n="settings_language">Idioma</span>
+                  <div class="hub-settings-langs" role="group" aria-label="Idioma" data-i18n-aria-label="settings_language">
+                    <button class="hub-settings-lang active" type="button" data-hub-lang="en" aria-pressed="true">EN</button>
+                    <button class="hub-settings-lang" type="button" data-hub-lang="es" aria-pressed="false">ES</button>
+                    <button class="hub-settings-lang" type="button" data-hub-lang="de" aria-pressed="false">DE</button>
+                  </div>
+                </div>
+
+                <div class="hub-settings-row">
+                  <span class="hub-settings-label" data-i18n="settings_sound">Sonido</span>
+                  <div class="hub-settings-sounds">
+                    <button class="hub-settings-toggle" type="button" data-sound-toggle data-sound="none" aria-pressed="true">
+                      <svg class="icon sound-on" aria-hidden="true"><use href="#i-sound"></use></svg>
+                      <svg class="icon sound-off" aria-hidden="true"><use href="#i-sound-off"></use></svg>
+                      <span data-i18n="settings_sfx">Efectos</span>
+                    </button>
+                    <button class="hub-settings-toggle" type="button" data-music-toggle aria-pressed="true">
+                      <svg class="icon sound-on" aria-hidden="true"><use href="#i-sound"></use></svg>
+                      <svg class="icon sound-off" aria-hidden="true"><use href="#i-sound-off"></use></svg>
+                      <span data-i18n="settings_music">Música</span>
+                    </button>
+                  </div>
+                </div>
+
+                <span class="hub-settings-label hub-settings-section" data-i18n="settings_layout">Composición</span>
+
                 <div class="hub-layout-modes" role="group" aria-label="Modo de diseño" data-i18n-aria-label="layout_mode_aria">
                   <button class="hub-layout-mode active" type="button" data-layout-mode="controlled" aria-pressed="true" data-i18n="layout_controlled">Controlado</button>
                   <button class="hub-layout-mode" type="button" data-layout-mode="free" aria-pressed="false" data-i18n="layout_free">Libre</button>
@@ -1801,14 +1829,13 @@
         </label>
       </div>
     </div>
-      <button id="btn-home-hub-floating" class="icon-btn studio-tool-btn" type="button" aria-label="Volver al lobby" data-i18n-aria-label="hub_back_studio" title="Volver al lobby" data-i18n-title="hub_back_studio">
-        <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>
-      </button>
-      <button id="btn-help-floating" class="icon-btn studio-tool-btn" type="button" aria-label="Atajos y ayuda" data-i18n-aria-label="ui_help" title="Atajos y ayuda (?)" data-i18n-title="ui_help_title">
-        <svg class="icon" aria-hidden="true"><use href="#i-help"></use></svg>
-      </button>
     </div>
-
+    <button id="btn-home-hub-floating" class="icon-btn studio-tool-btn" type="button" aria-label="Volver al lobby" data-i18n-aria-label="hub_back_studio" title="Volver al lobby" data-i18n-title="hub_back_studio">
+      <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>
+    </button>
+    <button id="btn-help-floating" class="icon-btn studio-tool-btn" type="button" aria-label="Atajos y ayuda" data-i18n-aria-label="ui_help" title="Atajos y ayuda (?)" data-i18n-title="ui_help_title">
+      <svg class="icon" aria-hidden="true"><use href="#i-help"></use></svg>
+    </button>
     <div class="bottom-right-cfg-wrap">
       <button id="btn-quick-cfg" class="icon-btn mini-cfg-btn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="quick-cfg-popup" aria-label="Configuración" title="Configuración de idioma y sonido">
         <svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg>

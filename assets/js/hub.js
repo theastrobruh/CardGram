@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    CardGram — v0.5.5 · Hub / Lobby
    Vista de entrada, estadísticas, biblioteca, colecciones, decks, perfil y
    arranque perezoso del motor 3D. El editor solo se inicializa al entrar.
@@ -938,6 +938,7 @@ function setupLayoutEditor() {
   const panel = document.getElementById('hub-layout-panel');
   if (!dock || !toggle || !panel) return;
 
+  document.body.appendChild(dock);
   hubLayout = sanitizeLayout(storage.read(HUB_STORAGE.layout, null));
   applyHubLayout();
 
@@ -948,6 +949,11 @@ function setupLayoutEditor() {
   });
 
   panel.addEventListener('click', (event) => {
+    const langButton = event.target.closest('[data-hub-lang]');
+    if (langButton) {
+      applyLanguage(langButton.dataset.hubLang);
+      return;
+    }
     const mode = event.target.closest('[data-layout-mode]');
     if (mode) {
       hubLayout.mode = mode.dataset.layoutMode;
@@ -2969,7 +2975,7 @@ function saveProfile() {
    -------------------------------------------------------------------------- */
 function updateLangButtons() {
   if (!hub.root) return;
-  Array.from(hub.root.querySelectorAll('[data-hub-lang]')).forEach((button) => {
+  Array.from(document.querySelectorAll('[data-hub-lang]')).forEach((button) => {
     const active = button.dataset.hubLang === currentLang;
     button.classList.toggle('active', active);
     button.setAttribute('aria-pressed', String(active));
@@ -3197,6 +3203,8 @@ function closeCardViewer(options = {}) {
 function setActivePanel(panel, options = {}) {
   const target = panel === 'library' ? 'collections' : HUB_PANELS.includes(panel) ? panel : 'home';
   hub.panel = target;
+  document.body.classList.toggle('is-home-route', target === 'home');
+  if (window.Music) window.Music.setScene(target === 'collections' ? 'my-cards' : 'home');
 
   Array.from(hub.root.querySelectorAll('[data-hub-panel]')).forEach((section) => {
     const active = section.dataset.hubPanel === target;

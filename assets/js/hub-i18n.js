@@ -959,3 +959,27 @@ Object.assign(I18N.de, {
   layout_reset: 'Zurücksetzen',
   layout_drag: 'Element bewegen'
 });
+Object.assign(I18N.es, {
+  settings_title: 'Configuración',
+  settings_language: 'Idioma',
+  settings_sound: 'Sonido',
+  settings_sfx: 'Efectos',
+  settings_music: 'Música',
+  settings_layout: 'Composición'
+});
+Object.assign(I18N.en, {
+  settings_title: 'Settings',
+  settings_language: 'Language',
+  settings_sound: 'Sound',
+  settings_sfx: 'Effects',
+  settings_music: 'Music',
+  settings_layout: 'Layout'
+});
+Object.assign(I18N.de, {
+  settings_title: 'Einstellungen',
+  settings_language: 'Sprache',
+  settings_sound: 'Ton',
+  settings_sfx: 'Effekte',
+  settings_music: 'Musik',
+  settings_layout: 'Layout'
+});

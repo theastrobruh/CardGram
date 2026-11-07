@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    CardGram — v0.4.5 · Hub / Lobby
    Pantalla de entrada, biblioteca, colecciones, explorador y perfil.
    Reutiliza los tokens visuales de app.css (Aqua Glass Studio).
@@ -8371,5 +8371,121 @@ body.viewer-open {
 
   .hub-home-panel[data-layout-mode="free"] .hub-layout-grip {
     display: inline-flex;
+  }
+}
+/* Configuración del inicio */
+.hub-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 28px;
+}
+
+.hub-settings-label {
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-strong);
+}
+
+.hub-settings-section {
+  display: block;
+  margin-top: 3px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(7, 51, 63, 0.08);
+}
+
+.hub-settings-langs,
+.hub-settings-sounds {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.hub-settings-lang {
+  min-width: 32px;
+  min-height: 24px;
+  border-radius: 7px;
+  font-size: 0.52rem;
+  font-weight: 800;
+  color: var(--muted-strong);
+  background: rgba(7, 51, 63, 0.05);
+}
+
+.hub-settings-lang.active {
+  color: #ffffff;
+  background: var(--accent);
+}
+
+.hub-settings-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 26px;
+  padding: 0 7px;
+  border-radius: 7px;
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: var(--muted-strong);
+  background: rgba(7, 51, 63, 0.05);
+}
+
+.hub-settings-toggle .icon {
+  width: 11px;
+  height: 11px;
+}
+
+.hub-settings-toggle.is-muted {
+  opacity: 0.55;
+}
+
+[data-music-toggle] .sound-off {
+  display: none;
+}
+
+[data-music-toggle].is-muted .sound-on {
+  display: none;
+}
+
+[data-music-toggle].is-muted .sound-off {
+  display: block;
+}
+/* Inicio de escritorio sin scroll + configuración global */
+body[data-view="studio"] .hub-layout-dock {
+  display: none !important;
+}
+
+body:not(.is-home-route) .hub-layout-modes,
+body:not(.is-home-route) .hub-layout-control,
+body:not(.is-home-route) .hub-layout-actions,
+body:not(.is-home-route) .hub-settings-section {
+  display: none;
+}
+
+@media (min-width: 981px) {
+  .hub-home-panel[data-hub-panel="home"] {
+    height: calc(100dvh - 78px);
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hub-home-panel .hub-dashboard {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 8px 0 12px;
+    align-content: center;
+  }
+
+  .hub-footer {
+    display: none;
+  }
+
+  .hub-top-actions .hub-sound-btn,
+  .hub-top-actions .hub-lang-shell {
+    display: none;
   }
 }
