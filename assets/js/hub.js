@@ -39,6 +39,7 @@ const HUB_HOME_DEFAULT = {
   handIds: [],
   drawCursor: 0,
   dropCardId: null,
+  backSrc: 'assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp',
   loose: []
 };
 
@@ -150,6 +151,7 @@ const hub = {
   explorePackId: null,
   gachaIds: [],
   handDraft: [],
+  handSetId: null,
   opening: false,
   presetsRendered: false,
   newCardRequested: false,
@@ -558,6 +560,11 @@ function availableBoosterGrant() {
   return boosterGrants().find((grant) => grant.unlocked && !grant.used) || null;
 }
 
+function syncMobileDailyButton() {
+  if (!hub.els.mobileDaily) return;
+  hub.els.mobileDaily.hidden = !(hubBooster.picks.length || availableBoosterGrant());
+}
+
 function markBoosterMission() {
   const today = dayKey();
   if (hubBooster.missionDay === today) return;
@@ -882,6 +889,61 @@ function renderBoosterSetButtons(sets) {
   );
 }
 
+const SHOP_VENDOR_SPRITES = Array.from({ length: 9 }, (_, index) => `assets/data/vendor/azura/webp/vendor-${index + 1}.webp`);
+const SHOP_LINES = [
+  'Hello… Welcome to the Shop.',
+  'These packs are calling your name.',
+  'Fresh drops, straight from the CardGram vault.',
+  'Pick a pack. Let fate choose your cards.'
+];
+let shopVendorTimer = 0;
+let shopVendorIndex = 0;
+let shopVendorActive = 0;
+let shopVendorInitialized = false;
+
+function initShopScene() {
+  if (shopVendorInitialized) return;
+  shopVendorInitialized = true;
+  SHOP_VENDOR_SPRITES.forEach((src) => {
+    const image = new Image();
+    image.src = src;
+  });
+  if (hub.els.shopNpcA) hub.els.shopNpcA.src = SHOP_VENDOR_SPRITES[0];
+  if (hub.els.shopNpcB) hub.els.shopNpcB.src = SHOP_VENDOR_SPRITES[1];
+  const swap = () => {
+    if (!hub.els.shopNpcA || !hub.els.shopNpcB) return;
+    shopVendorIndex = (shopVendorIndex + 1) % SHOP_VENDOR_SPRITES.length;
+    const next = shopVendorActive === 0 ? hub.els.shopNpcB : hub.els.shopNpcA;
+    const prev = shopVendorActive === 0 ? hub.els.shopNpcA : hub.els.shopNpcB;
+    next.src = SHOP_VENDOR_SPRITES[shopVendorIndex];
+    next.classList.add('is-active');
+    prev.classList.remove('is-active');
+    shopVendorActive = shopVendorActive === 0 ? 1 : 0;
+    if (hub.els.shopSpeech) hub.els.shopSpeech.textContent = SHOP_LINES[Math.floor(Math.random() * SHOP_LINES.length)];
+  };
+  window.clearInterval(shopVendorTimer);
+  shopVendorTimer = window.setInterval(swap, 4200 + Math.random() * 2200);
+}
+
+function renderShopRecommended(sets) {
+  const container = hub.els.shopRecommended;
+  if (!container) return;
+  const pools = sets.length ? sets : HUB_CATALOG.collections;
+  const recommended = pools.slice(0, 3);
+  container.replaceChildren(
+    ...recommended.map((collection) => {
+      const button = makeHubButton('shop-pack', null, { boosterSet: collection.id });
+      button.classList.toggle('is-active', collection.id === hubBooster.setId);
+      const art = makeNode('span', 'shop-pack-art');
+      art.appendChild(makeHubImage(collection.thumbCover || collection.cover || collection.cards[0]?.thumbFront || '', collection.name));
+      button.appendChild(art);
+      button.appendChild(makeNode('strong', null, collection.name));
+      button.appendChild(makeNode('small', null, countLabel('explore_pack_cards', collection.cards.length)));
+      return button;
+    })
+  );
+}
+
 function renderBooster() {
   if (!hub.ready || !hub.els.boosterPanel) return;
   ensureBoosterDay();
@@ -895,6 +957,8 @@ function renderBooster() {
   const available = grants.filter((grant) => grant.unlocked && !grant.used).length;
   const pending = hubBooster.picks.length > 0;
 
+  initShopScene();
+  renderShopRecommended(sets);
   renderBoosterSetButtons(sets);
 
   if (hub.els.boosterStreakValue) hub.els.boosterStreakValue.textContent = String(hubBooster.streak || 0);
@@ -969,6 +1033,9 @@ function renderBooster() {
     if (label) label.textContent = pending ? t('booster_continue') : t('booster_open');
   }
   if (hub.els.boosterClaim) hub.els.boosterClaim.hidden = true;
+  if (hub.els.mobileDaily) {
+    hub.els.mobileDaily.hidden = !(pending || available > 0);
+  }
   if (hub.els.boosterHint) {
     hub.els.boosterHint.textContent = pending
       ? t('booster_pending_hint')
@@ -1944,6 +2011,7 @@ function sanitizeHome(raw) {
   decks.forEach((deck) => sources.add(`deck:${deck.id}`));
   if (typeof raw.drawSource === 'string') data.drawSource = sources.has(raw.drawSource) ? raw.drawSource : 'all';
   if (typeof raw.deckSource === 'string') data.deckSource = sources.has(raw.deckSource) ? raw.deckSource : 'all';
+  if (typeof raw.backSrc === 'string' && raw.backSrc.startsWith('assets/')) data.backSrc = raw.backSrc;
   const count = Number(raw.drawCount);
   data.drawCount = Number.isFinite(count) ? Math.min(5, Math.max(1, Math.floor(count))) : 3;
   if (Array.isArray(raw.handIds)) {
@@ -1967,8 +2035,20 @@ function sanitizeHome(raw) {
   return data;
 }
 
-function homeSourceOptions() {
-  const options = [{ value: 'all', label: t('home_source_all') }];
+function homeBackOptions() {
+  const options = [
+    { value: 'assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp', label: t('home_back_shared') }
+  ];
+  HUB_CATALOG.collections.forEach((collection) => {
+    const back = collection.thumbBack || (collection.cards[0] && collection.cards[0].thumbBack);
+    if (back && !options.some((option) => option.value === back)) {
+      options.push({ value: back, label: collection.name });
+    }
+  });
+  return options;
+}
+
+function homeSourceOptions() {  const options = [{ value: 'all', label: t('home_source_all') }];
   HUB_CATALOG.collections.forEach((collection) => {
     options.push({ value: `set:${collection.id}`, label: collection.name });
   });
@@ -2178,6 +2258,19 @@ function renderHomeTable() {
   const countSelect = document.getElementById('home-draw-count');
   if (countSelect) countSelect.value = String(hubHome.drawCount);
 
+  const backSelect = document.getElementById('home-back-source');
+  if (backSelect) {
+    backSelect.replaceChildren(
+      ...homeBackOptions().map((option) => {
+        const node = document.createElement('option');
+        node.value = option.value;
+        node.textContent = option.label;
+        return node;
+      })
+    );
+    backSelect.value = hubHome.backSrc;
+  }
+
   const drawLabel = document.getElementById('home-draw-label');
   if (drawLabel) drawLabel.textContent = t('home_draw_hint_count', { count: hubHome.drawCount });
 
@@ -2191,7 +2284,7 @@ function renderHomeTable() {
     const sample = deckCards[0];
     hub.els.homeDeckFace.replaceChildren(
       makeHubImage(
-        sample ? sample.thumbBack : 'assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp',
+        hubHome.backSrc || 'assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp',
         ''
       )
     );
@@ -2221,37 +2314,37 @@ function renderHomeTable() {
 
 function initHomeTable() {
   hubHome = sanitizeHome(storage.read(HUB_STORAGE.home, null));
-  if (!hubHome.handIds.length) {
-    const cards = homeSourceCards(hubHome.drawSource);
-    hubHome.handIds = cards.slice(0, Math.min(hubHome.drawCount, cards.length)).map((card) => card.id);
-    saveHome();
-  }
   renderHomeTable();
+}
+
+function makeBackStackCard() {
+  const card = makeNode('button', 'hub-stack-card is-back');
+  card.type = 'button';
+  card.dataset.openHand = '1';
+  card.setAttribute('aria-label', t('hub_favorites_edit'));
+  card.appendChild(
+    makeHubImage(
+      hubHome.backSrc || 'assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp',
+      t('hub_favorites_edit')
+    )
+  );
+  card.addEventListener('click', openHandDialog);
+  return card;
 }
 
 function renderFeaturedStack() {
   const stack = hub.els.playerStack;
   if (!stack) return;
 
-  let cards = homeHandCards();
-  if (!cards.length) cards = featuredCards();
-  if (cards.length && cards.length < 3) {
-    const used = new Set(cards.map((card) => card.id));
-    const extras = HUB_CATALOG.cards
-      .filter((card) => !used.has(card.id))
-      .slice(0, 3 - cards.length);
-    cards = cards.concat(extras);
-  }
-  cards = cards.slice(0, 5);
-
-  const signature = `${currentLang}|${cards.map((card) => card.id).join('|')}`;
-  stack.dataset.count = String(cards.length);
+  const cards = homeHandCards().slice(0, 3);
+  const signature = `${currentLang}|${cards.map((card) => card.id).join('|')}|${cards.length ? '1' : 'back'}`;
+  stack.dataset.count = String(cards.length || 1);
   if (hub.featuredSignature === signature && stack.childElementCount) {
     renderHandDeck(cards);
     return;
   }
   hub.featuredSignature = signature;
-  stack.replaceChildren(...cards.map((card) => makeStackCard(card)));
+  stack.replaceChildren(...(cards.length ? cards.map((card) => makeStackCard(card)) : [makeBackStackCard()]));
   renderHandDeck(cards);
 }
 
@@ -2260,31 +2353,60 @@ function renderFeaturedStack() {
    -------------------------------------------------------------------------- */
 function makeHandOption(card) {
   const active = hub.handDraft.includes(card.id);
+  const order = hub.handDraft.indexOf(card.id) + 1;
   const button = makeNode('button', 'hand-option');
   button.type = 'button';
   button.dataset.handPick = card.id;
   button.setAttribute('aria-pressed', String(active));
   button.classList.toggle('is-active', active);
-  button.disabled = !active && hub.handDraft.length >= 6;
+  button.disabled = !active && hub.handDraft.length >= 3;
   button.appendChild(makeExplorerArt(card));
   button.appendChild(makeNode('span', 'hand-option-name', card.name));
+  if (active) button.appendChild(makeNode('span', 'hand-order', String(order)));
   return button;
 }
 
 function updateHandCount() {
-  if (hub.els.handCount) hub.els.handCount.textContent = `${hub.handDraft.length}/6`;
-  if (hub.els.handSave) hub.els.handSave.disabled = !hub.handDraft.length;
+  if (hub.els.handCount) hub.els.handCount.textContent = `${hub.handDraft.length}/3`;
+  if (hub.els.handSave) hub.els.handSave.disabled = false;
+  if (hub.els.handUndo) hub.els.handUndo.disabled = !hub.handDraft.length;
 }
 
 function renderHandPicker() {
   const picker = hub.els.handPicker;
   if (!picker) return;
-  picker.replaceChildren(...HUB_CATALOG.cards.map((card) => makeHandOption(card)));
+  picker.replaceChildren();
+
+  if (!hub.handSetId) {
+    picker.className = 'hand-set-grid';
+    HUB_CATALOG.collections.forEach((collection) => {
+      const button = makeNode('button', 'hand-set-card');
+      button.type = 'button';
+      button.dataset.handSet = collection.id;
+      button.appendChild(
+        makeHubImage(collection.thumbCover || collection.cover || collection.cards[0]?.thumbFront || '', collection.name)
+      );
+      button.appendChild(makeNode('strong', null, collection.name));
+      picker.appendChild(button);
+    });
+  } else {
+    const collection = HUB_CATALOG.collections.find((entry) => entry.id === hub.handSetId);
+    picker.className = 'hand-picker';
+    if (collection) {
+      const back = makeNode('button', 'hand-back-btn');
+      back.type = 'button';
+      back.dataset.handBack = '1';
+      back.textContent = `← ${collection.name}`;
+      picker.appendChild(back);
+      collection.cards.forEach((card) => picker.appendChild(makeHandOption(card)));
+    }
+  }
   updateHandCount();
 }
 
 function openHandDialog() {
-  hub.handDraft = featuredCards().map((card) => card.id);
+  hub.handSetId = null;
+  hub.handDraft = homeHandCards().slice(0, 3).map((card) => card.id);
   renderHandPicker();
   if (hub.els.handDialog && !hub.els.handDialog.open) {
     hub.els.handDialog.showModal();
@@ -2294,37 +2416,33 @@ function openHandDialog() {
 function toggleHandPick(cardId) {
   if (!HUB_CATALOG.byId(cardId)) return;
   const index = hub.handDraft.indexOf(cardId);
-  if (index >= 0) {
-    hub.handDraft.splice(index, 1);
-  } else if (hub.handDraft.length < 6) {
-    hub.handDraft.push(cardId);
-  }
+  if (index >= 0) hub.handDraft.splice(index, 1);
+  else if (hub.handDraft.length < 3) hub.handDraft.push(cardId);
   renderHandPicker();
 }
 
 function saveHand() {
-  if (!hub.handDraft.length) {
-    toast(t('hub_hand_empty'), { type: 'warning' });
-    return;
-  }
-
-  hubProfile.featuredIds = hub.handDraft.slice(0, 6);
-  /* Si la carta principal ya no está en la mano, pasa a ser la primera elegida. */
-  if (!hubProfile.featuredIds.includes(hubProfile.favoriteCardId)) {
+  hubProfile.featuredIds = hub.handDraft.slice(0, 3);
+  if (hubProfile.featuredIds.length) {
     hubProfile.favoriteCardId = hubProfile.featuredIds[0];
   }
+  hubHome.handIds = hub.handDraft.slice(0, 3);
   persistHubProfile();
+  saveHome();
   renderFavoriteCard();
+  renderFeaturedStack();
+  renderHomeTable();
   if (hub.els.handDialog && hub.els.handDialog.open) hub.els.handDialog.close();
 }
 
-/* Deja la mano en una sola carta: la protagonista actual (sin cerrar el diálogo). */
 function clearHand() {
-  const main = favoriteCard();
-  hub.handDraft = main ? [main.id] : [];
-  hubProfile.featuredIds = hub.handDraft.slice();
-  persistHubProfile();
-  renderFeaturedStack();
+  hub.handDraft = [];
+  updateHandCount();
+  renderHandPicker();
+}
+
+function undoHand() {
+  hub.handDraft.pop();
   renderHandPicker();
 }
 
@@ -4170,6 +4288,7 @@ function setActivePanel(panel, options = {}) {
     hub.explorePackId = null;
   }
   if (target === 'collections') markBoosterMission();
+  if (hub.ready) syncMobileDailyButton();
   document.body.classList.toggle('is-home-route', target === 'home');
   if (window.Music) {
     const musicScene = target === 'collections'
@@ -5031,6 +5150,17 @@ function setupHubEvents() {
 
   if (hub.els.handPicker) {
     hub.els.handPicker.addEventListener('click', (event) => {
+      const set = event.target.closest('[data-hand-set]');
+      if (set) {
+        hub.handSetId = set.dataset.handSet;
+        renderHandPicker();
+        return;
+      }
+      if (event.target.closest('[data-hand-back]')) {
+        hub.handSetId = null;
+        renderHandPicker();
+        return;
+      }
       const option = event.target.closest('[data-hand-pick]');
       if (option) toggleHandPick(option.dataset.handPick);
     });
@@ -5049,6 +5179,10 @@ function setupHubEvents() {
 
   if (hub.els.handClear) {
     hub.els.handClear.addEventListener('click', clearHand);
+  }
+
+  if (hub.els.handUndo) {
+    hub.els.handUndo.addEventListener('click', undoHand);
   }
 
   if (hub.els.cardInfo) {
@@ -5177,6 +5311,15 @@ function setupHubEvents() {
       hubHome.deckSource = deckSource.value;
       hubHome.dropCardId = null;
       saveHome();
+      renderHomeTable();
+    });
+  }
+  const backSource = document.getElementById('home-back-source');
+  if (backSource) {
+    backSource.addEventListener('change', () => {
+      hubHome.backSrc = backSource.value;
+      saveHome();
+      renderFeaturedStack();
       renderHomeTable();
     });
   }
@@ -5358,6 +5501,7 @@ function cacheHubDom() {
   els.handSave = hubEl('hand-save');
   els.handCancel = hubEl('hand-cancel');
   els.handClear = hubEl('hand-clear');
+  els.handUndo = hubEl('hand-undo');
 
   els.showcase = hubEl('hub-showcase');
   els.card = hubEl('hub-card');
@@ -5385,6 +5529,11 @@ function cacheHubDom() {
   els.explorerNext = document.querySelector('[data-explorer-nav="1"]');
 
   els.boosterPanel = document.querySelector('[data-hub-panel="booster"]');
+  els.shopRecommended = hubEl('shop-recommended');
+  els.shopNpcA = hubEl('shop-npc-a');
+  els.shopNpcB = hubEl('shop-npc-b');
+  els.shopSpeech = hubEl('shop-speech-text');
+  els.mobileDaily = hubEl('hub-mobile-daily');
   els.boosterStreakValue = hubEl('booster-streak-value');
   els.boosterStreakLabel = hubEl('booster-streak-label');
   els.boosterStatusTitle = hubEl('booster-status-title');
@@ -5504,6 +5653,7 @@ function setupHub() {
   renderCollectionRail();
   renderCardExplorer();
   renderHomeTable();
+  syncMobileDailyButton();
   renderBooster();
   setLibraryTab('all', { render: false });
   renderProfileForm();

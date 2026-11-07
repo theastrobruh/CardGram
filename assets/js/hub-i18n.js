@@ -1344,3 +1344,60 @@ Object.assign(I18N.de, {
   home_loose_full: 'Du hast bereits 6 lose Karten auf dem Tisch.', home_loose_duplicate: 'Diese Karte liegt bereits auf dem Tisch.',
   home_loose_remove: 'Karte einsammeln', home_source_all: 'Gesamte Sammlung'
 });
+Object.assign(I18N.es, {
+  music_mode_immersive: 'Inmersivo', music_mode_chill: 'Chill',
+  music_mode_immersive_hint: 'La música cambia según la pantalla. En eCard Studio suena una pista aleatoria.',
+  music_mode_chill_hint: 'Reproducción aleatoria continua en toda la app.'
+});
+Object.assign(I18N.en, {
+  music_mode_immersive: 'Immersive', music_mode_chill: 'Chill',
+  music_mode_immersive_hint: 'Music changes per screen. eCard Studio plays a random track.',
+  music_mode_chill_hint: 'Continuous random playback across the whole app.'
+});
+Object.assign(I18N.de, {
+  music_mode_immersive: 'Immersiv', music_mode_chill: 'Chill',
+  music_mode_immersive_hint: 'Musik wechselt pro Bildschirm. Im eCard Studio läuft ein zufälliger Titel.',
+  music_mode_chill_hint: 'Fortlaufende Zufallswiedergabe in der gesamten App.'
+});
+Object.assign(I18N.es, {
+  hub_nav_booster: 'Shop', hub_nav_booster_full: 'Shop', booster_title: 'Shop',
+  booster_lede: 'Elige tu pack diario, revisa el stock o entra a la computadora para ver otros vendedores.',
+  shop_computer: 'Computadora', shop_vendor_kicker: 'Shop vendor of the day',
+  shop_vendor_hello: 'Hello… Welcome to the Shop.', shop_daily_kicker: 'Daily Packs',
+  shop_selected_pack: 'Pack seleccionado', shop_recommended: 'Recomendados de hoy'
+});
+Object.assign(I18N.en, {
+  hub_nav_booster: 'Shop', hub_nav_booster_full: 'Shop', booster_title: 'Shop',
+  booster_lede: 'Pick your daily pack, check the stock or use the computer to browse other vendors.',
+  shop_computer: 'Computer', shop_vendor_kicker: 'Shop vendor of the day',
+  shop_vendor_hello: 'Hello… Welcome to the Shop.', shop_daily_kicker: 'Daily Packs',
+  shop_selected_pack: 'Selected pack', shop_recommended: "Today's picks"
+});
+Object.assign(I18N.de, {
+  hub_nav_booster: 'Shop', hub_nav_booster_full: 'Shop', booster_title: 'Shop',
+  booster_lede: 'Wähle dein tägliches Pack, prüfe den Bestand oder nutze den Computer für andere Verkäufer.',
+  shop_computer: 'Computer', shop_vendor_kicker: 'Shop vendor of the day',
+  shop_vendor_hello: 'Hello… Welcome to the Shop.', shop_daily_kicker: 'Daily Packs',
+  shop_selected_pack: 'Ausgewähltes Pack', shop_recommended: 'Heutige Empfehlungen'
+});
+Object.assign(I18N.es, { shop_daily_available: 'Daily Pack disponible', hub_favorites_edit: 'Editar cartas favoritas' });
+Object.assign(I18N.en, { shop_daily_available: 'Daily Pack available', hub_favorites_edit: 'Edit favorite cards' });
+Object.assign(I18N.de, { shop_daily_available: 'Daily Pack verfügbar', hub_favorites_edit: 'Lieblingskarten bearbeiten' });
+Object.assign(I18N.es, {
+  hub_favorites_title: 'Cartas favoritas', hub_favorites_desc: 'Elige hasta 3 cartas en orden. La primera será la protagonista.',
+  hub_favorites_undo: 'Deshacer', hub_favorites_clear: 'Borrar', hub_favorites_save: 'Guardar favoritas',
+  hub_favorites_edit: 'Editar cartas favoritas'
+});
+Object.assign(I18N.en, {
+  hub_favorites_title: 'Favorite cards', hub_favorites_desc: 'Pick up to 3 cards in order. The first one becomes the main card.',
+  hub_favorites_undo: 'Undo', hub_favorites_clear: 'Clear', hub_favorites_save: 'Save favorites',
+  hub_favorites_edit: 'Edit favorite cards'
+});
+Object.assign(I18N.de, {
+  hub_favorites_title: 'Lieblingskarten', hub_favorites_desc: 'Wähle bis zu 3 Karten in Reihenfolge. Die erste wird zur Hauptkarte.',
+  hub_favorites_undo: 'Rückgängig', hub_favorites_clear: 'Löschen', hub_favorites_save: 'Favoriten speichern',
+  hub_favorites_edit: 'Lieblingskarten bearbeiten'
+});
+Object.assign(I18N.es, { home_back: 'Reverso del mazo', home_back_shared: 'CardGram clásico' });
+Object.assign(I18N.en, { home_back: 'Deck back', home_back_shared: 'Classic CardGram' });
+Object.assign(I18N.de, { home_back: 'Deck-Rückseite', home_back_shared: 'Klassisches CardGram' });

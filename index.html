@@ -12,24 +12,42 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=165">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=165">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=171">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=171">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=165" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=165" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=165" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=165" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=165" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=165" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=165" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=165" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=165" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=165" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=165" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=171" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=171" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=171" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=171" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=171" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=171" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=171" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=171" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=171" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=171" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=171" defer></script>
+  <script src="assets/js/boot.js?v=0.5.5&rev=171" defer></script>
 </head>
-<body data-view="hub">
+<body data-view="hub" class="booting">
+  <div class="boot-screen" id="boot-screen">
+    <div class="boot-bg boot-bg-a" id="boot-bg-a"></div>
+    <div class="boot-bg boot-bg-b" id="boot-bg-b"></div>
+    <div class="boot-vignette" aria-hidden="true"></div>
+    <div class="boot-top">
+      <span class="boot-logo">CardGram</span>
+      <span class="boot-version">v0.5.5</span>
+    </div>
+    <div class="boot-center">
+      <span class="boot-kicker">A card universe awaits</span>
+      <h1 class="boot-title">CardGram</h1>
+      <p class="boot-sub">Create · Collect · Trade</p>
+      <div class="boot-progress" id="boot-progress"><span id="boot-bar"></span></div>
+      <button class="boot-start" id="boot-start" type="button" hidden>Press Start</button>
+      <p class="boot-hint" id="boot-hint">Cargando tu universo de cartas…</p>
+    </div>
+  </div>
 
   <!-- ======================================================================
        Sprite de iconos (SVG inline, sin peticiones extra)
@@ -398,16 +416,13 @@
             <h1 class="sr-only" id="hub-home-title" data-i18n="hub_home_title">Inicio de CardGram</h1>
 
             <!-- Dos datos vivos, solo en móvil: jugador y colección. -->
-            <div class="hub-mobile-datastrip" id="hub-mobile-datastrip">
-              <span class="hub-mobile-data">
-                <span class="hub-mobile-data-dot" aria-hidden="true"></span>
-                <span class="hub-mobile-data-text" id="hub-mobile-data-player">—</span>
-              </span>
-              <span class="hub-mobile-data-sep" aria-hidden="true"></span>
-              <span class="hub-mobile-data">
-                <span class="hub-mobile-data-dot hub-mobile-data-dot-sky" aria-hidden="true"></span>
-                <span class="hub-mobile-data-text" id="hub-mobile-data-collection">—</span>
-              </span>
+            <div class="hub-mobile-quick" id="hub-mobile-quick">
+              <button class="hub-mobile-quick-btn" type="button" data-new-card aria-label="Crear una carta nueva" data-i18n-aria-label="hub_new_card" title="Crear una carta nueva" data-i18n-title="hub_new_card">
+                <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
+              </button>
+              <button class="hub-mobile-quick-btn" type="button" id="hub-mobile-hand-edit" aria-haspopup="dialog" aria-controls="hand-dialog" aria-label="Editar cartas favoritas" data-i18n-aria-label="hub_favorites_edit" title="Editar cartas favoritas" data-i18n-title="hub_favorites_edit">
+                <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
+              </button>
             </div>
 
             <div class="hub-dashboard">
@@ -642,6 +657,9 @@
                 <label class="hub-layout-control"><span data-i18n="home_deck_source">Fuente del Deck</span>
                   <select class="home-setting-select" id="home-deck-source"></select>
                 </label>
+                <label class="hub-layout-control"><span data-i18n="home_back">Reverso del mazo</span>
+                  <select class="home-setting-select" id="home-back-source"></select>
+                </label>
                 <button class="btn btn-ghost btn-sm home-loose-clear" id="home-loose-clear" type="button" data-i18n="home_clear_loose">Recoger cartas sueltas</button>
 
                 <div class="hub-layout-modes" role="group" aria-label="Modo de diseño" data-i18n-aria-label="layout_mode_aria">
@@ -668,48 +686,47 @@
                Sobre diario
                ------------------------------------------------------------ -->
           <section class="hub-panel hub-booster-panel" data-hub-panel="booster" aria-labelledby="booster-title" hidden>
-            <header class="hub-view-head">
-              <button class="hub-back" type="button" data-hub-route="home" aria-label="Volver al inicio" data-i18n-aria-label="hub_back_home">
-                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
-              </button>
-              <div class="hub-view-copy">
-                <h1 id="booster-title" data-i18n="booster_title">Sobre diario</h1>
-                <p data-i18n="booster_lede">Cuatro cartas nuevas cada día. Elige el set y abre tu sobre.</p>
+            <h1 class="sr-only" id="booster-title" data-i18n="booster_title">Shop</h1>
+            <div class="shop-scene">
+              <div class="shop-bg" aria-hidden="true"></div>
+              <div class="shop-light" aria-hidden="true"></div>
+
+              <div class="shop-topbar">
+                <button class="hub-back" type="button" data-hub-route="home" aria-label="Volver al inicio" data-i18n-aria-label="hub_back_home">
+                  <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+                </button>
+                <span class="shop-days"><span aria-hidden="true">✦</span> 3 DAYS</span>
+                <button class="shop-computer" type="button" data-hub-route="explore">
+                  <svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>
+                  <span data-i18n="shop_computer">Computadora</span>
+                </button>
               </div>
-              <div class="booster-streak" id="booster-streak" title="Racha de días" data-i18n-title="booster_streak_label">
-                <span class="booster-streak-flame" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span>
-                <strong id="booster-streak-value">0</strong>
-                <span id="booster-streak-label" data-i18n="booster_streak_short">días</span>
+
+              <div class="shop-npc" aria-hidden="true">
+                <img class="shop-npc-img is-active" id="shop-npc-a" alt="">
+                <img class="shop-npc-img" id="shop-npc-b" alt="">
               </div>
-            </header>
 
-            <div class="booster-layout">
-              <aside class="booster-aside">
-                <div class="booster-status" id="booster-status">
-                  <span class="hub-panel-eyebrow"><span class="hub-live-dot" aria-hidden="true"></span><span data-i18n="booster_today">Hoy</span></span>
-                  <h2 id="booster-status-title" data-i18n="booster_ready_title">Tu sobre está listo</h2>
-                  <p id="booster-status-copy" data-i18n="booster_ready_copy">Elige un set. Recibirás 4 cartas al azar de ese set.</p>
-                  <div class="booster-progress" id="booster-progress" aria-live="polite"></div>
-                </div>
+              <div class="shop-speech">
+                <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky"></span><span data-i18n="shop_vendor_kicker">Shop vendor of the day</span></span>
+                <p id="shop-speech-text" data-i18n="shop_vendor_hello">Hello… Welcome to the Shop.</p>
+              </div>
 
-                <div class="booster-sets" id="booster-sets" role="group" aria-label="Sets disponibles" data-i18n-aria-label="booster_sets_aria"></div>
+              <div class="shop-recommended" id="shop-recommended"></div>
 
-                <p class="booster-note">
-                  <svg class="icon" aria-hidden="true"><use href="#i-star"></use></svg>
-                  <span data-i18n="booster_six_note">Cada sobre contiene 6 cartas y las rarezas altas tienen efectos especiales.</span>
-                </p>
-              </aside>
+              <aside class="shop-daily">
+                <span class="hub-panel-eyebrow"><span class="hub-live-dot"></span><span data-i18n="shop_daily_kicker">Daily Packs</span></span>
+                <h2 id="booster-status-title" data-i18n="booster_ready_title">Tu sobre está listo</h2>
+                <p id="booster-status-copy" data-i18n="booster_ready_copy">Cada sobre trae 6 cartas.</p>
+                <div class="booster-progress" id="booster-progress" aria-live="polite"></div>
 
-              <div class="booster-stage">
-                <div class="booster-stage-head">
-                  <div>
-                    <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky" aria-hidden="true"></span><span data-i18n="booster_pack_label">Sobre</span></span>
-                    <h2 id="booster-pack-title" data-i18n="booster_pack_empty">Elige un set para empezar</h2>
-                  </div>
+                <div class="shop-pack-selected">
+                  <span data-i18n="shop_selected_pack">Pack seleccionado</span>
+                  <strong id="booster-pack-title" data-i18n="booster_pack_empty">Elige un pack</strong>
                   <span class="hub-chip" id="booster-pack-chip" hidden></span>
                 </div>
 
-                <div class="booster-cards" id="booster-cards" aria-live="polite"></div>
+                <div class="booster-sets" id="booster-sets" role="group" aria-label="Sets disponibles" data-i18n-aria-label="booster_sets_aria" hidden></div>
 
                 <div class="booster-actions">
                   <button class="btn btn-primary" type="button" id="booster-open" disabled>
@@ -726,8 +743,14 @@
                   </button>
                 </div>
 
-                <p class="booster-hint" id="booster-hint" data-i18n="booster_hint">El sobre se abre una vez al día. Las cartas se guardan en este navegador.</p>
-              </div>
+                <p class="booster-hint" id="booster-hint" data-i18n="booster_hint">Tres sobres diarios. Las cartas se guardan en este navegador.</p>
+                <div class="booster-streak shop-hidden" id="booster-streak" title="Racha de días" data-i18n-title="booster_streak_label">
+                  <span class="booster-streak-flame" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg></span>
+                  <strong id="booster-streak-value">0</strong>
+                  <span id="booster-streak-label" data-i18n="booster_streak_short">días</span>
+                </div>
+                <div class="booster-cards shop-hidden" id="booster-cards" aria-live="polite"></div>
+              </aside>
             </div>
           </section>
 
@@ -1020,42 +1043,40 @@
       </button>
     </nav>
 
-    <!-- Acciones rápidas sobre el menú (móvil) -->
-    <div class="hub-fab-actions" aria-label="Acciones rápidas" data-i18n-aria-label="hub_quick_actions">
-      <button class="hub-fab-btn" type="button" data-hub-route="collections" aria-label="Mis cartas" data-i18n-aria-label="hub_nav_library" title="Mis cartas" data-i18n-title="hub_nav_library">
+    <!-- Navegación inferior móvil -->
+    <div class="hub-fab-actions hub-mobile-menu-nav" aria-label="Navegación principal" data-i18n-aria-label="hub_nav_aria">
+      <button class="hub-fab-btn tone-a" type="button" data-hub-route="collections" aria-label="Mis cartas" data-i18n-aria-label="hub_nav_library" title="Mis cartas" data-i18n-title="hub_nav_library">
         <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
           <rect x="7.5" y="3.5" width="10" height="14" rx="2.2"/>
           <path d="M4.5 7.5v10a2.5 2.5 0 0 0 2.5 2.5h8"/>
           <path d="M12.5 7.4l1 2.1 2.3.3-1.7 1.6.4 2.3-2-1.1-2 1.1.4-2.3-1.7-1.6 2.3-.3z" fill="currentColor" stroke="none"/>
         </svg>
       </button>
-      <button class="hub-fab-btn" type="button" data-render-favorite aria-label="Crear un render con tu carta" data-i18n-aria-label="hub_render_favorite" title="Crear un render con tu carta" data-i18n-title="hub_render_favorite">
-        <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
-          <rect x="2.8" y="7" width="12.6" height="10" rx="2.2"/>
-          <path d="M15.4 10.3l5.2-2.4v8.2l-5.2-2.4z"/>
-          <circle cx="8.6" cy="12" r="2.5"/>
-          <path d="M8.6 4.2V2.8M6.8 3.5h3.6" stroke-linecap="square"/>
-        </svg>
-      </button>
-      <button class="hub-fab-btn hub-fab-btn-primary" id="hub-home-fab" type="button" data-hub-route="home" aria-label="Inicio" data-i18n-aria-label="hub_nav_home" title="Inicio" data-i18n-title="hub_nav_home" hidden>
-        <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
-          <path d="M3.8 11.2L12 4l8.2 7.2"/>
-          <path d="M6.4 10v9.8h11.2V10"/>
-          <path d="M10.2 19.8v-5.2h3.6v5.2"/>
-        </svg>
-      </button>
-      <button class="hub-fab-btn" id="hub-mobile-hand-edit" type="button" aria-haspopup="dialog" aria-controls="hand-dialog" aria-label="Elegir cartas de la mano" data-i18n-aria-label="hub_hand_edit" title="Elegir cartas de la mano" data-i18n-title="hub_hand_edit">
+      <button class="hub-fab-btn tone-b" type="button" data-hub-route="booster" aria-label="Shop" data-i18n-aria-label="hub_nav_booster" title="Shop" data-i18n-title="hub_nav_booster">
         <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
-          <rect x="9" y="4.5" width="6.4" height="12" rx="1.6"/>
-          <path d="M5.4 8.2v8.9a2.4 2.4 0 0 0 2.4 2.4h8.4"/>
-          <path d="M18.6 8.2v8.9a2.4 2.4 0 0 1-2.4 2.4H7.8"/>
+          <path d="M4 9h16l-1 10.5H5z"/>
+          <path d="M8 9V7a4 4 0 0 1 8 0v2"/>
+          <path d="M9.5 13h5"/>
         </svg>
       </button>
-      <button class="hub-fab-btn" type="button" data-hub-route="explore" aria-label="Explorar" data-i18n-aria-label="hub_nav_explore" title="Explorar" data-i18n-title="hub_nav_explore">
+      <button class="hub-fab-btn tone-a" type="button" data-hub-route="explore" aria-label="Explorar" data-i18n-aria-label="hub_nav_explore" title="Explorar" data-i18n-title="hub_nav_explore">
         <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
           <circle cx="12" cy="12" r="7.4"/>
           <path d="M15.8 8.2l-2.4 5.2-5.2 2.4 2.4-5.2z" fill="currentColor" stroke="none"/>
-          <path d="M12 2.6v1.8M12 19.6v1.8M2.6 12h1.8M19.6 12h1.8" stroke-linecap="square"/>
+        </svg>
+      </button>
+      <button class="hub-fab-btn tone-b" type="button" data-hub-route="profile" aria-label="Perfil" data-i18n-aria-label="hub_nav_profile" title="Perfil" data-i18n-title="hub_nav_profile">
+        <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="3.5"/>
+          <path d="M5 20a7 7 0 0 1 14 0"/>
+        </svg>
+      </button>
+      <button class="hub-fab-btn tone-a hub-mobile-daily" id="hub-mobile-daily" type="button" data-hub-route="booster" aria-label="Daily Pack disponible" data-i18n-aria-label="shop_daily_available" title="Daily Pack disponible" data-i18n-title="shop_daily_available" hidden>
+        <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+          <path d="M4 9h16v11H4z"/>
+          <path d="M3 5h18v4H3z"/>
+          <path d="M12 5v15"/>
+          <path d="M12 5c-2.8 0-4.5-1-4.5-2.5C7.5 1.2 9 1 10 1.6c1.4.8 2 2.2 2 3.4zM12 5c2.8 0 4.5-1 4.5-2.5C16.5 1.2 15 1 14 1.6c-1.4.8-2 2.2-2 3.4z"/>
         </svg>
       </button>
     </div>
@@ -1290,9 +1311,10 @@
         <p class="music-now" id="music-now">—</p>
 
         <div class="music-mode" role="group" aria-label="Modo de reproducción" data-i18n-aria-label="music_mode_aria">
-          <button class="active" type="button" data-music-mode="scene" data-i18n="music_mode_scene">Por pantalla</button>
-          <button type="button" data-music-mode="all" data-i18n="music_mode_all">Todas en secuencia</button>
+          <button class="active" type="button" data-music-mode="immersive" data-i18n="music_mode_immersive">Inmersivo</button>
+          <button type="button" data-music-mode="chill" data-i18n="music_mode_chill">Chill</button>
         </div>
+        <p class="music-mode-hint" id="music-mode-hint"></p>
 
         <section class="music-section">
           <div class="music-section-head">
@@ -2185,16 +2207,17 @@
       <div class="dialog-head">
         <span class="dialog-icon"><svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg></span>
         <div>
-          <h2 class="dialog-title" id="hand-dialog-title" data-i18n="hub_hand_title">Tu mano</h2>
-          <p class="dialog-desc" data-i18n="hub_hand_desc">Elige hasta 6 cartas. Se alternarán como tus destacadas.</p>
+          <h2 class="dialog-title" id="hand-dialog-title" data-i18n="hub_favorites_title">Cartas favoritas</h2>
+          <p class="dialog-desc" data-i18n="hub_favorites_desc">Elige hasta 3 cartas en orden. La primera será la protagonista.</p>
         </div>
       </div>
       <div class="hand-picker" id="hand-picker"></div>
       <div class="dialog-actions hand-dialog-actions">
-        <span class="hand-count" id="hand-count">0/6</span>
-        <button class="btn btn-ghost hand-clear" id="hand-clear" type="button" data-i18n="hub_hand_clear">Limpiar</button>
+        <span class="hand-count" id="hand-count">0/3</span>
+        <button class="btn btn-ghost hand-clear" id="hand-undo" type="button" data-i18n="hub_favorites_undo">Deshacer</button>
+        <button class="btn btn-ghost hand-clear" id="hand-clear" type="button" data-i18n="hub_favorites_clear">Borrar</button>
         <button class="btn btn-ghost" id="hand-cancel" type="button" data-i18n="cancel">Cancelar</button>
-        <button class="btn btn-primary" id="hand-save" type="submit" data-i18n="hub_hand_save">Guardar mano</button>
+        <button class="btn btn-primary" id="hand-save" type="submit" data-i18n="hub_favorites_save">Guardar favoritas</button>
       </div>
     </form>
   </dialog>

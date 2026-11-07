@@ -44,7 +44,9 @@
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
     if (saved && typeof saved === 'object') {
       if (typeof saved.enabled === 'boolean') state.enabled = saved.enabled;
-      if (saved.mode === 'all' || saved.mode === 'scene') state.mode = saved.mode;
+      if (saved.mode === 'chill' || saved.mode === 'immersive') state.mode = saved.mode;
+      else if (saved.mode === 'all') state.mode = 'chill';
+      else if (saved.mode === 'scene') state.mode = 'immersive';
     }
   } catch (error) {
     /* Sin preferencia guardada. */
@@ -107,6 +109,13 @@
     document.querySelectorAll('[data-music-mode]').forEach((button) => {
       button.classList.toggle('active', button.dataset.musicMode === state.mode);
     });
+
+    const modeHint = document.getElementById('music-mode-hint');
+    if (modeHint) {
+      modeHint.textContent = state.mode === 'chill'
+        ? tr('music_mode_chill_hint', 'Reproducción aleatoria continua en toda la app.')
+        : tr('music_mode_immersive_hint', 'La música cambia según la pantalla. En eCard Studio suena una pista aleatoria.');
+    }
 
     const tracks = document.getElementById('music-tracks');
     if (tracks) {
@@ -239,17 +248,32 @@
   function playScene(scene, force = false) {
     if (!state.enabled) return;
     if (!state.armed && !force) return;
-    if (state.mode === 'all') {
+    if (state.mode === 'chill') {
       if (state.current && !state.current.radio && !force) return;
-      const list = sequence();
-      if (!list.length) return;
-      const index = Math.max(0, list.findIndex((entry) => entry.scene === scene));
-      state.sequenceIndex = index;
-      playSequenceIndex(index);
+      playRandomTrack();
       return;
     }
-
+    if (scene === 'studio') {
+      if (state.current && !state.current.radio && !force) return;
+      playRandomTrack();
+      return;
+    }
     playSceneTrack(scene, 0, force);
+  }
+
+  function playRandomTrack() {
+    const list = sequence();
+    if (!list.length) return;
+    const current = state.current ? state.current.src : null;
+    const candidates = list.length > 1 ? list.filter((entry) => entry.src !== current) : list;
+    const entry = candidates[Math.floor(Math.random() * candidates.length)];
+    state.sequenceIndex = list.indexOf(entry);
+    startTrack(entry.src, {
+      scene: entry.scene,
+      trackIndex: entry.index,
+      loop: false,
+      onEnded: () => playRandomTrack()
+    });
   }
 
   function playSequenceIndex(index) {
@@ -284,10 +308,13 @@
   }
 
   function setMode(mode) {
-    state.mode = mode === 'all' ? 'all' : 'scene';
+    state.mode = mode === 'chill' ? 'chill' : 'immersive';
     save();
     renderPanel();
-    if (state.enabled) playScene(state.scene, true);
+    if (!state.enabled) return;
+    state.armed = true;
+    if (state.mode === 'chill') playRandomTrack();
+    else playScene(state.scene, true);
   }
 
   function setEnabled(value) {
@@ -353,11 +380,19 @@
 
   function setScene(scene) {
     const next = SCENES.some((entry) => entry.id === scene) ? scene : 'home';
-    if (state.scene === next) return;
+    if (state.scene === next) {
+      if (!state.current && state.armed && state.enabled) playScene(next, true);
+      return;
+    }
     state.scene = next;
     if (state.radio) return;
-    if (state.mode === 'all') return;
+    if (state.mode === 'chill') return;
     playScene(next);
+  }
+
+  function start() {
+    state.armed = true;
+    if (state.enabled) playScene(state.scene, true);
   }
 
   document.querySelectorAll('[data-music-open]').forEach((button) => {
@@ -393,10 +428,13 @@
         state.enabled = true;
         save();
       }
-      if (state.mode === 'all') {
-        const list = sequence();
-        const position = list.findIndex((entry) => entry.scene === scene && entry.index === index);
-        playSequenceIndex(Math.max(0, position));
+      if (state.mode === 'chill') {
+        startTrack(tracksFor(scene)[index], {
+          scene,
+          trackIndex: index,
+          loop: false,
+          onEnded: () => playRandomTrack()
+        });
       } else {
         playSceneTrack(scene, index, true);
       }
@@ -429,6 +467,7 @@
     refresh: loadPlaylist,
     openPanel,
     closePanel,
+    start,
     isEnabled: () => state.enabled
   };
 })();
