@@ -1287,3 +1287,27 @@ Object.assign(I18N.de, { booster_status_available_title_one: 'Du hast 1 Pack ver
 Object.assign(I18N.es, { explore_open_booster: 'Abrir sobre de este pack' });
 Object.assign(I18N.en, { explore_open_booster: 'Open a pack from this set' });
 Object.assign(I18N.de, { explore_open_booster: 'Pack aus diesem Set öffnen' });
+Object.assign(I18N.es, {
+  music_kicker: 'Ambiente', music_title: 'Música', music_mode_aria: 'Modo de reproducción',
+  music_mode_scene: 'Por pantalla', music_mode_all: 'Todas en secuencia',
+  music_tracks: 'Pistas', music_toggle: 'Música activa', music_on: 'Música activa',
+  music_off: 'Música apagada', music_radios: 'Radios lo-fi gratis', music_radio: 'Radio',
+  music_scene_home: 'Inicio', music_scene_packs: 'Packs', music_scene_my_cards: 'Mis cartas', music_scene_explore: 'Explorar'
+});
+Object.assign(I18N.en, {
+  music_kicker: 'Ambience', music_title: 'Music', music_mode_aria: 'Playback mode',
+  music_mode_scene: 'Per screen', music_mode_all: 'Play all in sequence',
+  music_tracks: 'Tracks', music_toggle: 'Music on', music_on: 'Music on',
+  music_off: 'Music off', music_radios: 'Free lo-fi radios', music_radio: 'Radio',
+  music_scene_home: 'Home', music_scene_packs: 'Packs', music_scene_my_cards: 'My Cards', music_scene_explore: 'Explore'
+});
+Object.assign(I18N.de, {
+  music_kicker: 'Ambiente', music_title: 'Musik', music_mode_aria: 'Wiedergabemodus',
+  music_mode_scene: 'Pro Bildschirm', music_mode_all: 'Alle nacheinander',
+  music_tracks: 'Titel', music_toggle: 'Musik an', music_on: 'Musik an',
+  music_off: 'Musik aus', music_radios: 'Kostenlose Lo-fi-Radios', music_radio: 'Radio',
+  music_scene_home: 'Start', music_scene_packs: 'Packs', music_scene_my_cards: 'Meine Karten', music_scene_explore: 'Entdecken'
+});
+Object.assign(I18N.es, { music_scene_studio: 'eCard Studio' });
+Object.assign(I18N.en, { music_scene_studio: 'eCard Studio' });
+Object.assign(I18N.de, { music_scene_studio: 'eCard Studio' });

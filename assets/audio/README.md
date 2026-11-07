@@ -2,18 +2,25 @@
 
 Coloca aquí las canciones y regístralas en `playlist.json`.
 
-- `home/` — música de la pantalla de bienvenida.
-- `my-cards/` — música de Mis cartas.
+- `home/` — pantalla de bienvenida.
+- `packs/` — sobres y packs.
+- `my-cards/` — Mis cartas.
+- `explore/` — Explorar.
 
-Ejemplo de `playlist.json`:
+Ejemplo:
 
 ```json
 {
   "home": ["home/welcome.mp3"],
-  "my-cards": ["my-cards/cards.mp3"]
+  "packs": ["packs/packs.mp3"],
+  "my-cards": ["my-cards/cards.mp3"],
+  "explore": ["explore/explore.mp3"],`n  "studio": ["eCardStudio/theme.mp3"]
 }
 ```
 
-Formatos recomendados: MP3 u OGG. Las pistas se reproducen en bucle y hacen
-crossfade suave al cambiar entre Inicio y Mis cartas. Si una lista está vacía,
-no se reproduce nada para esa pantalla.
+Formatos recomendados: MP3 u OGG. Las pistas se reproducen en bucle en el modo
+"Por pantalla" y en secuencia en el modo "Todas en secuencia".
+
+El reproductor también incluye dos radios lo-fi gratuitas:
+- Lofi Radio
+- Chillhop Radio

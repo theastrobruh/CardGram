@@ -3864,7 +3864,16 @@ function setActivePanel(panel, options = {}) {
   }
   if (target === 'collections') markBoosterMission();
   document.body.classList.toggle('is-home-route', target === 'home');
-  if (window.Music) window.Music.setScene(target === 'collections' ? 'my-cards' : 'home');
+  if (window.Music) {
+    const musicScene = target === 'collections'
+      ? 'my-cards'
+      : target === 'booster'
+        ? 'packs'
+        : target === 'explore'
+          ? 'explore'
+          : 'home';
+    window.Music.setScene(musicScene);
+  }
 
   Array.from(hub.root.querySelectorAll('[data-hub-panel]')).forEach((section) => {
     const active = section.dataset.hubPanel === target;
@@ -4003,6 +4012,7 @@ function nextFrame() {
 
 async function openStudio(tab) {
   if (hub.opening) return;
+  if (window.Music) window.Music.setScene('studio');
   if (document.body.dataset.view === 'studio' && Scene && Scene.isReady()) {
     activateTab(HUB_STUDIO_TABS[tab] || 'tab-deck');
     return;

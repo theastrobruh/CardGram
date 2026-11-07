@@ -3970,3 +3970,8 @@ body.cinematic-mode .fx-rail {
     height: min(var(--side-h), calc(100dvh - 190px));
   }
 }
+@media (min-width: 981px) {
+  body.sidebar-collapsed .bottom-left-cluster {
+    left: 42px;
+  }
+}

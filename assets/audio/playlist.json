@@ -1,4 +1,20 @@
 {
-  "home": [],
-  "my-cards": []
+  "home": [
+    "home/The Sunrise is on C Major Today ~.mp3"
+  ],
+  "packs": [
+    "packs/G Major at Sunset ~.mp3"
+  ],
+  "my-cards": [
+    "my-cards/Picks ready for G Major ~.mp3"
+  ],
+  "explore": [
+    "explore/Thinking on Ü in C Major ~.mp3"
+  ],
+  "studio": [
+    "eCardStudio/Island Vibe.mp3",
+    "eCardStudio/Mesmerizing Belle.mp3",
+    "eCardStudio/The Moon.mp3",
+    "eCardStudio/The Tavern.mp3"
+  ]
 }
