@@ -3259,12 +3259,40 @@ body.cinematic-mode .toast-stack {
   padding-top: 2px;
 }
 
-/* Mini botón flotante en esquina inferior izquierda para cambiar fondo */
-.bottom-left-bg-wrap {
+/* Herramientas flotantes de la esquina inferior izquierda */
+.bottom-left-cluster {
   position: absolute;
   left: 20px;
   bottom: 24px;
   z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bottom-left-bg-wrap {
+  position: relative;
+  z-index: 45;
+}
+
+.studio-tool-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 16px rgba(7, 51, 63, 0.18), var(--inset-hi);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.studio-tool-btn .icon {
+  width: 17px;
+  height: 17px;
 }
 
 .mini-bg-btn {
@@ -3372,12 +3400,12 @@ body.cinematic-mode .toast-stack {
   height: 14px;
 }
 
-body.cinematic-mode .bottom-left-bg-wrap {
+body.cinematic-mode .bottom-left-cluster {
   display: none !important;
 }
 
 @media (max-width: 860px) {
-  .bottom-left-bg-wrap {
+  .bottom-left-cluster {
     left: 14px;
     bottom: 18px;
   }
@@ -3635,5 +3663,153 @@ body.cinematic-mode .bottom-right-cfg-wrap {
   .bottom-right-cfg-wrap {
     right: 14px;
     bottom: 18px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Riel rápido de efectos del escenario (orientación, velocidad, etc.)
+   -------------------------------------------------------------------------- */
+.fx-rail {
+  position: fixed;
+  top: 50%;
+  right: 18px;
+  transform: translateY(-50%);
+  z-index: 115;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 6px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 30px rgba(7, 51, 63, 0.16), var(--inset-hi);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+}
+
+.fx-btn {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #3b6672;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s var(--ease), border-color 0.2s ease;
+}
+
+.fx-btn .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.fx-btn-value {
+  font-family: var(--mono);
+  font-size: 0.48rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  opacity: 0.82;
+}
+
+.fx-btn:hover,
+.fx-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--accent);
+  border-color: rgba(124, 235, 221, 0.7);
+  transform: translateY(-1px);
+}
+
+.fx-btn.is-active {
+  background: linear-gradient(135deg, #00b4a0, #2f8fdd);
+  border-color: rgba(255, 255, 255, 0.85);
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(0, 135, 122, 0.28);
+}
+
+body[data-view="hub"] .fx-rail {
+  display: none !important;
+}
+
+body.cinematic-mode .fx-rail {
+  display: none !important;
+}
+
+@media (max-width: 860px) {
+  .fx-rail {
+    display: none;
+  }
+}
+
+/* Botón Thank you: discreto, compacto y con el mismo guiño que el home */
+.kofi-btn {
+  align-self: center;
+  width: auto;
+  margin-top: 6px;
+  padding: 4px 10px;
+  gap: 5px;
+  font-size: 0.58rem;
+  color: #8a2b2b;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  opacity: 0.72;
+}
+
+.kofi-btn:hover,
+.kofi-btn:focus-visible {
+  opacity: 1;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff7a76 0%, #ff5e5b 100%);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 6px 14px rgba(255, 94, 91, 0.28);
+  transform: translateY(-1px);
+}
+
+.kofi-icons {
+  display: inline-grid;
+  width: 13px;
+  height: 13px;
+  place-items: center;
+}
+
+.kofi-ico {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kofi-ico svg {
+  width: 13px;
+  height: 13px;
+}
+
+.kofi-coffee {
+  animation: kofiCoffee 5.6s ease-in-out infinite;
+}
+
+.kofi-heart {
+  color: #ff5e5b;
+  animation: kofiHeart 5.6s ease-in-out infinite;
+}
+
+.kofi-btn:hover .kofi-coffee,
+.kofi-btn:hover .kofi-heart,
+.kofi-btn:focus-visible .kofi-coffee,
+.kofi-btn:focus-visible .kofi-heart {
+  color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kofi-coffee,
+  .kofi-heart {
+    animation: none !important;
   }
 }

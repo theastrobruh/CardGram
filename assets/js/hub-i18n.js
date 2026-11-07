@@ -862,17 +862,20 @@
   Object.assign(I18N.es, {
     hub_new_card: 'Crear nueva carta',
     hub_new_card_hint: 'Sube el anverso para empezar tu carta desde cero.',
-    hub_github_project: 'GitHub del proyecto'
+    hub_github_project: 'GitHub del proyecto',
+    hub_astro_os_title: 'the.astro.os — apps de theAstroBruh'
   });
   Object.assign(I18N.en, {
     hub_new_card: 'Create new card',
     hub_new_card_hint: 'Upload a front image to start your card from scratch.',
-    hub_github_project: 'Project GitHub'
+    hub_github_project: 'Project GitHub',
+    hub_astro_os_title: 'the.astro.os — apps by theAstroBruh'
   });
   Object.assign(I18N.de, {
     hub_new_card: 'Neue Karte erstellen',
     hub_new_card_hint: 'Lade ein Vorderseitenbild hoch, um deine Karte neu zu beginnen.',
-    hub_github_project: 'Projekt auf GitHub'
+    hub_github_project: 'Projekt auf GitHub',
+    hub_astro_os_title: 'the.astro.os — Apps von theAstroBruh'
   });
 
   /* Biblioteca y visor individual */

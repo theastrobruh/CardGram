@@ -2880,29 +2880,7 @@ dialog {
 /* --------------------------------------------------------------------------
    17. Movimiento reducido
    -------------------------------------------------------------------------- */
-#btn-home-hub-floating {
-  display: none;
-}
 
-@media (max-width: 860px) {
-  body[data-view="studio"] #btn-home-hub-floating {
-    position: fixed;
-    top: 18px;
-    left: 64px;
-    z-index: 220;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 14px;
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.46));
-  }
-
-  body.sidebar-open-mobile #btn-home-hub-floating {
-    display: none;
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .hub-veil {

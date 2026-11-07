@@ -434,6 +434,7 @@ function serializableState() {
 }
 
 function persistSettings() {
+  if (el.fxRail) syncFxRail();
   clearTimeout(settingsTimer);
   settingsTimer = setTimeout(() => {
     const ok = storage.write(STORAGE.settings, serializableState());
@@ -1330,6 +1331,7 @@ function syncUI() {
   }
 
   updateFullArtToggle();
+  syncFxRail();
   scheduleResize();
   updateExportLabel();
 }
@@ -1584,7 +1586,153 @@ function setupTemplateBuilder() {
   });
 }
 
+const FX_FLOAT_KEYS = {
+  organic: 'float_organic',
+  subtle: 'float_subtle',
+  breathe: 'float_breathe',
+  dramatic: 'float_dramatic',
+  off: 'float_off'
+};
+
+const FX_FORMAT_KEYS = {
+  auto: 'format_auto',
+  tcg: 'format_tcg',
+  ygo: 'format_ygo',
+  tarot: 'format_tarot',
+  mini: 'format_mini',
+  wide: 'format_wide',
+  square: 'format_square'
+};
+
+const FX_FORMAT_SHORT = {
+  auto: 'AUTO',
+  tcg: 'TCG',
+  ygo: 'YGO',
+  tarot: 'TAROT',
+  mini: 'MINI',
+  wide: 'WIDE',
+  square: 'SQ'
+};
+
+const FX_FLOAT_SHORT = {
+  organic: 'ORG',
+  subtle: 'SUB',
+  breathe: 'BRT',
+  dramatic: 'PEN',
+  off: 'OFF'
+};
+
+function fxNextValue(list, current) {
+  const index = list.findIndex((value) => String(value) === String(current));
+  return list[(index + 1 + list.length) % list.length];
+}
+
+function syncFxRail() {
+  const rail = el.fxRail;
+  if (!rail) return;
+
+  const speedOn = Number(state.speed) > 0;
+  const values = {
+    orientation: state.spinDir === 1 ? 'CW' : 'CCW',
+    speed: speedOn ? `${state.speed}x` : 'OFF',
+    gravity: FX_FLOAT_SHORT[state.float] || 'OFF',
+    alignment: `${state.posY > 0 ? '+' : ''}${Number(state.posY).toFixed(2)}`,
+    size: `${Math.round(state.scale)}%`,
+    format: FX_FORMAT_SHORT[state.cardFormat] || 'AUTO'
+  };
+
+  const active = {
+    orientation: speedOn,
+    speed: speedOn,
+    gravity: state.float !== 'off',
+    alignment: Math.abs(Number(state.posY)) > 0.001,
+    size: Number(state.scale) < 100,
+    format: state.cardFormat !== 'auto'
+  };
+
+  const titles = {
+    orientation: `${t('spin_dir')}: ${state.spinDir === 1 ? t('dir_cw') : t('dir_ccw')}`,
+    speed: speedOn ? t('speed_label', { val: state.speed }) : t('speed_off'),
+    gravity: t(FX_FLOAT_KEYS[state.float] || 'floating'),
+    alignment: `${t('pos_y')}: ${values.alignment}`,
+    size: `${t('canvas_scale')}: ${values.size}`,
+    format: t(FX_FORMAT_KEYS[state.cardFormat] || 'card_format')
+  };
+
+  rail.querySelectorAll('.fx-btn').forEach((button) => {
+    const name = button.getAttribute('data-fx');
+    const valueNode = button.querySelector('.fx-btn-value');
+    if (valueNode && values[name]) valueNode.textContent = values[name];
+    button.classList.toggle('is-active', Boolean(active[name]));
+    button.setAttribute('aria-pressed', String(Boolean(active[name])));
+    if (titles[name]) {
+      button.title = titles[name];
+      button.setAttribute('aria-label', titles[name]);
+    }
+  });
+}
+
+function setupFxRail() {
+  const rail = el.fxRail;
+  if (!rail) return;
+
+  rail.addEventListener('click', (event) => {
+    const button = event.target.closest('.fx-btn');
+    if (!button || !rail.contains(button)) return;
+
+    const name = button.getAttribute('data-fx');
+
+    if (name === 'orientation') {
+      state.spinDir *= -1;
+      if (el.selectSpinDir) el.selectSpinDir.value = String(state.spinDir);
+      if (Scene.isReady()) Scene.applySettings({ spinDir: state.spinDir });
+      toast(`${t('spin_dir')}: ${state.spinDir === 1 ? t('dir_cw') : t('dir_ccw')}`, { type: 'info' });
+    } else if (name === 'speed') {
+      state.speed = fxNextValue([0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 2.5], state.speed);
+      if (el.selectSpeed) el.selectSpeed.value = String(state.speed);
+      if (Scene.isReady()) Scene.applySettings({ speed: state.speed });
+      toast(state.speed === 0 ? t('speed_off') : t('speed_label', { val: state.speed }), { type: 'info' });
+    } else if (name === 'gravity') {
+      state.float = fxNextValue(['organic', 'subtle', 'breathe', 'dramatic', 'off'], state.float);
+      if (el.selectFloating) el.selectFloating.value = state.float;
+      if (Scene.isReady()) Scene.applySettings({ float: state.float });
+      toast(t(FX_FLOAT_KEYS[state.float] || 'floating'), { type: 'info' });
+    } else if (name === 'alignment') {
+      const next = fxNextValue([-0.5, 0, 0.5], state.posY);
+      state.posY = Number(next);
+      if (el.rangePosY) {
+        el.rangePosY.value = String(state.posY);
+        updateRangeFill(el.rangePosY);
+      }
+      if (el.valPosY) el.valPosY.textContent = state.posY.toFixed(2);
+      if (Scene.isReady()) Scene.applySettings({ posY: state.posY });
+      toast(`${t('pos_y')}: ${state.posY.toFixed(2)}`, { type: 'info' });
+    } else if (name === 'size') {
+      state.scale = fxNextValue([100, 90, 80, 70, 60, 50], state.scale);
+      if (el.rangeScale) {
+        el.rangeScale.value = String(state.scale);
+        updateRangeFill(el.rangeScale);
+      }
+      if (el.valScale) el.valScale.textContent = `${Math.round(state.scale)}%`;
+      scheduleResize();
+      updateExportLabel();
+      toast(`${t('canvas_scale')}: ${Math.round(state.scale)}%`, { type: 'info' });
+    } else if (name === 'format') {
+      state.cardFormat = fxNextValue(['auto', 'tcg', 'ygo', 'tarot', 'mini', 'wide', 'square'], state.cardFormat);
+      if (el.selectCardFormat) el.selectCardFormat.value = state.cardFormat;
+      if (Scene.isReady()) Scene.applySettings({ cardFormat: state.cardFormat });
+      toast(t(FX_FORMAT_KEYS[state.cardFormat] || 'card_format'), { type: 'info' });
+    }
+
+    syncFxRail();
+    persistSettings();
+  });
+
+  syncFxRail();
+}
+
 function setupControls() {
+  setupFxRail();
   setupTemplateBuilder();
   if (el.studioPicker) {
     el.studioPicker.addEventListener('change', onStudioPickerChange);
@@ -2490,6 +2638,8 @@ function cacheDom() {
   el.langDropdown = $('#lang-dropdown');
   el.langOptions = $$('.lang-option');
   el.btnHelp = $('#btn-help');
+  el.btnHelpFloating = $('#btn-help-floating');
+  el.fxRail = $('#fx-rail');
   el.helpDialog = $('#help-dialog');
   el.helpClose = $('#help-close');
 
@@ -2709,7 +2859,8 @@ function setupChrome() {
   setTimeout(() => el.viewportHint.classList.add('hidden'), 9000);
 
   setupLangMenu();
-  el.btnHelp.addEventListener('click', openHelp);
+  if (el.btnHelp) el.btnHelp.addEventListener('click', openHelp);
+  if (el.btnHelpFloating) el.btnHelpFloating.addEventListener('click', openHelp);
   el.helpClose.addEventListener('click', () => el.helpDialog.close());
 
   [el.presetDialog, el.confirmDialog, el.helpDialog].forEach((dialog) => {
