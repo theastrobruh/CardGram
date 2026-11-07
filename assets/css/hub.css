@@ -8489,3 +8489,28 @@ body:not(.is-home-route) .hub-settings-section {
     display: none;
   }
 }
+/* Inicio: ajuste por altura y bloqueo real de scroll */
+@media (min-width: 981px) {
+  .hub-home-panel[data-hub-panel="home"] {
+    overflow: hidden;
+    overflow: clip;
+    overscroll-behavior: none;
+  }
+
+  .hub-home-panel[data-hub-panel="home"] .hub-dashboard {
+    overflow: hidden;
+    overflow: clip;
+    overscroll-behavior: none;
+  }
+
+  .hub-favorite .hub-card-stage,
+  .hub-hand-deck-card {
+    width: min(calc(clamp(380px, 35vw, 470px) * var(--hero-scale)), calc((100dvh - 300px) * 0.7467), 100%);
+    max-width: 100%;
+  }
+
+  .hub-player-panel,
+  .hub-explorer-panel {
+    height: min(var(--side-h), calc(100dvh - 190px));
+  }
+}

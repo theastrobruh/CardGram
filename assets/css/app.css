@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    CardGram — Aqua Glass Studio · v0.4.5
    Sistema visual: Frutiger Aero / glassmorphism luminoso
    ========================================================================== */
@@ -3813,40 +3813,160 @@ body.cinematic-mode .fx-rail {
     animation: none !important;
   }
 }
-/* Reubicación de herramientas del estudio */
+/* Ajustes de encuadre del estudio */
 #btn-home-hub-floating {
-  position: absolute;
-  left: 50%;
-  bottom: 24px;
-  z-index: 46;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  transform: translateX(-50%);
-}
-
-#btn-help-floating {
   position: fixed;
   top: 22px;
   left: 72px;
+  bottom: auto;
   z-index: 220;
   width: 40px;
   height: 40px;
   border-radius: 14px;
+  transform: none;
 }
 
-body.cinematic-mode #btn-help-floating {
-  display: none;
+.viewport-hint {
+  left: 50%;
+  right: auto;
+  bottom: 24px;
+  transform: translateX(-50%);
+  pointer-events: none;
 }
+
 @media (max-width: 980px) {
   #btn-home-hub-floating {
-    bottom: 18px;
-  }
-
-  #btn-help-floating {
     top: 18px;
     left: 64px;
     width: 38px;
     height: 38px;
+  }
+
+  .viewport-hint {
+    bottom: 68px;
+    max-width: calc(100vw - 40px);
+    white-space: normal;
+    text-align: center;
+  }
+
+  .fx-rail {
+    display: flex;
+    top: 50%;
+    right: 8px;
+    gap: 4px;
+    padding: 5px 4px;
+    border-radius: 14px;
+    transform: translateY(-50%);
+  }
+
+  .fx-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+  }
+
+  .fx-btn .icon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .fx-btn-value {
+    font-size: 0.42rem;
+  }
+}
+
+/* Ko-fi compacto junto al título del estudio */
+.brand-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.brand-kofi {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+  flex: 0 0 auto;
+  border-radius: 7px;
+  color: #a42f2f;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.94);
+  box-shadow: 0 3px 8px rgba(7, 51, 63, 0.1), inset 0 1px 0 #ffffff;
+  text-decoration: none;
+  transition: transform 0.2s var(--ease), background 0.2s ease, color 0.2s ease;
+}
+
+.brand-kofi:hover,
+.brand-kofi:focus-visible {
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff7a76 0%, #ff5e5b 100%);
+  transform: translateY(-1px);
+}
+
+.brand-kofi-icon {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease, transform 0.25s var(--ease);
+}
+
+.brand-kofi-icon .icon,
+.brand-kofi-icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+.brand-kofi-heart {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.brand-kofi:hover .brand-kofi-coffee,
+.brand-kofi:focus-visible .brand-kofi-coffee {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.brand-kofi:hover .brand-kofi-heart,
+.brand-kofi:focus-visible .brand-kofi-heart {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Inicio de escritorio: sin desplazamiento vertical */
+.hub-home-panel[data-hub-panel="home"] {
+  overscroll-behavior: none;
+}
+
+@media (min-width: 981px) {
+  html,
+  body {
+    overscroll-behavior-y: none;
+  }
+
+  .hub-home-panel[data-hub-panel="home"] {
+    overflow: hidden;
+    overflow: clip;
+  }
+
+  .hub-home-panel[data-hub-panel="home"] .hub-dashboard {
+    overflow: hidden;
+    overflow: clip;
+    overscroll-behavior: none;
+  }
+}
+@media (min-width: 981px) {
+  .hub-favorite .hub-card-stage,
+  .hub-hand-deck-card {
+    width: min(calc(clamp(380px, 35vw, 470px) * var(--hero-scale)), calc((100dvh - 300px) * 0.7467), 100%);
+  }
+
+  .hub-player-panel,
+  .hub-explorer-panel {
+    height: min(var(--side-h), calc(100dvh - 190px));
   }
 }

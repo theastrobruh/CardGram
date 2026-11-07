@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    CardGram — v0.5.5 · Aplicación
    Estado, persistencia, presets, cargas, interfaz, accesibilidad e inicio.
    ========================================================================== */
@@ -2638,7 +2638,6 @@ function cacheDom() {
   el.langDropdown = $('#lang-dropdown');
   el.langOptions = $$('.lang-option');
   el.btnHelp = $('#btn-help');
-  el.btnHelpFloating = $('#btn-help-floating');
   el.fxRail = $('#fx-rail');
   el.helpDialog = $('#help-dialog');
   el.helpClose = $('#help-close');
@@ -2860,8 +2859,7 @@ function setupChrome() {
 
   setupLangMenu();
   if (el.btnHelp) el.btnHelp.addEventListener('click', openHelp);
-  if (el.btnHelpFloating) el.btnHelpFloating.addEventListener('click', openHelp);
-  el.helpClose.addEventListener('click', () => el.helpDialog.close());
+  if (el.helpClose) el.helpClose.addEventListener('click', () => el.helpDialog.close());
 
   [el.presetDialog, el.confirmDialog, el.helpDialog].forEach((dialog) => {
     dialog.addEventListener('click', (event) => {
