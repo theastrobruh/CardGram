@@ -3372,30 +3372,38 @@ function makeDeckCoverImage(deck, alt = '') {
 
 function renderCollectionsOverview() {
   if (hub.els.ownedGrid) {
-    const ownedIds = [];
-    HUB_CATALOG.collections.forEach((collection) => {
-      ownedIn(collection.id).forEach((id) => {
-        if (!ownedIds.includes(id)) ownedIds.push(id);
-      });
+    const collectionsWithCards = HUB_CATALOG.collections
+      .map((collection) => {
+        const owned = ownedIn(collection.id);
+        return { collection, count: owned.length, cardIds: owned };
+      })
+      .filter((entry) => entry.count > 0);
+
+    const deckBoxCards = collectionsWithCards.map(({ collection, count }) => {
+      const button = makeHubButton('deck-box-card', null, { collectionId: collection.id });
+      const cover = makeNode('span', 'deck-box-cover');
+      const boxImg = makeNode('img', 'deck-box-img');
+      boxImg.src = `assets/data/cards/database/${collection.name}/deck-box.webp`;
+      boxImg.alt = collection.name;
+      boxImg.loading = 'lazy';
+      boxImg.onerror = () => {
+        boxImg.src = collection.thumbCover || collection.cover || (collection.cards[0] && thumbOf(collection.cards[0])) || '';
+      };
+      cover.appendChild(boxImg);
+      button.appendChild(cover);
+
+      const body = makeNode('span', 'deck-box-body');
+      body.appendChild(makeNode('span', 'deck-box-title', collection.name));
+      body.appendChild(makeNode('span', 'deck-box-desc', countLabel('hub_collection_cards', count)));
+      const meta = makeNode('span', 'deck-box-meta');
+      meta.appendChild(makeNode('span', 'hub-chip hub-chip-sm', t('collections_deck_box_view')));
+      body.appendChild(meta);
+      button.appendChild(body);
+      return button;
     });
-    hub.els.ownedGrid.replaceChildren(
-      ...ownedIds
-        .map((id) => HUB_CATALOG.byId(id))
-        .filter(Boolean)
-        .map((card) => {
-          const collection = HUB_CATALOG.collectionOf(card);
-          return createMediaCard({
-            kind: 'catalog',
-            id: card.id,
-            name: card.name,
-            subtitle: `${collection ? collection.name : card.collectionName} · ${card.set}`,
-            image: thumbOf(card),
-            badge: t(`rarity_${cardRarity(card).id}`),
-            isFavorite: hubProfile.favoriteCardId === card.id
-          });
-        })
-    );
-    if (hub.els.ownedEmpty) hub.els.ownedEmpty.hidden = ownedIds.length > 0;
+
+    hub.els.ownedGrid.replaceChildren(...deckBoxCards);
+    if (hub.els.ownedEmpty) hub.els.ownedEmpty.hidden = deckBoxCards.length > 0;
   }
 
   if (hub.els.createdGrid) {
