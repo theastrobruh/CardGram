@@ -1404,3 +1404,18 @@ Object.assign(I18N.de, { home_back: 'Deck-Rückseite', home_back_shared: 'Klassi
 Object.assign(I18N.es, { shop_completion: 'completado' });
 Object.assign(I18N.en, { shop_completion: 'complete' });
 Object.assign(I18N.de, { shop_completion: 'abgeschlossen' });
+Object.assign(I18N.es, { music_prev: 'Anterior', music_next: 'Siguiente', music_shuffle: 'Aleatorio', music_expand: 'Ver todas', music_collapse: 'Ocultar', music_immersive_explanation: 'En modo Inmersivo cada pantalla tiene su propia música. Entra al eCard Studio para recibir una canción aleatoria y desbloquear el reproductor.' });
+Object.assign(I18N.en, { music_prev: 'Previous', music_next: 'Next', music_shuffle: 'Shuffle', music_expand: 'View all', music_collapse: 'Hide', music_immersive_explanation: 'In Immersive mode each screen has its own music. Enter eCard Studio to get a random song and unlock the player.' });
+Object.assign(I18N.de, { music_prev: 'Zurück', music_next: 'Weiter', music_shuffle: 'Zufall', music_expand: 'Alle anzeigen', music_collapse: 'Ausblenden', music_immersive_explanation: 'Im Immersiv-Modus hat jeder Bildschirm eigene Musik. Betritt das eCard Studio für einen zufälligen Song und den Player.' });
+Object.assign(I18N.es, { shop_shift_day: 'Día', shop_shift_night: 'Noche' });
+Object.assign(I18N.en, { shop_shift_day: 'Day', shop_shift_night: 'Night' });
+Object.assign(I18N.de, { shop_shift_day: 'Tag', shop_shift_night: 'Nacht' });
+Object.assign(I18N.es, { shop_locked: 'Por desbloquear' });
+Object.assign(I18N.en, { shop_locked: 'Locked' });
+Object.assign(I18N.de, { shop_locked: 'Gesperrt' });
+Object.assign(I18N.es, { explore_creators_title: 'Users Shop', explore_creators_lede: 'Usuarios con tienda propia. Entra a una para ver los packs que venden.', explore_enter_shop: 'Entrar a la tienda', explore_want_kicker: 'Comunidad', explore_want_title: '¿Quieres ver más?', explore_want_copy: 'Ayúdanos a hacer CardGram más grande y disponible para todos. Esto es lo que ya construimos y hacia dónde vamos.' });
+Object.assign(I18N.en, { explore_creators_title: 'Users Shop', explore_creators_lede: 'Users with their own store. Open one to see the packs they sell.', explore_enter_shop: 'Enter shop', explore_want_kicker: 'Community', explore_want_title: 'Want to see more?', explore_want_copy: 'Help us make CardGram bigger and available for everyone. This is what we have built so far, and where we are going.' });
+Object.assign(I18N.de, { explore_creators_title: 'Users Shop', explore_creators_lede: 'Nutzer mit eigenem Shop. Öffne einen, um die angebotenen Packs zu sehen.', explore_enter_shop: 'Shop betreten', explore_want_kicker: 'Community', explore_want_title: 'Mehr sehen?', explore_want_copy: 'Hilf uns, CardGram größer und für alle verfügbar zu machen. Das haben wir bereits gebaut – und dahin gehen wir.' });
+Object.assign(I18N.es, { viewer_open_booster: 'Abrir booster', viewer_booster_note: 'Se puede obtener en el booster de {collection}.', viewer_created_note: 'Carta creada: no aparece en boosters. Puede obtenerse por condiciones o recompensas.' });
+Object.assign(I18N.en, { viewer_open_booster: 'Open booster', viewer_booster_note: 'Can be obtained from the {collection} booster.', viewer_created_note: 'Created card: not available in boosters. May be obtained through conditions or rewards.' });
+Object.assign(I18N.de, { viewer_open_booster: 'Booster öffnen', viewer_booster_note: 'Erhältlich im {collection}-Booster.', viewer_created_note: 'Erstellte Karte: nicht in Boostern. Kann über Bedingungen oder Belohnungen erhalten werden.' });

@@ -692,7 +692,7 @@ function openPackOverlay() {
   clearPackTimers();
 
   if (hub.els.packSealImg) {
-    hub.els.packSealImg.src = collection.thumbCover || collection.cover || collection.cards[0]?.thumbFront || '';
+    hub.els.packSealImg.src = shopPackArt[collection.id] || collection.thumbCover || collection.cover || collection.cards[0]?.thumbFront || '';
     hub.els.packSealImg.alt = collection.name;
   }
   if (hub.els.packSealName) hub.els.packSealName.textContent = collection.name;
@@ -889,19 +889,95 @@ function renderBoosterSetButtons(sets) {
   );
 }
 
-const SHOP_VENDOR_SPRITES = Array.from({ length: 9 }, (_, index) => `assets/data/vendor/azura/webp/vendor-${index + 1}.webp`);
-const SHOP_LINES = [
-  'Hello… Welcome to the Shop.',
-  'These packs are calling your name.',
-  'Fresh drops, straight from the CardGram vault.',
-  'Pick a pack. Let fate choose your cards.'
-];
+const SHOP_VENDOR_SPRITES = Array.from({ length: 14 }, (_, index) => `assets/data/vendor/azura/webp/vendor-${index + 1}.webp`);
+const SHOP_BACKGROUNDS = {
+  dawn: 'assets/data/shop_assets/dawn.webp',
+  day: 'assets/data/shop_assets/day.webp',
+  afternoon: 'assets/data/shop_assets/afternoon.webp',
+  night: 'assets/data/shop_assets/night.webp'
+};
+const SHOP_LINES = {
+  es: [
+    'Ah, llegaste. Qué sorpresa… bueno, no tanta.',
+    'Los sobres no muerden. Creo.',
+    'Si sale una rara, fingiré sorpresa. Muy bien.',
+    'Doce horas de turno. Tú eliges, yo juzgo en silencio.',
+    'Ese pack tiene buen karma. Lo digo siempre.',
+    'No soy adivina, pero ese foil te está llamando.'
+  ],
+  en: [
+    'Oh, you showed up. Shocking. Not really.',
+    'Packs don\'t bite. Probably.',
+    'Pull a rare and I\'ll pretend to be impressed.',
+    'Twelve-hour shift. You pick, I judge silently.',
+    'That pack has good karma. I say that a lot.',
+    'Not a psychic, but that foil is calling you.'
+  ],
+  de: [
+    'Oh, du bist da. Überraschend. Nicht wirklich.',
+    'Packs beißen nicht. Wahrscheinlich.',
+    'Zieh eine Rare und ich tue überrascht. Sehr gut.',
+    'Zwölf Stunden Schicht. Du wählst, ich urteile still.',
+    'Das Pack hat gutes Karma. Sage ich oft.',
+    'Keine Wahrsagerin, aber dieses Foil ruft dich.'
+  ]
+};
+const SHOP_MOODS = ['🪷', '🫧', '🌸', '🍒', '🌙', '🎀', '🪻', '🍥', '✨', '🧋'];
 let shopVendorTimer = 0;
+let shopClockTimer = 0;
 let shopVendorIndex = 0;
 let shopVendorActive = 0;
 let shopVendorInitialized = false;
 let shopPackArt = {};
 let shopPackArtLoaded = false;
+
+function shopTimeSlot(date = new Date()) {
+  const hour = date.getHours();
+  if (hour >= 5 && hour < 9) return 'dawn';
+  if (hour >= 9 && hour < 17) return 'day';
+  if (hour >= 17 && hour < 20) return 'afternoon';
+  return 'night';
+}
+
+function shopRemaining(ms) {
+  const total = Math.max(0, Math.ceil(ms / 60000));
+  const hours = Math.floor(total / 60);
+  const minutes = total % 60;
+  return hours ? `${hours}h ${String(minutes).padStart(2, '0')}m` : `${minutes}m`;
+}
+
+function renderShopAtmosphere() {
+  const now = new Date();
+  const slot = shopTimeSlot(now);
+  if (hub.els.shopBg) hub.els.shopBg.style.backgroundImage = `url("${SHOP_BACKGROUNDS[slot]}")`;
+
+  const lang = SHOP_LINES[document.documentElement.lang] ? document.documentElement.lang : 'en';
+  if (hub.els.shopSpeech && hub.els.shopSpeech.dataset.lang !== lang) {
+    hub.els.shopSpeech.textContent = (SHOP_LINES[lang] || SHOP_LINES.en)[0];
+    hub.els.shopSpeech.dataset.lang = lang;
+  }
+  const mood = SHOP_MOODS[(Math.floor(now.getTime() / 86400000) + now.getDate()) % SHOP_MOODS.length];
+  if (hub.els.shopMoodEmoji) hub.els.shopMoodEmoji.textContent = mood;
+  if (hub.els.shopMood) hub.els.shopMood.setAttribute('aria-label', `Mood ${mood}`);
+
+  const hour = now.getHours() + now.getMinutes() / 60;
+  const dayShift = hour >= 8 && hour < 20;
+  const shiftEnd = new Date(now);
+  if (dayShift) shiftEnd.setHours(20, 0, 0, 0);
+  else {
+    shiftEnd.setHours(8, 0, 0, 0);
+    if (hour >= 20) shiftEnd.setDate(shiftEnd.getDate() + 1);
+  }
+  if (hub.els.shopShift) {
+    hub.els.shopShift.textContent = `${dayShift ? t('shop_shift_day') : t('shop_shift_night')} · ${shopRemaining(shiftEnd - now)}`;
+  }
+
+  const reset = new Date(now);
+  const nextResetHour = (Math.floor(hour / 6) + 1) * 6;
+  reset.setHours(nextResetHour, 0, 0, 0);
+  if (hub.els.shopReset) hub.els.shopReset.textContent = shopRemaining(reset - now);
+  if (hub.els.shopBg) hub.els.shopBg.dataset.slot = slot;
+}
 
 function loadShopPackArt() {
   if (shopPackArtLoaded) return;
@@ -911,6 +987,7 @@ function loadShopPackArt() {
     .then((data) => {
       shopPackArt = data && data.packs && typeof data.packs === 'object' ? data.packs : {};
       if (hub.ready) renderShopRecommended(boosterSets());
+      if (hub.ready && hub.panel === 'explore') renderExplore();
     })
     .catch(() => {});
 }
@@ -934,17 +1011,33 @@ function initShopScene() {
     next.classList.add('is-active');
     prev.classList.remove('is-active');
     shopVendorActive = shopVendorActive === 0 ? 1 : 0;
-    if (hub.els.shopSpeech) hub.els.shopSpeech.textContent = SHOP_LINES[Math.floor(Math.random() * SHOP_LINES.length)];
+    if (hub.els.shopSpeech) {
+      const lang = SHOP_LINES[document.documentElement.lang] ? document.documentElement.lang : 'en';
+      const lines = SHOP_LINES[lang] || SHOP_LINES.en;
+      hub.els.shopSpeech.textContent = lines[Math.floor(Math.random() * lines.length)];
+      hub.els.shopSpeech.dataset.lang = lang;
+    }
   };
+  if (hub.els.shopSpeech) {
+    const lang = SHOP_LINES[document.documentElement.lang] ? document.documentElement.lang : 'en';
+    hub.els.shopSpeech.textContent = (SHOP_LINES[lang] || SHOP_LINES.en)[0];
+  }
+  renderShopAtmosphere();
+  window.setTimeout(renderShopAtmosphere, 1200);
   window.clearInterval(shopVendorTimer);
   shopVendorTimer = window.setInterval(swap, 4200 + Math.random() * 2200);
+  window.clearInterval(shopClockTimer);
+  shopClockTimer = window.setInterval(renderShopAtmosphere, 60000);
 }
 
 function renderShopRecommended(sets) {
   const container = hub.els.shopRecommended;
   if (!container) return;
   const pools = sets.length ? sets : HUB_CATALOG.collections;
-  const recommended = pools.slice(0, 3);
+  const slot = Math.floor(Date.now() / (6 * 60 * 60 * 1000)) % Math.max(1, pools.length);
+  const recommended = Array.from({ length: Math.min(3, pools.length) }, (_, index) =>
+    pools[(slot + index) % pools.length]
+  );
   container.replaceChildren(
     ...recommended.map((collection) => {
       const button = makeHubButton('shop-pack', null, { boosterSet: collection.id });
@@ -1036,14 +1129,17 @@ function renderBooster() {
     hub.els.shopPackPercent.textContent = `${total ? Math.round((owned / total) * 100) : 0}%`;
   }
   if (hub.els.shopRareCards) {
-    const rare = collection
-      ? collection.cards
-          .slice()
-          .sort((a, b) => cardRarity(a).weight - cardRarity(b).weight)
-          .slice(0, 3)
+    const owned = collection ? new Set(ownedIn(collection.id)) : new Set();
+    const cards = collection
+      ? collection.cards.slice().sort((a, b) => cardRarity(a).weight - cardRarity(b).weight)
       : [];
     hub.els.shopRareCards.replaceChildren(
-      ...rare.map((card) => makeHubImage(thumbOf(card), `${card.name} · ${t(`rarity_${cardRarity(card).id}`)}`))
+      ...cards.map((card) => {
+        const item = makeNode('span', `shop-preview-card${owned.has(card.id) ? ' is-owned' : ' is-locked'}`);
+        item.title = owned.has(card.id) ? card.name : `${card.name} · ${t('shop_locked')}`;
+        item.appendChild(makeHubImage(thumbOf(card), card.name));
+        return item;
+      })
     );
   }
 
@@ -3856,10 +3952,15 @@ function explorePacks() {
 }
 
 function makeExploreCreatorCard() {
-  const button = makeHubButton('explore-creator', null, { exploreCreator: 'theastrobruh' });
-  const avatar = makeNode('span', 'explore-creator-avatar');
-  avatar.appendChild(hubIcon('user'));
-  button.appendChild(avatar);
+  const button = makeHubButton('explore-creator explore-shop', null, { exploreCreator: 'theastrobruh' });
+  const cover = makeNode('span', 'explore-shop-cover');
+  cover.appendChild(makeHubImage('assets/data/shops/theastrobruh-cover.webp', 'theAstroBruh Shop'));
+  button.appendChild(cover);
+
+  const body = makeNode('span', 'explore-shop-body');
+  const avatar = makeNode('span', 'explore-shop-avatar');
+  avatar.appendChild(makeHubImage('assets/data/shops/theastrobruh-avatar.webp', 'theAstroBruh'));
+  body.appendChild(avatar);
 
   const copy = makeNode('span', 'explore-creator-copy');
   copy.appendChild(makeNode('strong', null, 'theAstroBruh'));
@@ -3869,8 +3970,12 @@ function makeExploreCreatorCard() {
   copy.appendChild(
     makeNode('span', 'explore-creator-meta', t('explore_creator_meta', { packs: packs.length, cards: totalCards }))
   );
-  button.appendChild(copy);
-  button.appendChild(hubIcon('arrow-right'));
+  body.appendChild(copy);
+
+  const cta = makeNode('span', 'explore-shop-cta', t('explore_enter_shop'));
+  cta.appendChild(hubIcon('arrow-right'));
+  body.appendChild(cta);
+  button.appendChild(body);
   return button;
 }
 
@@ -3882,8 +3987,14 @@ function makeExplorePackCard(collection) {
     pack.style.setProperty('--pack-b', collection.accent[1]);
   }
   const cover = makeNode('span', 'explore-pack-cover');
+  const customArt = shopPackArt[collection.id];
   const card = collection.cards[0];
-  if (card) cover.appendChild(makeHubImage(card.thumbFront || card.front, collection.name));
+  if (customArt) {
+    cover.classList.add('is-custom-pack');
+    cover.appendChild(makeHubImage(customArt, collection.name));
+  } else if (card) {
+    cover.appendChild(makeHubImage(card.thumbFront || card.front, collection.name));
+  }
   pack.appendChild(cover);
   pack.appendChild(makeNode('span', 'explore-pack-logo', 'CardGram'));
   pack.appendChild(makeNode('span', 'explore-pack-seal', '✦'));
@@ -3935,6 +4046,7 @@ function renderExplorePackDetail(collection) {
 
 function renderExplore() {
   if (!hub.ready || !hub.els.exploreCreators) return;
+  loadShopPackArt();
 
   const packs = explorePacks();
   const creatorOpen = hub.exploreCreatorId === 'theastrobruh';
@@ -4284,6 +4396,31 @@ function openCardViewer(target, trigger) {
   }
   if (hub.els.viewerType) hub.els.viewerType.textContent = card.type || '';
   if (hub.els.viewerLore) hub.els.viewerLore.textContent = card.lore || '';
+  if (hub.els.viewerObtain) {
+    const collection = card.collectionId
+      ? HUB_CATALOG.collections.find((entry) => entry.id === card.collectionId)
+      : null;
+    if (collection && collection.booster !== false) {
+      hub.els.viewerObtain.hidden = false;
+      const label = hub.els.viewerObtain.querySelector('span');
+      if (label) label.textContent = t('viewer_open_booster');
+      hub.els.viewerObtain.onclick = () => {
+        closeCardViewer({ restoreFocus: false, silent: true });
+        hubBooster.setId = collection.id;
+        navigate('booster');
+      };
+      if (hub.els.viewerObtainNote) {
+        hub.els.viewerObtainNote.textContent = card.acquisition
+          ? card.acquisition
+          : t('viewer_booster_note', { collection: collection.name });
+      }
+    } else {
+      hub.els.viewerObtain.hidden = true;
+      if (hub.els.viewerObtainNote) {
+        hub.els.viewerObtainNote.textContent = card.acquisition || t('viewer_created_note');
+      }
+    }
+  }
   if (hub.els.viewerChips) {
     const chips = [];
     if (card.rarity) chips.push(card.rarity);
@@ -5502,6 +5639,8 @@ function cacheHubDom() {
   els.viewerType = hubEl('card-viewer-type');
   els.viewerChips = hubEl('card-viewer-chips');
   els.viewerLore = hubEl('card-viewer-lore');
+  els.viewerObtain = hubEl('card-viewer-obtain');
+  els.viewerObtainNote = hubEl('card-viewer-obtain-note');
   els.viewerDetails = hubEl('card-viewer-details');
   els.viewerEdit = hubEl('card-viewer-edit');
   els.viewerClose = document.querySelector('.card-viewer-close');
@@ -5572,6 +5711,11 @@ function cacheHubDom() {
   els.shopNpcA = hubEl('shop-npc-a');
   els.shopNpcB = hubEl('shop-npc-b');
   els.shopSpeech = hubEl('shop-speech-text');
+  els.shopBg = document.querySelector('.shop-bg');
+  els.shopMoodEmoji = hubEl('shop-mood-emoji');
+  els.shopMood = hubEl('shop-mood');
+  els.shopShift = hubEl('shop-shift');
+  els.shopReset = hubEl('shop-reset');
   els.shopPackPercent = hubEl('shop-pack-percent');
   els.shopRareCards = hubEl('shop-rare-cards');
   els.mobileDaily = hubEl('hub-mobile-daily');

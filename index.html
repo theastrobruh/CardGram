@@ -12,23 +12,23 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=176">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=176">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=181">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=181">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=176" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=176" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=176" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=176" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=176" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=176" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=176" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=176" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=176" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=176" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=176" defer></script>
-  <script src="assets/js/boot.js?v=0.5.5&rev=176" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=181" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=181" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=181" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=181" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=181" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=181" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=181" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=181" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=181" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=181" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=181" defer></script>
+  <script src="assets/js/boot.js?v=0.5.5&rev=181" defer></script>
 </head>
 <body data-view="hub" class="booting">
   <div class="boot-screen" id="boot-screen">
@@ -709,7 +709,13 @@
 
               <div class="shop-speech">
                 <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky"></span><span data-i18n="shop_vendor_kicker">Shop vendor of the day</span></span>
-                <p id="shop-speech-text" data-i18n="shop_vendor_hello">Hello… Welcome to the Shop.</p>
+                <p id="shop-speech-text">Hello… Welcome to the Shop.</p>
+              </div>
+
+              <div class="shop-status-row">
+                <span class="shop-status-chip shop-mood-chip" id="shop-mood" aria-label="Mood de Azura"><span class="shop-status-emoji" id="shop-mood-emoji">🪷</span></span>
+                <span class="shop-status-chip" title="Turno de Azura"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg><span id="shop-shift">12h</span></span>
+                <span class="shop-status-chip" title="Próximo reinicio de packs"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg><span id="shop-reset">6h</span></span>
               </div>
 
               <div class="shop-recommended" id="shop-recommended"></div>
@@ -873,8 +879,8 @@
             <section class="explore-block" id="explore-creators-block">
               <div class="hub-section-head">
                 <div>
-                  <h2 data-i18n="explore_creators_title">Packs &amp; Boosters</h2>
-                  <p data-i18n="explore_creators_lede">Creadores que ya ofrecen sobres a la comunidad. Toca uno para ver sus packs.</p>
+                  <h2 data-i18n="explore_creators_title">Users Shop</h2>
+                  <p data-i18n="explore_creators_lede">Usuarios con tienda propia. Entra a una para ver los packs que venden.</p>
                 </div>
               </div>
               <div class="explore-creator-list" id="explore-creators"></div>
@@ -901,6 +907,12 @@
               </button>
               <div id="explore-pack-detail-head"></div>
               <div class="hub-card-grid" id="explore-pack-cards"></div>
+            </section>
+
+            <section class="explore-want-more">
+              <span class="hub-panel-eyebrow"><span class="hub-live-dot" aria-hidden="true"></span><span data-i18n="explore_want_kicker">Community</span></span>
+              <h2 data-i18n="explore_want_title">Want to see more?</h2>
+              <p data-i18n="explore_want_copy">Help us make CardGram bigger and available for everyone. This is what we have built so far, and where we are going.</p>
             </section>
 
             <section class="explore-roadmap">
@@ -1258,7 +1270,12 @@
             <p class="card-viewer-type" id="card-viewer-type"></p>
             <div class="card-viewer-chips" id="card-viewer-chips"></div>
             <p class="card-viewer-lore" id="card-viewer-lore"></p>
+            <p class="card-viewer-obtain-note" id="card-viewer-obtain-note"></p>
             <div class="card-viewer-actions">
+              <button class="btn btn-primary btn-sm" type="button" id="card-viewer-obtain" hidden>
+                <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+                <span data-i18n="viewer_open_booster">Abrir booster</span>
+              </button>
               <button class="btn btn-primary btn-sm" type="button" id="card-viewer-edit" data-viewer-edit>
                 <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
                 <span data-i18n="viewer_edit">Editar en el estudio</span>
@@ -1322,7 +1339,22 @@
         </div>
         <p class="music-mode-hint" id="music-mode-hint"></p>
 
-        <section class="music-section">
+        <div class="music-player" id="music-player" hidden>
+          <button class="music-player-btn" type="button" data-music-prev aria-label="Canción anterior" data-i18n-aria-label="music_prev" title="Anterior">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M6 5v14M18 6l-9 6 9 6z"/></svg>
+          </button>
+          <button class="music-player-btn music-player-next" type="button" data-music-next aria-label="Siguiente canción" data-i18n-aria-label="music_next" title="Siguiente">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M18 5v14M6 6l9 6-9 6z"/></svg>
+          </button>
+          <button class="music-player-btn music-shuffle" type="button" data-music-shuffle aria-pressed="true" aria-label="Aleatorio" data-i18n-aria-label="music_shuffle" title="Aleatorio">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 7h3l10 10h3M4 17h3l10-10h3M17 4l3 3-3 3M17 14l3 3-3 3"/></svg>
+          </button>
+          <button class="music-expand" type="button" data-music-expand aria-expanded="false" data-i18n="music_expand">Ver todas</button>
+        </div>
+
+        <p class="music-explanation" id="music-explanation" data-i18n="music_immersive_explanation">En modo Inmersivo cada pantalla tiene su propia música. Entra al eCard Studio para recibir una canción aleatoria y desbloquear el reproductor.</p>
+
+        <section class="music-section" id="music-tracks-section">
           <div class="music-section-head">
             <strong data-i18n="music_tracks">Pistas</strong>
             <button class="music-power" type="button" data-music-toggle aria-pressed="true" data-i18n="music_toggle">Música activa</button>

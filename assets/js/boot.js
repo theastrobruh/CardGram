@@ -35,6 +35,23 @@
   let active = bgA;
   let carouselTimer = 0;
 
+  function shopBackgroundForNow() {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 9) return 'assets/data/shop_assets/dawn.webp';
+    if (hour >= 9 && hour < 17) return 'assets/data/shop_assets/day.webp';
+    if (hour >= 17 && hour < 20) return 'assets/data/shop_assets/afternoon.webp';
+    return 'assets/data/shop_assets/night.webp';
+  }
+
+  function shuffled(list) {
+    const copy = list.slice();
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
   function setProgress() {
     const total = Math.max(1, images.length);
     const value = Math.min(100, Math.round((loaded / total) * 100));
@@ -112,10 +129,11 @@
         : data && Array.isArray(data.images)
           ? data.images.filter((src) => typeof src === 'string')
           : [];
-      carousel.push(...(custom.length ? custom : fallback));
+      carousel.push(shopBackgroundForNow());
+      carousel.push(...shuffled(custom.length ? custom : fallback));
       images = carousel.concat(extra);
     } catch (error) {
-      carousel = fallback.slice();
+      carousel = [shopBackgroundForNow(), ...shuffled(fallback)];
       images = carousel.concat(extra);
     }
 

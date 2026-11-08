@@ -28,9 +28,11 @@
   const state = {
     playlist: {},
     scene: 'home',
-    mode: 'scene',
+    mode: 'immersive',
     enabled: true,
     armed: false,
+    shuffle: true,
+    expanded: false,
     current: null,
     players: new Set(),
     fadeId: 0,
@@ -47,6 +49,7 @@
       if (saved.mode === 'chill' || saved.mode === 'immersive') state.mode = saved.mode;
       else if (saved.mode === 'all') state.mode = 'chill';
       else if (saved.mode === 'scene') state.mode = 'immersive';
+      if (typeof saved.shuffle === 'boolean') state.shuffle = saved.shuffle;
     }
   } catch (error) {
     /* Sin preferencia guardada. */
@@ -54,7 +57,7 @@
 
   function save() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabled: state.enabled, mode: state.mode }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabled: state.enabled, mode: state.mode, shuffle: state.shuffle }));
     } catch (error) {
       /* Almacenamiento no disponible. */
     }
@@ -115,6 +118,23 @@
       modeHint.textContent = state.mode === 'chill'
         ? tr('music_mode_chill_hint', 'Reproducción aleatoria continua en toda la app.')
         : tr('music_mode_immersive_hint', 'La música cambia según la pantalla. En eCard Studio suena una pista aleatoria.');
+    }
+
+    const player = document.getElementById('music-player');
+    if (player) player.hidden = state.mode !== 'chill';
+    const explanation = document.getElementById('music-explanation');
+    if (explanation) explanation.hidden = state.mode === 'chill';
+    const tracksSection = document.getElementById('music-tracks-section');
+    if (tracksSection) tracksSection.hidden = state.mode === 'immersive' || !state.expanded;
+    const shuffle = document.querySelector('[data-music-shuffle]');
+    if (shuffle) {
+      shuffle.classList.toggle('active', state.shuffle);
+      shuffle.setAttribute('aria-pressed', String(state.shuffle));
+    }
+    const expand = document.querySelector('[data-music-expand]');
+    if (expand) {
+      expand.setAttribute('aria-expanded', String(state.expanded));
+      expand.textContent = state.expanded ? tr('music_collapse', 'Ocultar') : tr('music_expand', 'Ver todas');
     }
 
     const tracks = document.getElementById('music-tracks');
@@ -250,11 +270,15 @@
     if (!state.armed && !force) return;
     if (state.mode === 'chill') {
       if (state.current && !state.current.radio && !force) return;
-      playRandomTrack();
+      if (state.shuffle) playRandomTrack();
+      else playSequenceIndex(state.sequenceIndex);
       return;
     }
     if (scene === 'studio') {
       if (state.current && !state.current.radio && !force) return;
+      state.mode = 'chill';
+      state.shuffle = true;
+      save();
       playRandomTrack();
       return;
     }
@@ -272,8 +296,22 @@
       scene: entry.scene,
       trackIndex: entry.index,
       loop: false,
-      onEnded: () => playRandomTrack()
+      onEnded: () => (state.shuffle ? playRandomTrack() : playSequenceIndex((state.sequenceIndex + 1) % list.length))
     });
+  }
+
+  function nextChill(direction) {
+    const list = sequence();
+    if (!list.length) return;
+    if (state.shuffle && direction > 0) {
+      playRandomTrack();
+      return;
+    }
+    const currentIndex = state.current
+      ? list.findIndex((entry) => entry.src === state.current.src)
+      : state.sequenceIndex;
+    const nextIndex = (Math.max(0, currentIndex) + direction + list.length) % list.length;
+    playSequenceIndex(nextIndex);
   }
 
   function playSequenceIndex(index) {
@@ -313,8 +351,10 @@
     renderPanel();
     if (!state.enabled) return;
     state.armed = true;
-    if (state.mode === 'chill') playRandomTrack();
-    else playScene(state.scene, true);
+    if (state.mode === 'chill') {
+      if (state.shuffle) playRandomTrack();
+      else playSequenceIndex(state.sequenceIndex);
+    } else playScene(state.scene, true);
   }
 
   function setEnabled(value) {
@@ -380,6 +420,15 @@
 
   function setScene(scene) {
     const next = SCENES.some((entry) => entry.id === scene) ? scene : 'home';
+    if (next === 'studio' && state.scene !== 'studio') {
+      state.scene = 'studio';
+      state.mode = 'chill';
+      state.shuffle = true;
+      save();
+      if (state.enabled && state.armed) playRandomTrack();
+      renderPanel();
+      return;
+    }
     if (state.scene === next) {
       if (!state.current && state.armed && state.enabled) playScene(next, true);
       return;
@@ -429,16 +478,38 @@
         save();
       }
       if (state.mode === 'chill') {
+        state.sequenceIndex = sequence().findIndex((entry) => entry.src === tracksFor(scene)[index]);
         startTrack(tracksFor(scene)[index], {
           scene,
           trackIndex: index,
           loop: false,
-          onEnded: () => playRandomTrack()
+          onEnded: () => (state.shuffle ? playRandomTrack() : playSequenceIndex((state.sequenceIndex + 1) % sequence().length))
         });
       } else {
         playSceneTrack(scene, index, true);
       }
       syncButtons();
+      return;
+    }
+    if (target.closest('[data-music-prev]')) {
+      nextChill(-1);
+      renderPanel();
+      return;
+    }
+    if (target.closest('[data-music-next]')) {
+      nextChill(1);
+      renderPanel();
+      return;
+    }
+    if (target.closest('[data-music-shuffle]')) {
+      state.shuffle = !state.shuffle;
+      save();
+      renderPanel();
+      return;
+    }
+    if (target.closest('[data-music-expand]')) {
+      state.expanded = !state.expanded;
+      renderPanel();
       return;
     }
     const radio = target.closest('[data-music-radio]');

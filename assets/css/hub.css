@@ -11447,3 +11447,327 @@ body.booting {
     margin-bottom: 0;
   }
 }
+/* Reproductor Chill dentro del menú de música */
+.music-player {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 9px;
+}
+
+.music-player[hidden],
+.music-explanation[hidden],
+.music-section[hidden] {
+  display: none !important;
+}
+
+.music-player-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: #0a6b78;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 10px rgba(8, 62, 82, 0.1);
+}
+
+.music-player-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.music-player-btn.active {
+  color: #ffffff;
+  background: linear-gradient(160deg, #18a7b8, #0b7184);
+}
+
+.music-expand {
+  margin-left: auto;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 9px;
+  font-size: 0.5rem;
+  font-weight: 800;
+  color: #0a6b78;
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.music-explanation {
+  margin: 0 0 10px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  font-size: 0.55rem;
+  line-height: 1.45;
+  color: var(--muted-strong);
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+}
+.shop-status-row {
+  position: absolute;
+  top: 136px;
+  left: 50%;
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translateX(-50%);
+}
+
+.shop-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 25px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 0.47rem;
+  font-weight: 800;
+  color: #ffffff;
+  background: rgba(7, 36, 45, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+
+.shop-status-chip .icon {
+  width: 11px;
+  height: 11px;
+}
+
+.shop-status-emoji {
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+@media (max-width: 980px) {
+  .shop-status-row {
+    top: 118px;
+    gap: 4px;
+  }
+
+  .shop-status-chip {
+    min-height: 22px;
+    padding: 0 6px;
+    font-size: 0.42rem;
+  }
+}
+/* Preview completo con scroll horizontal */
+.shop-rare-row {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+  padding-bottom: 2px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior-x: contain;
+}
+
+.shop-rare-row::-webkit-scrollbar {
+  display: none;
+}
+
+.shop-preview-card {
+  position: relative;
+  display: block;
+  flex: 0 0 54px;
+  width: 54px;
+}
+
+.shop-rare-row .shop-preview-card img {
+  display: block;
+  width: 54px !important;
+  height: 74px !important;
+  max-height: none;
+  aspect-ratio: auto;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 3px 7px rgba(3, 32, 42, 0.16);
+}
+
+.shop-preview-card.is-locked img {
+  filter: grayscale(1) brightness(0.55);
+  opacity: 0.48;
+}
+
+.shop-preview-card.is-owned img {
+  filter: none;
+  opacity: 1;
+}
+
+@media (max-width: 980px) {
+  .shop-preview-card,
+  .shop-rare-row .shop-preview-card img {
+    flex-basis: 42px;
+    width: 42px !important;
+    height: 58px !important;
+  }
+}
+/* Explore · Users Shop */
+.explore-want-more {
+  padding: 18px 20px;
+  margin: 18px 0 0;
+  border-radius: 18px;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.78), rgba(226, 251, 249, 0.6));
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.explore-want-more h2 {
+  margin: 3px 0 5px;
+  font-size: 1.25rem;
+}
+
+.explore-want-more p {
+  margin: 0;
+  max-width: 640px;
+  font-size: 0.62rem;
+  line-height: 1.5;
+  color: var(--muted-strong);
+}
+
+.explore-shop {
+  display: block !important;
+  overflow: hidden;
+  padding: 0 !important;
+  border-radius: 22px !important;
+  border: 1px solid rgba(255, 255, 255, 0.92) !important;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.86), rgba(210, 245, 249, 0.58)) !important;
+}
+
+.explore-shop-cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 190px;
+  padding: 12px;
+  background:
+    radial-gradient(60% 80% at 50% 40%, rgba(112, 235, 224, 0.22), transparent 70%),
+    linear-gradient(150deg, rgba(8, 55, 68, 0.08), rgba(255, 255, 255, 0.2));
+}
+
+.explore-shop-cover img {
+  width: min(260px, 58%);
+  max-height: 180px;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 24px rgba(8, 62, 82, 0.2));
+}
+
+.explore-shop-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px 14px;
+}
+
+.explore-shop-avatar {
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #d8f6f3;
+  border: 2px solid rgba(255, 255, 255, 0.96);
+  box-shadow: 0 6px 14px rgba(8, 62, 82, 0.16);
+}
+
+.explore-shop-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.explore-shop-body .explore-creator-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.explore-shop-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 0.52rem;
+  font-weight: 800;
+  color: #0a6b78;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.96);
+}
+
+.explore-shop-cta .icon {
+  width: 12px;
+  height: 12px;
+}
+
+@media (max-width: 980px) {
+  .explore-shop-cover {
+    min-height: 140px;
+  }
+
+  .explore-shop-cover img {
+    max-height: 130px;
+  }
+
+  .explore-shop-cta {
+    display: none;
+  }
+}
+.card-viewer-obtain-note {
+  margin: 6px 0 2px;
+  padding: 7px 9px;
+  border-radius: 9px;
+  font-size: 0.52rem;
+  line-height: 1.4;
+  color: var(--muted-strong);
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.card-viewer-obtain-note:empty {
+  display: none;
+}
+.shop-speech {
+  background: #ffffff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.explore-pack-cover.is-custom-pack img {
+  object-fit: contain !important;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.shop-mood-chip {
+  min-width: 27px;
+  justify-content: center;
+  padding: 0 8px !important;
+  background: linear-gradient(150deg, rgba(255, 236, 250, 0.86), rgba(218, 250, 246, 0.78)) !important;
+  border-color: rgba(255, 255, 255, 0.82) !important;
+}
+
+.shop-status-emoji {
+  font-size: 0.84rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.18));
+}
+/* HUD de Azura a la izquierda, sin tapar el rostro */
+.shop-status-row {
+  left: 16px;
+  top: 76px;
+  transform: none;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+@media (max-width: 980px) {
+  .shop-status-row {
+    top: 56px;
+    left: 10px;
+  }
+}

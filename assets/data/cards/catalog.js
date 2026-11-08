@@ -206,6 +206,7 @@
         fullArt: null,
         thumbFullArt: null,
         stats: stats || null,
+        acquisition: entry.acquisition || null,
         lore
       };
 

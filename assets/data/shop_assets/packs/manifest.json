@@ -1,8 +1,8 @@
 {
   "packs": {
-    "mew-tarot": "",
-    "champion-verse": "",
-    "dungeons-history": "",
+    "mew-tarot": "assets/data/shop_assets/packs/PACK-01.webp",
+    "champion-verse": "assets/data/shop_assets/packs/PACK-02.webp",
+    "dungeons-history": "assets/data/shop_assets/packs/PACK-03.webp",
     "ygo": ""
   }
 }
