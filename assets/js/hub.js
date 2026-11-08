@@ -4039,7 +4039,7 @@ function makeExploreCreatorCard() {
 
   const body = makeNode('span', 'explore-shop-body');
   const avatar = makeNode('span', 'explore-shop-avatar');
-  avatar.appendChild(makeHubImage('assets/data/shops/theastrobruh-avatar.webp', 'theAstroBruh'));
+  avatar.appendChild(makeHubImage('assets/data/shops/theastrobruh-avatar.jpg', 'theAstroBruh'));
   body.appendChild(avatar);
 
   const copy = makeNode('span', 'explore-creator-copy');
@@ -4062,22 +4062,19 @@ function makeExploreCreatorCard() {
 function makeExplorePackCard(collection) {
   const button = makeHubButton('explore-pack', null, { explorePack: collection.id });
   const pack = makeNode('span', 'explore-pack-3d');
-  if (Array.isArray(collection.accent)) {
-    pack.style.setProperty('--pack-a', collection.accent[0]);
-    pack.style.setProperty('--pack-b', collection.accent[1]);
-  }
   const cover = makeNode('span', 'explore-pack-cover');
   const customArt = shopPackArt[collection.id];
-  const card = collection.cards[0];
   if (customArt) {
     cover.classList.add('is-custom-pack');
     cover.appendChild(makeHubImage(customArt, collection.name));
-  } else if (card) {
-    cover.appendChild(makeHubImage(card.thumbFront || card.front, collection.name));
+  } else {
+    pack.classList.add('is-placeholder-pack');
+    const placeholder = makeNode('span', 'explore-pack-placeholder');
+    placeholder.appendChild(hubIcon('sparkles'));
+    placeholder.appendChild(makeNode('span', null, t('explore_pack_soon')));
+    cover.appendChild(placeholder);
   }
   pack.appendChild(cover);
-  pack.appendChild(makeNode('span', 'explore-pack-logo', 'CardGram'));
-  pack.appendChild(makeNode('span', 'explore-pack-seal', '✦'));
   button.appendChild(pack);
 
   const body = makeNode('span', 'explore-pack-body');
@@ -4570,7 +4567,21 @@ function setActivePanel(panel, options = {}) {
     else button.removeAttribute('aria-current');
   });
 
-  if (hub.els.homeFab) hub.els.homeFab.hidden = target === 'home';
+  const mobileNav = hub.root.querySelector('.hub-mobile-menu-nav');
+  if (hub.els.homeFab) {
+    const navButtons = mobileNav
+      ? Array.from(mobileNav.querySelectorAll('.hub-fab-btn:not(#hub-home-fab):not(.hub-mobile-daily)'))
+      : [];
+    navButtons.forEach((button) => { button.hidden = false; });
+    const activeNav = navButtons.find((button) => button.dataset.hubRoute === target) || null;
+    if (target !== 'home' && activeNav) {
+      activeNav.hidden = true;
+      hub.els.homeFab.hidden = false;
+      activeNav.parentNode.insertBefore(hub.els.homeFab, activeNav);
+    } else {
+      hub.els.homeFab.hidden = true;
+    }
+  }
 
   if (target === 'booster') scheduleShopIdle();
   else window.clearTimeout(shopIdleTimer);
