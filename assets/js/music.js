@@ -39,7 +39,8 @@
     loading: false,
     radio: null,
     sequenceIndex: 0,
-    sceneIndex: 0
+    sceneIndex: 0,
+    volume: 0.7
   };
 
   try {
@@ -50,6 +51,7 @@
       else if (saved.mode === 'all') state.mode = 'chill';
       else if (saved.mode === 'scene') state.mode = 'immersive';
       if (typeof saved.shuffle === 'boolean') state.shuffle = saved.shuffle;
+      if (Number.isFinite(saved.volume)) state.volume = Math.min(1, Math.max(0, saved.volume));
     }
   } catch (error) {
     /* Sin preferencia guardada. */
@@ -57,7 +59,7 @@
 
   function save() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabled: state.enabled, mode: state.mode, shuffle: state.shuffle }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabled: state.enabled, mode: state.mode, shuffle: state.shuffle, volume: state.volume }));
     } catch (error) {
       /* Almacenamiento no disponible. */
     }
@@ -137,6 +139,11 @@
       expand.textContent = state.expanded ? tr('music_collapse', 'Ocultar') : tr('music_expand', 'Ver todas');
     }
 
+    const volume = document.getElementById('music-volume');
+    if (volume) volume.value = String(Math.round(state.volume * 100));
+    const volumeVal = document.getElementById('music-volume-val');
+    if (volumeVal) volumeVal.textContent = `${Math.round(state.volume * 100)}%`;
+
     const tracks = document.getElementById('music-tracks');
     if (tracks) {
       tracks.replaceChildren();
@@ -208,7 +215,7 @@
       if (fadeId !== state.fadeId) return;
       const progress = Math.min(1, (performance.now() - started) / FADE_MS);
       const eased = progress * progress * (3 - 2 * progress);
-      if (next) next.volume = Math.min(1, eased);
+      if (next) next.volume = Math.min(1, eased) * state.volume;
       if (previous) previous.volume = Math.max(0, fromVolume * (1 - eased));
       if (progress < 1) requestAnimationFrame(step);
       else if (previous) previous.pause();
@@ -276,9 +283,6 @@
     }
     if (scene === 'studio') {
       if (state.current && !state.current.radio && !force) return;
-      state.mode = 'chill';
-      state.shuffle = true;
-      save();
       playRandomTrack();
       return;
     }
@@ -422,10 +426,8 @@
     const next = SCENES.some((entry) => entry.id === scene) ? scene : 'home';
     if (next === 'studio' && state.scene !== 'studio') {
       state.scene = 'studio';
-      state.mode = 'chill';
-      state.shuffle = true;
       save();
-      if (state.enabled && state.armed) playRandomTrack();
+      if (state.enabled && state.armed) playScene('studio', true);
       renderPanel();
       return;
     }
@@ -516,6 +518,17 @@
     if (radio) playRadio(radio.dataset.musicRadio);
   });
 
+  const musicVolume = document.getElementById('music-volume');
+  if (musicVolume) {
+    musicVolume.addEventListener('input', () => {
+      state.volume = Math.min(1, Math.max(0, Number(musicVolume.value) / 100));
+      const volumeVal = document.getElementById('music-volume-val');
+      if (volumeVal) volumeVal.textContent = `${Math.round(state.volume * 100)}%`;
+      if (state.current) state.current.player.volume = state.volume;
+      save();
+    });
+  }
+
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
     const panel = document.getElementById('music-panel');
@@ -528,7 +541,6 @@
   }
 
   syncButtons();
-  unlockOnGesture();
   loadPlaylist();
 
   window.Music = {
@@ -539,6 +551,13 @@
     openPanel,
     closePanel,
     start,
-    isEnabled: () => state.enabled
+    isEnabled: () => state.enabled,
+    getVolume: () => state.volume,
+    setVolume(value) {
+      state.volume = Math.min(1, Math.max(0, Number(value)));
+      if (state.current) state.current.player.volume = state.volume;
+      renderPanel();
+      save();
+    }
   };
 })();

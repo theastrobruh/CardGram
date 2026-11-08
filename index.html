@@ -12,23 +12,23 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=181">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=181">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=183">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=183">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=181" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=181" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=181" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=181" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=181" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=181" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=181" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=181" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=181" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=181" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=181" defer></script>
-  <script src="assets/js/boot.js?v=0.5.5&rev=181" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=183" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=183" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=183" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=183" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=183" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=183" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=183" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=183" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=183" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=183" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=183" defer></script>
+  <script src="assets/js/boot.js?v=0.5.5&rev=183" defer></script>
 </head>
 <body data-view="hub" class="booting">
   <div class="boot-screen" id="boot-screen">
@@ -708,8 +708,7 @@
               </div>
 
               <div class="shop-speech">
-                <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky"></span><span data-i18n="shop_vendor_kicker">Shop vendor of the day</span></span>
-                <p id="shop-speech-text">Hello… Welcome to the Shop.</p>
+                <p id="shop-speech-text" aria-live="polite">Hello… Welcome to the Shop.</p>
               </div>
 
               <div class="shop-status-row">
@@ -1063,6 +1062,13 @@
 
     <!-- Navegación inferior móvil -->
     <div class="hub-fab-actions hub-mobile-menu-nav" aria-label="Navegación principal" data-i18n-aria-label="hub_nav_aria">
+      <button class="hub-fab-btn tone-home" id="hub-home-fab" type="button" data-hub-route="home" aria-label="Volver a inicio" data-i18n-aria-label="hub_nav_home" title="Volver a inicio" data-i18n-title="hub_nav_home" hidden>
+        <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+          <path d="M4 10.5 12 4l8 6.5"/>
+          <path d="M6.5 9.8V20h11V9.8"/>
+          <path d="M10 20v-5.2h4V20"/>
+        </svg>
+      </button>
       <button class="hub-fab-btn tone-a" type="button" data-hub-route="collections" aria-label="Mis cartas" data-i18n-aria-label="hub_nav_library" title="Mis cartas" data-i18n-title="hub_nav_library">
         <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
           <rect x="7.5" y="3.5" width="10" height="14" rx="2.2"/>
@@ -1332,6 +1338,12 @@
         </header>
 
         <p class="music-now" id="music-now">—</p>
+
+        <label class="music-volume" for="music-volume">
+          <svg class="icon music-volume-ico" aria-hidden="true"><use href="#i-sound"></use></svg>
+          <input type="range" id="music-volume" min="0" max="100" step="1" value="70" aria-label="Volumen de la música" data-i18n-aria-label="music_volume">
+          <span class="music-volume-val" id="music-volume-val">70%</span>
+        </label>
 
         <div class="music-mode" role="group" aria-label="Modo de reproducción" data-i18n-aria-label="music_mode_aria">
           <button class="active" type="button" data-music-mode="immersive" data-i18n="music_mode_immersive">Inmersivo</button>

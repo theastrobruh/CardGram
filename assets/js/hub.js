@@ -923,8 +923,31 @@ const SHOP_LINES = {
   ]
 };
 const SHOP_MOODS = ['🪷', '🫧', '🌸', '🍒', '🌙', '🎀', '🪻', '🍥', '✨', '🧋'];
+const SHOP_IDLE_LINES = {
+  es: [
+    '¿Sigues ahí? El polvo no se compra solo.',
+    'Puedes tocar los sobres, no muerden. Creo.',
+    'Si no decides pronto, subo el precio por aburrimiento.',
+    'Yo aquí, esperando. Como siempre.'
+  ],
+  en: [
+    'Still there? Dust doesn\'t buy itself.',
+    'You can touch the packs. They don\'t bite. Probably.',
+    'Decide soon or I raise the price out of boredom.',
+    'I\'ll be here. Waiting. As always.'
+  ],
+  de: [
+    'Noch da? Staub kauft sich nicht von selbst.',
+    'Du darfst die Packs anfassen. Sie beißen nicht. Wahrscheinlich.',
+    'Entscheide dich bald, sonst erhöhe ich den Preis aus Langeweile.',
+    'Ich bin hier. Warte. Wie immer.'
+  ]
+};
 let shopVendorTimer = 0;
 let shopClockTimer = 0;
+let shopTypeTimer = 0;
+let shopIdleTimer = 0;
+let shopLineCursor = 0;
 let shopVendorIndex = 0;
 let shopVendorActive = 0;
 let shopVendorInitialized = false;
@@ -946,14 +969,70 @@ function shopRemaining(ms) {
   return hours ? `${hours}h ${String(minutes).padStart(2, '0')}m` : `${minutes}m`;
 }
 
+function shopLang() {
+  const lang = document.documentElement.lang;
+  return SHOP_LINES[lang] ? lang : 'en';
+}
+
+function typeShopLine(text, instant = false) {
+  const speech = hub.els.shopSpeech;
+  if (!speech || typeof text !== 'string') return;
+  window.clearInterval(shopTypeTimer);
+  speech.classList.remove('is-typing');
+  if (instant) {
+    speech.textContent = text;
+    return;
+  }
+  speech.textContent = '';
+  speech.classList.add('is-typing');
+  let index = 0;
+  shopTypeTimer = window.setInterval(() => {
+    index += 1;
+    speech.textContent = text.slice(0, index);
+    if (index >= text.length) {
+      window.clearInterval(shopTypeTimer);
+      speech.classList.remove('is-typing');
+    }
+  }, 28);
+}
+
+function scheduleShopIdle() {
+  window.clearTimeout(shopIdleTimer);
+  shopIdleTimer = window.setTimeout(() => {
+    if (hub.panel !== 'booster' || document.hidden) {
+      scheduleShopIdle();
+      return;
+    }
+    speakShopLine('idle');
+  }, 17000);
+}
+
+function speakShopLine(kind = 'talk') {
+  const lang = shopLang();
+  const pool = kind === 'idle'
+    ? (SHOP_IDLE_LINES[lang] || SHOP_IDLE_LINES.en)
+    : (SHOP_LINES[lang] || SHOP_LINES.en);
+  if (!pool || !pool.length) return;
+  let line;
+  if (kind === 'idle') {
+    line = pool[Math.floor(Math.random() * pool.length)];
+  } else {
+    shopLineCursor = (shopLineCursor + 1) % pool.length;
+    line = pool[shopLineCursor];
+  }
+  typeShopLine(line);
+  hub.els.shopSpeech.dataset.lang = lang;
+  scheduleShopIdle();
+}
+
 function renderShopAtmosphere() {
   const now = new Date();
   const slot = shopTimeSlot(now);
   if (hub.els.shopBg) hub.els.shopBg.style.backgroundImage = `url("${SHOP_BACKGROUNDS[slot]}")`;
 
-  const lang = SHOP_LINES[document.documentElement.lang] ? document.documentElement.lang : 'en';
+  const lang = shopLang();
   if (hub.els.shopSpeech && hub.els.shopSpeech.dataset.lang !== lang) {
-    hub.els.shopSpeech.textContent = (SHOP_LINES[lang] || SHOP_LINES.en)[0];
+    typeShopLine((SHOP_LINES[lang] || SHOP_LINES.en)[0], true);
     hub.els.shopSpeech.dataset.lang = lang;
   }
   const mood = SHOP_MOODS[(Math.floor(now.getTime() / 86400000) + now.getDate()) % SHOP_MOODS.length];
@@ -1011,16 +1090,10 @@ function initShopScene() {
     next.classList.add('is-active');
     prev.classList.remove('is-active');
     shopVendorActive = shopVendorActive === 0 ? 1 : 0;
-    if (hub.els.shopSpeech) {
-      const lang = SHOP_LINES[document.documentElement.lang] ? document.documentElement.lang : 'en';
-      const lines = SHOP_LINES[lang] || SHOP_LINES.en;
-      hub.els.shopSpeech.textContent = lines[Math.floor(Math.random() * lines.length)];
-      hub.els.shopSpeech.dataset.lang = lang;
-    }
+    speakShopLine('talk');
   };
   if (hub.els.shopSpeech) {
-    const lang = SHOP_LINES[document.documentElement.lang] ? document.documentElement.lang : 'en';
-    hub.els.shopSpeech.textContent = (SHOP_LINES[lang] || SHOP_LINES.en)[0];
+    typeShopLine((SHOP_LINES[shopLang()] || SHOP_LINES.en)[0]);
   }
   renderShopAtmosphere();
   window.setTimeout(renderShopAtmosphere, 1200);
@@ -1028,6 +1101,13 @@ function initShopScene() {
   shopVendorTimer = window.setInterval(swap, 4200 + Math.random() * 2200);
   window.clearInterval(shopClockTimer);
   shopClockTimer = window.setInterval(renderShopAtmosphere, 60000);
+  scheduleShopIdle();
+  if (!hub.shopInteractionBound) {
+    hub.shopInteractionBound = true;
+    document.addEventListener('click', () => {
+      if (hub.panel === 'booster') scheduleShopIdle();
+    }, { passive: true });
+  }
 }
 
 function renderShopRecommended(sets) {
@@ -4492,6 +4572,9 @@ function setActivePanel(panel, options = {}) {
 
   if (hub.els.homeFab) hub.els.homeFab.hidden = target === 'home';
 
+  if (target === 'booster') scheduleShopIdle();
+  else window.clearTimeout(shopIdleTimer);
+
   if (target === 'home') {
     hub.homeVisits += 1;
     renderFavoriteCard();
@@ -4552,7 +4635,11 @@ function navigate(route) {
     location.hash = hash;
     return;
   }
-  applyRoute();
+  if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.startViewTransition(() => applyRoute());
+  } else {
+    applyRoute();
+  }
 }
 
 function applyRoute() {

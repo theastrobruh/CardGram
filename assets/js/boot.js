@@ -61,7 +61,14 @@
   function showImage(src) {
     if (!src) return;
     const next = active === bgA ? bgB : bgA;
+    const moves = [[1.2, -1], [-1.2, 1], [1, 1.2]];
+    const move = moves[index % moves.length];
     next.style.backgroundImage = `url("${src}")`;
+    next.style.setProperty('--kb-x', `${move[0]}%`);
+    next.style.setProperty('--kb-y', `${move[1]}%`);
+    next.dataset.kb = String(index % 3);
+    next.classList.remove('is-on');
+    void next.offsetWidth;
     next.classList.add('is-on');
     active.classList.remove('is-on');
     active = next;
@@ -142,7 +149,7 @@
     carousel = results.slice(0, carousel.length).filter(Boolean);
     if (carousel.length) {
       showImage(carousel[0]);
-      carouselTimer = window.setInterval(playCarousel, 4200);
+      carouselTimer = window.setInterval(playCarousel, 5600);
     }
     finish();
   }

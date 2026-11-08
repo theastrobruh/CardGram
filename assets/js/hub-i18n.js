@@ -1404,9 +1404,9 @@ Object.assign(I18N.de, { home_back: 'Deck-Rückseite', home_back_shared: 'Klassi
 Object.assign(I18N.es, { shop_completion: 'completado' });
 Object.assign(I18N.en, { shop_completion: 'complete' });
 Object.assign(I18N.de, { shop_completion: 'abgeschlossen' });
-Object.assign(I18N.es, { music_prev: 'Anterior', music_next: 'Siguiente', music_shuffle: 'Aleatorio', music_expand: 'Ver todas', music_collapse: 'Ocultar', music_immersive_explanation: 'En modo Inmersivo cada pantalla tiene su propia música. Entra al eCard Studio para recibir una canción aleatoria y desbloquear el reproductor.' });
-Object.assign(I18N.en, { music_prev: 'Previous', music_next: 'Next', music_shuffle: 'Shuffle', music_expand: 'View all', music_collapse: 'Hide', music_immersive_explanation: 'In Immersive mode each screen has its own music. Enter eCard Studio to get a random song and unlock the player.' });
-Object.assign(I18N.de, { music_prev: 'Zurück', music_next: 'Weiter', music_shuffle: 'Zufall', music_expand: 'Alle anzeigen', music_collapse: 'Ausblenden', music_immersive_explanation: 'Im Immersiv-Modus hat jeder Bildschirm eigene Musik. Betritt das eCard Studio für einen zufälligen Song und den Player.' });
+Object.assign(I18N.es, { music_prev: 'Anterior', music_next: 'Siguiente', music_shuffle: 'Aleatorio', music_expand: 'Ver todas', music_collapse: 'Ocultar', music_volume: 'Volumen de la música', music_immersive_explanation: 'En modo Inmersivo cada pantalla tiene su propia música. Entra al eCard Studio para recibir una canción aleatoria y desbloquear el reproductor.' });
+Object.assign(I18N.en, { music_prev: 'Previous', music_next: 'Next', music_shuffle: 'Shuffle', music_expand: 'View all', music_collapse: 'Hide', music_volume: 'Music volume', music_immersive_explanation: 'In Immersive mode each screen has its own music. Enter eCard Studio to get a random song and unlock the player.' });
+Object.assign(I18N.de, { music_prev: 'Zurück', music_next: 'Weiter', music_shuffle: 'Zufall', music_expand: 'Alle anzeigen', music_collapse: 'Ausblenden', music_volume: 'Musiklautstärke', music_immersive_explanation: 'Im Immersiv-Modus hat jeder Bildschirm eigene Musik. Betritt das eCard Studio für einen zufälligen Song und den Player.' });
 Object.assign(I18N.es, { shop_shift_day: 'Día', shop_shift_night: 'Noche' });
 Object.assign(I18N.en, { shop_shift_day: 'Day', shop_shift_night: 'Night' });
 Object.assign(I18N.de, { shop_shift_day: 'Tag', shop_shift_night: 'Nacht' });
