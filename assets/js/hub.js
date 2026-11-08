@@ -1111,6 +1111,97 @@ function initShopScene() {
   }
 }
 
+function fillShopPackPreview(container, collection) {
+  if (!container) return;
+  const owned = collection ? new Set(ownedIn(collection.id)) : new Set();
+  const cards = collection ? collection.cards.slice().sort((a, b) => cardRarity(a).weight - cardRarity(b).weight) : [];
+  container.replaceChildren(
+    ...cards.map((card) => {
+      const item = makeNode('span', `shop-preview-card${owned.has(card.id) ? ' is-owned' : ' is-locked'}`);
+      item.title = owned.has(card.id) ? card.name : `${card.name} · ${t('shop_locked')}`;
+      item.appendChild(makeHubImage(thumbOf(card), card.name));
+      return item;
+    })
+  );
+}
+
+function renderShopPackDetail() {
+  const collection = HUB_CATALOG.collections.find((entry) => entry.id === hubBooster.setId);
+  if (!collection || !hub.els.shopPackView) return;
+  if (hub.els.shopPackViewImg) {
+    hub.els.shopPackViewImg.src = shopPackArt[collection.id] || collection.thumbCover || collection.cover || '';
+    hub.els.shopPackViewImg.alt = collection.name;
+  }
+  if (hub.els.shopPackViewName) hub.els.shopPackViewName.textContent = collection.name;
+  if (hub.els.shopPackViewPercent) {
+    const owned = ownedIn(collection.id).length;
+    const total = collection.cards.length;
+    hub.els.shopPackViewPercent.textContent = `${total ? Math.round((owned / total) * 100) : 0}%`;
+  }
+  fillShopPackPreview(hub.els.shopPackViewCards, collection);
+
+  const picks = hubBooster.picks;
+  if (hub.els.shopPackViewReveal) {
+    hub.els.shopPackViewReveal.hidden = !picks.length;
+    if (picks.length) {
+      hub.els.shopPackViewReveal.replaceChildren(
+        ...picks.map((cardId) => {
+          const card = makeBoosterCard(cardId, { reveal: true });
+          card.addEventListener('click', () => {
+            card.classList.toggle('is-open');
+            if (window.Sound) window.Sound.play('flip');
+          });
+          return card;
+        })
+      );
+    }
+  }
+  if (hub.els.shopPackOpen) {
+    hub.els.shopPackOpen.hidden = picks.length > 0;
+    const label = hub.els.shopPackOpen.querySelector('span');
+    if (label) label.textContent = picks.length ? t('booster_continue') : t('booster_open');
+  }
+  if (hub.els.shopPackSave) hub.els.shopPackSave.hidden = !picks.length;
+  if (hub.els.shopPackViewHint) {
+    hub.els.shopPackViewHint.textContent = picks.length ? t('shop_pack_detail_reveal_hint') : t('shop_pack_detail_hint');
+  }
+  if (hub.els.boosterOpen) hub.els.shopPackOpen.disabled = hub.els.boosterOpen.disabled && !picks.length;
+}
+
+function openBoosterFromDetail() {
+  ensureBoosterDay();
+  if (!hubBooster.picks.length) {
+    const grant = availableBoosterGrant();
+    if (!grant) {
+      toast(t('booster_no_grants'), { type: 'warning' });
+      return;
+    }
+    const setId = hubBooster.setId || (boosterSets()[0] && boosterSets()[0].id);
+    if (!setId) return;
+    hubBooster.setId = setId;
+    hubBooster.picks = drawBoosterCards(setId);
+    hubBooster.pendingGrant = grant.id;
+    persistBooster();
+    renderBooster();
+  }
+  renderShopPackDetail();
+  if (window.Sound) window.Sound.play('success');
+}
+
+function openShopPackView(collectionId) {
+  if (!HUB_CATALOG.collections.some((entry) => entry.id === collectionId)) return;
+  hubBooster.setId = collectionId;
+  hubBooster.dropCardId = null;
+  persistBooster();
+  renderBooster();
+  if (hub.els.shopPackView) hub.els.shopPackView.hidden = false;
+  renderShopPackDetail();
+}
+
+function closeShopPackView() {
+  if (hub.els.shopPackView) hub.els.shopPackView.hidden = true;
+}
+
 function renderShopRecommended(sets) {
   const container = hub.els.shopRecommended;
   if (!container) return;
@@ -1121,7 +1212,8 @@ function renderShopRecommended(sets) {
   );
   container.replaceChildren(
     ...recommended.map((collection) => {
-      const button = makeHubButton('shop-pack', null, { boosterSet: collection.id });
+      const button = makeHubButton('shop-pack');
+      button.dataset.shopPackOpen = collection.id;
       button.classList.toggle('is-active', collection.id === hubBooster.setId);
       const art = makeNode('span', 'shop-pack-art');
       const customArt = shopPackArt[collection.id];
@@ -1259,6 +1351,7 @@ function renderBooster() {
         ? t('booster_open_hint')
         : t('booster_no_grants');
   }
+  if (hub.els.shopPackView && !hub.els.shopPackView.hidden) renderShopPackDetail();
 }
 
 function updateBoosterClock() {
@@ -4902,6 +4995,32 @@ function onHubClick(event) {
     return;
   }
 
+  const shopPack = target.closest('[data-shop-pack-open]');
+  if (shopPack) {
+    event.preventDefault();
+    openShopPackView(shopPack.dataset.shopPackOpen);
+    return;
+  }
+
+  if (target.closest('[data-shop-pack-close]')) {
+    event.preventDefault();
+    closeShopPackView();
+    return;
+  }
+
+  if (target.closest('#shop-pack-open')) {
+    event.preventDefault();
+    openBoosterFromDetail();
+    return;
+  }
+
+  if (target.closest('#shop-pack-save')) {
+    event.preventDefault();
+    claimBoosterPack();
+    renderShopPackDetail();
+    return;
+  }
+
   const boosterSet = target.closest('[data-booster-set]');
   if (boosterSet) {
     event.preventDefault();
@@ -5817,6 +5936,15 @@ function cacheHubDom() {
   els.shopReset = hubEl('shop-reset');
   els.shopPackPercent = hubEl('shop-pack-percent');
   els.shopRareCards = hubEl('shop-rare-cards');
+  els.shopPackView = hubEl('shop-pack-view');
+  els.shopPackViewImg = hubEl('shop-pack-view-img');
+  els.shopPackViewName = hubEl('shop-pack-view-name');
+  els.shopPackViewPercent = hubEl('shop-pack-view-percent');
+  els.shopPackViewCards = hubEl('shop-pack-view-cards');
+  els.shopPackViewReveal = hubEl('shop-pack-view-reveal');
+  els.shopPackViewHint = hubEl('shop-pack-view-hint');
+  els.shopPackOpen = hubEl('shop-pack-open');
+  els.shopPackSave = hubEl('shop-pack-save');
   els.mobileDaily = hubEl('hub-mobile-daily');
   els.boosterStreakValue = hubEl('booster-streak-value');
   els.boosterStreakLabel = hubEl('booster-streak-label');

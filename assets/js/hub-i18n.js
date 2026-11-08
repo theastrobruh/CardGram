@@ -1425,3 +1425,9 @@ Object.assign(I18N.de, { viewer_open_booster: 'Booster öffnen', viewer_booster_
 Object.assign(I18N.es, { music_pause: 'Pausar', music_resume: 'Reanudar' });
 Object.assign(I18N.en, { music_pause: 'Pause', music_resume: 'Resume' });
 Object.assign(I18N.de, { music_pause: 'Pause', music_resume: 'Fortsetzen' });
+Object.assign(I18N.es, { shop_back_to_packs: 'Volver', shop_pack_detail_hint: 'Contenido del sobre y cartas que puedes conseguir.' });
+Object.assign(I18N.en, { shop_back_to_packs: 'Back', shop_pack_detail_hint: 'Pack contents and cards you can collect.' });
+Object.assign(I18N.de, { shop_back_to_packs: 'Zurück', shop_pack_detail_hint: 'Packinhalt und sammelbare Karten.' });
+Object.assign(I18N.es, { shop_pack_detail_reveal_hint: 'Toca cada carta para voltearla. Guarda tus nuevas cartas para completar el set.' });
+Object.assign(I18N.en, { shop_pack_detail_reveal_hint: 'Tap each card to flip it. Save your new cards to complete the set.' });
+Object.assign(I18N.de, { shop_pack_detail_reveal_hint: 'Tippe jede Karte zum Umdrehen. Speichere deine neuen Karten für das Set.' });
