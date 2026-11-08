@@ -1,8 +1,8 @@
 {
   "packs": {
-    "mew-tarot": "assets/data/shop_assets/packs/PACK-01.PNG",
-    "champion-verse": "assets/data/shop_assets/packs/PACK-02.PNG",
-    "dungeons-history": "assets/data/shop_assets/packs/PACK-03.PNG",
-    "ygo": "assets/data/shop_assets/packs/PACK-04.PNG"
+    "mew-tarot": "assets/data/shop_assets/packs/PACK-01.webp",
+    "champion-verse": "assets/data/shop_assets/packs/PACK-02.webp",
+    "dungeons-history": "assets/data/shop_assets/packs/PACK-03.webp",
+    "ygo": "assets/data/shop_assets/packs/PACK-04.webp"
   }
 }
