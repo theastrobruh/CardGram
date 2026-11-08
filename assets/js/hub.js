@@ -997,6 +997,7 @@ function typeShopLine(text, instant = false) {
 }
 
 function scheduleShopIdle() {
+  if (!hub.els.shopSpeech) return;
   window.clearTimeout(shopIdleTimer);
   shopIdleTimer = window.setTimeout(() => {
     if (hub.panel !== 'booster' || document.hidden) {
@@ -1008,6 +1009,7 @@ function scheduleShopIdle() {
 }
 
 function speakShopLine(kind = 'talk') {
+  if (!hub.els.shopSpeech) return;
   const lang = shopLang();
   const pool = kind === 'idle'
     ? (SHOP_IDLE_LINES[lang] || SHOP_IDLE_LINES.en)
@@ -1047,6 +1049,7 @@ function renderShopAtmosphere() {
     shiftEnd.setHours(8, 0, 0, 0);
     if (hour >= 20) shiftEnd.setDate(shiftEnd.getDate() + 1);
   }
+  if (hub.els.shopDaysCount) hub.els.shopDaysCount.textContent = String(hubBooster.streak || 0);
   if (hub.els.shopShift) {
     hub.els.shopShift.textContent = shopRemaining(shiftEnd - now);
     hub.els.shopShift.parentElement.title = dayShift ? t('shop_shift_day') : t('shop_shift_night');
@@ -1202,6 +1205,22 @@ function closeShopPackView() {
   if (hub.els.shopPackView) hub.els.shopPackView.hidden = true;
 }
 
+function renderShopStores(recommended) {
+  const container = hub.els.shopStores;
+  if (!container) return;
+  container.replaceChildren(
+    ...recommended.map(() => {
+      const button = makeHubButton('shop-store', null, { hubRoute: 'explore' });
+      const art = makeNode('span', 'shop-store-art');
+      art.appendChild(makeHubImage('assets/data/shops/theastrobruh-cover.webp', 'theAstroBruh Shop'));
+      button.appendChild(art);
+      button.appendChild(makeNode('strong', null, 'theAstroBruh'));
+      button.appendChild(makeNode('small', null, t('explore_enter_shop')));
+      return button;
+    })
+  );
+}
+
 function renderShopRecommended(sets) {
   const container = hub.els.shopRecommended;
   if (!container) return;
@@ -1230,6 +1249,7 @@ function renderShopRecommended(sets) {
       return button;
     })
   );
+  renderShopStores(recommended);
 }
 
 function renderBooster() {
@@ -4637,6 +4657,7 @@ function setActivePanel(panel, options = {}) {
   if (target === 'collections') markBoosterMission();
   if (hub.ready) syncMobileDailyButton();
   document.body.classList.toggle('is-home-route', target === 'home');
+  document.body.classList.toggle('is-booster-route', target === 'booster');
   if (window.Music) {
     const musicScene = target === 'collections'
       ? 'my-cards'
@@ -5936,6 +5957,8 @@ function cacheHubDom() {
   els.shopReset = hubEl('shop-reset');
   els.shopPackPercent = hubEl('shop-pack-percent');
   els.shopRareCards = hubEl('shop-rare-cards');
+  els.shopStores = hubEl('shop-stores');
+  els.shopDaysCount = hubEl('shop-days-count');
   els.shopPackView = hubEl('shop-pack-view');
   els.shopPackViewImg = hubEl('shop-pack-view-img');
   els.shopPackViewName = hubEl('shop-pack-view-name');

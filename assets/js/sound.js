@@ -9,7 +9,7 @@
   'use strict';
 
   const STORAGE_KEY = 'cardgram.sound.v1';
-  const DEFAULTS = { enabled: true, volume: 0.8 };
+  const DEFAULTS = { enabled: true, volume: 0.44 };
 
   const MIN_GAP = {
     tap: 0.045,

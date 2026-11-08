@@ -100,11 +100,6 @@
       image.onload = () => {
         loaded += 1;
         setProgress();
-        if (!index && !bgA.style.backgroundImage) {
-          bgA.style.backgroundImage = `url("${src}")`;
-          bgA.classList.add('is-on');
-          active = bgA;
-        }
         resolve(src);
       };
       image.onerror = () => {
@@ -148,7 +143,9 @@
     images = results.filter(Boolean);
     carousel = results.slice(0, carousel.length).filter(Boolean);
     if (carousel.length) {
-      showImage(carousel[0]);
+      bgA.style.backgroundImage = `url("${carousel[0]}")`;
+      bgA.classList.add('is-on');
+      active = bgA;
       carouselTimer = window.setInterval(playCarousel, 5600);
     }
     finish();

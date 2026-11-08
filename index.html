@@ -12,23 +12,23 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=187">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=187">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=199">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=199">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=187" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=187" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=187" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=187" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=187" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=187" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=187" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=187" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=187" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=187" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=187" defer></script>
-  <script src="assets/js/boot.js?v=0.5.5&rev=187" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=199" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=199" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=199" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=199" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=199" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=199" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=199" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=199" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=199" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=199" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=199" defer></script>
+  <script src="assets/js/boot.js?v=0.5.5&rev=199" defer></script>
 </head>
 <body data-view="hub" class="booting">
   <div class="boot-screen" id="boot-screen">
@@ -40,7 +40,19 @@
       <span class="boot-version">v0.5.5</span>
     </div>
     <div class="boot-center">
-      <span class="boot-kicker">A card universe awaits</span>
+      <span class="boot-mark" aria-hidden="true">
+        <span class="boot-mark-inner">
+          <svg class="boot-mark-svg" viewBox="0 0 24 24" fill="none">
+            <path d="M2 19L6 5h12l4 14H2z" stroke="#ffffff" stroke-width="1.4" opacity="0.95" stroke-linejoin="round"></path>
+            <path d="M4 14.5h16" stroke="#ffffff" stroke-width="1.1" opacity="0.85"></path>
+            <path d="M5 10h14" stroke="#ffffff" stroke-width="1.1" opacity="0.85"></path>
+            <path d="M10 5l-2.4 14" stroke="#ffffff" stroke-width="1.1" opacity="0.9"></path>
+            <path d="M14 5l2.4 14" stroke="#ffffff" stroke-width="1.1" opacity="0.9"></path>
+            <circle cx="12" cy="10" r="1.3" fill="#ffffff"></circle>
+          </svg>
+        </span>
+      </span>
+      <span class="boot-kicker">FOR CREATORS &amp; PLAYERS</span>
       <h1 class="boot-title">CardGram</h1>
       <p class="boot-sub">Create · Collect · Trade</p>
       <div class="boot-progress" id="boot-progress"><span id="boot-bar"></span></div>
@@ -335,6 +347,14 @@
               </span>
             </a>
   
+            <div class="hub-mobile-quick" id="hub-mobile-quick">
+              <button class="hub-mobile-quick-btn" type="button" data-new-card aria-label="Crear una carta nueva" data-i18n-aria-label="hub_new_card" title="Crear una carta nueva" data-i18n-title="hub_new_card">
+                <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
+              </button>
+              <button class="hub-mobile-quick-btn" type="button" id="hub-mobile-hand-edit" aria-haspopup="dialog" aria-controls="hand-dialog" aria-label="Editar cartas favoritas" data-i18n-aria-label="hub_favorites_edit" title="Editar cartas favoritas" data-i18n-title="hub_favorites_edit">
+                <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
+              </button>
+            </div>
             <nav class="hub-nav" aria-label="Navegación principal" data-i18n-aria-label="hub_nav_aria">
               <button class="hub-nav-btn active" type="button" data-hub-route="home" aria-current="page">
                 <svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg>
@@ -414,16 +434,6 @@
                ------------------------------------------------------------ -->
           <section class="hub-panel active hub-home-panel" data-hub-panel="home" aria-labelledby="hub-home-title">
             <h1 class="sr-only" id="hub-home-title" data-i18n="hub_home_title">Inicio de CardGram</h1>
-
-            <!-- Dos datos vivos, solo en móvil: jugador y colección. -->
-            <div class="hub-mobile-quick" id="hub-mobile-quick">
-              <button class="hub-mobile-quick-btn" type="button" data-new-card aria-label="Crear una carta nueva" data-i18n-aria-label="hub_new_card" title="Crear una carta nueva" data-i18n-title="hub_new_card">
-                <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
-              </button>
-              <button class="hub-mobile-quick-btn" type="button" id="hub-mobile-hand-edit" aria-haspopup="dialog" aria-controls="hand-dialog" aria-label="Editar cartas favoritas" data-i18n-aria-label="hub_favorites_edit" title="Editar cartas favoritas" data-i18n-title="hub_favorites_edit">
-                <svg class="icon" aria-hidden="true"><use href="#i-cards"></use></svg>
-              </button>
-            </div>
 
             <div class="hub-dashboard">
               <!-- Panel de jugador y datos de colección -->
@@ -695,7 +705,11 @@
                 <button class="hub-back" type="button" data-hub-route="home" aria-label="Volver al inicio" data-i18n-aria-label="hub_back_home">
                   <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
                 </button>
-                <span class="shop-days"><span aria-hidden="true">✦</span> 3 DAYS</span>
+                <span class="shop-days" id="shop-days"><span aria-hidden="true">✦</span> <span id="shop-days-count">0</span> DAYS</span>
+                <div class="shop-status-row">
+                  <span class="shop-status-chip" title="Turno de Azura"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg><span id="shop-shift">12h</span></span>
+                  <span class="shop-status-chip" title="Próximo reinicio de packs"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg><span id="shop-reset">6h</span></span>
+                </div>
                 <button class="shop-computer" type="button" data-hub-route="explore">
                   <svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>
                   <span data-i18n="shop_computer">Computadora</span>
@@ -707,17 +721,8 @@
                 <img class="shop-npc-img" id="shop-npc-b" alt="">
               </div>
 
-              <div class="shop-speech">
-                <p id="shop-speech-text" aria-live="polite">Hello… Welcome to the Shop.</p>
-              </div>
-
-              <div class="shop-status-row">
-                <span class="shop-status-chip shop-mood-chip" id="shop-mood" aria-label="Mood de Azura"><span class="shop-status-emoji" id="shop-mood-emoji">🪷</span></span>
-                <span class="shop-status-chip" title="Turno de Azura"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg><span id="shop-shift">12h</span></span>
-                <span class="shop-status-chip" title="Próximo reinicio de packs"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg><span id="shop-reset">6h</span></span>
-              </div>
-
               <div class="shop-recommended" id="shop-recommended"></div>
+              <div class="shop-stores" id="shop-stores"></div>
 
               <aside class="shop-daily">
                 <span class="hub-panel-eyebrow"><span class="hub-live-dot"></span><span data-i18n="shop_daily_kicker">Daily Packs</span></span>
