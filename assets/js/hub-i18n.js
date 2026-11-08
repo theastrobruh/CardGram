@@ -1422,3 +1422,6 @@ Object.assign(I18N.de, { explore_creators_title: 'Users Shop', explore_creators_
 Object.assign(I18N.es, { viewer_open_booster: 'Abrir booster', viewer_booster_note: 'Se puede obtener en el booster de {collection}.', viewer_created_note: 'Carta creada: no aparece en boosters. Puede obtenerse por condiciones o recompensas.' });
 Object.assign(I18N.en, { viewer_open_booster: 'Open booster', viewer_booster_note: 'Can be obtained from the {collection} booster.', viewer_created_note: 'Created card: not available in boosters. May be obtained through conditions or rewards.' });
 Object.assign(I18N.de, { viewer_open_booster: 'Booster öffnen', viewer_booster_note: 'Erhältlich im {collection}-Booster.', viewer_created_note: 'Erstellte Karte: nicht in Boostern. Kann über Bedingungen oder Belohnungen erhalten werden.' });
+Object.assign(I18N.es, { music_pause: 'Pausar', music_resume: 'Reanudar' });
+Object.assign(I18N.en, { music_pause: 'Pause', music_resume: 'Resume' });
+Object.assign(I18N.de, { music_pause: 'Pause', music_resume: 'Fortsetzen' });

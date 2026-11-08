@@ -33,6 +33,7 @@
     armed: false,
     shuffle: true,
     expanded: false,
+    paused: false,
     current: null,
     players: new Set(),
     fadeId: 0,
@@ -104,6 +105,13 @@
       button.classList.toggle('is-muted', !state.enabled);
       button.setAttribute('aria-pressed', String(state.enabled));
       button.textContent = state.enabled ? tr('music_on', 'Música activa') : tr('music_off', 'Música apagada');
+    });
+    document.querySelectorAll('[data-music-pause]').forEach((button) => {
+      const paused = Boolean(state.paused && state.current);
+      button.classList.toggle('is-paused', paused);
+      button.setAttribute('aria-pressed', String(paused));
+      const label = button.querySelector('span');
+      if (label) label.textContent = paused ? tr('music_resume', 'Reanudar') : tr('music_pause', 'Pausar');
     });
   }
 
@@ -225,6 +233,7 @@
 
   function startTrack(src, options = {}) {
     if (!src) return;
+    state.paused = false;
     const previous = state.current ? state.current.player : null;
     const player = new Audio();
     player.src = src;
@@ -361,8 +370,21 @@
     } else playScene(state.scene, true);
   }
 
-  function setEnabled(value) {
-    state.enabled = Boolean(value);
+  function togglePause() {
+    if (!state.current || !state.current.player) return;
+    if (state.paused) {
+      state.paused = false;
+      const promise = state.current.player.play();
+      if (promise && typeof promise.catch === 'function') promise.catch(() => {});
+    } else {
+      state.paused = true;
+      state.current.player.pause();
+    }
+    syncButtons();
+    renderPanel();
+  }
+
+  function setEnabled(value) {    state.enabled = Boolean(value);
     save();
     syncButtons();
     renderPanel();
@@ -491,6 +513,10 @@
         playSceneTrack(scene, index, true);
       }
       syncButtons();
+      return;
+    }
+    if (target.closest('[data-music-pause]')) {
+      togglePause();
       return;
     }
     if (target.closest('[data-music-prev]')) {

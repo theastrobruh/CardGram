@@ -1048,7 +1048,8 @@ function renderShopAtmosphere() {
     if (hour >= 20) shiftEnd.setDate(shiftEnd.getDate() + 1);
   }
   if (hub.els.shopShift) {
-    hub.els.shopShift.textContent = `${dayShift ? t('shop_shift_day') : t('shop_shift_night')} · ${shopRemaining(shiftEnd - now)}`;
+    hub.els.shopShift.textContent = shopRemaining(shiftEnd - now);
+    hub.els.shopShift.parentElement.title = dayShift ? t('shop_shift_day') : t('shop_shift_night');
   }
 
   const reset = new Date(now);
