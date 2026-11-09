@@ -4320,6 +4320,36 @@ function renderExplorePackDetail(collection) {
   }
 }
 
+
+function makeExplorePlazaCard() {
+  const button = makeHubButton('explore-creator explore-shop explore-plaza-card', null);
+  button.dataset.hubRoute = 'plaza';
+  button.setAttribute('aria-label', t('plaza_title') || 'Plaza TCG');
+
+  const cover = makeNode('span', 'explore-shop-cover explore-plaza-cover');
+  cover.appendChild(makeHubImage('assets/data/explore/Plaza-Icon.webp', 'Plaza TCG'));
+  button.appendChild(cover);
+
+  const body = makeNode('span', 'explore-shop-body');
+  const avatar = makeNode('span', 'explore-shop-avatar explore-plaza-avatar');
+  avatar.appendChild(makeHubImage('assets/data/explore/Plaza-Icon.webp', 'Plaza TCG'));
+  body.appendChild(avatar);
+
+  const copy = makeNode('span', 'explore-creator-copy');
+  copy.appendChild(makeNode('strong', null, t('plaza_title') || 'Plaza TCG'));
+  copy.appendChild(makeNode('span', null, t('plaza_card_sub') || '@plaza · Panamá'));
+  copy.appendChild(
+    makeNode('span', 'explore-creator-meta', t('plaza_meta') || 'Comunidad, Torneos y Noticias')
+  );
+  body.appendChild(copy);
+
+  const cta = makeNode('span', 'explore-shop-cta', t('plaza_enter') || 'Entrar a Plaza');
+  cta.appendChild(hubIcon('arrow-right'));
+  body.appendChild(cta);
+  button.appendChild(body);
+  return button;
+}
+
 function renderExplore() {
   if (!hub.ready || !hub.els.exploreCreators) return;
   loadShopPackArt();
@@ -4338,7 +4368,7 @@ function renderExplore() {
   }
 
   if (!creatorOpen) {
-    hub.els.exploreCreators.replaceChildren(makeExploreCreatorCard());
+    hub.els.exploreCreators.replaceChildren(makeExploreCreatorCard(), makeExplorePlazaCard());
     return;
   }
 
