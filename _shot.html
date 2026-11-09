@@ -1,0 +1,52 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;height:100%;overflow:hidden;background:#fff}iframe{border:0;width:100vw;height:100vh;display:block}</style></head>
+<body>
+<iframe id="f"></iframe>
+<script>
+const params = new URLSearchParams(location.search);
+const route = params.get('r') || 'home';
+const started = { boot: false, routed: false, creator: false, pack: false, draw: false };
+const f = document.getElementById('f');
+const size = (params.get('size') || '').split('x').map(Number);
+if (size.length === 2 && size[0] > 0 && size[1] > 0) {
+  f.style.width = size[0] + 'px';
+  f.style.height = size[1] + 'px';
+}
+const base = route.replace('-draw', '');
+f.src = 'index.html?shot=' + Date.now() + '#/' + (base === 'explore-packs' || base === 'explore-pack' ? 'explore' : base);
+f.addEventListener('load', () => {
+  const go = () => {
+    try {
+      const d = f.contentDocument;
+      if (!d.getElementById('shot-css')) {
+        const st = d.createElement('style');
+        st.id = 'shot-css';
+        st.textContent = '*{animation:none!important;transition:none!important}.hub-veil,.boot-screen{display:none!important}';
+        d.head.appendChild(st);
+      }
+      const b = d.getElementById('boot-start');
+      if (b && !b.hidden && !b.disabled) { b.click(); started.boot = true; setTimeout(go, 800); return; }
+      if (!started.boot) { setTimeout(go, 300); return; }
+      if (!started.routed && base !== 'home') {
+        if (d.defaultView.location.hash !== '#/' + base) d.defaultView.location.hash = '#/' + base;
+        started.routed = true; setTimeout(go, 1000); return;
+      }
+      if (route === 'home-draw' && !started.draw) {
+        const draw = d.getElementById('home-draw-btn');
+        if (draw) { draw.click(); started.draw = true; }
+      }
+      if ((base === 'explore-packs' || base === 'explore-pack') && !started.creator) {
+        const creator = d.querySelector('[data-explore-creator]');
+        if (creator) { creator.click(); started.creator = true; setTimeout(go, 900); return; }
+        setTimeout(go, 300); return;
+      }
+      if (base === 'explore-pack' && !started.pack) {
+        const pack = d.querySelector('[data-explore-pack]');
+        if (pack) { pack.click(); started.pack = true; }
+      }
+    } catch (e) {}
+  };
+  setTimeout(go, 500);
+});
+</script>
+</body></html>
