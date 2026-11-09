@@ -12,23 +12,23 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=212">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=212">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=213">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=213">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=212" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=212" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=212" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=212" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=212" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=212" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=212" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=212" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=212" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=212" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=212" defer></script>
-  <script src="assets/js/boot.js?v=0.5.5&rev=212" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=213" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=213" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=213" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=213" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=213" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=213" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=213" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=213" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=213" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=213" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=213" defer></script>
+  <script src="assets/js/boot.js?v=0.5.5&rev=213" defer></script>
 </head>
 <body data-view="hub" class="booting">
   <div class="boot-screen" id="boot-screen">
@@ -810,6 +810,11 @@
                   <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky"></span><span data-i18n="shop_selected_pack">Pack seleccionado</span></span>
                   <h2 id="shop-pack-view-name"></h2>
                   <div class="shop-pack-view-progress">
+                    <div class="soda-meter-wrap">
+                      <div class="soda-meter-bar" id="shop-pack-view-meter-bar">
+                        <div class="soda-liquid"></div>
+                      </div>
+                    </div>
                     <strong id="shop-pack-view-percent">0%</strong>
                     <span data-i18n="shop_completion">completado</span>
                   </div>
@@ -1037,53 +1042,167 @@
                 <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
                 <span>Volver a Explorar</span>
               </button>
+
+              <!-- Plaza Scope Selector (Local vs. General) -->
+              <div class="plaza-scope-container">
+                <div class="plaza-scope-grid" id="plaza-scope-grid" role="tablist" aria-label="Alcance de La Plaza">
+                  <button class="plaza-scope-card is-active" type="button" role="tab" aria-selected="true" data-plaza-scope="local">
+                    <div class="plaza-scope-art">
+                      <img src="assets/data/shops/theastrobruh-cover.png" alt="Panamá TCG" class="plaza-scope-img">
+                      <span class="plaza-scope-badge">Panamá 🇵🇦</span>
+                    </div>
+                    <div class="plaza-scope-body">
+                      <strong class="plaza-scope-title" data-i18n="plaza_scope_local_title">Local (Panamá 🇵🇦)</strong>
+                      <p class="plaza-scope-desc" data-i18n="plaza_scope_local_desc">Explora la comunidad local, eventos presenciales, tiendas TCG en Panamá y cartas creadas por diseñadores de la región.</p>
+                    </div>
+                    <span class="plaza-scope-indicator" aria-hidden="true">Activo</span>
+                  </button>
+
+                  <button class="plaza-scope-card" type="button" role="tab" aria-selected="false" data-plaza-scope="general">
+                    <div class="plaza-scope-art">
+                      <img src="assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp" alt="Global TCG" class="plaza-scope-img plaza-scope-img-globe">
+                      <span class="plaza-scope-badge">Global 🌍</span>
+                    </div>
+                    <div class="plaza-scope-body">
+                      <strong class="plaza-scope-title" data-i18n="plaza_scope_general_title">General (Global 🌍)</strong>
+                      <p class="plaza-scope-desc" data-i18n="plaza_scope_general_desc">Descubre las cartas más populares del mundo, tendencias globales, meca de TCGs y retos de creación internacionales.</p>
+                    </div>
+                    <span class="plaza-scope-indicator" aria-hidden="true">Activo</span>
+                  </button>
+                </div>
+              </div>
+
               <div class="plaza-content">
-                <div class="plaza-hero-banner">
-                  <div class="plaza-hero-badge">Ciudad de Panamá · Eventos Destacados</div>
-                  <h2>Comunidad TCG Panamá 2026</h2>
-                  <p>Torneos semanales, intercambios de cartas coleccionables, lanzamientos y puntos de encuentro para duelistas y coleccionistas.</p>
+                <!-- FEED LOCAL (PANAMÁ 🇵🇦) -->
+                <div class="plaza-feed" id="plaza-feed-local">
+                  <div class="plaza-hero-banner">
+                    <div class="plaza-hero-badge">Ciudad de Panamá · Eventos Destacados</div>
+                    <h2>Comunidad TCG Panamá 2026</h2>
+                    <p>Torneos semanales, intercambios de cartas coleccionables, lanzamientos y puntos de encuentro para duelistas y coleccionistas.</p>
+                  </div>
+
+                  <div class="plaza-grid" id="plaza-grid-inline">
+                    <article class="plaza-card">
+                      <div class="plaza-card-badge event-badge">Torneo Oficial</div>
+                      <h3 class="plaza-card-title">Liga TCG Panamá · Torneo Nacional</h3>
+                      <p class="plaza-card-desc">Competencia abierta de cartas coleccionables en Albrook Mall, Panamá. Premios en sobres exclusivos y trofeo conmemorativo CardGram.</p>
+                      <div class="plaza-card-footer">
+                        <span>📍 Albrook Mall, Pasillo del Koala</span>
+                        <strong>Sábado 15:00</strong>
+                      </div>
+                    </article>
+
+                    <article class="plaza-card">
+                      <div class="plaza-card-badge meet-badge">Encuentro & Trade</div>
+                      <h3 class="plaza-card-title">Card Swap & Trade Night</h3>
+                      <p class="plaza-card-desc">Noche de intercambio y exhibición de cartas raras, foils y graduadas. Trae tus binders y conoce a coleccionistas de toda la ciudad.</p>
+                      <div class="plaza-card-footer">
+                        <span>📍 Vía Argentina, El Cangrejo</span>
+                        <strong>Domingos 16:30</strong>
+                      </div>
+                    </article>
+
+                    <article class="plaza-card">
+                      <div class="plaza-card-badge store-badge">Tienda Destacada</div>
+                      <h3 class="plaza-card-title">Korasama Hobby & TCG Hub</h3>
+                      <p class="plaza-card-desc">Torneos oficiales semanales, accesorios premium, playmats personalizados y mesas abiertas para partidas libres y ligas locales.</p>
+                      <div class="plaza-card-footer">
+                        <span>📍 San Francisco, Calle 74</span>
+                        <strong>Viernes & Sábados</strong>
+                      </div>
+                    </article>
+
+                    <article class="plaza-card">
+                      <div class="plaza-card-badge event-badge">Convención Regional</div>
+                      <h3 class="plaza-card-title">Panamá Geek Fest & Q1 TCG Expo</h3>
+                      <p class="plaza-card-desc">El gran encuentro anual de cultura geek, cosplay y juegos de cartas coleccionables con stands de ilustradores y torneos relámpago.</p>
+                      <div class="plaza-card-footer">
+                        <span>📍 Centro de Convenciones Amador</span>
+                        <strong>Q1 2027 · Preventa</strong>
+                      </div>
+                    </article>
+
+                    <article class="plaza-card">
+                      <div class="plaza-card-badge launch-badge">Creadores de la Región</div>
+                      <h3 class="plaza-card-title">Mew Tarot & Champion-Verse Showcase</h3>
+                      <p class="plaza-card-desc">Presentación especial y demostración interactiva de renders 3D para coleccionistas con CardGram e Inkra.</p>
+                      <div class="plaza-card-footer">
+                        <span>📍 theAstroBruh · Panamá</span>
+                        <strong>Showcase Activo</strong>
+                      </div>
+                    </article>
+
+                    <article class="plaza-card">
+                      <div class="plaza-card-badge news-badge">Actualidad TCG</div>
+                      <h3 class="plaza-card-title">Expansión de Tiendas Asociadas</h3>
+                      <p class="plaza-card-desc">Nuevos puntos autorizados en San Francisco y Casco Antiguo para adquirir cartas físicas y códigos para Daily Booster Drops.</p>
+                      <div class="plaza-card-footer">
+                        <span>📍 Red de Tiendas Panamá</span>
+                        <strong>Activo</strong>
+                      </div>
+                    </article>
+                  </div>
                 </div>
 
-                <div class="plaza-grid" id="plaza-grid-inline">
-                  <article class="plaza-card">
-                    <div class="plaza-card-badge event-badge">Torneo Oficial</div>
-                    <h3 class="plaza-card-title">Liga TCG Panamá · Torneo Nacional</h3>
-                    <p class="plaza-card-desc">Competencia abierta de cartas coleccionables en Albrook Mall, Panamá. Premios en sobres exclusivos y trofeo conmemorativo CardGram.</p>
-                    <div class="plaza-card-footer">
-                      <span>📍 Albrook Mall, Pasillo del Koala</span>
-                      <strong>Sábado 15:00</strong>
-                    </div>
-                  </article>
+                <!-- FEED GENERAL (GLOBAL 🌍) -->
+                <div class="plaza-feed" id="plaza-feed-general" hidden>
+                  <div class="plaza-hero-banner plaza-hero-global">
+                    <div class="plaza-hero-badge">TCG World Arena · Global Meta 2026</div>
+                    <h2>Tendencias Mundiales & Metagame Global</h2>
+                    <p>Descubre las cartas más populares del mundo, tendencias globales, mecas de TCGs internacionales y retos de creación de la comunidad.</p>
+                  </div>
 
-                  <article class="plaza-card">
-                    <div class="plaza-card-badge meet-badge">Encuentro & Trade</div>
-                    <h3 class="plaza-card-title">Card Swap & Trade Night</h3>
-                    <p class="plaza-card-desc">Noche de intercambio y exhibición de cartas raras, foils y graduadas. Trae tus binders y conoce a coleccionistas de toda la ciudad.</p>
-                    <div class="plaza-card-footer">
-                      <span>📍 Vía Argentina, El Cangrejo</span>
-                      <strong>Domingos 16:30</strong>
-                    </div>
-                  </article>
+                  <div class="plaza-grid">
+                    <article class="plaza-card">
+                      <div class="plaza-card-badge meta-badge">Metagame Global</div>
+                      <h3 class="plaza-card-title">Radar de Metajuego: Pokémon, One Piece, Magic & YGO</h3>
+                      <p class="plaza-card-desc">Análisis semanal de los arquetipos dominantes en los torneos mundiales de Tokio, Anaheim y Frankfurt. Tier list de cartas clave de la temporada.</p>
+                      <div class="plaza-card-footer">
+                        <span>🌐 Circuito Competitivo Mundial</span>
+                        <strong>Reporte Semanal</strong>
+                      </div>
+                    </article>
 
-                  <article class="plaza-card">
-                    <div class="plaza-card-badge launch-badge">Nuevo Drop</div>
-                    <h3 class="plaza-card-title">Mew Tarot & Champion-Verse Showcase</h3>
-                    <p class="plaza-card-desc">Presentación especial y demostración interactiva de renders 3D para coleccionistas con CardGram e Inkra.</p>
-                    <div class="plaza-card-footer">
-                      <span>📍 Costa del Este, Panamá</span>
-                      <strong>Próximo Viernes</strong>
-                    </div>
-                  </article>
+                    <article class="plaza-card">
+                      <div class="plaza-card-badge challenge-badge">Reto de Creación</div>
+                      <h3 class="plaza-card-title">Global Community Design Challenge 2026</h3>
+                      <p class="plaza-card-desc">Crea tu carta con efectos holográficos y temática "Cosmic Astral Shaders". Las 5 cartas más votadas se integrarán al catálogo oficial de CardGram.</p>
+                      <div class="plaza-card-footer">
+                        <span>🏆 Reto Internacional Abierto</span>
+                        <strong>Termina en 14 días</strong>
+                      </div>
+                    </article>
 
-                  <article class="plaza-card">
-                    <div class="plaza-card-badge news-badge">Actualidad TCG</div>
-                    <h3 class="plaza-card-title">Expansión de Tiendas Asociadas</h3>
-                    <p class="plaza-card-desc">Nuevos puntos autorizados en San Francisco y Casco Antiguo para adquirir cartas físicas y códigos para Daily Booster Drops.</p>
-                    <div class="plaza-card-footer">
-                      <span>📍 Red de Tiendas Panamá</span>
-                      <strong>Activo</strong>
-                    </div>
-                  </article>
+                    <article class="plaza-card">
+                      <div class="plaza-card-badge trending-badge">Ranking Mundial</div>
+                      <h3 class="plaza-card-title">Top Creadores & Cartas Más Populares</h3>
+                      <p class="plaza-card-desc">theAstroBruh, PixelForge JP, CardCraft UK y StudioLumens lideran el ranking internacional con más de 250,000 cartas abiertas en boosters.</p>
+                      <div class="plaza-card-footer">
+                        <span>🌍 Hall of Fame Internacional</span>
+                        <strong>Top 10 Global</strong>
+                      </div>
+                    </article>
+
+                    <article class="plaza-card">
+                      <div class="plaza-card-badge hub-badge">Meca del TCG</div>
+                      <h3 class="plaza-card-title">Akihabara & Megalopolis TCG Hub Highlights</h3>
+                      <p class="plaza-card-desc">Crónica fotográfica de las tiendas y subastas de cartas de colección en Tokio, Nueva York y Londres. Drops limitados y vitrinas graduadas.</p>
+                      <div class="plaza-card-footer">
+                        <span>📍 Tokio · NY · Londres</span>
+                        <strong>Destacado Especial</strong>
+                      </div>
+                    </article>
+
+                    <article class="plaza-card">
+                      <div class="plaza-card-badge launch-badge">Innovación WebGL</div>
+                      <h3 class="plaza-card-title">Aqua Glass Studio 3D Pipeline</h3>
+                      <p class="plaza-card-desc">Nuevos shaders de cristal líquido y refracción caústica en tiempo real disponibles para creadores de todo el planeta en eCard Studio.</p>
+                      <div class="plaza-card-footer">
+                        <span>✨ Engine CardGram v0.5.5</span>
+                        <strong>Disponible Global</strong>
+                      </div>
+                    </article>
+                  </div>
                 </div>
               </div>
             </section>
@@ -1502,27 +1621,73 @@
       <div class="pack-overlay-backdrop" data-pack-close></div>
       <div class="pack-overlay-shell">
         <header class="pack-overlay-head">
-          <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky" aria-hidden="true"></span><span data-i18n="pack_overlay_kicker">Booster Drop</span></span>
-          <h2 id="pack-overlay-title" data-i18n="pack_overlay_title">Abriendo tu sobre</h2>
+          <div class="pack-head-info">
+            <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky" aria-hidden="true"></span><span data-i18n="pack_overlay_kicker">Booster Drop</span></span>
+            <h2 id="pack-overlay-title" data-i18n="pack_overlay_title">Abriendo tu sobre</h2>
+          </div>
+          <div class="pack-head-meta" id="pack-head-meta" hidden>
+            <span class="pack-card-counter" id="pack-card-counter">1 / 6</span>
+            <div class="pack-step-dots" id="pack-step-dots"></div>
+          </div>
           <button class="icon-btn pack-overlay-close" type="button" data-pack-close aria-label="Cerrar" data-i18n-aria-label="cancel">
             <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
           </button>
         </header>
 
+        <!-- 1. ETAPA SOBRE SELLADO (SE TOCA PARA ABRIR) -->
         <div class="pack-seal-wrap" id="pack-seal-wrap">
-          <div class="pack-seal" id="pack-seal">
+          <div class="pack-seal" id="pack-seal" tabindex="0" role="button" aria-label="Toca el sobre para abrirlo">
             <span class="pack-seal-brand">CardGram</span>
             <img id="pack-seal-img" alt="" width="300" height="420">
             <span class="pack-seal-name" id="pack-seal-name"></span>
             <span class="pack-seal-shine" aria-hidden="true"></span>
+            <span class="pack-seal-rip-fx" aria-hidden="true"></span>
           </div>
-          <p class="pack-seal-hint" data-i18n="pack_overlay_sealed">El sobre está vibrando…</p>
+          <button class="btn btn-primary pack-seal-open-btn" type="button" id="pack-seal-trigger-btn">
+            <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+            <span>Abrir sobre</span>
+          </button>
+          <p class="pack-seal-hint" id="pack-seal-hint">Toca el paquete para abrirlo y descubrir tus cartas una a una</p>
         </div>
 
-        <div class="pack-reveal-grid" id="pack-reveal-grid" aria-live="polite"></div>
+        <!-- 2. ETAPA TEATRO CARTA POR CARTA (POKÉMON POCKET STYLE) -->
+        <div class="pack-theater-wrap" id="pack-theater-wrap" hidden>
+          <div class="pack-theater-stage" id="pack-theater-stage">
+            <div class="pack-theater-card" id="pack-theater-card" tabindex="0" role="button" aria-label="Toca para avanzar a la siguiente carta">
+              <div class="pack-theater-card-inner" id="pack-theater-card-inner">
+                <div class="pack-theater-face pack-theater-back">
+                  <img src="assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp" alt="CardGram Back">
+                </div>
+                <div class="pack-theater-face pack-theater-front" id="pack-theater-front">
+                  <!-- Inyectado dinámicamente -->
+                </div>
+              </div>
+              <div class="pack-theater-hologram" aria-hidden="true"></div>
+            </div>
+          </div>
 
-        <div class="pack-overlay-actions">
-          <button class="btn btn-ghost btn-sm" type="button" id="pack-reveal-all" data-i18n="pack_reveal_all">Revelar todo</button>
+          <div class="pack-theater-nav">
+            <button class="btn btn-ghost btn-sm pack-theater-prev" type="button" id="pack-theater-prev" aria-label="Carta anterior">
+              <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+              <span>Anterior</span>
+            </button>
+            <span class="pack-theater-tap-hint" id="pack-theater-tap-hint" data-i18n="pack_card_reveal_tap">Toca la carta para revelar y avanzar</span>
+            <button class="btn btn-primary btn-sm pack-theater-next" type="button" id="pack-theater-next" aria-label="Siguiente carta">
+              <span>Siguiente</span>
+              <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. VISTA CUADRÍCULA / RESUMEN -->
+        <div class="pack-reveal-grid" id="pack-reveal-grid" aria-live="polite" hidden></div>
+
+        <div class="pack-overlay-actions" id="pack-overlay-actions">
+          <button class="btn btn-ghost btn-sm" type="button" id="pack-toggle-view" hidden>
+            <svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>
+            <span id="pack-toggle-view-text" data-i18n="pack_view_all">Ver todas</span>
+          </button>
+          <button class="btn btn-ghost btn-sm" type="button" id="pack-reveal-all" hidden data-i18n="pack_reveal_all">Revelar todo</button>
           <button class="btn btn-primary" type="button" id="pack-save" hidden data-i18n="pack_save">Guardar en mi colección</button>
         </div>
 

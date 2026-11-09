@@ -1470,3 +1470,39 @@ Object.assign(I18N.de, { shop_back_to_packs: 'Zurück', shop_pack_detail_hint: '
 Object.assign(I18N.es, { shop_pack_detail_reveal_hint: 'Toca cada carta para voltearla. Guarda tus nuevas cartas para completar el set.' });
 Object.assign(I18N.en, { shop_pack_detail_reveal_hint: 'Tap each card to flip it. Save your new cards to complete the set.' });
 Object.assign(I18N.de, { shop_pack_detail_reveal_hint: 'Tippe jede Karte zum Umdrehen. Speichere deine neuen Karten für das Set.' });
+Object.assign(I18N.es, {
+  collections_tab_created: 'Cartas creadas',
+  plaza_scope_local_title: 'Local (Panamá 🇵🇦)',
+  plaza_scope_local_desc: 'Explora la comunidad local, eventos presenciales, tiendas TCG en Panamá y cartas creadas por diseñadores de la región.',
+  plaza_scope_general_title: 'General (Global 🌍)',
+  plaza_scope_general_desc: 'Descubre las cartas más populares del mundo, tendencias globales, meca de TCGs y retos de creación internacionales.',
+  pack_card_counter: 'Carta {current} de {total}',
+  pack_next_card: 'Siguiente carta',
+  pack_view_all: 'Ver todas',
+  pack_theater_mode: 'Modo cine',
+  pack_card_reveal_tap: 'Toca la carta para revelar y avanzar'
+});
+Object.assign(I18N.en, {
+  collections_tab_created: 'Created cards',
+  plaza_scope_local_title: 'Local (Panama 🇵🇦)',
+  plaza_scope_local_desc: 'Explore the local community, in-person events, TCG hobby stores in Panama, and regional creator cards.',
+  plaza_scope_general_title: 'General (Global 🌍)',
+  plaza_scope_general_desc: 'Discover world trending cards, global metagame news, TCG hubs, and international design challenges.',
+  pack_card_counter: 'Card {current} of {total}',
+  pack_next_card: 'Next card',
+  pack_view_all: 'View all',
+  pack_theater_mode: 'Theater mode',
+  pack_card_reveal_tap: 'Tap card to reveal and proceed'
+});
+Object.assign(I18N.de, {
+  collections_tab_created: 'Erstellte Karten',
+  plaza_scope_local_title: 'Lokal (Panama 🇵🇦)',
+  plaza_scope_local_desc: 'Entdecke die lokale Community, Events, TCG-Läden in Panama und Karten von regionalen Designern.',
+  plaza_scope_general_title: 'Global (Weltweit 🌍)',
+  plaza_scope_general_desc: 'Entdecke weltweite Kartentrends, Meta-Updates, internationale TCG-Hotspots und globale Design-Challenges.',
+  pack_card_counter: 'Karte {current} von {total}',
+  pack_next_card: 'Nächste Karte',
+  pack_view_all: 'Alle ansehen',
+  pack_theater_mode: 'Kinomodus',
+  pack_card_reveal_tap: 'Karte antippen zum Aufdecken'
+});

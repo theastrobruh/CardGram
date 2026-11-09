@@ -13898,10 +13898,10 @@ body:not(.is-home-route) .hub-mobile-quick {
   justify-content: center;
 }
 
-/* Tienda del día en modo desktop: más a la derecha (al menos 25%) y más grande (al menos 30%) */
+/* Tienda del día en modo desktop: simétrica opuesta a los booster packs de la izquierda */
 @media (min-width: 981px) {
   .shop-stores {
-    right: 0.6% !important;
+    right: 2.5% !important;
     width: 298px !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
@@ -14260,4 +14260,598 @@ body:not(.is-home-route) .hub-mobile-quick {
   font-size: 0.68rem !important;
   font-weight: 800 !important;
   border-radius: 999px !important;
+}
+
+
+/* ==========================================================================
+   CardGram v0.5.5 — Soda Filling Loop FX & Pokémon Pocket Opening & Plaza Scope
+   ========================================================================== */
+
+/* 1. LOOP FX DE SODA BURBUJEANTE EN BARRAS DE PROGRESO */
+@keyframes soda-liquid-shift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes soda-bubbles-float {
+  0% {
+    transform: translateY(100%) scale(0.7);
+    opacity: 0.2;
+  }
+  30% {
+    opacity: 0.95;
+  }
+  75% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-120%) scale(1.15);
+    opacity: 0.1;
+  }
+}
+
+/* En la pantalla de selección del pack (.shop-pack-view) */
+.soda-meter-wrap {
+  position: relative;
+  width: 100%;
+  height: 14px;
+  background: rgba(4, 20, 32, 0.45);
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.45), 0 0 12px rgba(0, 242, 254, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+.soda-meter-bar {
+  position: relative;
+  height: 100%;
+  border-radius: 999px;
+  min-width: 8px;
+  transition: width 0.7s cubic-bezier(0.2, 0.9, 0.3, 1);
+  overflow: hidden;
+  background: linear-gradient(90deg, #00f2fe 0%, #4facfe 30%, #00e5ff 60%, #38ef7d 100%);
+  background-size: 200% 100%;
+  animation: soda-liquid-shift 3.5s linear infinite;
+}
+
+.soda-liquid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.soda-liquid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle 2.2px at 15% 50%, rgba(255, 255, 255, 0.95) 100%, transparent 0),
+    radial-gradient(circle 1.6px at 35% 35%, rgba(255, 255, 255, 0.9) 100%, transparent 0),
+    radial-gradient(circle 2.6px at 58% 65%, rgba(255, 255, 255, 0.95) 100%, transparent 0),
+    radial-gradient(circle 1.8px at 80% 45%, rgba(255, 255, 255, 0.9) 100%, transparent 0),
+    radial-gradient(circle 2.2px at 94% 55%, rgba(255, 255, 255, 0.95) 100%, transparent 0);
+  background-size: 50px 100%;
+  animation: soda-bubbles-float 1.25s linear infinite;
+}
+
+.soda-liquid::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: 999px 999px 0 0;
+}
+
+/* Barra de soda pequeña debajo del nombre de cada booster en Shop (.shop-pack) */
+.shop-pack-soda-meter {
+  display: block;
+  width: 86%;
+  height: 8px;
+  margin: 3px auto 4px;
+  background: rgba(3, 16, 26, 0.4);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.shop-pack-soda-fill {
+  display: block;
+  position: relative;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #00f2fe 0%, #4facfe 35%, #00e5ff 70%, #38ef7d 100%);
+  background-size: 200% 100%;
+  animation: soda-liquid-shift 3s linear infinite;
+  overflow: hidden;
+}
+
+.shop-pack-soda-liquid {
+  position: absolute;
+  inset: 0;
+}
+
+.shop-pack-soda-liquid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle 1.5px at 20% 50%, rgba(255, 255, 255, 0.9) 100%, transparent 0),
+    radial-gradient(circle 1.8px at 50% 50%, rgba(255, 255, 255, 0.95) 100%, transparent 0),
+    radial-gradient(circle 1.5px at 80% 50%, rgba(255, 255, 255, 0.9) 100%, transparent 0);
+  background-size: 32px 100%;
+  animation: soda-bubbles-float 1.1s linear infinite;
+}
+
+
+/* ==========================================================================
+   2. POKÉMON POCKET STYLE: BOOSTER PACK OPENING (CARTA POR CARTA EN PANTALLA COMPLETA)
+   ========================================================================== */
+.pack-open .shop-scene {
+  filter: blur(12px) brightness(0.65);
+}
+
+.pack-overlay-backdrop {
+  backdrop-filter: blur(18px) saturate(1.4) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.4) !important;
+  background: radial-gradient(circle at 50% 45%, rgba(6, 26, 42, 0.82), rgba(2, 10, 18, 0.94)) !important;
+}
+
+.pack-overlay-shell {
+  width: min(640px, 96vw) !important;
+  max-height: 96vh !important;
+  padding: 14px 18px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 25px 60px rgba(0, 5, 12, 0.6), 0 0 40px rgba(0, 242, 254, 0.25) !important;
+  border-radius: 28px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.pack-overlay-head {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding-right: 0 !important;
+  margin-bottom: 6px !important;
+}
+
+.pack-head-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pack-card-counter {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #00f0ff;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  background: rgba(0, 40, 60, 0.55);
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 240, 255, 0.35);
+}
+
+.pack-step-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.pack-step-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  transition: all 0.3s ease;
+}
+
+.pack-step-dot.is-revealed {
+  background: rgba(0, 242, 254, 0.6);
+}
+
+.pack-step-dot.is-active {
+  background: #00f2fe;
+  box-shadow: 0 0 8px #00f2fe;
+  transform: scale(1.3);
+}
+
+/* Sobre sellado flotante */
+.pack-seal-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px 0 16px;
+  width: 100%;
+}
+
+.pack-seal {
+  cursor: pointer;
+  transform: scale(1);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+}
+
+.pack-seal:hover {
+  transform: scale(1.04);
+}
+
+.pack-seal-open-btn {
+  margin-top: 4px;
+  min-height: 44px;
+  padding: 0 26px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  border-radius: 999px;
+  box-shadow: 0 10px 24px rgba(0, 242, 254, 0.35);
+}
+
+/* Etapa Teatro: Carta por carta (Pokémon Pocket) */
+.pack-theater-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  animation: fadeIn 0.4s ease;
+}
+
+.pack-theater-stage {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+  padding: 6px 0;
+}
+
+.pack-theater-card {
+  position: relative;
+  width: min(360px, 80vw);
+  height: min(510px, 64vh);
+  border-radius: 20px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.25s ease, box-shadow 0.3s ease;
+  animation: theaterCardEntrance 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 0 35px rgba(0, 242, 254, 0.3);
+}
+
+@keyframes theaterCardEntrance {
+  0% {
+    transform: translateY(30px) scale(0.92) rotateY(-15deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1) rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+.pack-theater-card:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.pack-theater-card-inner {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  background: #051420;
+}
+
+.pack-theater-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.pack-theater-card-head {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pack-theater-card-collection {
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.pack-theater-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pack-theater-card-foot {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding: 24px 14px 12px;
+  background: linear-gradient(180deg, transparent 0%, rgba(3, 14, 24, 0.88) 100%);
+  text-align: center;
+}
+
+.pack-theater-card-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* Shimmer holográfico reflectivo */
+.pack-theater-hologram {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    transparent 35%,
+    rgba(0, 242, 254, 0.35) 50%,
+    transparent 65%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  background-size: 200% 200%;
+  animation: soda-liquid-shift 4s ease infinite alternate;
+  mix-blend-mode: overlay;
+}
+
+/* Navegación del teatro */
+.pack-theater-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: min(380px, 90vw);
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.pack-theater-tap-hint {
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+}
+
+/* ==========================================================================
+   3. MODO SELECTOR (LOCAL VS. GENERAL) EN EXPLORE LA PLAZA
+   ========================================================================== */
+.plaza-scope-container {
+  width: 100%;
+  max-width: 860px;
+  margin: 12px auto 20px;
+  padding: 0 8px;
+}
+
+.plaza-scope-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.plaza-scope-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 24px rgba(7, 43, 56, 0.08);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  min-height: 110px;
+}
+
+.plaza-scope-card:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 14px 32px rgba(7, 43, 56, 0.14);
+}
+
+.plaza-scope-card.is-active {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(225, 250, 254, 0.9));
+  border-color: #00f2fe;
+  box-shadow: 0 0 0 2px #00f2fe, 0 14px 36px rgba(0, 242, 254, 0.25);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.plaza-scope-art {
+  position: relative;
+  flex: 0 0 72px;
+  height: 72px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(4, 25, 36, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plaza-scope-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.plaza-scope-card:hover .plaza-scope-img {
+  transform: scale(1.08);
+}
+
+.plaza-scope-badge {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  right: 2px;
+  font-size: 0.44rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-align: center;
+  padding: 2px 4px;
+  border-radius: 999px;
+  background: rgba(3, 18, 28, 0.75);
+  color: #ffffff;
+  backdrop-filter: blur(4px);
+}
+
+.plaza-scope-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.plaza-scope-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.plaza-scope-card.is-active .plaza-scope-title {
+  color: #086b7c;
+}
+
+.plaza-scope-desc {
+  margin: 0;
+  font-size: 0.58rem;
+  line-height: 1.35;
+  color: var(--muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.plaza-scope-indicator {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 0.46rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(0, 242, 254, 0.2);
+  color: #0b6574;
+  border: 1px solid rgba(0, 242, 254, 0.4);
+  opacity: 0;
+  transform: scale(0.85);
+  transition: all 0.25s ease;
+}
+
+.plaza-scope-card.is-active .plaza-scope-indicator {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Feed Hero Global styling */
+.plaza-hero-global {
+  background: linear-gradient(135deg, rgba(14, 25, 48, 0.85), rgba(4, 45, 68, 0.75)) !important;
+  color: #ffffff !important;
+}
+
+.plaza-hero-global h2 {
+  color: #ffffff !important;
+}
+
+.plaza-hero-global p {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.plaza-hero-global .plaza-hero-badge {
+  background: rgba(0, 242, 254, 0.25) !important;
+  color: #00f0ff !important;
+  border-color: rgba(0, 242, 254, 0.5) !important;
+}
+
+/* Badges de tarjetas en feeds */
+.meta-badge {
+  background: rgba(99, 102, 241, 0.2) !important;
+  color: #4338ca !important;
+  border-color: rgba(99, 102, 241, 0.35) !important;
+}
+
+.challenge-badge {
+  background: rgba(245, 158, 11, 0.2) !important;
+  color: #b45309 !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+.trending-badge {
+  background: rgba(236, 72, 153, 0.2) !important;
+  color: #be185d !important;
+  border-color: rgba(236, 72, 153, 0.35) !important;
+}
+
+.hub-badge {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #047857 !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+.store-badge {
+  background: rgba(56, 189, 248, 0.2) !important;
+  color: #0369a1 !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+}
+
+/* Responsive adjustment for scope selector */
+@media (max-width: 680px) {
+  .plaza-scope-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .plaza-scope-card {
+    min-height: 94px;
+    padding: 10px 12px;
+  }
+
+  .plaza-scope-art {
+    flex: 0 0 58px;
+    height: 58px;
+  }
 }

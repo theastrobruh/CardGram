@@ -690,7 +690,15 @@ function drawBoosterCards(collectionId) {
   return picked;
 }
 
-let packOverlayState = { cards: [], grant: null, timers: [] };
+let packOverlayState = {
+  cards: [],
+  grant: null,
+  timers: [],
+  currentIndex: 0,
+  revealedSet: new Set(),
+  isBurst: false,
+  viewMode: 'single'
+};
 
 function clearPackTimers() {
   packOverlayState.timers.forEach((timer) => window.clearTimeout(timer));
@@ -702,6 +710,136 @@ function closePackOverlay() {
   clearPackTimers();
   hub.els.packOverlay.hidden = true;
   document.body.classList.remove('pack-open');
+}
+
+function triggerPackRip() {
+  if (packOverlayState.isBurst) return;
+  packOverlayState.isBurst = true;
+  if (hub.els.packSeal) hub.els.packSeal.classList.add('is-burst');
+  if (hub.els.packSealTriggerBtn) hub.els.packSealTriggerBtn.hidden = true;
+  if (window.Sound) window.Sound.play('burst');
+
+  packOverlayState.timers.push(
+    window.setTimeout(() => {
+      if (hub.els.packSealWrap) hub.els.packSealWrap.hidden = true;
+      if (hub.els.packTheaterWrap) hub.els.packTheaterWrap.hidden = false;
+      if (hub.els.packHeadMeta) hub.els.packHeadMeta.hidden = false;
+      if (hub.els.packToggleView) hub.els.packToggleView.hidden = false;
+
+      if (hub.els.packRevealGrid) {
+        hub.els.packRevealGrid.replaceChildren(
+          ...packOverlayState.cards
+            .map((id) => HUB_CATALOG.byId(id))
+            .filter(Boolean)
+            .map((card, index) => buildPackCard(card, index))
+        );
+      }
+      renderTheaterCard(0);
+    }, 650)
+  );
+}
+
+function renderTheaterCard(index) {
+  if (!packOverlayState.cards.length) return;
+  if (index < 0) index = 0;
+  if (index >= packOverlayState.cards.length) index = packOverlayState.cards.length - 1;
+  packOverlayState.currentIndex = index;
+  packOverlayState.revealedSet.add(index);
+
+  const cardId = packOverlayState.cards[index];
+  const card = HUB_CATALOG.byId(cardId);
+  if (!card) return;
+
+  const total = packOverlayState.cards.length;
+  const currentNum = index + 1;
+
+  if (hub.els.packCardCounter) {
+    hub.els.packCardCounter.textContent = `${currentNum} / ${total}`;
+  }
+  if (hub.els.packStepDots) {
+    hub.els.packStepDots.innerHTML = packOverlayState.cards
+      .map((_, i) => `<span class="pack-step-dot ${i === index ? 'is-active' : ''} ${packOverlayState.revealedSet.has(i) ? 'is-revealed' : ''}"></span>`)
+      .join('');
+  }
+
+  if (hub.els.packTheaterPrev) {
+    hub.els.packTheaterPrev.disabled = index === 0;
+  }
+  if (hub.els.packTheaterNext) {
+    if (index === total - 1) {
+      hub.els.packTheaterNext.innerHTML = '<span>Completar</span><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>';
+    } else {
+      hub.els.packTheaterNext.innerHTML = '<span>Siguiente</span><svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>';
+    }
+  }
+
+  const rarity = cardRarity(card);
+  if (hub.els.packTheaterFront) {
+    hub.els.packTheaterFront.replaceChildren();
+
+    const head = makeNode('div', 'pack-theater-card-head');
+    head.appendChild(makeNode('span', `pack-card-rarity rarity-${rarity.id}`, t(`rarity_${rarity.id}`)));
+    head.appendChild(makeNode('span', 'pack-theater-card-collection', card.collectionName || 'CardGram'));
+
+    const img = makeHubImage(card.thumbFront || card.front, card.name);
+    img.className = 'pack-theater-img';
+
+    const foot = makeNode('div', 'pack-theater-card-foot');
+    foot.appendChild(makeNode('strong', 'pack-theater-card-title', card.name));
+
+    hub.els.packTheaterFront.append(head, img, foot);
+  }
+
+  if (hub.els.packTheaterCard) {
+    hub.els.packTheaterCard.className = `pack-theater-card rarity-${rarity.id} is-revealed`;
+    hub.els.packTheaterCard.style.animation = 'none';
+    hub.els.packTheaterCard.offsetHeight;
+    hub.els.packTheaterCard.style.animation = '';
+  }
+
+  if (window.Sound) {
+    window.Sound.play(['legendary', 'mythic'].includes(rarity.id) ? 'success' : 'flip');
+  }
+
+  revealPackCard(index);
+
+  if (packOverlayState.revealedSet.size >= total) {
+    claimBoosterPackSilently();
+    if (hub.els.packEndActions) hub.els.packEndActions.hidden = false;
+  }
+}
+
+function nextTheaterCard() {
+  const nextIdx = packOverlayState.currentIndex + 1;
+  if (nextIdx < packOverlayState.cards.length) {
+    renderTheaterCard(nextIdx);
+  } else {
+    claimBoosterPackSilently();
+    if (hub.els.packEndActions) hub.els.packEndActions.hidden = false;
+    togglePackView('grid');
+  }
+}
+
+function prevTheaterCard() {
+  const prevIdx = packOverlayState.currentIndex - 1;
+  if (prevIdx >= 0) {
+    renderTheaterCard(prevIdx);
+  }
+}
+
+function togglePackView(forceMode) {
+  const targetMode = forceMode || (packOverlayState.viewMode === 'single' ? 'grid' : 'single');
+  packOverlayState.viewMode = targetMode;
+
+  if (targetMode === 'grid') {
+    if (hub.els.packTheaterWrap) hub.els.packTheaterWrap.hidden = true;
+    if (hub.els.packRevealGrid) hub.els.packRevealGrid.hidden = false;
+    if (hub.els.packToggleViewText) hub.els.packToggleViewText.textContent = t('pack_theater_mode') || 'Modo cine';
+  } else {
+    if (hub.els.packTheaterWrap) hub.els.packTheaterWrap.hidden = false;
+    if (hub.els.packRevealGrid) hub.els.packRevealGrid.hidden = true;
+    if (hub.els.packToggleViewText) hub.els.packToggleViewText.textContent = t('pack_view_all') || 'Ver todas';
+  }
 }
 
 function revealPackCard(index) {
@@ -729,6 +867,8 @@ function revealAllPackCards() {
   Array.from(hub.els.packRevealGrid.querySelectorAll('.pack-card')).forEach((card) => {
     revealPackCard(Number(card.dataset.packCard));
   });
+  claimBoosterPackSilently();
+  if (hub.els.packEndActions) hub.els.packEndActions.hidden = false;
 }
 
 function buildPackCard(card, index) {
@@ -758,6 +898,10 @@ function openPackOverlay() {
 
   packOverlayState.cards = hubBooster.picks.slice();
   packOverlayState.grant = hubBooster.pendingGrant || null;
+  packOverlayState.currentIndex = 0;
+  packOverlayState.revealedSet = new Set();
+  packOverlayState.isBurst = false;
+  packOverlayState.viewMode = 'single';
   clearPackTimers();
 
   if (hub.els.packSealImg) {
@@ -767,7 +911,14 @@ function openPackOverlay() {
   if (hub.els.packSealName) hub.els.packSealName.textContent = collection.name;
   if (hub.els.packSeal) hub.els.packSeal.classList.remove('is-burst');
   if (hub.els.packSealWrap) hub.els.packSealWrap.hidden = false;
-  if (hub.els.packRevealGrid) hub.els.packRevealGrid.replaceChildren();
+  if (hub.els.packSealTriggerBtn) hub.els.packSealTriggerBtn.hidden = false;
+  if (hub.els.packTheaterWrap) hub.els.packTheaterWrap.hidden = true;
+  if (hub.els.packRevealGrid) {
+    hub.els.packRevealGrid.replaceChildren();
+    hub.els.packRevealGrid.hidden = true;
+  }
+  if (hub.els.packHeadMeta) hub.els.packHeadMeta.hidden = true;
+  if (hub.els.packToggleView) hub.els.packToggleView.hidden = true;
   if (hub.els.packRevealAll) hub.els.packRevealAll.hidden = true;
   if (hub.els.packSave) hub.els.packSave.hidden = true;
   if (hub.els.packEndActions) hub.els.packEndActions.hidden = true;
@@ -775,28 +926,6 @@ function openPackOverlay() {
   hub.els.packOverlay.hidden = false;
   document.body.classList.add('pack-open');
   if (window.Sound) window.Sound.play('booster');
-
-  packOverlayState.timers.push(
-    window.setTimeout(() => {
-      if (hub.els.packSeal) hub.els.packSeal.classList.add('is-burst');
-      if (window.Sound) window.Sound.play('burst');
-    }, 700)
-  );
-
-  packOverlayState.timers.push(
-    window.setTimeout(() => {
-      if (hub.els.packSealWrap) hub.els.packSealWrap.hidden = true;
-      if (!hub.els.packRevealGrid) return;
-      hub.els.packRevealGrid.replaceChildren(
-        ...packOverlayState.cards
-          .map((id) => HUB_CATALOG.byId(id))
-          .filter(Boolean)
-          .map((card, index) => buildPackCard(card, index))
-      );
-      if (hub.els.packRevealAll) hub.els.packRevealAll.hidden = false;
-      // Cards start face-down and floating in 3x2 grid, waiting for user click/tap!
-    }, 1400)
-  );
 }
 
 function openBoosterPack() {
@@ -1336,7 +1465,11 @@ function renderShopPackDetail() {
   if (hub.els.shopPackViewPercent) {
     const owned = ownedIn(collection.id).length;
     const total = collection.cards.length;
-    hub.els.shopPackViewPercent.textContent = `${total ? Math.round((owned / total) * 100) : 0}%`;
+    const pct = total ? Math.round((owned / total) * 100) : 0;
+    hub.els.shopPackViewPercent.textContent = `${pct}%`;
+    if (hub.els.shopPackViewMeterBar) {
+      hub.els.shopPackViewMeterBar.style.width = `${Math.max(6, pct)}%`;
+    }
   }
   fillShopPackPreview(hub.els.shopPackViewCards, collection);
 
@@ -1384,8 +1517,8 @@ function openBoosterFromDetail() {
     persistBooster();
     renderBooster();
   }
-  renderShopPackDetail();
-  if (window.Sound) window.Sound.play('success');
+  closeShopPackView();
+  openPackOverlay();
 }
 
 function openShopPackView(collectionId) {
@@ -1457,6 +1590,15 @@ function renderShopRecommended(sets) {
       const owned = ownedIn(collection.id).length;
       const total = collection.cards.length;
       const percent = total ? Math.round((owned / total) * 100) : 0;
+
+      // Barra de progreso de soda líquida burbujeante y colorida
+      const meter = makeNode('span', 'shop-pack-soda-meter');
+      const fill = makeNode('span', 'shop-pack-soda-fill');
+      fill.style.width = `${Math.max(6, percent)}%`;
+      const liquid = makeNode('span', 'shop-pack-soda-liquid');
+      fill.appendChild(liquid);
+      meter.appendChild(fill);
+      button.appendChild(meter);
 
       button.appendChild(makeNode('small', 'shop-pack-count', countLabel('explore_pack_cards', collection.cards.length)));
       button.appendChild(makeNode('small', 'shop-pack-percent-badge', `${percent}%`));
@@ -4597,6 +4739,43 @@ function makeExplorePlazaCard() {
   return button;
 }
 
+
+let plazaScope = 'local';
+try {
+  const savedScope = localStorage.getItem('cardgram.plaza.scope');
+  if (savedScope === 'local' || savedScope === 'general') plazaScope = savedScope;
+} catch (err) {
+  /* ignore */
+}
+
+function setPlazaScope(scope) {
+  if (scope !== 'local' && scope !== 'general') return;
+  plazaScope = scope;
+  try {
+    localStorage.setItem('cardgram.plaza.scope', scope);
+  } catch (err) {
+    /* ignore */
+  }
+  renderPlazaScope();
+}
+
+function renderPlazaScope() {
+  if (hub.els.plazaScopeGrid) {
+    const cards = hub.els.plazaScopeGrid.querySelectorAll('[data-plaza-scope]');
+    cards.forEach((btn) => {
+      const active = btn.dataset.plazaScope === plazaScope;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-selected', String(active));
+    });
+  }
+  if (hub.els.plazaFeedLocal) {
+    hub.els.plazaFeedLocal.hidden = plazaScope !== 'local';
+  }
+  if (hub.els.plazaFeedGeneral) {
+    hub.els.plazaFeedGeneral.hidden = plazaScope !== 'general';
+  }
+}
+
 function renderExplore() {
   if (!hub.ready || !hub.els.exploreCreators) return;
   loadShopPackArt();
@@ -4619,7 +4798,10 @@ function renderExplore() {
     hub.els.explorePackCount.textContent = countLabel('explore_pack_count', packs.length);
   }
 
-  if (plazaOpen) return;
+  if (plazaOpen) {
+    renderPlazaScope();
+    return;
+  }
 
   if (!creatorOpen) {
     if (hub.els.explorePlazaList) {
@@ -5441,6 +5623,40 @@ function onHubClick(event) {
   if (target.closest('[data-pack-close]')) {
     event.preventDefault();
     closePackOverlay();
+    return;
+  }
+
+  // Interacción con sobre sellado
+  if (target.closest('#pack-seal') || target.closest('#pack-seal-trigger-btn')) {
+    event.preventDefault();
+    triggerPackRip();
+    return;
+  }
+
+  // Interacción con carta en teatro / siguiente carta (Pokémon Pocket style)
+  if (target.closest('#pack-theater-card') || target.closest('#pack-theater-next')) {
+    event.preventDefault();
+    nextTheaterCard();
+    return;
+  }
+
+  if (target.closest('#pack-theater-prev')) {
+    event.preventDefault();
+    prevTheaterCard();
+    return;
+  }
+
+  if (target.closest('#pack-toggle-view')) {
+    event.preventDefault();
+    togglePackView();
+    return;
+  }
+
+  const plazaScopeBtn = target.closest('[data-plaza-scope]');
+  if (plazaScopeBtn) {
+    event.preventDefault();
+    setPlazaScope(plazaScopeBtn.dataset.plazaScope);
+    if (window.Sound) window.Sound.play('flip');
     return;
   }
 
@@ -6341,10 +6557,25 @@ function cacheHubDom() {
   els.packSealWrap = hubEl('pack-seal-wrap');
   els.packSealImg = hubEl('pack-seal-img');
   els.packSealName = hubEl('pack-seal-name');
+  els.packSealTriggerBtn = hubEl('pack-seal-trigger-btn');
+  els.packTheaterWrap = hubEl('pack-theater-wrap');
+  els.packTheaterCard = hubEl('pack-theater-card');
+  els.packTheaterFront = hubEl('pack-theater-front');
+  els.packTheaterPrev = hubEl('pack-theater-prev');
+  els.packTheaterNext = hubEl('pack-theater-next');
+  els.packCardCounter = hubEl('pack-card-counter');
+  els.packStepDots = hubEl('pack-step-dots');
+  els.packHeadMeta = hubEl('pack-head-meta');
+  els.packToggleView = hubEl('pack-toggle-view');
+  els.packToggleViewText = hubEl('pack-toggle-view-text');
   els.packRevealGrid = hubEl('pack-reveal-grid');
   els.packRevealAll = hubEl('pack-reveal-all');
   els.packSave = hubEl('pack-save');
   els.packEndActions = hubEl('pack-end-actions');
+  els.shopPackViewMeterBar = hubEl('shop-pack-view-meter-bar');
+  els.plazaScopeGrid = hubEl('plaza-scope-grid');
+  els.plazaFeedLocal = hubEl('plaza-feed-local');
+  els.plazaFeedGeneral = hubEl('plaza-feed-general');
   els.topName = hubEl('hub-profile-name');
   els.topHandle = hubEl('hub-profile-handle');
   els.avatar = hubEl('hub-avatar');
