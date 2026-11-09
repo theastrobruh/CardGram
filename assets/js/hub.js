@@ -1599,6 +1599,7 @@ function renderShopRecommended(sets) {
 function renderBooster() {
   if (!hub.ready || !hub.els.boosterPanel) return;
   ensureBoosterDay();
+  setTimeout(setupShopPlaygroundAll, 80);
 
   const sets = boosterSets();
   if (!hubBooster.setId && sets.length) {
@@ -5337,6 +5338,7 @@ function setActivePanel(panel, options = {}) {
     renderLibrary();
   } else if (target === 'booster') {
     renderBooster();
+    setTimeout(setupShopPlaygroundAll, 120);
   } else if (target === 'collections') {
     renderCollections();
   } else if (target === 'explore') {
@@ -6892,6 +6894,10 @@ window.addEventListener('load', () => {
 const shopPlaygroundStates = new Map();
 let shopPlaygroundSuppressClick = 0;
 
+function isShopDesktop() {
+  return window.matchMedia('(min-width: 981px)').matches;
+}
+
 function getPlaygroundState(el) {
   if (!shopPlaygroundStates.has(el)) {
     shopPlaygroundStates.set(el, {
@@ -6939,13 +6945,16 @@ function showPlaygroundScaleBadge(el, scale) {
 }
 
 function attachShopPlayground(el) {
-  if (!el || el._hasPlayground) return;
-  el._hasPlayground = true;
+  if (!el || el._hasPlaygroundAttached) return;
+  el._hasPlaygroundAttached = true;
 
   const state = getPlaygroundState(el);
 
+  // Evitar arrastre nativo de imágenes en HTML5
+  el.addEventListener('dragstart', (e) => e.preventDefault());
+
   el.addEventListener('pointerdown', (e) => {
-    if (window.innerWidth <= 980) return; // Solo en desktop
+    if (!isShopDesktop()) return;
     if (e.button !== 0) return; // Solo clic primario
 
     // Cancelar cualquier física previa
@@ -6964,14 +6973,12 @@ function attachShopPlayground(el) {
     state.lastY = e.clientY;
     state.lastTime = performance.now();
 
-    try { el.setPointerCapture(e.pointerId); } catch (err) {}
-
     const onPointerMove = (moveEvent) => {
       const dist = Math.hypot(moveEvent.clientX - state.startX, moveEvent.clientY - state.startY);
-      if (dist > 5) {
+      if (dist > 4) {
         state.isDragging = true;
         state.hasMoved = true;
-        el.classList.add('is-playground-active');
+        el.classList.add('is-dragging');
       }
 
       if (state.isDragging) {
@@ -6995,33 +7002,32 @@ function attachShopPlayground(el) {
     };
 
     const onPointerUp = (upEvent) => {
-      el.removeEventListener('pointermove', onPointerMove);
-      el.removeEventListener('pointerup', onPointerUp);
-      el.removeEventListener('pointercancel', onPointerUp);
-      try { el.releasePointerCapture(upEvent.pointerId); } catch (err) {}
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
 
-      el.classList.remove('is-playground-active');
+      el.classList.remove('is-dragging');
 
       if (state.hasMoved) {
-        shopPlaygroundSuppressClick = Date.now() + 250;
+        shopPlaygroundSuppressClick = Date.now() + 350;
       }
 
       state.isDragging = false;
 
       // Iniciar física de lanzamiento y rebote en los bordes
-      if (state.hasMoved && Math.hypot(state.vx, state.vy) > 0.5) {
+      if (state.hasMoved && Math.hypot(state.vx, state.vy) > 0.4) {
         runPlaygroundPhysics(el, state);
       }
     };
 
-    el.addEventListener('pointermove', onPointerMove);
-    el.addEventListener('pointerup', onPointerUp);
-    el.addEventListener('pointercancel', onPointerUp);
+    window.addEventListener('pointermove', onPointerMove, { passive: false });
+    window.addEventListener('pointerup', onPointerUp, { passive: false });
+    window.addEventListener('pointercancel', onPointerUp, { passive: false });
   });
 
   // Modificación de tamaño con la rueda del ratón
   el.addEventListener('wheel', (e) => {
-    if (window.innerWidth <= 980) return;
+    if (!isShopDesktop()) return;
     e.preventDefault();
     e.stopPropagation();
 
@@ -7055,32 +7061,32 @@ function runPlaygroundPhysics(el, state) {
       // Izquierda
       if (elRect.left < sRect.left && state.vx < 0) {
         state.x += (sRect.left - elRect.left);
-        state.vx = -state.vx * 0.76;
+        state.vx = -state.vx * 0.78;
         triggerPlaygroundBounce(el);
       }
       // Derecha
       if (elRect.right > sRect.right && state.vx > 0) {
         state.x -= (elRect.right - sRect.right);
-        state.vx = -state.vx * 0.76;
+        state.vx = -state.vx * 0.78;
         triggerPlaygroundBounce(el);
       }
       // Arriba
       if (elRect.top < sRect.top && state.vy < 0) {
         state.y += (sRect.top - elRect.top);
-        state.vy = -state.vy * 0.76;
+        state.vy = -state.vy * 0.78;
         triggerPlaygroundBounce(el);
       }
       // Abajo
       if (elRect.bottom > sRect.bottom && state.vy > 0) {
         state.y -= (elRect.bottom - sRect.bottom);
-        state.vy = -state.vy * 0.76;
+        state.vy = -state.vy * 0.78;
         triggerPlaygroundBounce(el);
       }
     }
 
     updatePlaygroundTransform(el, state);
 
-    if (Math.hypot(state.vx, state.vy) > 0.15) {
+    if (Math.hypot(state.vx, state.vy) > 0.12) {
       state.animId = requestAnimationFrame(step);
     } else {
       state.animId = null;
@@ -7124,7 +7130,7 @@ function resetShopPlayground() {
 }
 
 function setupShopPlaygroundAll() {
-  if (window.innerWidth <= 980) return;
+  if (!isShopDesktop()) return;
 
   // 1. Azura (NPC)
   const npc = document.querySelector('.shop-npc');

@@ -16068,3 +16068,84 @@ body:not(.is-home-route) .hub-mobile-quick {
   border: 1px solid rgba(255, 255, 255, 0.95) !important;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08) !important;
 }
+
+/* ==========================================================================
+   DESKTOP SHOP PLAYGROUND ROBUST OVERRIDES
+   ========================================================================== */
+@media (min-width: 981px) {
+  .shop-recommended .shop-pack {
+    animation: none !important;
+    touch-action: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -webkit-user-drag: none !important;
+    cursor: grab !important;
+    transform-origin: center center !important;
+    will-change: transform !important;
+  }
+
+  .shop-recommended .shop-pack:hover {
+    animation: none !important;
+  }
+
+  .shop-recommended .shop-pack * {
+    pointer-events: none !important;
+    user-select: none !important;
+    -webkit-user-drag: none !important;
+  }
+
+  .shop-recommended .shop-pack.is-dragging {
+    cursor: grabbing !important;
+    z-index: 100 !important;
+    box-shadow: 0 20px 48px rgba(0, 242, 254, 0.45) !important;
+    border-color: #00f2fe !important;
+  }
+
+  .shop-npc {
+    pointer-events: auto !important;
+    touch-action: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -webkit-user-drag: none !important;
+    cursor: grab !important;
+    transform-origin: center bottom !important;
+    will-change: transform !important;
+  }
+
+  .shop-npc * {
+    pointer-events: none !important;
+    user-select: none !important;
+    -webkit-user-drag: none !important;
+  }
+
+  .shop-npc.is-dragging {
+    cursor: grabbing !important;
+    z-index: 90 !important;
+  }
+
+  .shop-stores {
+    pointer-events: auto !important;
+    touch-action: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -webkit-user-drag: none !important;
+    cursor: grab !important;
+    transform-origin: center center !important;
+    will-change: transform !important;
+  }
+
+  .shop-stores * {
+    pointer-events: none !important;
+    user-select: none !important;
+    -webkit-user-drag: none !important;
+  }
+
+  .shop-stores.is-dragging {
+    cursor: grabbing !important;
+    z-index: 95 !important;
+  }
+
+  .is-bouncing {
+    filter: drop-shadow(0 0 24px rgba(0, 242, 254, 0.75)) !important;
+  }
+}
