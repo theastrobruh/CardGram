@@ -1289,7 +1289,7 @@ function renderShopStores(recommended) {
     ...recommended.map(() => {
       const button = makeHubButton('shop-store', null, { hubRoute: 'explore' });
       const art = makeNode('span', 'shop-store-art');
-      art.appendChild(makeHubImage('assets/data/shops/theastrobruh-cover.webp', 'theAstroBruh Shop'));
+      art.appendChild(makeHubImage('assets/data/shops/theastrobruh-cover.png', 'theAstroBruh Shop'));
       button.appendChild(art);
       button.appendChild(makeNode('strong', null, 'theAstroBruh'));
       button.appendChild(makeNode('small', null, t('explore_enter_shop')));
@@ -4233,7 +4233,7 @@ function explorePacks() {
 function makeExploreCreatorCard() {
   const button = makeHubButton('explore-creator explore-shop', null, { exploreCreator: 'theastrobruh' });
   const cover = makeNode('span', 'explore-shop-cover');
-  cover.appendChild(makeHubImage('assets/data/shops/theastrobruh-cover.webp', 'theAstroBruh Shop'));
+  cover.appendChild(makeHubImage('assets/data/shops/theastrobruh-cover.png', 'theAstroBruh Shop'));
   button.appendChild(cover);
 
   const body = makeNode('span', 'explore-shop-body');
