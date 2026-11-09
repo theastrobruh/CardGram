@@ -718,7 +718,9 @@ function revealPackCard(index) {
   const revealed = hub.els.packRevealGrid.querySelectorAll('.pack-card.is-revealed');
   if (all.length && revealed.length === all.length) {
     if (hub.els.packRevealAll) hub.els.packRevealAll.hidden = true;
-    if (hub.els.packSave) hub.els.packSave.hidden = false;
+    if (hub.els.packSave) hub.els.packSave.hidden = true;
+    if (hub.els.packEndActions) hub.els.packEndActions.hidden = false;
+    claimBoosterPackSilently();
   }
 }
 
@@ -768,14 +770,17 @@ function openPackOverlay() {
   if (hub.els.packRevealGrid) hub.els.packRevealGrid.replaceChildren();
   if (hub.els.packRevealAll) hub.els.packRevealAll.hidden = true;
   if (hub.els.packSave) hub.els.packSave.hidden = true;
+  if (hub.els.packEndActions) hub.els.packEndActions.hidden = true;
 
   hub.els.packOverlay.hidden = false;
   document.body.classList.add('pack-open');
+  if (window.Sound) window.Sound.play('booster');
 
   packOverlayState.timers.push(
     window.setTimeout(() => {
       if (hub.els.packSeal) hub.els.packSeal.classList.add('is-burst');
-    }, 1050)
+      if (window.Sound) window.Sound.play('burst');
+    }, 700)
   );
 
   packOverlayState.timers.push(
@@ -789,12 +794,8 @@ function openPackOverlay() {
           .map((card, index) => buildPackCard(card, index))
       );
       if (hub.els.packRevealAll) hub.els.packRevealAll.hidden = false;
-      Array.from(hub.els.packRevealGrid.children).forEach((card, index) => {
-        packOverlayState.timers.push(
-          window.setTimeout(() => revealPackCard(index), 450 + index * 360)
-        );
-      });
-    }, 1650)
+      // Cards start face-down and floating in 3x2 grid, waiting for user click/tap!
+    }, 1400)
   );
 }
 
@@ -820,6 +821,29 @@ function openBoosterPack() {
   persistBooster();
   renderBooster();
   openPackOverlay();
+}
+
+
+function claimBoosterPackSilently() {
+  ensureBoosterDay();
+  if (!hubBooster.picks.length) return;
+  const collection = HUB_CATALOG.collections.find((entry) => entry.id === hubBooster.setId);
+  if (!collection) return;
+
+  const owned = new Set(ownedIn(collection.id));
+  hubBooster.picks.forEach((cardId) => {
+    const card = HUB_CATALOG.byId(cardId);
+    if (card && card.collectionId === collection.id) owned.add(cardId);
+  });
+  hubBooster.owned[collection.id] = Array.from(owned);
+  if (hubBooster.pendingGrant && !hubBooster.usedGrants.includes(hubBooster.pendingGrant)) {
+    hubBooster.usedGrants.push(hubBooster.pendingGrant);
+  }
+  hubBooster.pendingGrant = null;
+  hubBooster.picks = [];
+  persistBooster();
+  renderBooster();
+  renderCollectionRail();
 }
 
 function claimBoosterPack() {
@@ -1388,7 +1412,7 @@ function renderShopStores(recommended) {
 
       const building = makeNode('span', 'shop-store-building');
       const art = makeNode('span', 'shop-store-art');
-      art.appendChild(makeHubImage('assets/data/shops/theastrobruh-cover.webp', 'Astro~Verse Shop'));
+      art.appendChild(makeHubImage('assets/data/shops/theastrobruh-cover.png', 'Astro~Verse Shop'));
       building.appendChild(art);
       building.appendChild(makeNode('span', 'shop-store-name', 'Astro~Verse'));
       button.appendChild(building);
@@ -1428,8 +1452,14 @@ function renderShopRecommended(sets) {
         art.appendChild(makeHubImage(collection.thumbCover || collection.cover || collection.cards[0]?.thumbFront || '', collection.name));
       }
       button.appendChild(art);
-      button.appendChild(makeNode('strong', null, collection.name));
-      button.appendChild(makeNode('small', null, countLabel('explore_pack_cards', collection.cards.length)));
+      button.appendChild(makeNode('strong', 'shop-pack-name', collection.name));
+
+      const owned = ownedIn(collection.id).length;
+      const total = collection.cards.length;
+      const percent = total ? Math.round((owned / total) * 100) : 0;
+
+      button.appendChild(makeNode('small', 'shop-pack-count', countLabel('explore_pack_cards', collection.cards.length)));
+      button.appendChild(makeNode('small', 'shop-pack-percent-badge', `${percent}%`));
       return button;
     })
   );
@@ -3609,31 +3639,24 @@ function renderCollectionsOverview() {
 
   if (hub.els.createdGrid) {
     const created = typeof presets !== 'undefined' && Array.isArray(presets) ? presets : [];
-    const userBox = (src, label) => {
-      const button = makeHubButton('deck-box-card is-user-box', null, {});
-      const cover = makeNode('span', 'deck-box-cover');
-      const boxImg = makeNode('img', 'deck-box-img');
-      boxImg.src = src;
-      boxImg.alt = label;
-      boxImg.loading = 'lazy';
-      cover.appendChild(boxImg);
-      button.appendChild(cover);
+    const count = created.length;
+    const boxSrc = userBoxFor(0);
+    const button = makeHubButton('deck-box-card is-user-box', null, { collectionId: 'user-created' });
+    const cover = makeNode('span', 'deck-box-cover');
+    const boxImg = makeNode('img', 'deck-box-img');
+    boxImg.src = boxSrc;
+    boxImg.alt = t('collections_tab_created') || 'Cartas creadas';
+    boxImg.loading = 'lazy';
+    cover.appendChild(boxImg);
+    button.appendChild(cover);
 
-      const body = makeNode('span', 'deck-box-body');
-      body.appendChild(makeNode('span', 'deck-box-title', label));
-      body.appendChild(makeNode('span', 'deck-box-desc', '100%'));
-      button.appendChild(body);
-      return button;
-    };
-    const tiles = created.length
-      ? created.map((preset, index) => {
-          const button = userBox(userBoxFor(index), preset.name);
-          button.dataset.deckBoxPreset = preset.id;
-          return button;
-        })
-      : hubDeckBoxes.map((src) => userBox(src, t('collections_upload_box')));
-    hub.els.createdGrid.replaceChildren(...tiles);
-    if (hub.els.createdEmpty) hub.els.createdEmpty.hidden = tiles.length > 0;
+    const body = makeNode('span', 'deck-box-body');
+    body.appendChild(makeNode('span', 'deck-box-title', t('collections_tab_created') || 'Cartas creadas'));
+    body.appendChild(makeNode('span', 'deck-box-desc', count === 1 ? '1 carta' : `${count} cartas`));
+    button.appendChild(body);
+
+    hub.els.createdGrid.replaceChildren(button);
+    if (hub.els.createdEmpty) hub.els.createdEmpty.hidden = true;
   }
 
   if (hub.els.decksGrid) {
@@ -3725,7 +3748,68 @@ function markCollectionReviewed(id) {
   renderCollectionRail();
 }
 
+
+function renderUserCreatedCardsDetail() {
+  if (!hub.els.collectionDetailHead || !hub.els.collectionDetailGrid) return;
+  hub.els.collectionDetailHead.replaceChildren();
+
+  const stack = makeNode('div', 'collection-stack');
+  const boxImg = makeNode('img', 'deck-box-img');
+  boxImg.src = userBoxFor(0);
+  boxImg.alt = 'Cartas creadas';
+  stack.appendChild(boxImg);
+  hub.els.collectionDetailHead.appendChild(stack);
+
+  const copy = makeNode('div', 'hub-detail-copy');
+  copy.appendChild(makeNode('span', 'collection-eyebrow', t('hub_nav_library') || 'Inventario'));
+  copy.appendChild(makeNode('h1', null, t('collections_tab_created') || 'Cartas creadas'));
+  copy.appendChild(
+    makeNode('p', null, 'Tus diseños y cartas personalizadas creadas en eCard Studio.')
+  );
+
+  const created = typeof presets !== 'undefined' && Array.isArray(presets) ? presets : [];
+  const meta = makeNode('div', 'hub-detail-meta');
+  meta.appendChild(
+    makeNode('span', 'hub-chip', created.length === 1 ? '1 carta creada' : `${created.length} cartas creadas`)
+  );
+  copy.appendChild(meta);
+  hub.els.collectionDetailHead.appendChild(copy);
+
+  if (created.length === 0) {
+    const empty = makeNode('div', 'hub-empty-state');
+    empty.style.textAlign = 'center';
+    empty.style.padding = '32px 16px';
+    empty.style.gridColumn = '1 / -1';
+    empty.appendChild(makeNode('p', null, 'Aún no has creado cartas en eCard Studio.'));
+    const btn = makeHubButton('btn btn-primary', 'Crear primera carta', { hubRoute: 'studio' });
+    btn.appendChild(hubIcon('sparkles'));
+    empty.appendChild(btn);
+    hub.els.collectionDetailGrid.replaceChildren(empty);
+    return;
+  }
+
+  hub.els.collectionDetailGrid.replaceChildren(
+    ...created.map((preset) => {
+      const card = createMediaCard({
+        kind: 'preset',
+        id: preset.id,
+        name: preset.name,
+        subtitle: 'Personalizada',
+        image: preset.front || preset.back || 'assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp',
+        badge: 'Custom',
+        isFavorite: hubProfile.favoriteCardId === preset.id,
+        preview: true
+      });
+      return card;
+    })
+  );
+}
+
 function renderCollectionDetail() {
+  if (hub.collectionId === 'user-created') {
+    renderUserCreatedCardsDetail();
+    return;
+  }
   const collection = HUB_CATALOG.collections.find((entry) => entry.id === hub.collectionId);
   if (!collection) {
     hub.collectionId = null;
@@ -5366,6 +5450,30 @@ function onHubClick(event) {
     return;
   }
 
+  if (target.closest('[data-pack-to-shop]')) {
+    event.preventDefault();
+    claimBoosterPackSilently();
+    closePackOverlay();
+    navigate('booster');
+    return;
+  }
+
+  if (target.closest('[data-pack-to-inventory]')) {
+    event.preventDefault();
+    claimBoosterPackSilently();
+    closePackOverlay();
+    navigate('collections');
+    return;
+  }
+
+  if (target.closest('[data-pack-to-home]')) {
+    event.preventDefault();
+    claimBoosterPackSilently();
+    closePackOverlay();
+    navigate('home');
+    return;
+  }
+
   if (target.closest('#pack-save')) {
     event.preventDefault();
     claimBoosterPack();
@@ -6236,6 +6344,7 @@ function cacheHubDom() {
   els.packRevealGrid = hubEl('pack-reveal-grid');
   els.packRevealAll = hubEl('pack-reveal-all');
   els.packSave = hubEl('pack-save');
+  els.packEndActions = hubEl('pack-end-actions');
   els.topName = hubEl('hub-profile-name');
   els.topHandle = hubEl('hub-profile-handle');
   els.avatar = hubEl('hub-avatar');
