@@ -14855,3 +14855,525 @@ body:not(.is-home-route) .hub-mobile-quick {
     height: 58px;
   }
 }
+
+
+/* ==========================================================================
+   CardGram v0.5.5 — Updates & Refinements (Shop Desktop Mockup, Mobile FPS, Centering)
+   ========================================================================== */
+
+/* 1. ELIMINACIÓN DE LA BARRA BLANCA REDUNDANTE Y PROGRESO EN VISTA DETALLE */
+.shop-pack-percent-badge {
+  display: none !important;
+}
+
+.shop-pack-view-progress {
+  display: none !important;
+}
+
+/* 2. BARRA DE SODA SUAVE, LIGERA Y ELEGANTE (OPTIMIZADA PARA 60 FPS EN MOBILE) */
+.shop-pack-soda-meter {
+  display: block !important;
+  width: 82% !important;
+  height: 6px !important;
+  margin: 3px auto 4px !important;
+  background: rgba(4, 20, 30, 0.45) !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35) !important;
+  contain: paint !important;
+}
+
+.shop-pack-soda-fill {
+  display: block !important;
+  height: 100% !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, #00f2fe 0%, #38ef7d 100%) !important;
+  background-size: 160% 100% !important;
+  animation: soda-gentle 4s ease-in-out infinite alternate !important;
+  transform: translateZ(0) !important;
+}
+
+@keyframes soda-gentle {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* 3. CENTRADO ESTRICTO UNIVERSAL DE ENCABEZADOS, TÍTULOS Y TEXTOS */
+.hub-section-head,
+.explore-block-head,
+.hub-head,
+.hub-home-hero,
+.plaza-content,
+.plaza-hero-banner,
+.shop-pack-view-info,
+.collections-head {
+  text-align: center !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.hub-section-head h1,
+.hub-section-head h2,
+.hub-section-head h3,
+.hub-section-head p,
+.explore-block-head h1,
+.explore-block-head h2,
+.explore-block-head p,
+.plaza-hero-banner h1,
+.plaza-hero-banner h2,
+.plaza-hero-banner p,
+.shop-pack-view-info h2,
+.shop-pack-view-info p {
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 4. REPLICACIÓN EXACTA DEL BOCETO EN DESKTOP (SHOP DESKTOP MOCKUP) */
+@media (min-width: 981px) {
+  .shop-scene {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .shop-topbar {
+    position: absolute !important;
+    top: 14px !important;
+    left: 20px !important;
+    right: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    z-index: 20 !important;
+  }
+
+  .shop-topbar .hub-back {
+    position: static !important;
+  }
+
+  .shop-topbar-center {
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .shop-npc {
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    bottom: 0 !important;
+    height: 82vh !important;
+    z-index: 5 !important;
+    pointer-events: auto !important;
+  }
+
+  .shop-npc img {
+    height: 100% !important;
+    width: auto !important;
+    object-fit: contain !important;
+  }
+
+  /* Los 3 Booster Packs a la izquierda de Azura, alineados horizontalmente */
+  .shop-recommended {
+    position: absolute !important;
+    left: 3.5% !important;
+    top: 52% !important;
+    transform: translateY(-50%) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-end !important;
+    justify-content: flex-start !important;
+    gap: 16px !important;
+    width: auto !important;
+    max-width: none !important;
+    z-index: 10 !important;
+  }
+
+  .shop-recommended .shop-pack {
+    width: 144px !important;
+    max-width: 144px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    transition: transform 0.25s ease !important;
+  }
+
+  .shop-recommended .shop-pack:hover {
+    transform: translateY(-6px) scale(1.04) !important;
+  }
+
+  .shop-recommended .shop-pack-art {
+    width: 136px !important;
+    height: 205px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.45)) !important;
+  }
+
+  .shop-recommended .shop-pack-art img {
+    max-height: 100% !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+  }
+
+  .shop-recommended .shop-pack-name {
+    margin-top: 6px !important;
+    font-size: 0.64rem !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    width: 100% !important;
+  }
+
+  .shop-recommended .shop-pack-count {
+    font-size: 0.48rem !important;
+    font-weight: 700 !important;
+    color: rgba(255, 255, 255, 0.82) !important;
+    text-align: center !important;
+  }
+
+  /* Tienda Astro~Verse a la derecha de Azura tal cual el boceto */
+  .shop-stores {
+    position: absolute !important;
+    right: 4.5% !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 280px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 10 !important;
+    gap: 8px !important;
+  }
+
+  .shop-store {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    gap: 8px !important;
+  }
+
+  .shop-store-building {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .shop-store-art {
+    width: 270px !important;
+    height: 270px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .shop-store-art img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.45)) !important;
+    transition: transform 0.25s ease !important;
+  }
+
+  .shop-store:hover .shop-store-art img {
+    transform: scale(1.04) !important;
+  }
+
+  .shop-store-name {
+    font-size: 0.65rem !important;
+    font-weight: 800 !important;
+    color: #07333f !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    padding: 3px 14px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22) !important;
+    white-space: nowrap !important;
+  }
+
+  .shop-store-owner {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .shop-store-avatar {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    border: 2px solid rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .shop-store-avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .shop-store-user {
+    font-size: 0.58rem !important;
+    font-weight: 800 !important;
+    color: #07333f !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    padding: 2px 10px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* 5. TEXTOS EN SHOP MOBILE (TIENDA Y AVATAR) */
+.shop-mobile-store {
+  display: flex !important;
+  align-items: flex-end !important;
+  gap: 10px !important;
+  position: absolute !important;
+  right: 12px !important;
+  bottom: 84px !important;
+  z-index: 15 !important;
+  text-decoration: none !important;
+}
+
+.shop-mobile-store-col {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 3px !important;
+}
+
+.shop-mobile-store-art {
+  width: 58px !important;
+  height: 58px !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4)) !important;
+}
+
+.shop-mobile-store-avatar {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  border: 1.5px solid #ffffff !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+.shop-mobile-store-badge {
+  font-size: 0.44rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
+  color: #07333f !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  padding: 1px 6px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+  white-space: nowrap !important;
+  max-width: 68px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* 6. PANTALLA PREVIEW BOOSTER (.shop-pack-view) MINIMALISTA Y LIMPIA */
+.shop-pack-view {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 30 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 14px 14px 18px !important;
+  background: radial-gradient(circle at 50% 32%, rgba(124, 235, 221, 0.32), rgba(4, 32, 42, 0.94)) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+}
+
+.shop-pack-view-stage {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  gap: 12px !important;
+  width: 100% !important;
+  padding: 10px 0 !important;
+}
+
+#shop-pack-view-img {
+  height: min(48vh, 380px) !important;
+  width: auto !important;
+  max-width: min(320px, 84vw) !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 20px 36px rgba(0, 0, 0, 0.5)) !important;
+}
+
+.shop-pack-view-open {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 10px 28px !important;
+  border-radius: 999px !important;
+  font-size: 0.74rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em !important;
+  color: #074755 !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(185, 246, 238, 0.95)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32), inset 0 1px 0 #ffffff !important;
+  cursor: pointer !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  width: auto !important;
+}
+
+.shop-pack-view-open:hover {
+  transform: translateY(-2px) scale(1.05) !important;
+  box-shadow: 0 12px 28px rgba(47, 198, 180, 0.5), inset 0 1px 0 #ffffff !important;
+}
+
+.shop-pack-view-info {
+  width: min(720px, 94vw) !important;
+  margin: 0 auto !important;
+  padding: 8px 14px !important;
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24) !important;
+  text-align: center !important;
+}
+
+.shop-pack-view-info h2 {
+  font-size: 0.92rem !important;
+  margin: 0 0 6px !important;
+  text-align: center !important;
+}
+
+.shop-pack-view-cards {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  padding: 2px 2px 4px !important;
+  scrollbar-width: thin;
+}
+
+.shop-pack-view-hint {
+  font-size: 0.48rem !important;
+  color: var(--muted) !important;
+  margin: 4px 0 0 !important;
+  text-align: center !important;
+}
+
+/* 7. BOTONES DE CAMBIO DE MODO EN LA PLAZA (80% RENDER, 20% TEXTO/EMOJI) */
+.plaza-scope-container {
+  width: 100% !important;
+  max-width: 520px !important;
+  margin: 10px auto 18px auto !important;
+  padding: 0 8px !important;
+}
+
+.plaza-scope-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 14px !important;
+  justify-content: center !important;
+}
+
+.plaza-scope-card {
+  height: 180px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 10px 10px 12px 10px !important;
+  border-radius: 22px !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 8px 24px rgba(7, 43, 56, 0.08) !important;
+  cursor: pointer !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+
+.plaza-scope-card:hover {
+  transform: translateY(-2px) scale(1.02) !important;
+  box-shadow: 0 12px 28px rgba(7, 43, 56, 0.14) !important;
+}
+
+.plaza-scope-card.is-active {
+  border-color: #00f2fe !important;
+  box-shadow: 0 0 0 2px #00f2fe, 0 14px 34px rgba(0, 242, 254, 0.3) !important;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.96), rgba(215, 248, 254, 0.92)) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+.plaza-scope-render-wrap {
+  flex: 0 0 78% !important;
+  height: 78% !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+.plaza-scope-hero-render {
+  max-height: 100% !important;
+  max-width: 90% !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2)) !important;
+  transition: transform 0.25s ease !important;
+}
+
+.plaza-scope-card:hover .plaza-scope-hero-render {
+  transform: scale(1.06) !important;
+}
+
+.plaza-scope-label-wrap {
+  flex: 0 0 22% !important;
+  height: 22% !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.plaza-scope-switch-title {
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  color: #07333f !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  padding: 4px 14px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.96) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+  white-space: nowrap !important;
+}

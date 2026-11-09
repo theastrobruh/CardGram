@@ -1462,43 +1462,17 @@ function renderShopPackDetail() {
     hub.els.shopPackViewImg.alt = collection.name;
   }
   if (hub.els.shopPackViewName) hub.els.shopPackViewName.textContent = collection.name;
-  if (hub.els.shopPackViewPercent) {
-    const owned = ownedIn(collection.id).length;
-    const total = collection.cards.length;
-    const pct = total ? Math.round((owned / total) * 100) : 0;
-    hub.els.shopPackViewPercent.textContent = `${pct}%`;
-    if (hub.els.shopPackViewMeterBar) {
-      hub.els.shopPackViewMeterBar.style.width = `${Math.max(6, pct)}%`;
-    }
-  }
   fillShopPackPreview(hub.els.shopPackViewCards, collection);
 
-  const picks = hubBooster.picks;
-  if (hub.els.shopPackViewReveal) {
-    hub.els.shopPackViewReveal.hidden = !picks.length;
-    if (picks.length) {
-      hub.els.shopPackViewReveal.replaceChildren(
-        ...picks.map((cardId) => {
-          const card = makeBoosterCard(cardId, { reveal: true });
-          card.addEventListener('click', () => {
-            card.classList.toggle('is-open');
-            if (window.Sound) window.Sound.play('flip');
-          });
-          return card;
-        })
-      );
-    }
-  }
   if (hub.els.shopPackOpen) {
-    hub.els.shopPackOpen.hidden = picks.length > 0;
+    hub.els.shopPackOpen.hidden = false;
+    hub.els.shopPackOpen.disabled = false;
     const label = hub.els.shopPackOpen.querySelector('span');
-    if (label) label.textContent = picks.length ? t('booster_continue') : t('booster_open');
+    if (label) label.textContent = t('booster_open');
   }
-  if (hub.els.shopPackSave) hub.els.shopPackSave.hidden = !picks.length;
   if (hub.els.shopPackViewHint) {
-    hub.els.shopPackViewHint.textContent = picks.length ? t('shop_pack_detail_reveal_hint') : t('shop_pack_detail_hint');
+    hub.els.shopPackViewHint.textContent = t('shop_pack_detail_hint') || 'Contenido del sobre y cartas que puedes conseguir.';
   }
-  if (hub.els.boosterOpen) hub.els.shopPackOpen.disabled = hub.els.boosterOpen.disabled && !picks.length;
 }
 
 function openBoosterFromDetail() {
@@ -1591,17 +1565,14 @@ function renderShopRecommended(sets) {
       const total = collection.cards.length;
       const percent = total ? Math.round((owned / total) * 100) : 0;
 
-      // Barra de progreso de soda líquida burbujeante y colorida
+      // Única barra de progreso de soda líquida suave y estética
       const meter = makeNode('span', 'shop-pack-soda-meter');
       const fill = makeNode('span', 'shop-pack-soda-fill');
       fill.style.width = `${Math.max(6, percent)}%`;
-      const liquid = makeNode('span', 'shop-pack-soda-liquid');
-      fill.appendChild(liquid);
       meter.appendChild(fill);
       button.appendChild(meter);
 
       button.appendChild(makeNode('small', 'shop-pack-count', countLabel('explore_pack_cards', collection.cards.length)));
-      button.appendChild(makeNode('small', 'shop-pack-percent-badge', `${percent}%`));
       return button;
     })
   );

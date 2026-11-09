@@ -12,23 +12,23 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=213">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=213">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=214">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=214">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=213" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=213" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=213" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=213" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=213" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=213" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=213" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=213" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=213" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=213" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=213" defer></script>
-  <script src="assets/js/boot.js?v=0.5.5&rev=213" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=214" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=214" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=214" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=214" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=214" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=214" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=214" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=214" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=214" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=214" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=214" defer></script>
+  <script src="assets/js/boot.js?v=0.5.5&rev=214" defer></script>
 </head>
 <body data-view="hub" class="booting">
   <div class="boot-screen" id="boot-screen">
@@ -745,8 +745,14 @@
               <div class="shop-recommended" id="shop-recommended"></div>
               <div class="shop-stores" id="shop-stores"></div>
               <a class="shop-mobile-store" href="#/explore" data-hub-route="explore" aria-label="Visitar la tienda de theAstroBruh">
-                <img class="shop-mobile-store-art" src="assets/data/shops/theastrobruh-cover.png" alt="">
-                <img class="shop-mobile-store-avatar" src="assets/data/shops/theastrobruh-avatar.jpg" alt="">
+                <div class="shop-mobile-store-col">
+                  <img class="shop-mobile-store-art" src="assets/data/shops/theastrobruh-cover.png" alt="Astro~Verse">
+                  <span class="shop-mobile-store-badge">Astro~Verse</span>
+                </div>
+                <div class="shop-mobile-store-col">
+                  <img class="shop-mobile-store-avatar" src="assets/data/shops/theastrobruh-avatar.jpg" alt="theAstroBruh">
+                  <span class="shop-mobile-store-badge">theAstroBruh</span>
+                </div>
               </a>
               <div class="shop-mobile-bar" aria-hidden="true"></div>
 
@@ -807,25 +813,9 @@
                   </button>
                 </div>
                 <div class="shop-pack-view-info">
-                  <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky"></span><span data-i18n="shop_selected_pack">Pack seleccionado</span></span>
                   <h2 id="shop-pack-view-name"></h2>
-                  <div class="shop-pack-view-progress">
-                    <div class="soda-meter-wrap">
-                      <div class="soda-meter-bar" id="shop-pack-view-meter-bar">
-                        <div class="soda-liquid"></div>
-                      </div>
-                    </div>
-                    <strong id="shop-pack-view-percent">0%</strong>
-                    <span data-i18n="shop_completion">completado</span>
-                  </div>
                   <div class="shop-rare-row shop-pack-view-cards" id="shop-pack-view-cards"></div>
-                  <div class="shop-pack-view-reveal" id="shop-pack-view-reveal" hidden></div>
-                  
-                  <button class="btn btn-primary shop-pack-view-open" type="button" id="shop-pack-save" hidden>
-                    <svg class="icon" aria-hidden="true"><use href="#i-save"></use></svg>
-                    <span data-i18n="booster_claim">Guardar en mi colección</span>
-                  </button>
-                  <p class="shop-pack-view-hint" id="shop-pack-view-hint"></p>
+                  <p class="shop-pack-view-hint" id="shop-pack-view-hint" data-i18n="shop_pack_detail_hint">Contenido del sobre y cartas que puedes conseguir.</p>
                 </div>
               </div>
             </div>
@@ -1047,27 +1037,21 @@
               <div class="plaza-scope-container">
                 <div class="plaza-scope-grid" id="plaza-scope-grid" role="tablist" aria-label="Alcance de La Plaza">
                   <button class="plaza-scope-card is-active" type="button" role="tab" aria-selected="true" data-plaza-scope="local">
-                    <div class="plaza-scope-art">
-                      <img src="assets/data/shops/theastrobruh-cover.png" alt="Panamá TCG" class="plaza-scope-img">
-                      <span class="plaza-scope-badge">Panamá 🇵🇦</span>
+                    <div class="plaza-scope-render-wrap">
+                      <img src="assets/data/shops/theastrobruh-cover.png" alt="Local Panamá" class="plaza-scope-hero-render">
                     </div>
-                    <div class="plaza-scope-body">
-                      <strong class="plaza-scope-title" data-i18n="plaza_scope_local_title">Local (Panamá 🇵🇦)</strong>
-                      <p class="plaza-scope-desc" data-i18n="plaza_scope_local_desc">Explora la comunidad local, eventos presenciales, tiendas TCG en Panamá y cartas creadas por diseñadores de la región.</p>
+                    <div class="plaza-scope-label-wrap">
+                      <span class="plaza-scope-switch-title">Local 🇵🇦</span>
                     </div>
-                    <span class="plaza-scope-indicator" aria-hidden="true">Activo</span>
                   </button>
 
                   <button class="plaza-scope-card" type="button" role="tab" aria-selected="false" data-plaza-scope="general">
-                    <div class="plaza-scope-art">
-                      <img src="assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp" alt="Global TCG" class="plaza-scope-img plaza-scope-img-globe">
-                      <span class="plaza-scope-badge">Global 🌍</span>
+                    <div class="plaza-scope-render-wrap">
+                      <img src="assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp" alt="General Global" class="plaza-scope-hero-render plaza-scope-hero-globe">
                     </div>
-                    <div class="plaza-scope-body">
-                      <strong class="plaza-scope-title" data-i18n="plaza_scope_general_title">General (Global 🌍)</strong>
-                      <p class="plaza-scope-desc" data-i18n="plaza_scope_general_desc">Descubre las cartas más populares del mundo, tendencias globales, meca de TCGs y retos de creación internacionales.</p>
+                    <div class="plaza-scope-label-wrap">
+                      <span class="plaza-scope-switch-title">General 🌍</span>
                     </div>
-                    <span class="plaza-scope-indicator" aria-hidden="true">Activo</span>
                   </button>
                 </div>
               </div>
