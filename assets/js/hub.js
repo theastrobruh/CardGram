@@ -44,9 +44,28 @@ function inventoryBoxFor(collection) {
   return INVENTORY_DECK_BOXES[collection.id] || collection.thumbCover || collection.cover || '';
 }
 
+const PRESET_DECK_BOXES = [
+  { id: 'user-1', name: 'Aqua Glass', src: 'assets/data/inventory/Deck_Box_Created-by-User (1).webp' },
+  { id: 'user-2', name: 'Cyber Void', src: 'assets/data/inventory/Deck_Box_Created-by-User (2).webp' },
+  { id: 'champion', name: 'Champion-Verse', src: 'assets/data/inventory/Deck-Box_Champion-Verse.webp' },
+  { id: 'dungeons', name: 'Dungeons & History', src: 'assets/data/inventory/Deck-Box_Dungeons-&-History.webp' },
+  { id: 'mew-tarot', name: 'Mew Tarot', src: 'assets/data/inventory/Deck-Box_Mew-Tarot.webp' },
+  { id: 'ygo', name: 'Yu-Gi-Oh!', src: 'assets/data/inventory/Deck-Box_Yu-Gi-Oh!.webp' }
+];
+
 function userBoxFor(index) {
+  if (hubData && hubData.selectedUserBox) return hubData.selectedUserBox;
   if (hubDeckBoxes.length) return hubDeckBoxes[index % hubDeckBoxes.length];
   return USER_DECK_BOXES[index % USER_DECK_BOXES.length];
+}
+
+function getUserPresets() {
+  if (typeof presets !== 'undefined' && Array.isArray(presets) && presets.length) return presets;
+  try {
+    const raw = storage.read('cardgram.presets.v2', []);
+    if (Array.isArray(raw)) return raw;
+  } catch (e) {}
+  return [];
 }
 
 const HUB_LAYOUT_DEFAULT = {
@@ -3748,7 +3767,7 @@ function renderCollectionsOverview() {
   }
 
   if (hub.els.createdGrid) {
-    const created = typeof presets !== 'undefined' && Array.isArray(presets) ? presets : [];
+    const created = getUserPresets();
     const count = created.length;
     const boxSrc = userBoxFor(0);
     const button = makeHubButton('deck-box-card is-user-box', null, { collectionId: 'user-created' });
@@ -3796,7 +3815,10 @@ function renderCollectionsOverview() {
     hub.els.decksGrid.replaceChildren(...cards);
   }
 
-  if (hub.els.decksEmpty) hub.els.decksEmpty.hidden = hubData.decks.length > 0;
+  const hasDecks = Array.isArray(hubData.decks) && hubData.decks.length > 0;
+  if (hub.els.decksEmpty) hub.els.decksEmpty.hidden = hasDecks;
+  const newDeckCenter = document.getElementById('collections-new-deck-center');
+  if (newDeckCenter) newDeckCenter.hidden = !hasDecks;
 }
 
 function createMissingCard(collection) {
@@ -3863,9 +3885,11 @@ function renderUserCreatedCardsDetail() {
   if (!hub.els.collectionDetailHead || !hub.els.collectionDetailGrid) return;
   hub.els.collectionDetailHead.replaceChildren();
 
+  const currentBoxSrc = userBoxFor(0);
+
   const stack = makeNode('div', 'collection-stack');
   const boxImg = makeNode('img', 'deck-box-img');
-  boxImg.src = userBoxFor(0);
+  boxImg.src = currentBoxSrc;
   boxImg.alt = 'Cartas creadas';
   stack.appendChild(boxImg);
   hub.els.collectionDetailHead.appendChild(stack);
@@ -3877,14 +3901,86 @@ function renderUserCreatedCardsDetail() {
     makeNode('p', null, 'Tus diseños y cartas personalizadas creadas en eCard Studio.')
   );
 
-  const created = typeof presets !== 'undefined' && Array.isArray(presets) ? presets : [];
+  const created = getUserPresets();
   const meta = makeNode('div', 'hub-detail-meta');
   meta.appendChild(
     makeNode('span', 'hub-chip', created.length === 1 ? '1 carta creada' : `${created.length} cartas creadas`)
   );
   copy.appendChild(meta);
+
+  // Acciones dentro de Cartas Creadas
+  const actionRow = makeNode('div', 'user-created-actions');
+
+  const createBtn = makeNode('button', 'btn btn-primary btn-sm');
+  createBtn.type = 'button';
+  createBtn.dataset.openStudio = 'deck';
+  createBtn.appendChild(hubIcon('plus'));
+  createBtn.appendChild(makeNode('span', null, t('collections_create_card') || 'Crear carta'));
+  actionRow.appendChild(createBtn);
+
+  const uploadBtn = makeNode('button', 'btn btn-ghost btn-sm');
+  uploadBtn.type = 'button';
+  uploadBtn.id = 'upload-user-box-detail';
+  uploadBtn.appendChild(hubIcon('upload'));
+  uploadBtn.appendChild(makeNode('span', null, t('collections_upload_box') || 'Subir deck box'));
+  uploadBtn.addEventListener('click', () => {
+    const input = document.getElementById('deck-box-upload');
+    if (input) input.click();
+  });
+  actionRow.appendChild(uploadBtn);
+
+  copy.appendChild(actionRow);
+
+  // Selector de Box Art (Presets oficiales + Custom subidos)
+  const selectorBox = makeNode('div', 'user-box-selector');
+  const selectorHead = makeNode('div', 'user-box-selector-head');
+  selectorHead.appendChild(makeNode('span', 'user-box-selector-label', 'Diseño de Deck Box:'));
+  selectorBox.appendChild(selectorHead);
+
+  const optionsRow = makeNode('div', 'user-box-options');
+
+  const allBoxes = [
+    ...PRESET_DECK_BOXES.map((b) => ({ id: b.id, name: b.name, src: b.src })),
+    ...hubDeckBoxes.map((src, idx) => ({ id: `custom-${idx}`, name: `Custom ${idx + 1}`, src }))
+  ];
+
+  allBoxes.forEach((item) => {
+    const isActive = item.src === currentBoxSrc;
+    const thumbBtn = makeNode('button', `user-box-thumb-btn${isActive ? ' is-active' : ''}`);
+    thumbBtn.type = 'button';
+    thumbBtn.title = item.name;
+    thumbBtn.setAttribute('aria-label', `Elegir ${item.name}`);
+
+    const thumbImg = makeNode('img', 'user-box-thumb-img');
+    thumbImg.src = item.src;
+    thumbImg.alt = item.name;
+    thumbBtn.appendChild(thumbImg);
+
+    if (isActive) {
+      const badge = makeNode('span', 'user-box-active-badge');
+      badge.textContent = '✓';
+      thumbBtn.appendChild(badge);
+    }
+
+    thumbBtn.addEventListener('click', () => {
+      hubData.selectedUserBox = item.src;
+      persistHubData();
+      renderUserCreatedCardsDetail();
+      renderCollections();
+      if (typeof toast === 'function') {
+        toast('¡Box art del deck actualizado!', { type: 'success' });
+      }
+    });
+
+    optionsRow.appendChild(thumbBtn);
+  });
+
+  selectorBox.appendChild(optionsRow);
+  copy.appendChild(selectorBox);
+
   hub.els.collectionDetailHead.appendChild(copy);
 
+  // Grid de cartas creadas
   if (created.length === 0) {
     const empty = makeNode('div', 'hub-empty-state');
     empty.style.textAlign = 'center';
