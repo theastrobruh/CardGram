@@ -13830,3 +13830,178 @@ body:not(.is-home-route) .hub-mobile-quick {
   height: 100%;
   object-fit: contain !important;
 }
+
+
+/* ==========================================================================
+   Shop of the Day Desktop & Mobile Refinements + Brand Pack Pulse
+   ========================================================================== */
+
+/* Brand Pack beside logo in header: loop fx de respiración cuando hay packs */
+.hub-brand-pack {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 38px;
+  height: 38px;
+  margin-left: 8px;
+  border-radius: 12px;
+  color: #074755;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(185, 246, 238, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.98);
+  box-shadow: 0 4px 14px rgba(6, 55, 74, 0.15), inset 0 1px 0 #ffffff;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  flex: 0 0 auto;
+}
+
+.hub-brand-pack[hidden] {
+  display: none !important;
+}
+
+.hub-brand-pack.has-packs {
+  animation: brandPackBreathe 2.2s ease-in-out infinite !important;
+}
+
+@keyframes brandPackBreathe {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(47, 198, 180, 0.6), 0 4px 14px rgba(6, 55, 74, 0.15);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 18px 5px rgba(47, 198, 180, 0.75), 0 6px 20px rgba(6, 55, 74, 0.28);
+  }
+}
+
+.hub-brand-pack .icon {
+  width: 20px;
+  height: 20px;
+  color: #0d7a8a;
+}
+
+.hub-brand-pack-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff5e62, #ff9966);
+  border: 1.5px solid #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tienda del día en modo desktop: más a la derecha (al menos 25%) y más grande (al menos 30%) */
+@media (min-width: 981px) {
+  .shop-stores {
+    right: 0.6% !important;
+    width: 298px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    gap: 16px !important;
+  }
+
+  .shop-store {
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .shop-store-art {
+    width: 100% !important;
+    height: 350px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .shop-store-art img {
+    max-height: 345px !important;
+    width: auto !important;
+    object-fit: contain !important;
+    filter: drop-shadow(0 22px 28px rgba(0, 0, 0, 0.38)) !important;
+    transition: transform 0.25s ease;
+  }
+
+  .shop-store:hover .shop-store-art img {
+    transform: scale(1.04);
+  }
+
+  .shop-store-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.96);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    margin-top: 4px;
+  }
+
+  .shop-store-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+/* Nombres de tienda y usuario en desktop y mobile */
+.shop-store-building,
+.shop-mobile-store-building {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.shop-store-owner,
+.shop-mobile-store-owner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.shop-store-name,
+.shop-mobile-store-name {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #074755;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.98);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  text-shadow: none !important;
+}
+
+.shop-store-user,
+.shop-mobile-store-user {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.54rem;
+  font-weight: 700;
+  color: #0b5966;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.96);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+  text-shadow: none !important;
+}
+
+/* Plaza sub-view inside Explore */
+#explore-plaza-block {
+  animation: fadeIn 0.3s ease;
+}
+
+#explore-plaza-block .plaza-content {
+  padding-top: 8px;
+}

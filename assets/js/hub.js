@@ -620,7 +620,7 @@ function availablePackCount() {
 function syncMobileDailyButton() {
   const count = availablePackCount();
   if (hub.els.brandPack) {
-    hub.els.brandPack.hidden = false;
+    hub.els.brandPack.hidden = count === 0;
     hub.els.brandPack.classList.toggle('has-packs', count > 0);
     if (hub.els.brandPackBadge) {
       hub.els.brandPackBadge.hidden = count <= 1;
@@ -628,7 +628,7 @@ function syncMobileDailyButton() {
     }
   }
   if (hub.els.mobileDaily) {
-    hub.els.mobileDaily.hidden = count === 0;
+    hub.els.mobileDaily.hidden = true;
   }
 }
 
@@ -1384,11 +1384,22 @@ function renderShopStores(recommended) {
   container.replaceChildren(
     ...recommended.map(() => {
       const button = makeHubButton('shop-store', null, { hubRoute: 'explore' });
+      button.setAttribute('aria-label', 'Visitar tienda Astro~Verse de theAstroBruh');
+
+      const building = makeNode('span', 'shop-store-building');
       const art = makeNode('span', 'shop-store-art');
-      art.appendChild(makeHubImage('assets/data/shops/theastrobruh-cover.png', 'theAstroBruh Shop'));
-      button.appendChild(art);
-      button.appendChild(makeNode('strong', null, 'theAstroBruh'));
-      button.appendChild(makeNode('small', null, t('explore_enter_shop')));
+      art.appendChild(makeHubImage('assets/data/shops/theastrobruh-cover.webp', 'Astro~Verse Shop'));
+      building.appendChild(art);
+      building.appendChild(makeNode('span', 'shop-store-name', 'Astro~Verse'));
+      button.appendChild(building);
+
+      const owner = makeNode('span', 'shop-store-owner');
+      const avatar = makeNode('span', 'shop-store-avatar');
+      avatar.appendChild(makeHubImage('assets/data/shops/theastrobruh-avatar.jpg', 'theAstroBruh'));
+      owner.appendChild(avatar);
+      owner.appendChild(makeNode('span', 'shop-store-user', 'theAstroBruh'));
+      button.appendChild(owner);
+
       return button;
     })
   );
@@ -4475,28 +4486,27 @@ function renderExplorePackDetail(collection) {
 
 
 function makeExplorePlazaCard() {
-  const button = makeHubButton('explore-creator explore-shop explore-plaza-card', null);
-  button.dataset.hubRoute = 'plaza';
-  button.setAttribute('aria-label', t('plaza_title') || 'Plaza TCG');
+  const button = makeHubButton('explore-creator explore-shop explore-plaza-card', null, { explorePlaza: 'true' });
+  button.setAttribute('aria-label', 'Entrar a La Plaza');
 
   const cover = makeNode('span', 'explore-shop-cover explore-plaza-cover');
-  cover.appendChild(makeHubImage('assets/data/explore/Plaza-Icon.webp', 'Plaza TCG'));
+  cover.appendChild(makeHubImage('assets/data/explore/Plaza-Icon.webp', 'La Plaza'));
   button.appendChild(cover);
 
   const body = makeNode('span', 'explore-shop-body');
   const avatar = makeNode('span', 'explore-shop-avatar explore-plaza-avatar');
-  avatar.appendChild(makeHubImage('assets/data/explore/Plaza-Icon.webp', 'Plaza TCG'));
+  avatar.appendChild(makeHubImage('assets/data/explore/Plaza-Icon.webp', 'La Plaza'));
   body.appendChild(avatar);
 
   const copy = makeNode('span', 'explore-creator-copy');
-  copy.appendChild(makeNode('strong', null, t('plaza_title') || 'Plaza TCG'));
-  copy.appendChild(makeNode('span', null, t('plaza_card_sub') || '@plaza · Panamá'));
+  copy.appendChild(makeNode('strong', null, 'La Plaza'));
+  copy.appendChild(makeNode('span', null, '@plaza · Ciudad de Panamá'));
   copy.appendChild(
-    makeNode('span', 'explore-creator-meta', t('plaza_meta') || 'Comunidad, Torneos y Noticias')
+    makeNode('span', 'explore-creator-meta', 'Noticias & Torneos TCG')
   );
   body.appendChild(copy);
 
-  const cta = makeNode('span', 'explore-shop-cta', t('plaza_enter') || 'Entrar a Plaza');
+  const cta = makeNode('span', 'explore-shop-cta', 'Entrar a La Plaza');
   cta.appendChild(hubIcon('arrow-right'));
   body.appendChild(cta);
   button.appendChild(body);
@@ -4509,19 +4519,31 @@ function renderExplore() {
 
   const packs = explorePacks();
   const creatorOpen = hub.exploreCreatorId === 'theastrobruh';
+  const plazaOpen = Boolean(hub.explorePlazaOpen);
   const pack = creatorOpen ? packs.find((collection) => collection.id === hub.explorePackId) : null;
 
   if (hub.els.explorePacksBlock) hub.els.explorePacksBlock.hidden = !creatorOpen || Boolean(pack);
   if (hub.els.explorePackDetail) hub.els.explorePackDetail.hidden = !pack;
-  if (hub.els.exploreCreators) hub.els.exploreCreators.hidden = creatorOpen;
-  if (hub.els.exploreCreatorsBlock) hub.els.exploreCreatorsBlock.hidden = creatorOpen;
+
+  if (hub.els.explorePlazaBlock) hub.els.explorePlazaBlock.hidden = !plazaOpen;
+  if (hub.els.explorePlazaEntryBlock) hub.els.explorePlazaEntryBlock.hidden = creatorOpen || plazaOpen;
+  if (hub.els.exploreCreatorsBlock) hub.els.exploreCreatorsBlock.hidden = creatorOpen || plazaOpen;
+  if (hub.els.exploreWantMore) hub.els.exploreWantMore.hidden = creatorOpen || plazaOpen;
+  if (hub.els.exploreRoadmap) hub.els.exploreRoadmap.hidden = creatorOpen || plazaOpen;
 
   if (hub.els.explorePackCount) {
     hub.els.explorePackCount.textContent = countLabel('explore_pack_count', packs.length);
   }
 
+  if (plazaOpen) return;
+
   if (!creatorOpen) {
-    hub.els.exploreCreators.replaceChildren(makeExploreCreatorCard(), makeExplorePlazaCard());
+    if (hub.els.explorePlazaList) {
+      hub.els.explorePlazaList.replaceChildren(makeExplorePlazaCard());
+    }
+    if (hub.els.exploreCreators) {
+      hub.els.exploreCreators.replaceChildren(makeExploreCreatorCard());
+    }
     return;
   }
 
@@ -5408,6 +5430,22 @@ function onHubClick(event) {
     hubBooster.setId = exploreOpen.dataset.exploreOpenPack;
     persistBooster();
     navigate('booster');
+    return;
+  }
+
+  if (target.closest('[data-explore-plaza]')) {
+    event.preventDefault();
+    hub.explorePlazaOpen = true;
+    hub.exploreCreatorId = null;
+    hub.explorePackId = null;
+    renderExplore();
+    return;
+  }
+
+  if (target.closest('[data-explore-plaza-back]')) {
+    event.preventDefault();
+    hub.explorePlazaOpen = false;
+    renderExplore();
     return;
   }
 
@@ -6329,6 +6367,11 @@ function cacheHubDom() {
   els.deckBoxUpload = hubEl('deck-box-upload');
 
   els.exploreCreators = hubEl('explore-creators');
+  els.explorePlazaEntryBlock = hubEl('explore-plaza-entry-block');
+  els.explorePlazaList = hubEl('explore-plaza-list');
+  els.explorePlazaBlock = hubEl('explore-plaza-block');
+  els.exploreWantMore = document.querySelector('.explore-want-more');
+  els.exploreRoadmap = document.querySelector('.explore-roadmap');
   els.exploreCreatorsBlock = hubEl('explore-creators-block');
   els.explorePacksBlock = hubEl('explore-packs-block');
   els.explorePacks = hubEl('explore-packs');

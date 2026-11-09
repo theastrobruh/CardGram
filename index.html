@@ -397,9 +397,7 @@
             </nav>
   
             <div class="hub-top-actions">
-              <button class="hub-top-icon hub-btn-new-pack" type="button" data-hub-route="booster" aria-label="Nuevo Pack" data-i18n-aria-label="shop_new_pack" title="Nuevo Pack" data-i18n-title="shop_new_pack">
-                <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
-              </button>
+              
               <button class="hub-sound-btn" type="button" data-sound-toggle data-sound="none" aria-pressed="true" aria-label="Efectos de sonido" data-i18n-aria-label="ui_sound_toggle" title="Efectos de sonido" data-i18n-title="ui_sound_toggle">
                 <svg class="icon sound-on" aria-hidden="true"><use href="#i-sound"></use></svg>
                 <svg class="icon sound-off" aria-hidden="true"><use href="#i-sound-off"></use></svg>
@@ -437,9 +435,7 @@
               </button>
             </div>
             <div class="hub-header-actions">
-              <button class="hub-header-btn hub-btn-new-pack" type="button" data-hub-route="booster" aria-label="Nuevo Pack" data-i18n-aria-label="shop_new_pack" title="Nuevo Pack" data-i18n-title="shop_new_pack">
-                <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
-              </button>
+              
               <a class="hub-header-btn" href="https://github.com/theastrobruh/CardGram" target="_blank" rel="noopener noreferrer" aria-label="Abrir el repositorio de CardGram en GitHub" data-i18n-aria-label="hub_support_github_title" title="Repositorio de CardGram en GitHub" data-i18n-title="hub_support_github_title">
                 <svg class="icon" aria-hidden="true"><use href="#i-github"></use></svg>
               </a>
@@ -940,7 +936,7 @@
                ------------------------------------------------------------ -->
           <section class="hub-panel" data-hub-panel="plaza" aria-labelledby="plaza-title" hidden>
             <header class="hub-view-head">
-              <button class="hub-back" type="button" data-hub-route="booster" aria-label="Volver a la tienda" data-i18n-aria-label="hub_back_shop">
+              <button class="hub-back" type="button" data-hub-route="explore" aria-label="Volver a Explorar" data-i18n-aria-label="hub_back_explore">
                 <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
               </button>
               <div class="hub-view-copy">
@@ -1012,6 +1008,18 @@
               <span class="hub-count-pill" id="explore-pack-count">4 packs</span>
             </header>
 
+            <!-- 1. PRIMERO: La Plaza -->
+            <section class="explore-block" id="explore-plaza-entry-block">
+              <div class="hub-section-head">
+                <div>
+                  <h2>La Plaza</h2>
+                  <p>Noticias de actualidad y eventos TCG en Ciudad de Panamá.</p>
+                </div>
+              </div>
+              <div class="explore-creator-list" id="explore-plaza-list"></div>
+            </section>
+
+            <!-- 2. SCROLL DOWN: Users Shop -->
             <section class="explore-block" id="explore-creators-block">
               <div class="hub-section-head">
                 <div>
@@ -1020,6 +1028,63 @@
                 </div>
               </div>
               <div class="explore-creator-list" id="explore-creators"></div>
+            </section>
+
+            <!-- 3. DETALLE DE LA PLAZA (DENTRO DE EXPLORE) -->
+            <section class="explore-block" id="explore-plaza-block" hidden>
+              <button class="hub-back-inline" type="button" data-explore-plaza-back>
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+                <span>Volver a Explorar</span>
+              </button>
+              <div class="plaza-content">
+                <div class="plaza-hero-banner">
+                  <div class="plaza-hero-badge">Ciudad de Panamá · Eventos Destacados</div>
+                  <h2>Comunidad TCG Panamá 2026</h2>
+                  <p>Torneos semanales, intercambios de cartas coleccionables, lanzamientos y puntos de encuentro para duelistas y coleccionistas.</p>
+                </div>
+
+                <div class="plaza-grid" id="plaza-grid-inline">
+                  <article class="plaza-card">
+                    <div class="plaza-card-badge event-badge">Torneo Oficial</div>
+                    <h3 class="plaza-card-title">Liga TCG Panamá · Torneo Nacional</h3>
+                    <p class="plaza-card-desc">Competencia abierta de cartas coleccionables en Albrook Mall, Panamá. Premios en sobres exclusivos y trofeo conmemorativo CardGram.</p>
+                    <div class="plaza-card-footer">
+                      <span>📍 Albrook Mall, Pasillo del Koala</span>
+                      <strong>Sábado 15:00</strong>
+                    </div>
+                  </article>
+
+                  <article class="plaza-card">
+                    <div class="plaza-card-badge meet-badge">Encuentro & Trade</div>
+                    <h3 class="plaza-card-title">Card Swap & Trade Night</h3>
+                    <p class="plaza-card-desc">Noche de intercambio y exhibición de cartas raras, foils y graduadas. Trae tus binders y conoce a coleccionistas de toda la ciudad.</p>
+                    <div class="plaza-card-footer">
+                      <span>📍 Vía Argentina, El Cangrejo</span>
+                      <strong>Domingos 16:30</strong>
+                    </div>
+                  </article>
+
+                  <article class="plaza-card">
+                    <div class="plaza-card-badge launch-badge">Nuevo Drop</div>
+                    <h3 class="plaza-card-title">Mew Tarot & Champion-Verse Showcase</h3>
+                    <p class="plaza-card-desc">Presentación especial y demostración interactiva de renders 3D para coleccionistas con CardGram e Inkra.</p>
+                    <div class="plaza-card-footer">
+                      <span>📍 Costa del Este, Panamá</span>
+                      <strong>Próximo Viernes</strong>
+                    </div>
+                  </article>
+
+                  <article class="plaza-card">
+                    <div class="plaza-card-badge news-badge">Actualidad TCG</div>
+                    <h3 class="plaza-card-title">Expansión de Tiendas Asociadas</h3>
+                    <p class="plaza-card-desc">Nuevos puntos autorizados en San Francisco y Casco Antiguo para adquirir cartas físicas y códigos para Daily Booster Drops.</p>
+                    <div class="plaza-card-footer">
+                      <span>📍 Red de Tiendas Panamá</span>
+                      <strong>Activo</strong>
+                    </div>
+                  </article>
+                </div>
+              </div>
             </section>
 
             <section class="explore-block" id="explore-packs-block" hidden>
@@ -1240,14 +1305,7 @@
           <path d="M5 20a7 7 0 0 1 14 0"/>
         </svg>
       </button>
-      <button class="hub-fab-btn tone-a hub-mobile-daily" id="hub-mobile-daily" type="button" data-hub-route="booster" aria-label="Daily Pack disponible" data-i18n-aria-label="shop_daily_available" title="Daily Pack disponible" data-i18n-title="shop_daily_available" hidden>
-        <svg class="hub-fab-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
-          <path d="M4 9h16v11H4z"/>
-          <path d="M3 5h18v4H3z"/>
-          <path d="M12 5v15"/>
-          <path d="M12 5c-2.8 0-4.5-1-4.5-2.5C7.5 1.2 9 1 10 1.6c1.4.8 2 2.2 2 3.4zM12 5c2.8 0 4.5-1 4.5-2.5C16.5 1.2 15 1 14 1.6c-1.4.8-2 2.2-2 3.4z"/>
-        </svg>
-      </button>
+      
     </div>
 
     <!-- Botón único de menú + navegación (móvil) -->
