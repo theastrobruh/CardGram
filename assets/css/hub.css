@@ -15377,3 +15377,356 @@ body:not(.is-home-route) .hub-mobile-quick {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
   white-space: nowrap !important;
 }
+
+
+/* ==========================================================================
+   CardGram v0.5.5 — Updates & Refinements v3
+   - Corrección de tienda única en Desktop Shop (sin tiendas duplicadas)
+   - Restauración de tamaño y posición de Astro~Verse en Shop Mobile (140px, bottom 230px)
+   - Botón volver a la izquierda en Inventario y botón Nuevo Deck centrado en Tus Decks
+   - Separación de La Plaza en Pantalla 1 (Selector con dos botones 80/20) y Pantalla 2 (Feed)
+   ========================================================================== */
+
+/* 1. TIENDA ÚNICA EN DESKTOP SHOP (SIN TIENDAS DUPLICADAS) */
+@media (min-width: 981px) {
+  .shop-stores {
+    position: absolute !important;
+    right: 5% !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 290px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 10 !important;
+    gap: 8px !important;
+  }
+
+  .shop-stores .shop-store:not(:first-child) {
+    display: none !important;
+  }
+
+  .shop-store {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    gap: 8px !important;
+  }
+
+  .shop-store-building {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .shop-store-art {
+    width: 270px !important;
+    height: 270px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .shop-store-art img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.45)) !important;
+    transition: transform 0.25s ease !important;
+  }
+
+  .shop-store:hover .shop-store-art img {
+    transform: scale(1.04) !important;
+  }
+
+  .shop-store-name {
+    font-size: 0.65rem !important;
+    font-weight: 800 !important;
+    color: #07333f !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    padding: 3px 14px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22) !important;
+    white-space: nowrap !important;
+  }
+
+  .shop-store-owner {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .shop-store-avatar {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    border: 2px solid rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .shop-store-avatar img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .shop-store-user {
+    font-size: 0.58rem !important;
+    font-weight: 800 !important;
+    color: #07333f !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    padding: 2px 10px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* 2. SHOP RESPONSIVO / MOBILE: RESTAURACIÓN DE TAMAÑO Y POSICIÓN ORIGINAL */
+@media (max-width: 980px) {
+  .shop-mobile-store {
+    position: absolute !important;
+    right: 14px !important;
+    bottom: 230px !important;
+    z-index: 20 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+  }
+
+  .shop-mobile-store-building {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .shop-mobile-store-art {
+    width: 140px !important;
+    height: 140px !important;
+    object-fit: contain !important;
+    filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.45)) !important;
+  }
+
+  .shop-mobile-store-name {
+    font-size: 0.62rem !important;
+    font-weight: 800 !important;
+    color: #074755 !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    padding: 3px 12px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22) !important;
+    white-space: nowrap !important;
+  }
+
+  .shop-mobile-store-owner {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 3px !important;
+  }
+
+  .shop-mobile-store-avatar {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .shop-mobile-store-user {
+    font-size: 0.54rem !important;
+    font-weight: 800 !important;
+    color: #0b5966 !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    padding: 2px 10px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2) !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* 3. INVENTARIO: BOTÓN VOLVER A LA ESQUINA IZQUIERDA Y BOTÓN NUEVO DECK CENTRADO EN TUS DECKS */
+.hub-panel[data-hub-panel="collections"] .hub-view-head {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 54px !important;
+  width: 100% !important;
+  margin-bottom: 20px !important;
+}
+
+.hub-panel[data-hub-panel="collections"] .hub-view-head #collections-view-back {
+  position: absolute !important;
+  left: 0 !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin: 0 !important;
+  z-index: 5 !important;
+}
+
+.hub-panel[data-hub-panel="collections"] .hub-view-head .hub-view-copy {
+  width: 100% !important;
+  text-align: center !important;
+  margin: 0 auto !important;
+}
+
+.hub-panel[data-hub-panel="collections"] .hub-view-head .hub-view-copy h1,
+.hub-panel[data-hub-panel="collections"] .hub-view-head .hub-view-copy p {
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.collections-new-deck-center {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  margin: 12px auto 18px auto !important;
+}
+
+.collections-new-deck-center .btn {
+  min-height: 40px !important;
+  padding: 0 24px !important;
+  border-radius: 999px !important;
+  font-weight: 800 !important;
+}
+
+/* 4. EXPLORE: LA PLAZA EN DOS PANTALLAS (PANTALLA 1 SELECTOR, PANTALLA 2 FEED) */
+#explore-plaza-picker-block {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 55vh !important;
+  padding: 10px 16px 30px 16px !important;
+  animation: fadeIn 0.3s ease !important;
+}
+
+#explore-plaza-picker-block[hidden] {
+  display: none !important;
+}
+
+.plaza-picker-head {
+  text-align: center !important;
+  margin: 10px auto 24px auto !important;
+  max-width: 580px !important;
+}
+
+.plaza-picker-head h2 {
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  margin: 4px 0 6px 0 !important;
+  color: var(--ink) !important;
+  letter-spacing: -0.02em !important;
+}
+
+.plaza-picker-head p {
+  font-size: 0.68rem !important;
+  color: var(--muted) !important;
+  margin: 0 auto !important;
+  line-height: 1.45 !important;
+}
+
+#explore-plaza-picker-block .plaza-scope-container {
+  width: 100% !important;
+  max-width: 560px !important;
+  margin: 0 auto !important;
+}
+
+#explore-plaza-picker-block .plaza-scope-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+  width: 100% !important;
+}
+
+#explore-plaza-picker-block .plaza-scope-card {
+  height: 220px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 14px 12px 14px 12px !important;
+  border-radius: 26px !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.92) !important;
+  box-shadow: 0 12px 32px rgba(7, 43, 56, 0.12) !important;
+  cursor: pointer !important;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+
+#explore-plaza-picker-block .plaza-scope-card:hover {
+  transform: translateY(-4px) scale(1.03) !important;
+  border-color: #00f2fe !important;
+  box-shadow: 0 0 0 2px #00f2fe, 0 16px 36px rgba(0, 242, 254, 0.3) !important;
+}
+
+#explore-plaza-picker-block .plaza-scope-render-wrap {
+  flex: 0 0 78% !important;
+  height: 78% !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+#explore-plaza-picker-block .plaza-scope-hero-render {
+  max-height: 100% !important;
+  max-width: 92% !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.22)) !important;
+  transition: transform 0.3s ease !important;
+}
+
+#explore-plaza-picker-block .plaza-scope-card:hover .plaza-scope-hero-render {
+  transform: scale(1.08) !important;
+}
+
+#explore-plaza-picker-block .plaza-scope-label-wrap {
+  flex: 0 0 22% !important;
+  height: 22% !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#explore-plaza-picker-block .plaza-scope-switch-title {
+  font-size: 0.88rem !important;
+  font-weight: 800 !important;
+  color: #07333f !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  padding: 5px 18px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08) !important;
+  white-space: nowrap !important;
+}
+
+#explore-plaza-feed-block {
+  animation: fadeIn 0.3s ease !important;
+}
+
+#explore-plaza-feed-block[hidden] {
+  display: none !important;
+}

@@ -12,23 +12,23 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=214">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=214">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=215">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=215">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=214" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=214" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=214" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=214" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=214" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=214" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=214" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=214" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=214" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=214" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=214" defer></script>
-  <script src="assets/js/boot.js?v=0.5.5&rev=214" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=215" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=215" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=215" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=215" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=215" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=215" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=215" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=215" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=215" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=215" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=215" defer></script>
+  <script src="assets/js/boot.js?v=0.5.5&rev=215" defer></script>
 </head>
 <body data-view="hub" class="booting">
   <div class="boot-screen" id="boot-screen">
@@ -745,13 +745,13 @@
               <div class="shop-recommended" id="shop-recommended"></div>
               <div class="shop-stores" id="shop-stores"></div>
               <a class="shop-mobile-store" href="#/explore" data-hub-route="explore" aria-label="Visitar la tienda de theAstroBruh">
-                <div class="shop-mobile-store-col">
+                <div class="shop-mobile-store-building">
                   <img class="shop-mobile-store-art" src="assets/data/shops/theastrobruh-cover.png" alt="Astro~Verse">
-                  <span class="shop-mobile-store-badge">Astro~Verse</span>
+                  <span class="shop-mobile-store-name">Astro~Verse</span>
                 </div>
-                <div class="shop-mobile-store-col">
+                <div class="shop-mobile-store-owner">
                   <img class="shop-mobile-store-avatar" src="assets/data/shops/theastrobruh-avatar.jpg" alt="theAstroBruh">
-                  <span class="shop-mobile-store-badge">theAstroBruh</span>
+                  <span class="shop-mobile-store-user">theAstroBruh</span>
                 </div>
               </a>
               <div class="shop-mobile-bar" aria-hidden="true"></div>
@@ -833,10 +833,6 @@
                 <h1 id="collections-title" data-i18n="collections_title">Colecciones y decks</h1>
                 <p data-i18n="collections_lede">Explora el catálogo o junta tus cartas favoritas en un deck propio.</p>
               </div>
-              <button class="btn btn-primary btn-sm" type="button" id="btn-new-deck">
-                <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
-                <span data-i18n="collections_new_deck">Nuevo deck</span>
-              </button>
             </header>
 
             <div id="collections-overview">
@@ -884,14 +880,16 @@
               </section>
 
               <section class="hub-section" aria-labelledby="collections-yours-title">
-                <div class="hub-section-head hub-section-head-row">
+                <div class="hub-section-head">
                   <div>
                     <h2 id="collections-yours-title" data-i18n="collections_yours">Tus decks</h2>
                     <p data-i18n="collections_yours_hint">Agrupaciones personales para preparar un render o una serie.</p>
                   </div>
-                  <button class="hub-text-btn" type="button" id="btn-new-deck-2">
+                </div>
+                <div class="collections-new-deck-center">
+                  <button class="btn btn-primary btn-sm" type="button" id="btn-new-deck" data-new-deck>
                     <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
-                    <span data-i18n="collections_new_deck_short">Crear deck</span>
+                    <span data-i18n="collections_new_deck">Nuevo deck</span>
                   </button>
                 </div>
                 <div class="hub-deck-grid" id="decks-grid"></div>
@@ -1027,16 +1025,22 @@
             </section>
 
             <!-- 3. DETALLE DE LA PLAZA (DENTRO DE EXPLORE) -->
-            <section class="explore-block" id="explore-plaza-block" hidden>
+            <!-- PANTALLA 1: SELECCIÓN DE ALCANCE DE LA PLAZA (SOLO LOS DOS BOTONES SWITCH) -->
+            <section class="explore-block" id="explore-plaza-picker-block" hidden>
               <button class="hub-back-inline" type="button" data-explore-plaza-back>
                 <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
                 <span>Volver a Explorar</span>
               </button>
 
-              <!-- Plaza Scope Selector (Local vs. General) -->
+              <div class="plaza-picker-head">
+                <span class="hub-panel-eyebrow"><span class="hub-live-dot hub-live-dot-sky"></span><span>La Plaza</span></span>
+                <h2>Elige el alcance a explorar</h2>
+                <p>Descubre eventos presenciales y tiendas en Panamá o el pulso del metajuego a nivel mundial.</p>
+              </div>
+
               <div class="plaza-scope-container">
                 <div class="plaza-scope-grid" id="plaza-scope-grid" role="tablist" aria-label="Alcance de La Plaza">
-                  <button class="plaza-scope-card is-active" type="button" role="tab" aria-selected="true" data-plaza-scope="local">
+                  <button class="plaza-scope-card" type="button" data-plaza-scope="local">
                     <div class="plaza-scope-render-wrap">
                       <img src="assets/data/shops/theastrobruh-cover.png" alt="Local Panamá" class="plaza-scope-hero-render">
                     </div>
@@ -1045,7 +1049,7 @@
                     </div>
                   </button>
 
-                  <button class="plaza-scope-card" type="button" role="tab" aria-selected="false" data-plaza-scope="general">
+                  <button class="plaza-scope-card" type="button" data-plaza-scope="general">
                     <div class="plaza-scope-render-wrap">
                       <img src="assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp" alt="General Global" class="plaza-scope-hero-render plaza-scope-hero-globe">
                     </div>
@@ -1055,6 +1059,14 @@
                   </button>
                 </div>
               </div>
+            </section>
+
+            <!-- PANTALLA 2: CONTENIDO DE LA PLAZA SEGÚN LA CATEGORÍA ELEGIDA -->
+            <section class="explore-block" id="explore-plaza-feed-block" hidden>
+              <button class="hub-back-inline" type="button" data-plaza-feed-back>
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+                <span>Volver a opciones de La Plaza</span>
+              </button>
 
               <div class="plaza-content">
                 <!-- FEED LOCAL (PANAMÁ 🇵🇦) -->

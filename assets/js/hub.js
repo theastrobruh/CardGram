@@ -1509,31 +1509,28 @@ function closeShopPackView() {
   if (hub.els.shopPackView) hub.els.shopPackView.hidden = true;
 }
 
-function renderShopStores(recommended) {
+function renderShopStores() {
   const container = hub.els.shopStores;
   if (!container) return;
-  container.replaceChildren(
-    ...recommended.map(() => {
-      const button = makeHubButton('shop-store', null, { hubRoute: 'explore' });
-      button.setAttribute('aria-label', 'Visitar tienda Astro~Verse de theAstroBruh');
 
-      const building = makeNode('span', 'shop-store-building');
-      const art = makeNode('span', 'shop-store-art');
-      art.appendChild(makeHubImage('assets/data/shops/theastrobruh-cover.png', 'Astro~Verse Shop'));
-      building.appendChild(art);
-      building.appendChild(makeNode('span', 'shop-store-name', 'Astro~Verse'));
-      button.appendChild(building);
+  const button = makeHubButton('shop-store', null, { hubRoute: 'explore' });
+  button.setAttribute('aria-label', 'Visitar tienda Astro~Verse de theAstroBruh');
 
-      const owner = makeNode('span', 'shop-store-owner');
-      const avatar = makeNode('span', 'shop-store-avatar');
-      avatar.appendChild(makeHubImage('assets/data/shops/theastrobruh-avatar.jpg', 'theAstroBruh'));
-      owner.appendChild(avatar);
-      owner.appendChild(makeNode('span', 'shop-store-user', 'theAstroBruh'));
-      button.appendChild(owner);
+  const building = makeNode('span', 'shop-store-building');
+  const art = makeNode('span', 'shop-store-art');
+  art.appendChild(makeHubImage('assets/data/shops/theastrobruh-cover.png', 'Astro~Verse Shop'));
+  building.appendChild(art);
+  building.appendChild(makeNode('span', 'shop-store-name', 'Astro~Verse'));
+  button.appendChild(building);
 
-      return button;
-    })
-  );
+  const owner = makeNode('span', 'shop-store-owner');
+  const avatar = makeNode('span', 'shop-store-avatar');
+  avatar.appendChild(makeHubImage('assets/data/shops/theastrobruh-avatar.jpg', 'theAstroBruh'));
+  owner.appendChild(avatar);
+  owner.appendChild(makeNode('span', 'shop-store-user', 'theAstroBruh'));
+  button.appendChild(owner);
+
+  container.replaceChildren(button);
 }
 
 function renderShopRecommended(sets) {
@@ -1576,7 +1573,7 @@ function renderShopRecommended(sets) {
       return button;
     })
   );
-  renderShopStores(recommended);
+  renderShopStores();
 }
 
 function renderBooster() {
@@ -4753,24 +4750,30 @@ function renderExplore() {
 
   const packs = explorePacks();
   const creatorOpen = hub.exploreCreatorId === 'theastrobruh';
-  const plazaOpen = Boolean(hub.explorePlazaOpen);
+  const plazaStep = hub.explorePlazaStep || null; // null (explore lobby) | 'picker' (screen 1) | 'feed' (screen 2)
+  const inPlaza = Boolean(plazaStep);
   const pack = creatorOpen ? packs.find((collection) => collection.id === hub.explorePackId) : null;
 
   if (hub.els.explorePacksBlock) hub.els.explorePacksBlock.hidden = !creatorOpen || Boolean(pack);
   if (hub.els.explorePackDetail) hub.els.explorePackDetail.hidden = !pack;
 
-  if (hub.els.explorePlazaBlock) hub.els.explorePlazaBlock.hidden = !plazaOpen;
-  if (hub.els.explorePlazaEntryBlock) hub.els.explorePlazaEntryBlock.hidden = creatorOpen || plazaOpen;
-  if (hub.els.exploreCreatorsBlock) hub.els.exploreCreatorsBlock.hidden = creatorOpen || plazaOpen;
-  if (hub.els.exploreWantMore) hub.els.exploreWantMore.hidden = creatorOpen || plazaOpen;
-  if (hub.els.exploreRoadmap) hub.els.exploreRoadmap.hidden = creatorOpen || plazaOpen;
+  if (hub.els.explorePlazaPickerBlock) hub.els.explorePlazaPickerBlock.hidden = plazaStep !== 'picker';
+  if (hub.els.explorePlazaFeedBlock) hub.els.explorePlazaFeedBlock.hidden = plazaStep !== 'feed';
+
+  if (hub.els.explorePlazaEntryBlock) hub.els.explorePlazaEntryBlock.hidden = creatorOpen || inPlaza;
+  if (hub.els.exploreCreatorsBlock) hub.els.exploreCreatorsBlock.hidden = creatorOpen || inPlaza;
+  if (hub.els.exploreWantMore) hub.els.exploreWantMore.hidden = creatorOpen || inPlaza;
+  if (hub.els.exploreRoadmap) hub.els.exploreRoadmap.hidden = creatorOpen || inPlaza;
 
   if (hub.els.explorePackCount) {
     hub.els.explorePackCount.textContent = countLabel('explore_pack_count', packs.length);
   }
 
-  if (plazaOpen) {
+  if (plazaStep === 'feed') {
     renderPlazaScope();
+    return;
+  }
+  if (plazaStep === 'picker') {
     return;
   }
 
@@ -5627,6 +5630,8 @@ function onHubClick(event) {
   if (plazaScopeBtn) {
     event.preventDefault();
     setPlazaScope(plazaScopeBtn.dataset.plazaScope);
+    hub.explorePlazaStep = 'feed';
+    renderExplore();
     if (window.Sound) window.Sound.play('flip');
     return;
   }
@@ -5730,16 +5735,24 @@ function onHubClick(event) {
 
   if (target.closest('[data-explore-plaza]')) {
     event.preventDefault();
-    hub.explorePlazaOpen = true;
+    hub.explorePlazaStep = 'picker';
     hub.exploreCreatorId = null;
     hub.explorePackId = null;
     renderExplore();
+    if (window.Sound) window.Sound.play('flip');
     return;
   }
 
   if (target.closest('[data-explore-plaza-back]')) {
     event.preventDefault();
-    hub.explorePlazaOpen = false;
+    hub.explorePlazaStep = null;
+    renderExplore();
+    return;
+  }
+
+  if (target.closest('[data-plaza-feed-back]')) {
+    event.preventDefault();
+    hub.explorePlazaStep = 'picker';
     renderExplore();
     return;
   }
@@ -6680,7 +6693,8 @@ function cacheHubDom() {
   els.exploreCreators = hubEl('explore-creators');
   els.explorePlazaEntryBlock = hubEl('explore-plaza-entry-block');
   els.explorePlazaList = hubEl('explore-plaza-list');
-  els.explorePlazaBlock = hubEl('explore-plaza-block');
+  els.explorePlazaPickerBlock = hubEl('explore-plaza-picker-block');
+  els.explorePlazaFeedBlock = hubEl('explore-plaza-feed-block');
   els.exploreWantMore = document.querySelector('.explore-want-more');
   els.exploreRoadmap = document.querySelector('.explore-roadmap');
   els.exploreCreatorsBlock = hubEl('explore-creators-block');
