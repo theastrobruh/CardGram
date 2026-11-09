@@ -43,7 +43,7 @@ const HUB_HOME_DEFAULT = {
   loose: []
 };
 
-const HUB_PANELS = ['home', 'booster', 'collections', 'explore', 'profile'];
+const HUB_PANELS = ['home', 'booster', 'collections', 'explore', 'plaza', 'profile'];
 
 const DECK_EMOJIS = [
   '🃏', '🔥', '🌙', '⭐', '✨', '🐉', '🦊', '🐱',
@@ -1073,6 +1073,83 @@ function loadShopPackArt() {
       if (hub.ready && hub.panel === 'explore') renderExplore();
     })
     .catch(() => {});
+}
+
+
+function triggerShopTransitionAnimation(newSlot) {
+  const npcContainer = hub.els.shopNpcContainer || document.querySelector('.shop-npc');
+  if (!npcContainer) return;
+  npcContainer.classList.add('is-time-transition');
+  window.setTimeout(() => {
+    npcContainer.classList.remove('is-time-transition');
+  }, 1500);
+}
+
+function triggerAzuraLeave() {
+  if (azuraIsAway || hub.panel !== 'booster') return;
+  azuraIsAway = true;
+  const npcContainer = hub.els.shopNpcContainer || document.querySelector('.shop-npc');
+  if (npcContainer) {
+    const activeImg = shopVendorActive === 0 ? hub.els.shopNpcA : hub.els.shopNpcB;
+    if (activeImg) activeImg.src = AZURA_POSES.leave;
+    window.setTimeout(() => {
+      npcContainer.classList.add('is-leaving-scene');
+    }, 400);
+  }
+}
+
+function triggerAzuraReturn() {
+  if (!azuraIsAway) return;
+  azuraIsAway = false;
+  const npcContainer = hub.els.shopNpcContainer || document.querySelector('.shop-npc');
+  if (npcContainer) {
+    npcContainer.classList.remove('is-leaving-scene');
+    const activeImg = shopVendorActive === 0 ? hub.els.shopNpcA : hub.els.shopNpcB;
+    if (activeImg) activeImg.src = AZURA_POSES.enter;
+    npcContainer.classList.add('is-entering-scene');
+    window.setTimeout(() => {
+      npcContainer.classList.remove('is-entering-scene');
+    }, 900);
+  }
+  scheduleAzuraAway();
+}
+
+function scheduleAzuraAway() {
+  window.clearTimeout(azuraAwayTimer);
+  // Cuando no se usa por un periodo largo (35 segundos sin interacción en la tienda)
+  azuraAwayTimer = window.setTimeout(() => {
+    if (hub.panel === 'booster' && !document.hidden) {
+      triggerAzuraLeave();
+    }
+  }, 35000);
+}
+
+function handleAzuraTap() {
+  scheduleAzuraAway();
+  if (azuraIsAway) {
+    triggerAzuraReturn();
+    return;
+  }
+  azuraTapCount += 1;
+  window.clearTimeout(azuraTapResetTimer);
+  azuraTapResetTimer = window.setTimeout(() => {
+    azuraTapCount = 0;
+  }, 3500);
+
+  // Si se hace demasiados taps consecutivos (4 o más), adopta postura irritada/molesta
+  if (azuraTapCount >= 4) {
+    const annoyedSrc = AZURA_POSES.annoyed[Math.floor(Math.random() * AZURA_POSES.annoyed.length)];
+    const activeImg = shopVendorActive === 0 ? hub.els.shopNpcA : hub.els.shopNpcB;
+    if (activeImg) activeImg.src = annoyedSrc;
+    if (hub.els.shopSpeech) {
+      const annoyedLine = document.documentElement.lang === 'es'
+        ? '¡Oye! Ya te vi, no tienes que picarme la pantalla.'
+        : "Hey! I see you, you don't need to poke me repeatedly.";
+      typeShopLine(annoyedLine);
+    }
+  } else {
+    speakShopLine('talk');
+  }
 }
 
 function initShopScene() {
@@ -5805,6 +5882,23 @@ function setupHubEvents() {
   });
 
   window.setInterval(updateBoosterClock, 1000);
+  // Deshabilitar click derecho en modo escritorio
+  document.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    return false;
+  });
+
+  // Prevenir zoom gestual (pinch to zoom) en modo responsivo
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches && e.touches.length > 1) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  document.addEventListener('gesturestart', (e) => {
+    e.preventDefault();
+  });
+
 }
 
 /* --------------------------------------------------------------------------

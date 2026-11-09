@@ -13450,3 +13450,274 @@ body:not(.is-home-route) .hub-mobile-quick {
   color: #ffffff;
   box-shadow: 0 8px 18px rgba(41, 140, 217, 0.28);
 }
+
+/* Home Mobile: Carta favorita un 20% más abajo y nombre de carta 20% más grande */
+@media (max-width: 980px) {
+  .hub-favorite .hub-showcase {
+    margin-top: clamp(48px, 11vh, 85px) !important;
+  }
+
+  .hub-card-name,
+  .hub-favorite .hub-card-name {
+    font-size: clamp(1.35rem, 5.8vw, 1.75rem) !important;
+  }
+}
+
+/* Shop Mobile: Alinear e interconectar los 3 iconos (días, turno, packs) centrados con el botón Volver */
+@media (max-width: 980px) {
+  .shop-topbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    position: relative !important;
+  }
+
+  .shop-topbar .hub-back {
+    position: relative !important;
+    z-index: 8 !important;
+    flex: 0 0 auto !important;
+  }
+
+  .shop-days {
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  /* Ocultar el botón computadora en mobile ya que es redundante con el icono tienda */
+  .shop-computer {
+    display: none !important;
+  }
+
+  /* Centrar los 3 indicadores en la barra superior móvil */
+  .shop-topbar-center-group,
+  .shop-topbar {
+    gap: 8px !important;
+  }
+
+  .shop-status-row {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .shop-topbar {
+    justify-content: flex-start !important;
+  }
+
+  .shop-days {
+    margin-left: auto !important;
+  }
+
+  .shop-status-row {
+    margin-right: auto !important;
+  }
+}
+
+/* Botón Nuevo Pack en Header (Desktop y Mobile) */
+.hub-btn-new-pack {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(200, 248, 242, 0.85)) !important;
+  color: #074b5a !important;
+  box-shadow: 0 0 0 2px rgba(69, 217, 194, 0.35), 0 4px 12px rgba(8, 62, 82, 0.15) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.hub-btn-new-pack:hover {
+  transform: translateY(-1px) scale(1.05) !important;
+  box-shadow: 0 0 0 3px rgba(69, 217, 194, 0.5), 0 6px 16px rgba(8, 62, 82, 0.22) !important;
+}
+
+/* Azura NPC Transition & Idle Leave animations */
+.shop-npc {
+  cursor: pointer;
+  pointer-events: auto !important;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), filter 0.5s ease;
+}
+
+.shop-npc.is-leaving-scene {
+  opacity: 0 !important;
+  transform: translateX(-50%) translateY(30px) scale(0.92) !important;
+  pointer-events: none !important;
+}
+
+.shop-npc.is-entering-scene {
+  animation: azuraEnterScene 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes azuraEnterScene {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(25px) scale(0.94);
+    filter: blur(4px) brightness(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+    filter: blur(0px) brightness(1);
+  }
+}
+
+.shop-npc.is-time-transition {
+  animation: azuraTimeShift 1.4s ease-in-out forwards;
+}
+
+@keyframes azuraTimeShift {
+  0% {
+    opacity: 1;
+    filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  }
+  35% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(14px) scale(0.96);
+    filter: drop-shadow(0 0 25px rgba(255, 215, 140, 0.8)) brightness(1.3);
+  }
+  65% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.35));
+  }
+}
+
+/* Botón Plaza en la tienda móvil */
+.shop-mobile-plaza {
+  right: auto !important;
+  left: 14px !important;
+  bottom: 255px !important;
+}
+
+.shop-plaza-label {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 9px;
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: #074755;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.98);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Plaza TCG Panel Styling */
+.plaza-content {
+  padding: 16px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.plaza-hero-banner {
+  padding: 22px;
+  border-radius: 24px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(214, 248, 245, 0.75));
+  border: 1px solid rgba(255, 255, 255, 0.98);
+  box-shadow: 0 16px 36px rgba(6, 55, 74, 0.12), inset 0 1px 0 #ffffff;
+  margin-bottom: 20px;
+}
+
+.plaza-hero-badge {
+  display: inline-block;
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0d6b7b;
+  margin-bottom: 8px;
+}
+
+.plaza-hero-banner h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #052b35;
+  margin: 0 0 6px;
+}
+
+.plaza-hero-banner p {
+  font-size: 0.74rem;
+  color: #2b5f6d;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.plaza-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.plaza-card {
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  border-radius: 20px;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.88), rgba(230, 250, 252, 0.65));
+  border: 1px solid rgba(255, 255, 255, 0.96);
+  box-shadow: 0 8px 24px rgba(6, 55, 74, 0.08), inset 0 1px 0 #ffffff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.plaza-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(6, 55, 74, 0.14);
+}
+
+.plaza-card-badge {
+  align-self: flex-start;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.event-badge {
+  background: rgba(41, 140, 217, 0.18);
+  color: #1a6da8;
+  border: 1px solid rgba(41, 140, 217, 0.35);
+}
+
+.meet-badge {
+  background: rgba(69, 217, 194, 0.24);
+  color: #09756b;
+  border: 1px solid rgba(69, 217, 194, 0.4);
+}
+
+.launch-badge {
+  background: rgba(255, 178, 64, 0.2);
+  color: #a36100;
+  border: 1px solid rgba(255, 178, 64, 0.4);
+}
+
+.news-badge {
+  background: rgba(140, 80, 220, 0.18);
+  color: #6b28b5;
+  border: 1px solid rgba(140, 80, 220, 0.35);
+}
+
+.plaza-card-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #06313d;
+  margin: 0 0 6px;
+}
+
+.plaza-card-desc {
+  font-size: 0.64rem;
+  color: #35626f;
+  line-height: 1.45;
+  margin: 0 0 12px;
+  flex: 1 1 auto;
+}
+
+.plaza-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(124, 235, 221, 0.22);
+  font-size: 0.55rem;
+  color: #0a5f6e;
+}

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#b6ebea">
   <meta name="color-scheme" content="light">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -12,23 +12,23 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=207">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=207">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=208">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=208">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=207" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=207" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=207" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=207" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=207" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=207" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=207" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=207" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=207" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=207" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=207" defer></script>
-  <script src="assets/js/boot.js?v=0.5.5&rev=207" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=208" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=208" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=208" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=208" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=208" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=208" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=208" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=208" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=208" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=208" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=208" defer></script>
+  <script src="assets/js/boot.js?v=0.5.5&rev=208" defer></script>
 </head>
 <body data-view="hub" class="booting">
   <div class="boot-screen" id="boot-screen">
@@ -397,6 +397,9 @@
               <a class="hub-top-icon hub-top-kofi" href="https://ko-fi.com/theastrobruh" target="_blank" rel="noopener noreferrer" title="Apoyar CardGram en Ko-fi" data-i18n-title="hub_support_kofi_title" aria-label="Apoyar CardGram en Ko-fi" data-i18n-aria-label="hub_support_kofi_title">
                 <svg class="icon" aria-hidden="true"><use href="#i-kofi"></use></svg>
               </a>
+              <button class="hub-top-icon hub-btn-new-pack" type="button" data-hub-route="booster" aria-label="Nuevo Pack" data-i18n-aria-label="shop_new_pack" title="Nuevo Pack" data-i18n-title="shop_new_pack">
+                <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+              </button>
               <a class="hub-top-icon" href="https://github.com/theastrobruh/CardGram" target="_blank" rel="noopener noreferrer" title="Repositorio de CardGram en GitHub" data-i18n-title="hub_support_github_title" aria-label="Abrir el repositorio de CardGram en GitHub" data-i18n-aria-label="hub_support_github_title">
                 <svg class="icon" aria-hidden="true"><use href="#i-github"></use></svg>
               </a>
@@ -412,6 +415,9 @@
               </button>
             </div>
             <div class="hub-header-actions">
+              <button class="hub-header-btn hub-btn-new-pack" type="button" data-hub-route="booster" aria-label="Nuevo Pack" data-i18n-aria-label="shop_new_pack" title="Nuevo Pack" data-i18n-title="shop_new_pack">
+                <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+              </button>
               <a class="hub-header-btn" href="https://github.com/theastrobruh/CardGram" target="_blank" rel="noopener noreferrer" aria-label="Abrir el repositorio de CardGram en GitHub" data-i18n-aria-label="hub_support_github_title" title="Repositorio de CardGram en GitHub" data-i18n-title="hub_support_github_title">
                 <svg class="icon" aria-hidden="true"><use href="#i-github"></use></svg>
               </a>
@@ -727,6 +733,10 @@
                 <img class="shop-mobile-store-art" src="assets/data/shops/theastrobruh-cover.webp" alt="">
                 <img class="shop-mobile-store-avatar" src="assets/data/shops/theastrobruh-avatar.jpg" alt="">
               </a>
+              <a class="shop-mobile-store shop-mobile-plaza" href="#/plaza" data-hub-route="plaza" aria-label="Visitar Plaza TCG">
+                <img class="shop-mobile-store-art" src="assets/data/explore/Plaza-Icon.webp" alt="Plaza TCG">
+                <span class="shop-plaza-label">Plaza</span>
+              </a>
               <div class="shop-mobile-bar" aria-hidden="true"></div>
 
               <aside class="shop-daily">
@@ -902,6 +912,72 @@
           <!-- ------------------------------------------------------------
                Explorar (preparado, función futura)
                ------------------------------------------------------------ -->
+          
+          <!-- ------------------------------------------------------------
+               Plaza TCG (Eventos y Noticias TCG Ciudad de Panamá)
+               ------------------------------------------------------------ -->
+          <section class="hub-panel" data-hub-panel="plaza" aria-labelledby="plaza-title" hidden>
+            <header class="hub-view-head">
+              <button class="hub-back" type="button" data-hub-route="booster" aria-label="Volver a la tienda" data-i18n-aria-label="hub_back_shop">
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+              </button>
+              <div class="hub-view-copy">
+                <h1 id="plaza-title" data-i18n="plaza_title">Plaza TCG</h1>
+                <p data-i18n="plaza_lede">Noticias de actualidad y eventos TCG en Ciudad de Panamá.</p>
+              </div>
+              <span class="hub-count-pill" id="plaza-badge-panama">🇵🇦 Panamá</span>
+            </header>
+
+            <section class="plaza-content">
+              <div class="plaza-hero-banner">
+                <div class="plaza-hero-badge">Ciudad de Panamá · Eventos Destacados</div>
+                <h2>Comunidad TCG Panamá 2026</h2>
+                <p>Torneos semanales, intercambios de cartas coleccionables, lanzamientos y puntos de encuentro para duelistas y coleccionistas.</p>
+              </div>
+
+              <div class="plaza-grid" id="plaza-grid">
+                <article class="plaza-card">
+                  <div class="plaza-card-badge event-badge">Torneo Oficial</div>
+                  <h3 class="plaza-card-title">Liga TCG Panamá · Torneo Nacional</h3>
+                  <p class="plaza-card-desc">Competencia abierta de cartas coleccionables en Albrook Mall, Panamá. Premios en sobres exclusivos y trofeo conmemorativo CardGram.</p>
+                  <div class="plaza-card-footer">
+                    <span>📍 Albrook Mall, Pasillo del Koala</span>
+                    <strong>Sábado 15:00</strong>
+                  </div>
+                </article>
+
+                <article class="plaza-card">
+                  <div class="plaza-card-badge meet-badge">Encuentro & Trade</div>
+                  <h3 class="plaza-card-title">Card Swap & Trade Night</h3>
+                  <p class="plaza-card-desc">Noche de intercambio y exhibición de cartas raras, foils y graduadas. Trae tus binders y conoce a coleccionistas de toda la ciudad.</p>
+                  <div class="plaza-card-footer">
+                    <span>📍 Vía Argentina, El Cangrejo</span>
+                    <strong>Domingos 16:30</strong>
+                  </div>
+                </article>
+
+                <article class="plaza-card">
+                  <div class="plaza-card-badge launch-badge">Nuevo Drop</div>
+                  <h3 class="plaza-card-title">Mew Tarot & Champion-Verse Showcase</h3>
+                  <p class="plaza-card-desc">Presentación especial y demostración interactiva de renders 3D para coleccionistas con CardGram e Inkra.</p>
+                  <div class="plaza-card-footer">
+                    <span>📍 Costa del Este, Panamá</span>
+                    <strong>Próximo Viernes</strong>
+                  </div>
+                </article>
+
+                <article class="plaza-card">
+                  <div class="plaza-card-badge news-badge">Actualidad TCG</div>
+                  <h3 class="plaza-card-title">Expansión de Tiendas Asociadas</h3>
+                  <p class="plaza-card-desc">Nuevos puntos autorizados en San Francisco y Casco Antiguo para adquirir cartas físicas y códigos para Daily Booster Drops.</p>
+                  <div class="plaza-card-footer">
+                    <span>📍 Red de Tiendas Panamá</span>
+                    <strong>Activo</strong>
+                  </div>
+                </article>
+              </div>
+            </section>
+          </section>
           <section class="hub-panel" data-hub-panel="explore" aria-labelledby="explore-title" hidden>
             <header class="hub-view-head">
               <button class="hub-back" type="button" data-hub-route="home" aria-label="Volver al inicio" data-i18n-aria-label="hub_back_home">

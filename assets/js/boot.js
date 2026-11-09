@@ -122,15 +122,11 @@
     try {
       const response = await fetch('assets/data/loading/manifest.json', { cache: 'no-store' });
       const data = response.ok ? await response.json() : null;
-      const desktop = window.matchMedia('(min-width: 981px)').matches;
-      const selected = data && Array.isArray(desktop ? data.desktop : data.mobile)
-        ? (desktop ? data.desktop : data.mobile)
-        : null;
+      // Utilizar un solo fondo unificado (desktop wide) tanto en móvil como en escritorio
+      const selected = data && Array.isArray(data.desktop) ? data.desktop : (data && Array.isArray(data.images) ? data.images : null);
       const custom = selected
         ? selected.filter((src) => typeof src === 'string')
-        : data && Array.isArray(data.images)
-          ? data.images.filter((src) => typeof src === 'string')
-          : [];
+        : [];
       carousel.push(shopBackgroundForNow());
       carousel.push(...shuffled(custom.length ? custom : fallback));
       images = carousel.concat(extra);
