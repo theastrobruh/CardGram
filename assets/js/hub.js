@@ -1531,6 +1531,7 @@ function closeShopPackView() {
 function renderShopStores() {
   const container = hub.els.shopStores;
   if (!container) return;
+  setTimeout(setupShopPlaygroundAll, 50);
 
   const button = makeHubButton('shop-store', null, { hubRoute: 'explore' });
   button.setAttribute('aria-label', 'Visitar tienda Astro~Verse de theAstroBruh');
@@ -3736,14 +3737,12 @@ function makeDeckCoverImage(deck, alt = '') {
 
 function renderCollectionsOverview() {
   if (hub.els.ownedGrid) {
-    const collectionsWithCards = HUB_CATALOG.collections
-      .map((collection) => {
-        const owned = ownedIn(collection.id);
-        return { collection, count: owned.length, cardIds: owned };
-      })
-      .filter((entry) => entry.count > 0);
+    // Mostrar todos los sets disponibles en el catálogo en formato 3 por pantalla
+    const allSets = HUB_CATALOG.collections.filter((col) => col.id !== 'user-created');
 
-    const deckBoxCards = collectionsWithCards.map(({ collection, count }) => {
+    const deckBoxCards = allSets.map((collection) => {
+      const owned = ownedIn(collection.id);
+      const count = owned.length;
       const total = collection.setSize || collection.cards.length;
       const percent = total ? Math.round((count / total) * 100) : 0;
       const button = makeHubButton('deck-box-card', null, { collectionId: collection.id });
@@ -3757,7 +3756,7 @@ function renderCollectionsOverview() {
 
       const body = makeNode('span', 'deck-box-body');
       body.appendChild(makeNode('span', 'deck-box-title', collection.name));
-      body.appendChild(makeNode('span', 'deck-box-desc', `${percent}%`));
+      body.appendChild(makeNode('span', 'deck-box-desc', `${percent}% completado`));
       button.appendChild(body);
       return button;
     });
@@ -3781,7 +3780,7 @@ function renderCollectionsOverview() {
 
     const body = makeNode('span', 'deck-box-body');
     body.appendChild(makeNode('span', 'deck-box-title', t('collections_tab_created') || 'Cartas creadas'));
-    body.appendChild(makeNode('span', 'deck-box-desc', count === 1 ? '1 carta' : `${count} cartas`));
+    body.appendChild(makeNode('span', 'deck-box-desc', count === 1 ? '1 carta creada' : `${count} cartas creadas`));
     button.appendChild(body);
 
     hub.els.createdGrid.replaceChildren(button);
@@ -6882,3 +6881,270 @@ window.addEventListener('load', () => {
     }
   }
 });
+
+/* ==========================================================================
+   DESKTOP SHOP PLAYGROUND ENGINE
+   - Elementos manipulables: Boosters individuales, Azura (NPC) y Tienda del día (edificio + pastillas + avatar)
+   - Movimiento libre con arrastre y lanzamiento (física de rebote en los bordes de la pantalla)
+   - Modificación de tamaño a voluntad (rueda del mouse / zoom) con indicador visual
+   - Botón de restablecimiento para volver exactamente a la posición y tamaño original
+   ========================================================================== */
+const shopPlaygroundStates = new Map();
+let shopPlaygroundSuppressClick = 0;
+
+function getPlaygroundState(el) {
+  if (!shopPlaygroundStates.has(el)) {
+    shopPlaygroundStates.set(el, {
+      x: 0,
+      y: 0,
+      scale: 1,
+      vx: 0,
+      vy: 0,
+      animId: null,
+      isDragging: false,
+      hasMoved: false,
+      startX: 0,
+      startY: 0,
+      lastX: 0,
+      lastY: 0,
+      lastTime: 0
+    });
+  }
+  return shopPlaygroundStates.get(el);
+}
+
+function updatePlaygroundTransform(el, state) {
+  if (el.classList.contains('shop-npc')) {
+    el.style.transform = `translate(calc(-50% + ${state.x}px), ${state.y}px) scale(${state.scale})`;
+  } else if (el.classList.contains('shop-stores')) {
+    el.style.transform = `translate(${state.x}px, calc(-50% + ${state.y}px)) scale(${state.scale})`;
+  } else {
+    el.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
+  }
+}
+
+function showPlaygroundScaleBadge(el, scale) {
+  let badge = el.querySelector('.playground-scale-badge');
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.className = 'playground-scale-badge';
+    el.appendChild(badge);
+  }
+  badge.textContent = `${Math.round(scale * 100)}%`;
+  badge.classList.add('is-visible');
+  clearTimeout(el._scaleTimer);
+  el._scaleTimer = setTimeout(() => {
+    badge.classList.remove('is-visible');
+  }, 900);
+}
+
+function attachShopPlayground(el) {
+  if (!el || el._hasPlayground) return;
+  el._hasPlayground = true;
+
+  const state = getPlaygroundState(el);
+
+  el.addEventListener('pointerdown', (e) => {
+    if (window.innerWidth <= 980) return; // Solo en desktop
+    if (e.button !== 0) return; // Solo clic primario
+
+    // Cancelar cualquier física previa
+    if (state.animId) {
+      cancelAnimationFrame(state.animId);
+      state.animId = null;
+    }
+    state.vx = 0;
+    state.vy = 0;
+    state.isDragging = false;
+    state.hasMoved = false;
+
+    state.startX = e.clientX;
+    state.startY = e.clientY;
+    state.lastX = e.clientX;
+    state.lastY = e.clientY;
+    state.lastTime = performance.now();
+
+    try { el.setPointerCapture(e.pointerId); } catch (err) {}
+
+    const onPointerMove = (moveEvent) => {
+      const dist = Math.hypot(moveEvent.clientX - state.startX, moveEvent.clientY - state.startY);
+      if (dist > 5) {
+        state.isDragging = true;
+        state.hasMoved = true;
+        el.classList.add('is-playground-active');
+      }
+
+      if (state.isDragging) {
+        const dx = moveEvent.clientX - state.lastX;
+        const dy = moveEvent.clientY - state.lastY;
+        const now = performance.now();
+        const dt = Math.max(1, now - state.lastTime);
+
+        // Velocidad normalizada a píxeles por frame (~60fps)
+        state.vx = (dx / dt) * 16;
+        state.vy = (dy / dt) * 16;
+
+        state.x += dx;
+        state.y += dy;
+        state.lastX = moveEvent.clientX;
+        state.lastY = moveEvent.clientY;
+        state.lastTime = now;
+
+        updatePlaygroundTransform(el, state);
+      }
+    };
+
+    const onPointerUp = (upEvent) => {
+      el.removeEventListener('pointermove', onPointerMove);
+      el.removeEventListener('pointerup', onPointerUp);
+      el.removeEventListener('pointercancel', onPointerUp);
+      try { el.releasePointerCapture(upEvent.pointerId); } catch (err) {}
+
+      el.classList.remove('is-playground-active');
+
+      if (state.hasMoved) {
+        shopPlaygroundSuppressClick = Date.now() + 250;
+      }
+
+      state.isDragging = false;
+
+      // Iniciar física de lanzamiento y rebote en los bordes
+      if (state.hasMoved && Math.hypot(state.vx, state.vy) > 0.5) {
+        runPlaygroundPhysics(el, state);
+      }
+    };
+
+    el.addEventListener('pointermove', onPointerMove);
+    el.addEventListener('pointerup', onPointerUp);
+    el.addEventListener('pointercancel', onPointerUp);
+  });
+
+  // Modificación de tamaño con la rueda del ratón
+  el.addEventListener('wheel', (e) => {
+    if (window.innerWidth <= 980) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const zoom = e.deltaY < 0 ? 1.08 : 0.92;
+    state.scale = Math.max(0.35, Math.min(2.6, state.scale * zoom));
+    updatePlaygroundTransform(el, state);
+    showPlaygroundScaleBadge(el, state.scale);
+  }, { passive: false });
+}
+
+function runPlaygroundPhysics(el, state) {
+  if (state.animId) cancelAnimationFrame(state.animId);
+
+  const scene = document.querySelector('.shop-scene');
+
+  function step() {
+    if (state.isDragging) return;
+
+    state.x += state.vx;
+    state.y += state.vy;
+
+    // Fricción / resistencia del aire
+    state.vx *= 0.985;
+    state.vy *= 0.985;
+
+    // Rebote elástico en los bordes de la tienda
+    if (scene) {
+      const sRect = scene.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+
+      // Izquierda
+      if (elRect.left < sRect.left && state.vx < 0) {
+        state.x += (sRect.left - elRect.left);
+        state.vx = -state.vx * 0.76;
+        triggerPlaygroundBounce(el);
+      }
+      // Derecha
+      if (elRect.right > sRect.right && state.vx > 0) {
+        state.x -= (elRect.right - sRect.right);
+        state.vx = -state.vx * 0.76;
+        triggerPlaygroundBounce(el);
+      }
+      // Arriba
+      if (elRect.top < sRect.top && state.vy < 0) {
+        state.y += (sRect.top - elRect.top);
+        state.vy = -state.vy * 0.76;
+        triggerPlaygroundBounce(el);
+      }
+      // Abajo
+      if (elRect.bottom > sRect.bottom && state.vy > 0) {
+        state.y -= (elRect.bottom - sRect.bottom);
+        state.vy = -state.vy * 0.76;
+        triggerPlaygroundBounce(el);
+      }
+    }
+
+    updatePlaygroundTransform(el, state);
+
+    if (Math.hypot(state.vx, state.vy) > 0.15) {
+      state.animId = requestAnimationFrame(step);
+    } else {
+      state.animId = null;
+      state.vx = 0;
+      state.vy = 0;
+    }
+  }
+
+  state.animId = requestAnimationFrame(step);
+}
+
+function triggerPlaygroundBounce(el) {
+  el.classList.add('is-bouncing');
+  setTimeout(() => el.classList.remove('is-bouncing'), 180);
+}
+
+function resetShopPlayground() {
+  shopPlaygroundStates.forEach((state, el) => {
+    if (state.animId) {
+      cancelAnimationFrame(state.animId);
+      state.animId = null;
+    }
+    state.x = 0;
+    state.y = 0;
+    state.scale = 1;
+    state.vx = 0;
+    state.vy = 0;
+    state.isDragging = false;
+    state.hasMoved = false;
+
+    el.style.transition = 'transform 0.45s cubic-bezier(0.18, 0.89, 0.32, 1.28)';
+    updatePlaygroundTransform(el, state);
+    setTimeout(() => {
+      el.style.transition = '';
+    }, 460);
+  });
+
+  if (typeof toast === 'function') {
+    toast('¡Playground restablecido al diseño original!', { type: 'success' });
+  }
+}
+
+function setupShopPlaygroundAll() {
+  if (window.innerWidth <= 980) return;
+
+  // 1. Azura (NPC)
+  const npc = document.querySelector('.shop-npc');
+  if (npc) attachShopPlayground(npc);
+
+  // 2. Tienda del día (edificio + pastillas + avatar como un conjunto)
+  const stores = document.getElementById('shop-stores');
+  if (stores) attachShopPlayground(stores);
+
+  // 3. Boosters individuales
+  const packs = document.querySelectorAll('#shop-recommended .shop-pack');
+  packs.forEach((pack) => attachShopPlayground(pack));
+
+  // 4. Botón de restablecimiento
+  const resetBtn = document.getElementById('shop-playground-reset');
+  if (resetBtn && !resetBtn._hasClick) {
+    resetBtn._hasClick = true;
+    resetBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      resetShopPlayground();
+    });
+  }
+}
