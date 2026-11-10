@@ -6885,14 +6885,17 @@ window.addEventListener('load', () => {
 });
 
 /* ==========================================================================
-   DESKTOP SHOP PLAYGROUND ENGINE
+   DESKTOP SHOP PLAYGROUND ENGINE (V2 PULIDA)
    - Elementos manipulables: Boosters individuales, Azura (NPC) y Tienda del día (edificio + pastillas + avatar)
-   - Movimiento libre con arrastre y lanzamiento (física de rebote en los bordes de la pantalla)
-   - Modificación de tamaño a voluntad (rueda del mouse / zoom) con indicador visual
-   - Botón de restablecimiento para volver exactamente a la posición y tamaño original
+   - LÍMITES ESTRICTOS DE PANTALLA: NINGÚN ELEMENTO PUEDE SALIRSE JAMÁS DE LA ESCENA
+   - FÍSICA DE REBOTE EN PAREDES: Rebotan en los 4 bordes de la pantalla como si fueran paredes sólidas
+   - MENÚ DE POSICIÓN DE AZURA: Centro (Original), Izquierda, Derecha o Fuera de escena
+   - ESCALADO A VOLUNTAD: Rueda del mouse para agrandar/achicar con indicador de porcentaje
+   - BOTÓN DE RESET: Vuelve todo suavemente a sus posiciones y tamaños originales
    ========================================================================== */
 const shopPlaygroundStates = new Map();
 let shopPlaygroundSuppressClick = 0;
+let shopPlaygroundActiveNpcPos = 'center';
 
 function isShopDesktop() {
   return window.matchMedia('(min-width: 981px)').matches;
@@ -6944,6 +6947,36 @@ function showPlaygroundScaleBadge(el, scale) {
   }, 900);
 }
 
+function clampElementToScene(el, state) {
+  const scene = document.querySelector('.shop-scene');
+  if (!scene) return;
+  const sRect = scene.getBoundingClientRect();
+  const elRect = el.getBoundingClientRect();
+
+  const pad = 12; // Margen de seguridad dentro de la pantalla
+  let adjusted = false;
+
+  if (elRect.left < sRect.left + pad) {
+    state.x += ((sRect.left + pad) - elRect.left);
+    adjusted = true;
+  } else if (elRect.right > sRect.right - pad) {
+    state.x -= (elRect.right - (sRect.right - pad));
+    adjusted = true;
+  }
+
+  if (elRect.top < sRect.top + pad) {
+    state.y += ((sRect.top + pad) - elRect.top);
+    adjusted = true;
+  } else if (elRect.bottom > sRect.bottom - pad) {
+    state.y -= (elRect.bottom - (sRect.bottom - pad));
+    adjusted = true;
+  }
+
+  if (adjusted) {
+    updatePlaygroundTransform(el, state);
+  }
+}
+
 function attachShopPlayground(el) {
   if (!el || el._hasPlaygroundAttached) return;
   el._hasPlaygroundAttached = true;
@@ -6979,17 +7012,44 @@ function attachShopPlayground(el) {
         state.isDragging = true;
         state.hasMoved = true;
         el.classList.add('is-dragging');
+
+        // Si se mueve manualmente a Azura, actualizar el label a 'Azura: Libre'
+        if (el.classList.contains('shop-npc') && shopPlaygroundActiveNpcPos !== 'custom') {
+          setNpcPosLabel('Azura: Libre', 'custom');
+        }
       }
 
       if (state.isDragging) {
-        const dx = moveEvent.clientX - state.lastX;
-        const dy = moveEvent.clientY - state.lastY;
+        let dx = moveEvent.clientX - state.lastX;
+        let dy = moveEvent.clientY - state.lastY;
         const now = performance.now();
         const dt = Math.max(1, now - state.lastTime);
 
-        // Velocidad normalizada a píxeles por frame (~60fps)
-        state.vx = (dx / dt) * 16;
-        state.vy = (dy / dt) * 16;
+        // Clamping estricto durante el arrastre: no permitir que ningún borde se salga
+        const scene = document.querySelector('.shop-scene');
+        if (scene) {
+          const sRect = scene.getBoundingClientRect();
+          const elRect = el.getBoundingClientRect();
+          const pad = 10;
+
+          if (elRect.left + dx < sRect.left + pad) {
+            dx = (sRect.left + pad) - elRect.left;
+          } else if (elRect.right + dx > sRect.right - pad) {
+            dx = (sRect.right - pad) - elRect.right;
+          }
+
+          if (elRect.top + dy < sRect.top + pad) {
+            dy = (sRect.top + pad) - elRect.top;
+          } else if (elRect.bottom + dy > sRect.bottom - pad) {
+            dy = (sRect.bottom - pad) - elRect.bottom;
+          }
+        }
+
+        // Velocidad normalizada (con límite máximo para evitar túneles)
+        const rawVx = (dx / dt) * 16;
+        const rawVy = (dy / dt) * 16;
+        state.vx = Math.max(-22, Math.min(22, rawVx));
+        state.vy = Math.max(-22, Math.min(22, rawVy));
 
         state.x += dx;
         state.y += dy;
@@ -7014,6 +7074,9 @@ function attachShopPlayground(el) {
 
       state.isDragging = false;
 
+      // Asegurar que quede dentro de la pantalla
+      clampElementToScene(el, state);
+
       // Iniciar física de lanzamiento y rebote en los bordes
       if (state.hasMoved && Math.hypot(state.vx, state.vy) > 0.4) {
         runPlaygroundPhysics(el, state);
@@ -7032,8 +7095,9 @@ function attachShopPlayground(el) {
     e.stopPropagation();
 
     const zoom = e.deltaY < 0 ? 1.08 : 0.92;
-    state.scale = Math.max(0.35, Math.min(2.6, state.scale * zoom));
+    state.scale = Math.max(0.4, Math.min(2.5, state.scale * zoom));
     updatePlaygroundTransform(el, state);
+    clampElementToScene(el, state);
     showPlaygroundScaleBadge(el, state.scale);
   }, { passive: false });
 }
@@ -7046,52 +7110,69 @@ function runPlaygroundPhysics(el, state) {
   function step() {
     if (state.isDragging) return;
 
-    state.x += state.vx;
-    state.y += state.vy;
+    // Limitar velocidad máxima de rebote
+    state.vx = Math.max(-22, Math.min(22, state.vx));
+    state.vy = Math.max(-22, Math.min(22, state.vy));
 
-    // Fricción / resistencia del aire
-    state.vx *= 0.985;
-    state.vy *= 0.985;
+    let bounced = false;
 
-    // Rebote elástico en los bordes de la tienda
     if (scene) {
       const sRect = scene.getBoundingClientRect();
       const elRect = el.getBoundingClientRect();
+      const pad = 10;
 
-      // Izquierda
-      if (elRect.left < sRect.left && state.vx < 0) {
-        state.x += (sRect.left - elRect.left);
-        state.vx = -state.vx * 0.78;
-        triggerPlaygroundBounce(el);
+      const nextLeft = elRect.left + state.vx;
+      const nextRight = elRect.right + state.vx;
+      const nextTop = elRect.top + state.vy;
+      const nextBottom = elRect.bottom + state.vy;
+
+      // Pared izquierda
+      if (nextLeft <= sRect.left + pad) {
+        state.x += ((sRect.left + pad) - elRect.left);
+        state.vx = Math.abs(state.vx) * 0.75; // Siempre rebota hacia adentro (derecha)
+        bounced = true;
+      } else if (nextRight >= sRect.right - pad) {
+        state.x += ((sRect.right - pad) - elRect.right);
+        state.vx = -Math.abs(state.vx) * 0.75; // Siempre rebota hacia adentro (izquierda)
+        bounced = true;
+      } else {
+        state.x += state.vx;
       }
-      // Derecha
-      if (elRect.right > sRect.right && state.vx > 0) {
-        state.x -= (elRect.right - sRect.right);
-        state.vx = -state.vx * 0.78;
-        triggerPlaygroundBounce(el);
+
+      // Techo
+      if (nextTop <= sRect.top + pad) {
+        state.y += ((sRect.top + pad) - elRect.top);
+        state.vy = Math.abs(state.vy) * 0.75; // Siempre rebota hacia adentro (abajo)
+        bounced = true;
+      } else if (nextBottom >= sRect.bottom - pad) {
+        state.y += ((sRect.bottom - pad) - elRect.bottom);
+        state.vy = -Math.abs(state.vy) * 0.75; // Siempre rebota hacia adentro (arriba)
+        bounced = true;
+      } else {
+        state.y += state.vy;
       }
-      // Arriba
-      if (elRect.top < sRect.top && state.vy < 0) {
-        state.y += (sRect.top - elRect.top);
-        state.vy = -state.vy * 0.78;
-        triggerPlaygroundBounce(el);
-      }
-      // Abajo
-      if (elRect.bottom > sRect.bottom && state.vy > 0) {
-        state.y -= (elRect.bottom - sRect.bottom);
-        state.vy = -state.vy * 0.78;
-        triggerPlaygroundBounce(el);
-      }
+    } else {
+      state.x += state.vx;
+      state.y += state.vy;
     }
+
+    if (bounced) {
+      triggerPlaygroundBounce(el);
+    }
+
+    // Fricción / resistencia del aire
+    state.vx *= 0.982;
+    state.vy *= 0.982;
 
     updatePlaygroundTransform(el, state);
 
-    if (Math.hypot(state.vx, state.vy) > 0.12) {
+    if (Math.hypot(state.vx, state.vy) > 0.15) {
       state.animId = requestAnimationFrame(step);
     } else {
       state.animId = null;
       state.vx = 0;
       state.vy = 0;
+      clampElementToScene(el, state);
     }
   }
 
@@ -7100,7 +7181,77 @@ function runPlaygroundPhysics(el, state) {
 
 function triggerPlaygroundBounce(el) {
   el.classList.add('is-bouncing');
-  setTimeout(() => el.classList.remove('is-bouncing'), 180);
+  setTimeout(() => el.classList.remove('is-bouncing'), 160);
+}
+
+function setNpcPosLabel(text, posKey) {
+  shopPlaygroundActiveNpcPos = posKey;
+  const label = document.getElementById('shop-npc-pos-label');
+  if (label) label.textContent = text;
+
+  const menu = document.getElementById('shop-npc-pos-menu');
+  if (menu) {
+    Array.from(menu.querySelectorAll('[data-npc-pos]')).forEach((btn) => {
+      btn.classList.toggle('is-selected', btn.dataset.npcPos === posKey);
+    });
+  }
+}
+
+function setShopNpcPosition(pos) {
+  const npc = document.querySelector('.shop-npc');
+  if (!npc) return;
+  const scene = document.querySelector('.shop-scene');
+  const state = getPlaygroundState(npc);
+
+  if (state.animId) {
+    cancelAnimationFrame(state.animId);
+    state.animId = null;
+  }
+  state.vx = 0;
+  state.vy = 0;
+  state.isDragging = false;
+
+  npc.style.transition = 'transform 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.2), opacity 0.4s ease';
+
+  const sceneW = scene ? scene.clientWidth : window.innerWidth;
+  const sceneH = scene ? scene.clientHeight : window.innerHeight;
+
+  if (pos === 'center') {
+    state.x = 0;
+    state.y = 0;
+    state.scale = 1;
+    npc.style.opacity = '1';
+    npc.style.pointerEvents = 'auto';
+    setNpcPosLabel('Azura: Centro', 'center');
+  } else if (pos === 'left') {
+    state.x = -Math.round(sceneW * 0.28);
+    state.y = 0;
+    state.scale = 0.95;
+    npc.style.opacity = '1';
+    npc.style.pointerEvents = 'auto';
+    setNpcPosLabel('Azura: Izquierda', 'left');
+  } else if (pos === 'right') {
+    state.x = Math.round(sceneW * 0.28);
+    state.y = 0;
+    state.scale = 0.95;
+    npc.style.opacity = '1';
+    npc.style.pointerEvents = 'auto';
+    setNpcPosLabel('Azura: Derecha', 'right');
+  } else if (pos === 'hidden') {
+    state.x = 0;
+    state.y = Math.round(sceneH * 0.7);
+    state.scale = 0.8;
+    npc.style.opacity = '0';
+    npc.style.pointerEvents = 'none';
+    setNpcPosLabel('Azura: Fuera', 'hidden');
+  }
+
+  updatePlaygroundTransform(npc, state);
+
+  setTimeout(() => {
+    npc.style.transition = '';
+    clampElementToScene(npc, state);
+  }, 520);
 }
 
 function resetShopPlayground() {
@@ -7117,12 +7268,18 @@ function resetShopPlayground() {
     state.isDragging = false;
     state.hasMoved = false;
 
-    el.style.transition = 'transform 0.45s cubic-bezier(0.18, 0.89, 0.32, 1.28)';
+    el.style.transition = 'transform 0.45s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.4s ease';
+    if (el.classList.contains('shop-npc')) {
+      el.style.opacity = '1';
+      el.style.pointerEvents = 'auto';
+    }
     updatePlaygroundTransform(el, state);
     setTimeout(() => {
       el.style.transition = '';
     }, 460);
   });
+
+  setNpcPosLabel('Azura: Centro', 'center');
 
   if (typeof toast === 'function') {
     toast('¡Playground restablecido al diseño original!', { type: 'success' });
@@ -7144,7 +7301,36 @@ function setupShopPlaygroundAll() {
   const packs = document.querySelectorAll('#shop-recommended .shop-pack');
   packs.forEach((pack) => attachShopPlayground(pack));
 
-  // 4. Botón de restablecimiento
+  // 4. Menú de posición de Azura
+  const posBtn = document.getElementById('shop-npc-pos-btn');
+  const posMenu = document.getElementById('shop-npc-pos-menu');
+  if (posBtn && posMenu && !posBtn._hasClick) {
+    posBtn._hasClick = true;
+    posBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = posMenu.hidden;
+      posMenu.hidden = !open;
+      posBtn.setAttribute('aria-expanded', String(open));
+    });
+
+    posMenu.addEventListener('click', (e) => {
+      const opt = e.target.closest('[data-npc-pos]');
+      if (!opt) return;
+      e.stopPropagation();
+      setShopNpcPosition(opt.dataset.npcPos);
+      posMenu.hidden = true;
+      posBtn.setAttribute('aria-expanded', 'false');
+    });
+
+    document.addEventListener('click', () => {
+      if (!posMenu.hidden) {
+        posMenu.hidden = true;
+        posBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  // 5. Botón de restablecimiento
   const resetBtn = document.getElementById('shop-playground-reset');
   if (resetBtn && !resetBtn._hasClick) {
     resetBtn._hasClick = true;
@@ -7153,4 +7339,17 @@ function setupShopPlaygroundAll() {
       resetShopPlayground();
     });
   }
+
+  // 6. Verificar y asegurar que ningún elemento esté fuera de los bordes
+  shopPlaygroundStates.forEach((state, el) => {
+    clampElementToScene(el, state);
+  });
 }
+
+// Clamp on window resize
+window.addEventListener('resize', () => {
+  if (!isShopDesktop()) return;
+  shopPlaygroundStates.forEach((state, el) => {
+    clampElementToScene(el, state);
+  });
+});

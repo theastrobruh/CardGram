@@ -16149,3 +16149,121 @@ body:not(.is-home-route) .hub-mobile-quick {
     filter: drop-shadow(0 0 24px rgba(0, 242, 254, 0.75)) !important;
   }
 }
+
+/* ==========================================================================
+   DESKTOP SHOP PLAYGROUND TOOLBAR & NPC POSITION MENU
+   ========================================================================== */
+.shop-playground-bar {
+  display: none !important;
+}
+
+@media (min-width: 981px) {
+  .shop-playground-bar {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    position: absolute !important;
+    top: 20px !important;
+    right: 28px !important;
+    z-index: 35 !important;
+  }
+
+  .shop-playground-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 8px 18px !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.96) !important;
+    box-shadow: 0 8px 24px rgba(4, 30, 40, 0.12), inset 0 1px 0 #ffffff !important;
+    font-size: 0.74rem !important;
+    font-weight: 800 !important;
+    color: #074755 !important;
+    cursor: pointer !important;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease !important;
+  }
+
+  .shop-playground-btn:hover {
+    transform: translateY(-2px) scale(1.04) !important;
+    background: #ffffff !important;
+    border-color: #00f2fe !important;
+    box-shadow: 0 12px 28px rgba(0, 242, 254, 0.35) !important;
+    color: #032b35 !important;
+  }
+
+  .shop-npc-position-picker {
+    position: relative !important;
+  }
+
+  .shop-npc-pos-menu {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    right: 0 !important;
+    min-width: 190px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.98) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 16px 36px rgba(4, 30, 40, 0.2) !important;
+    padding: 6px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    z-index: 50 !important;
+    animation: fadeIn 0.2s ease !important;
+  }
+
+  .shop-npc-pos-menu[hidden] {
+    display: none !important;
+  }
+
+  .shop-npc-pos-opt {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 8px 12px !important;
+    border-radius: 12px !important;
+    border: none !important;
+    background: transparent !important;
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    color: #074755 !important;
+    cursor: pointer !important;
+    text-align: left !important;
+    transition: background 0.15s ease, color 0.15s ease !important;
+  }
+
+  .shop-npc-pos-opt:hover {
+    background: rgba(0, 242, 254, 0.12) !important;
+    color: #015263 !important;
+  }
+
+  .shop-npc-pos-opt.is-selected {
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(47, 143, 221, 0.2)) !important;
+    color: #043642 !important;
+    border: 1px solid rgba(0, 242, 254, 0.4) !important;
+  }
+
+  .pos-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00f2fe;
+    box-shadow: 0 0 6px #00f2fe;
+    flex-shrink: 0;
+  }
+
+  .chevron-icon {
+    width: 12px !important;
+    height: 12px !important;
+    transition: transform 0.2s ease !important;
+  }
+
+  .shop-npc-pos-btn[aria-expanded="true"] .chevron-icon {
+    transform: rotate(180deg) !important;
+  }
+}
