@@ -7039,6 +7039,8 @@ function attachShopPlayground(el) {
       state.maxY = mid + 40;
     }
 
+    try { el.setPointerCapture(e.pointerId); } catch (_) {}
+
     const startPointerX = e.clientX;
     const startPointerY = e.clientY;
     const startStateX = state.x;
@@ -7054,6 +7056,8 @@ function attachShopPlayground(el) {
         state.isDragging = true;
         state.hasMoved = true;
         el.classList.add('is-dragging');
+        const parentRec = el.closest('.shop-recommended');
+        if (parentRec) parentRec.classList.add('has-dragging-pack');
 
         if (el.classList.contains('shop-npc')) {
           setNpcPosLabel('Azura: Libre', 'custom');
@@ -7083,12 +7087,17 @@ function attachShopPlayground(el) {
       }
     };
 
-    const onPointerUp = () => {
+    const onPointerUp = (upEvt) => {
+      if (upEvt && upEvt.pointerId !== undefined) {
+        try { el.releasePointerCapture(upEvt.pointerId); } catch (_) {}
+      }
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);
 
       el.classList.remove('is-dragging');
+      const parentRec = el.closest('.shop-recommended');
+      if (parentRec) parentRec.classList.remove('has-dragging-pack');
 
       if (state.hasMoved) {
         shopPlaygroundSuppressClick = Date.now() + 450;

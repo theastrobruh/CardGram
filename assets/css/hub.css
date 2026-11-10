@@ -16058,6 +16058,11 @@ body:not(.is-home-route) .hub-mobile-quick {
     -webkit-user-drag: none !important;
   }
 
+  .shop-recommended.has-dragging-pack,
+  .shop-recommended:has(.is-dragging) {
+    z-index: 100 !important;
+  }
+
   .shop-recommended .shop-pack.is-dragging {
     cursor: grabbing !important;
     z-index: 100 !important;
@@ -16328,6 +16333,11 @@ body:not(.is-home-route) .hub-mobile-quick {
   .shop-recommended .shop-pack:hover {
     transform: none !important;
     animation: none !important;
+  }
+
+  .shop-recommended.has-dragging-pack,
+  .shop-recommended:has(.is-dragging) {
+    z-index: 100 !important;
   }
 
   .shop-recommended .shop-pack.is-dragging {
