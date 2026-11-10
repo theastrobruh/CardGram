@@ -46,6 +46,20 @@ CardGram is built by **[theAstroBruh](https://github.com/theastrobruh)** (Creati
 
 ---
 
+## 🆕 What's new in v0.5.5
+
+| | Update | Details |
+|---|---|---|
+| 🛍️ | **Shop v2** | Daily pack, stock, Azura the vendor, computer for other sellers and an Astro~Verse store |
+| 🧪 | **Playable shop stage** | Drag boosters and the store, slide Azura sideways, reset the whole scene in one click |
+| 🎚️ | **Azura size control** | Native slider inside the **Azura** menu (55 %–190 %) — no accidental resizing with drag or wheel |
+| 🧑‍🔬 | **Export Layout (Dev)** | Downloads a JSON with every element's coordinates, scale and offset so the layout can be reproduced exactly |
+| 🧭 | **Top-bar polish** | Back button, day/shift chips and the playground toolbar share one axis, 40 px tall, with Azura on the left by default |
+| 📱 | **Mobile sheets** | Identity chip → vitrine → card details sheet → round menu sheet, plus a bottom-sheet card grid |
+| 🪪 | **About + Welcome** | Alpha intro, story, feature cards and the “replay welcome” flow |
+
+---
+
 ## ✨ Two Products, One Ecosystem
 
 ### 🏛️ Card Hub — Your Digital Collection Lobby
@@ -56,7 +70,9 @@ The **Card Hub** is your home base — a cinematic, card-first experience where 
 <tr>
 <td width="50%">
 
-**📦 Daily Packs** — Open 4 random cards once a day from the set you choose. Complete collections like Mew Tarot (22/22) or build up Champion-Verse and Dungeons & History.
+**📦 Daily Packs** — Open 6 random cards once a day from the set you choose. Complete collections like Mew Tarot (22/22) or build up Champion-Verse and Dungeons & History.
+
+**🛍️ The Shop** — A cinematic vendor's hall: Azura on the left, today's boosters centred on the stage, the Astro~Verse store on the right, and live stock/rarity rails.
 
 **🃏 My Cards** — Browse saved presets plus the full catalog, mark favorites, and jump into the studio with one tap.
 
@@ -78,6 +94,16 @@ The **Card Hub** is your home base — a cinematic, card-first experience where 
 </td>
 </tr>
 </table>
+
+### 🛍️ The Shop — a stage you can arrange
+
+The Shop is not a static mockup: it is a small physics playground for presenting boosters.
+
+- **Drag & throw** — boosters and the Astro~Verse store follow the pointer, bounce off the stage edges and settle straight.
+- **Azura moves sideways** — drag her left or right; she never grows or shrinks from a drag. Her size lives in the **Azura** menu as a native slider (55 %–190 %), together with the position presets *Left · Center · Right · Off screen*.
+- **Reset Playground** — restores the approved composition: Azura on the left, the three boosters centred and slightly below the middle, the store on the right.
+- **Export Layout (Dev)** — a developer button in the playground toolbar that downloads `cardgram-shop-layout-<date>.json`. It contains the live `rect`, `center`, `centerPct`, `edgePct`, `offset` and `scalePercent` of Azura, the store and every booster, so a layout can be reproduced from CSS without guessing pixels. `window.exportShopLayout()` returns the same object from the console.
+- **Responsive by proportion** — booster width scales with the viewport and the row stays anchored to the centre of the stage; the Export Layout label collapses to its icon under 1280 px and the toolbar hides entirely on mobile.
 
 ### 🎴 eCard Studio — 3D Card Forge
 
@@ -129,8 +155,11 @@ The **eCard Studio** is where the magic happens — a full procedural 3D engine 
 |---|---|
 | 🎭 **Built-in Presets** | *Shadowblade Kinetic*, *Volt Striker*, *Aureon the Golden Maw*, and more |
 | 💿 **Custom Presets** | Save front/back/Full Art combos in browser storage |
-| 🌍 **i18n** | Instant language switching: **English**, **Español**, **Deutsch** |
+| 🧪 **Shop Playground** | Drag boosters and the store with elastic physics; slide Azura sideways; resize her from the Azura menu; one-click reset |
+| 🧑‍🔬 **Layout Export (Dev)** | Download a JSON of every shop coordinate, offset and scale — the source of truth for future layout tweaks |
+| 🌍 **i18n** | Instant language switching: **English**, **Español**, **Deutsch** (studio, hub and the shop toolbar) |
 | 🔊 **Sound Design** | Synthesized Web Audio palette with 5 gesture types — always mutable, never intrusive |
+| 🎵 **Music Modes** | *Immersive* (changes per screen) and *Chill* (continuous shuffle) with persisted volume and mute |
 | ⚡ **Lazy 3D** | No WebGL on load; render loop pauses while in the lobby |
 | 🔒 **Offline-First** | Everything runs locally, even from `file://`. No backend, no tracking |
 
@@ -149,7 +178,7 @@ Our vision is to transform CardGram from a **personal showcase tool** into a **l
 | Phase | Status | What's Coming |
 |---|---|---|
 | **eCard Studio** | ✅ Done | 3D engine, formats, export, presets |
-| **Card Hub** | ✅ Done | Lobby, collections, daily packs, profile, ambient |
+| **Card Hub** | ✅ Done | Lobby, collections, daily packs, shop stage + playground, profile, ambient |
 | **Inkra Print** | 🔧 Active | Real-scale layouts, batch printing, custom templates |
 | **Community** | 🌐 Planned | **Share your creations** — Public gallery, user profiles, social features |
 | **Drops & Marketplace** | ✨ Future | **Create your own drops** — Design card sets, publish limited drops, community voting, trading |
@@ -202,31 +231,39 @@ cd CardGram
 ## 🗂️ Project Structure
 
 ```
-├── index.html                  # Main app (HTML + Three.js scene entry point)
+├── index.html                  # Main app (hub + studio + shop markup)
 ├── Iniciar_Webapp.bat          # Windows local server launcher
 ├── assets/
 │   ├── css/
 │   │   ├── app.css             # Studio UI styles (Aqua Glass design system)
-│   │   └── hub.css             # Card Hub styles
+│   │   └── hub.css             # Hub, shop stage and playground styles
 │   ├── js/
+│   │   ├── boot.js             # Boot screen, start gate and app wiring
+│   │   ├── welcome.js          # Welcome / About flow and alpha intro
 │   │   ├── app.js              # Core studio logic & UI
 │   │   ├── scene.js            # Three.js WebGL scene & card geometry
 │   │   ├── export.js           # PNG snapshot & video recording
-│   │   ├── hub.js              # Card Hub browser & lobby
+│   │   ├── hub.js              # Hub, shop, playground engine & layout export
 │   │   ├── ambient.js          # Reactive background palette
 │   │   ├── sound.js            # Synthesized Web Audio palette
+│   │   ├── music.js            # Background music (immersive / chill)
 │   │   ├── i18n.js             # Studio translations (EN/ES/DE)
-│   │   ├── hub-i18n.js         # Hub translations
+│   │   ├── hub-i18n.js         # Hub + shop translations
 │   │   └── community.js        # Community feed adapter (prepared)
 │   └── data/
 │       ├── cards/              # Per-collection folders + catalog.js
 │       │   ├── thumbs/         # WebP thumbnails
 │       │   └── tools/          # make-thumbs.py
-│       └── sounds/             # UI sound samples
+│       ├── shop_assets/        # Shop background, lights, props
+│       ├── vendor/azura/       # Azura sprite frames (WebP)
+│       ├── shops/              # Astro~Verse store art and avatars
+│       ├── sounds/             # UI sound samples
+│       ├── loading/            # Boot / loading realities
+│       └── readme/             # Logo, banner and roadmap art
 ├── .github/workflows/
 │   └── deploy.yml              # GitHub Actions → GitHub Pages
 └── skills/
-    └── cardgram-ui/            # Agent guide for AI pair-programming
+    └── cardgram-ui/            # Agent guide: file map, rules, references
 ```
 
 ---

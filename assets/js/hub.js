@@ -1514,6 +1514,14 @@ function openBoosterFromDetail() {
   openPackOverlay();
 }
 
+function setShopPackContentsOpen(open) {
+  if (!hub.els.shopPackContents) return;
+  hub.els.shopPackContents.hidden = !open;
+  if (hub.els.shopPackContentsBtn) {
+    hub.els.shopPackContentsBtn.setAttribute('aria-expanded', String(Boolean(open)));
+  }
+}
+
 function openShopPackView(collectionId) {
   if (!HUB_CATALOG.collections.some((entry) => entry.id === collectionId)) return;
   hubBooster.setId = collectionId;
@@ -1521,11 +1529,17 @@ function openShopPackView(collectionId) {
   persistBooster();
   renderBooster();
   if (hub.els.shopPackView) hub.els.shopPackView.hidden = false;
+  setShopPackContentsOpen(false);
+  const scene = document.querySelector('.shop-scene');
+  if (scene) scene.classList.add('is-pack-view');
   renderShopPackDetail();
 }
 
 function closeShopPackView() {
   if (hub.els.shopPackView) hub.els.shopPackView.hidden = true;
+  setShopPackContentsOpen(false);
+  const scene = document.querySelector('.shop-scene');
+  if (scene) scene.classList.remove('is-pack-view');
 }
 
 function renderShopStores() {
@@ -5455,6 +5469,10 @@ function applyRoute() {
   if (key === hub.lastRoute) return;
   hub.lastRoute = key;
 
+  if (hub.els && hub.els.shopPackView && !hub.els.shopPackView.hidden && key !== 'booster') {
+    closeShopPackView();
+  }
+
   if (head === 'studio') {
     openStudio(parts[1] || 'deck');
     return;
@@ -5709,6 +5727,18 @@ function onHubClick(event) {
   if (target.closest('[data-shop-pack-close]')) {
     event.preventDefault();
     closeShopPackView();
+    return;
+  }
+
+  if (target.closest('#shop-pack-contents-btn')) {
+    event.preventDefault();
+    setShopPackContentsOpen(hub.els.shopPackContents ? hub.els.shopPackContents.hidden : false);
+    return;
+  }
+
+  if (target.closest('[data-shop-pack-contents-close]')) {
+    event.preventDefault();
+    setShopPackContentsOpen(false);
     return;
   }
 
@@ -6790,6 +6820,8 @@ function cacheHubDom() {
   els.shopPackViewCards = hubEl('shop-pack-view-cards');
   els.shopPackViewReveal = hubEl('shop-pack-view-reveal');
   els.shopPackViewHint = hubEl('shop-pack-view-hint');
+  els.shopPackContents = hubEl('shop-pack-contents');
+  els.shopPackContentsBtn = hubEl('shop-pack-contents-btn');
   els.shopPackOpen = hubEl('shop-pack-open');
   els.shopPackSave = hubEl('shop-pack-save');
   els.mobileDaily = hubEl('hub-mobile-daily');

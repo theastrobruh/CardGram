@@ -17572,3 +17572,291 @@ body.welcome-open {
     box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.35);
   }
 }
+
+/* ==========================================================================
+   SHOP · Vista del booster inmersiva (rev 239)
+   - El pack se muestra grande y centrado sobre el fondo limpio de la Shop.
+   - Sin ventana de cartas dentro: un botón en la esquina abre la ventana.
+   - Ni Azura ni el resto del escenario aparecen dentro de la vista.
+   ========================================================================== */
+.shop-scene.is-pack-view > :not(.shop-bg):not(.shop-light):not(.shop-pack-view) {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.shop-pack-view {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 0 !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.shop-pack-view-back {
+  position: absolute !important;
+  top: 18px !important;
+  left: 18px !important;
+  z-index: 6 !important;
+  align-self: auto !important;
+  box-shadow: 0 10px 26px rgba(4, 30, 40, 0.32) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.shop-pack-view-stage {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  flex: 1 1 auto !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  z-index: 1 !important;
+}
+
+#shop-pack-view-img {
+  height: auto !important;
+  max-height: min(64vh, 600px) !important;
+  width: auto !important;
+  max-width: min(44vw, 470px) !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.5)) !important;
+  animation: floatingPackCentered 4s ease-in-out infinite alternate !important;
+}
+
+@keyframes floatingPackCentered {
+  0% { transform: translateY(6px); }
+  100% { transform: translateY(-6px); }
+}
+
+.shop-pack-view-open {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: clamp(20px, 4.5vh, 52px) !important;
+  translate: -50% 0 !important;
+  margin: 0 !important;
+  z-index: 3 !important;
+}
+
+/* Botón de la esquina: abre la ventana con las cartas del sobre */
+.shop-pack-view-contents-btn {
+  position: absolute !important;
+  top: 18px !important;
+  right: 18px !important;
+  z-index: 6 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  min-height: 34px !important;
+  padding: 0 14px !important;
+  border-radius: 999px !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.98) !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  color: #07333f !important;
+  font-size: 0.55rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  box-shadow: 0 10px 26px rgba(4, 30, 40, 0.32), inset 0 1px 0 #ffffff !important;
+  cursor: pointer !important;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease !important;
+}
+
+.shop-pack-view-contents-btn .icon {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.shop-pack-view-contents-btn:hover {
+  transform: translateY(-1px) !important;
+  background: #ffffff !important;
+  box-shadow: 0 14px 30px rgba(4, 30, 40, 0.38), inset 0 1px 0 #ffffff !important;
+}
+
+.shop-pack-view-contents-btn[aria-expanded="true"] {
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.3), 0 14px 30px rgba(4, 30, 40, 0.38) !important;
+}
+
+/* Ventana independiente con el contenido del sobre */
+.shop-pack-contents {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 20 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  background: rgba(4, 21, 29, 0.55) !important;
+  animation: fadeIn 0.18s ease !important;
+}
+
+.shop-pack-contents[hidden] {
+  display: none !important;
+}
+
+.shop-pack-contents-window {
+  display: flex !important;
+  flex-direction: column !important;
+  width: min(760px, 92vw) !important;
+  max-height: 84vh !important;
+  overflow-y: auto !important;
+  border-radius: 22px !important;
+  box-shadow: 0 30px 60px rgba(4, 30, 40, 0.4) !important;
+}
+
+.shop-pack-contents-head,
+.shop-pack-view-cards,
+.shop-pack-view-hint {
+  width: 100% !important;
+}
+
+.shop-pack-contents-head {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  margin: 0 auto !important;
+  padding: 16px 18px 10px !important;
+  border-radius: 22px 22px 0 0 !important;
+  background: rgba(255, 255, 255, 0.97) !important;
+  border: 1px solid rgba(255, 255, 255, 0.98) !important;
+  border-bottom: 0 !important;
+  box-shadow: 0 20px 46px rgba(4, 30, 40, 0.3) !important;
+}
+
+.shop-pack-contents-copy {
+  min-width: 0 !important;
+}
+
+.shop-pack-contents-kicker {
+  display: block !important;
+  font-size: 0.5rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  color: #0a7d8c !important;
+}
+
+.shop-pack-contents-head h2 {
+  margin: 3px 0 0 !important;
+  font-size: 1.05rem !important;
+  letter-spacing: -0.01em !important;
+  color: #043642 !important;
+  text-align: left !important;
+}
+
+.shop-pack-contents-close {
+  flex: 0 0 auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 30px !important;
+  height: 30px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  border: 1px solid rgba(4, 30, 40, 0.1) !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  color: #07333f !important;
+  cursor: pointer !important;
+}
+
+.shop-pack-contents-close .icon {
+  width: 13px !important;
+  height: 13px !important;
+}
+
+.shop-pack-contents-close:hover {
+  border-color: #00f2fe !important;
+  box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.25) !important;
+}
+
+.shop-pack-contents .shop-pack-view-cards {
+  margin: 0 auto !important;
+  padding: 14px 18px !important;
+  border-radius: 0 !important;
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.98) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.98) !important;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, 54px) !important;
+  justify-content: center !important;
+  justify-items: center !important;
+  gap: 8px !important;
+  overflow: visible !important;
+}
+
+/* Aquí sí queremos ver las cartas que trae el sobre, no siluetas */
+.shop-pack-contents .shop-preview-card.is-locked img {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+.shop-pack-contents .shop-pack-view-hint {
+  margin: 0 auto !important;
+  padding: 0 18px 16px !important;
+  border-radius: 0 0 22px 22px !important;
+  background: rgba(255, 255, 255, 0.97) !important;
+  border: 1px solid rgba(255, 255, 255, 0.98) !important;
+  border-top: 0 !important;
+  box-shadow: 0 26px 54px rgba(4, 30, 40, 0.34) !important;
+  font-size: 0.56rem !important;
+}
+
+/* La pantalla de apertura también muestra el fondo limpio de la Shop */
+.pack-open .shop-scene {
+  filter: none !important;
+}
+
+body.pack-open .shop-scene > :not(.shop-bg):not(.shop-light) {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.pack-overlay-backdrop {
+  background: radial-gradient(ellipse at 50% 40%, rgba(4, 21, 29, 0.18) 0%, rgba(4, 21, 29, 0.6) 100%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.pack-overlay-shell {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 30px 70px rgba(4, 21, 29, 0.42), inset 0 1px 0 #ffffff !important;
+}
+
+.pack-theater-tap-hint {
+  color: #0a5f6e !important;
+}
+
+@media (max-width: 640px) {
+  .shop-pack-view-contents-btn {
+    padding: 0 !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-height: 0 !important;
+  }
+
+  .shop-pack-view-contents-btn span {
+    display: none !important;
+  }
+
+  #shop-pack-view-img {
+    max-height: min(60vh, 460px) !important;
+    max-width: min(78vw, 300px) !important;
+  }
+
+  .shop-pack-contents-head,
+  .shop-pack-view-cards,
+  .shop-pack-view-hint {
+    width: 100% !important;
+  }
+
+  .shop-pack-contents-window {
+    width: min(94vw, 560px) !important;
+  }
+}
