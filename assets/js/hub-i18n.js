@@ -1734,3 +1734,41 @@ Object.assign(I18N.de, { pack_card_swipe_hint: 'Wische leicht, um die nächste K
 Object.assign(I18N.es, { shop_pack_percent: '{percent}%' });
 Object.assign(I18N.en, { shop_pack_percent: '{percent}%' });
 Object.assign(I18N.de, { shop_pack_percent: '{percent}%' });
+
+/* Inventory · tamaño de iconos/cartas y ajustes del deck box. */
+Object.assign(I18N.es, {
+  collections_size_label: 'Tamaño',
+  collections_size_compact: 'S',
+  collections_size_compact_desc: 'Iconos y cartas pequeños',
+  collections_size_normal: 'M',
+  collections_size_normal_desc: 'Tamaño estándar',
+  collections_size_large: 'L',
+  collections_size_large_desc: 'Iconos y cartas grandes',
+  collections_size_huge: 'XL',
+  collections_size_huge_desc: 'Vista máxima',
+  collections_box_design: 'Diseño del deck box'
+});
+Object.assign(I18N.en, {
+  collections_size_label: 'Size',
+  collections_size_compact: 'S',
+  collections_size_compact_desc: 'Small icons and cards',
+  collections_size_normal: 'M',
+  collections_size_normal_desc: 'Standard size',
+  collections_size_large: 'L',
+  collections_size_large_desc: 'Large icons and cards',
+  collections_size_huge: 'XL',
+  collections_size_huge_desc: 'Maximum size',
+  collections_box_design: 'Deck box design'
+});
+Object.assign(I18N.de, {
+  collections_size_label: 'Größe',
+  collections_size_compact: 'S',
+  collections_size_compact_desc: 'Kleine Symbole und Karten',
+  collections_size_normal: 'M',
+  collections_size_normal_desc: 'Standardgröße',
+  collections_size_large: 'L',
+  collections_size_large_desc: 'Große Symbole und Karten',
+  collections_size_huge: 'XL',
+  collections_size_huge_desc: 'Maximale Größe',
+  collections_box_design: 'Deckbox-Design'
+});

@@ -59,6 +59,62 @@ function userBoxFor(index) {
   return USER_DECK_BOXES[index % USER_DECK_BOXES.length];
 }
 
+/* --------------------------------------------------------------------------
+   Inventory · tamaño de iconos (deck boxes) y cartas
+   Cuatro opciones; se guarda en su propia clave para no tocar hubData.
+   -------------------------------------------------------------------------- */
+const HUB_INVENTORY_SIZES = ['compact', 'normal', 'large', 'huge'];
+const HUB_INVENTORY_SIZE_STORAGE = 'cardgram.inventory.v1';
+let hubInventorySize = 'normal';
+
+function loadInventorySize() {
+  const raw = storage.read(HUB_INVENTORY_SIZE_STORAGE, null);
+  const value = raw && typeof raw === 'object' ? raw.size : raw;
+  hubInventorySize = HUB_INVENTORY_SIZES.includes(value) ? value : 'normal';
+  applyInventorySize();
+}
+
+function applyInventorySize() {
+  document.documentElement.setAttribute('data-inv-size', hubInventorySize);
+  document.querySelectorAll('[data-inv-size-btn]').forEach((btn) => {
+    const active = btn.dataset.invSizeBtn === hubInventorySize;
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-pressed', String(active));
+  });
+}
+
+function setInventorySize(size) {
+  if (!HUB_INVENTORY_SIZES.includes(size) || size === hubInventorySize) return;
+  hubInventorySize = size;
+  storage.write(HUB_INVENTORY_SIZE_STORAGE, { size });
+  applyInventorySize();
+}
+
+function inventorySizeLabel(size) {
+  const key = `collections_size_${size}`;
+  return t(key) || size.toUpperCase();
+}
+
+function makeInventorySizeControl() {
+  const wrap = makeNode('div', 'inventory-size');
+  wrap.appendChild(makeNode('span', 'inventory-size-label', t('collections_size_label') || 'Tamaño'));
+  const group = makeNode('div', 'inventory-size-options');
+  group.setAttribute('role', 'group');
+  group.setAttribute('aria-label', t('collections_size_label') || 'Tamaño');
+  HUB_INVENTORY_SIZES.forEach((size) => {
+    const active = size === hubInventorySize;
+    const btn = makeNode('button', `inventory-size-btn${active ? ' is-active' : ''}`, inventorySizeLabel(size));
+    btn.type = 'button';
+    btn.dataset.invSizeBtn = size;
+    btn.setAttribute('aria-pressed', String(active));
+    btn.title = t(`collections_size_${size}_desc`) || inventorySizeLabel(size);
+    btn.addEventListener('click', () => setInventorySize(size));
+    group.appendChild(btn);
+  });
+  wrap.appendChild(group);
+  return wrap;
+}
+
 function getUserPresets() {
   if (typeof presets !== 'undefined' && Array.isArray(presets) && presets.length) return presets;
   try {
@@ -210,6 +266,7 @@ const hub = {
   opening: false,
   presetsRendered: false,
   newCardRequested: false,
+  boxPanelOpen: false,
   lastRoute: '',
   activeSheet: null,
   viewerCard: null,
@@ -496,6 +553,17 @@ function sanitizeHubData(raw) {
 
   const lastRender = Number(raw.lastRenderAt);
   data.lastRenderAt = Number.isFinite(lastRender) && lastRender > 0 ? lastRender : null;
+
+  /* Deck box elegido para "Cartas creadas": debe sobrevivir a recargas. */
+  data.selectedUserBox = null;
+  if (typeof raw.selectedUserBox === 'string') {
+    const boxSrc = raw.selectedUserBox.trim();
+    if (/^assets\//.test(boxSrc) && boxSrc.length <= 512) {
+      data.selectedUserBox = boxSrc;
+    } else if (boxSrc.startsWith('data:image/') && boxSrc.length <= 1200000) {
+      data.selectedUserBox = boxSrc;
+    }
+  }
 
   if (Array.isArray(raw.decks)) {
     const usedIds = new Set();
@@ -3972,6 +4040,10 @@ function makeDeckCoverImage(deck, alt = '') {
 }
 
 function renderCollectionsOverview() {
+  if (hub.els.inventoryToolbar) {
+    hub.els.inventoryToolbar.replaceChildren(makeInventorySizeControl());
+  }
+
   if (hub.els.ownedGrid) {
     // Mostrar todos los sets disponibles en el catálogo en formato 3 por pantalla
     const allSets = HUB_CATALOG.collections.filter((col) => col.id !== 'user-created');
@@ -3992,7 +4064,7 @@ function renderCollectionsOverview() {
 
       const body = makeNode('span', 'deck-box-body');
       body.appendChild(makeNode('span', 'deck-box-title', collection.name));
-      body.appendChild(makeNode('span', 'deck-box-desc', `${percent}% completado`));
+      body.appendChild(makeNode('span', 'deck-box-desc', `${percent}%`));
       button.appendChild(body);
       return button;
     });
@@ -4085,7 +4157,10 @@ function renderCollections() {
 
   const hasDetail = Boolean(hub.collectionId || hub.deckId);
   if (hub.els.collectionsOverview) hub.els.collectionsOverview.hidden = hasDetail;
-  if (hub.els.collectionDetail) hub.els.collectionDetail.hidden = !hub.collectionId;
+  if (hub.els.collectionDetail) {
+    hub.els.collectionDetail.hidden = !hub.collectionId;
+    hub.els.collectionDetail.classList.toggle('is-user-created', hub.collectionId === 'user-created');
+  }
   if (hub.els.deckDetail) hub.els.deckDetail.hidden = !hub.deckId;
   if (hub.els.btnNewDeck) hub.els.btnNewDeck.hidden = hasDetail;
 
@@ -4164,7 +4239,28 @@ function renderUserCreatedCardsDetail() {
   });
   actionRow.appendChild(uploadBtn);
 
+  // El diseño del deck box ya no vive abierto: se abre con este botón.
+  const designBtn = makeNode('button', 'btn btn-ghost btn-sm user-box-toggle');
+  designBtn.type = 'button';
+  designBtn.id = 'user-box-toggle';
+  designBtn.setAttribute('aria-controls', 'user-box-panel');
+  designBtn.setAttribute('aria-expanded', String(hub.boxPanelOpen));
+  designBtn.appendChild(hubIcon('settings'));
+  designBtn.appendChild(makeNode('span', null, t('collections_box_design') || 'Diseño del deck box'));
+  designBtn.addEventListener('click', () => {
+    hub.boxPanelOpen = !hub.boxPanelOpen;
+    designBtn.setAttribute('aria-expanded', String(hub.boxPanelOpen));
+    selectorBox.hidden = !hub.boxPanelOpen;
+    selectorBox.classList.toggle('is-open', hub.boxPanelOpen);
+  });
+  actionRow.appendChild(designBtn);
+
   copy.appendChild(actionRow);
+
+  // Tamaño de iconos y cartas del inventario.
+  const detailToolbar = makeNode('div', 'inventory-toolbar is-detail');
+  detailToolbar.appendChild(makeInventorySizeControl());
+  copy.appendChild(detailToolbar);
 
   // Selector de Box Art (Presets oficiales + Custom subidos)
   const selectorBox = makeNode('div', 'user-box-selector');
@@ -4211,6 +4307,12 @@ function renderUserCreatedCardsDetail() {
   });
 
   selectorBox.appendChild(optionsRow);
+
+  // Panel cerrado por defecto: solo se muestra al pulsar el botón de ajustes.
+  selectorBox.id = 'user-box-panel';
+  selectorBox.classList.toggle('is-open', Boolean(hub.boxPanelOpen));
+  selectorBox.hidden = !hub.boxPanelOpen;
+
   copy.appendChild(selectorBox);
 
   hub.els.collectionDetailHead.appendChild(copy);
@@ -6698,6 +6800,10 @@ function setupHubEvents() {
         }
         hubDeckBoxes = hubDeckBoxes.slice(-12);
         saveDeckBoxes();
+        if (hubDeckBoxes.length) {
+          hubData.selectedUserBox = hubDeckBoxes[hubDeckBoxes.length - 1];
+          persistHubData();
+        }
         renderCollections();
         toast(t('collections_upload_box_ok'), { type: 'success' });
       } catch (error) {
@@ -7067,6 +7173,7 @@ function cacheHubDom() {
 
   els.collectionsOverview = hubEl('collections-overview');
   els.collectionsGrid = hubEl('collections-grid');
+  els.inventoryToolbar = hubEl('inventory-toolbar');
   els.ownedGrid = hubEl('owned-grid');
   els.ownedEmpty = hubEl('owned-empty');
   els.createdGrid = hubEl('created-grid');
@@ -7149,6 +7256,7 @@ function setupHub() {
 
   loadHubState();
   loadDeckBoxes();
+  loadInventorySize();
   buildProfileFavoriteOptions();
   setupHubEvents();
   setupCardRatios();
