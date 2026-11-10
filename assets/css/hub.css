@@ -17271,7 +17271,33 @@ body.welcome-open {
 
   .hub-about-panel .hub-view-head {
     align-items: flex-start;
+    position: relative;
   }
+
+  .hub-about-panel .hub-view-head .hub-back {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: none;
+    z-index: 6;
+  }
+
+  .hub-about-panel .hub-view-head .hub-count-pill {
+    margin-left: 0;
+  }
+}
+
+/* Flecha de vuelta anclada a la izquierda tambien en escritorio */
+.hub-about-panel .hub-view-head {
+  position: relative;
+}
+
+.hub-about-panel .hub-view-head .hub-back {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 6;
 }
 
 /* --------------------------------------------------------------------------
