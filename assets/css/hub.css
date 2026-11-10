@@ -15005,11 +15005,11 @@ body:not(.is-home-route) .hub-mobile-quick {
     align-items: center !important;
     cursor: pointer !important;
     text-decoration: none !important;
-    transition: transform 0.25s ease !important;
+    transition: none !important;
   }
 
   .shop-recommended .shop-pack:hover {
-    transform: translateY(-6px) scale(1.04) !important;
+    transform: none !important;
   }
 
   .shop-recommended .shop-pack-art {
@@ -16307,5 +16307,40 @@ body:not(.is-home-route) .hub-mobile-quick {
     border-color: #00f2fe !important;
     box-shadow: 0 12px 28px rgba(0, 242, 254, 0.35) !important;
     color: #032b35 !important;
+  }
+}
+
+/* ==========================================================================
+   DESKTOP BOOSTER PACKS PLAYGROUND OVERRIDES (NO HOVER OVERRIDE, NO TRANSITION DELAY)
+   ========================================================================== */
+@media (min-width: 981px) {
+  .shop-recommended .shop-pack {
+    transition: none !important;
+    animation: none !important;
+    cursor: grab !important;
+    touch-action: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -webkit-user-drag: none !important;
+    transform-origin: center center !important;
+  }
+
+  .shop-recommended .shop-pack:hover {
+    transform: none !important;
+    animation: none !important;
+  }
+
+  .shop-recommended .shop-pack.is-dragging {
+    cursor: grabbing !important;
+    z-index: 999 !important;
+    box-shadow: 0 20px 48px rgba(0, 242, 254, 0.45) !important;
+    border-color: #00f2fe !important;
+    transition: none !important;
+  }
+
+  .shop-recommended .shop-pack * {
+    pointer-events: none !important;
+    user-select: none !important;
+    -webkit-user-drag: none !important;
   }
 }
