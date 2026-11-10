@@ -18,14 +18,35 @@ f.addEventListener('load', () => {
   const go = () => {
     try {
       const d = f.contentDocument;
-      if (!d.getElementById('shot-css')) {
+      if (!d.getElementById('shot-css') && params.get('bare') !== '1') {
         const st = d.createElement('style');
         st.id = 'shot-css';
         st.textContent = '*{animation:none!important;transition:none!important}.hub-veil,.boot-screen{display:none!important}';
         d.head.appendChild(st);
       }
+      const hide = params.get('hide');
+      if (hide && !d.getElementById('shot-hide')) {
+        const h = d.createElement('style');
+        h.id = 'shot-hide';
+        h.textContent = hide + '{display:none!important}';
+        d.head.appendChild(h);
+      }
+      const css = params.get('css');
+      if (css && !d.getElementById('shot-extra')) {
+        const e = d.createElement('style');
+        e.id = 'shot-extra';
+        e.textContent = css;
+        d.head.appendChild(e);
+      }
       const b = d.getElementById('boot-start');
-      if (b && !b.hidden && !b.disabled) { b.click(); started.boot = true; setTimeout(go, 800); return; }
+      if (b && !b.hidden && !b.disabled) {
+        b.click();
+        started.boot = true;
+        if (route === 'boot') return;
+        setTimeout(go, 800);
+        return;
+      }
+      if (route === 'boot') return;
       const welcome = d.getElementById('welcome-screen');
       if (welcome && !welcome.hidden && route !== 'welcome') {
         const we = d.getElementById('welcome-enter');
@@ -41,6 +62,11 @@ f.addEventListener('load', () => {
       if (route === 'home-draw' && !started.draw) {
         const draw = d.getElementById('home-draw-btn');
         if (draw) { draw.click(); started.draw = true; }
+      }
+      const scrollTo = params.get('scroll');
+      if (scrollTo && !started.scrolled) {
+        const target = d.querySelector(scrollTo);
+        if (target) { target.scrollIntoView({ block: 'center' }); started.scrolled = true; }
       }
       if ((base === 'explore-packs' || base === 'explore-pack') && !started.creator) {
         const creator = d.querySelector('[data-explore-creator]');

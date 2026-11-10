@@ -7145,8 +7145,8 @@ function attachShopPlayground(el) {
         const instantVy = ((moveEvent.clientY - lastMoveY) / dt) * 16;
         state.vx = state.vx * 0.55 + Math.max(-26, Math.min(26, instantVx)) * 0.45;
         state.vy = state.vy * 0.55 + Math.max(-26, Math.min(26, instantVy)) * 0.45;
-        state.rot = Math.max(-12, Math.min(12, state.vx * 0.55));
-        state.rotV = state.vx * 0.35;
+        state.rot = Math.max(-12, Math.min(12, state.vx * 0.5));
+        state.rotV = Math.max(-2.4, Math.min(2.4, state.vx * 0.12));
       }
 
       lastMoveTime = now;
@@ -7220,6 +7220,8 @@ function runPlaygroundPhysics(el, state) {
     state.x += state.vx;
     state.y += state.vy;
     state.rot += state.rotV;
+    if (state.rot > 18) { state.rot = 18; state.rotV = 0; }
+    if (state.rot < -18) { state.rot = -18; state.rotV = 0; }
 
     // Fricción del aire + giro que se asienta.
     state.vx *= 0.955;
