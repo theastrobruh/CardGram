@@ -59,6 +59,7 @@ The project is the source of truth: if a reference disagrees with the code, trus
 | Any visible string | `i18n.js` (studio) or `hub-i18n.js` (hub) | `data-i18n*` attributes |
 | Collection progress / new set | `catalog.js` `setSize` + `hub.js` `makeCollectionCard` | `hub-i18n.js` |
 | Daily pack | `hub.js` `renderBooster` / `openBoosterPack` / `claimBoosterPack` | `hub.css` §22, `index.html` `[data-hub-panel="booster"]`, `hub-i18n.js` |
+| Shop playground / NPC position / layout export | `hub.js` `setupShopPlaygroundAll` + `exportShopPlaygroundLayout` | `hub.css` toolbar + layout bands, `components.md` |
 | New catalog card | `assets/data/cards/<COLLECTION>/…` + `catalog.js` | `thumbs/` (WebP) |
 
 ## Run and verify

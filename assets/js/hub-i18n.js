@@ -1673,3 +1673,51 @@ Object.assign(I18N.de, {
   about_card_meta: 'Geschichte, Vision und Projektstatus',
   about_card_cta: 'CardGram kennenlernen'
 });
+Object.assign(I18N.es, {
+  shop_dev_export: 'Exportar layout',
+  shop_dev_export_aria: 'Exportar coordenadas del layout (Dev)',
+  shop_dev_export_done: 'Layout exportado: JSON descargado y copiado al portapapeles',
+  shop_npc_pos_left: 'Azura: Izquierda',
+  shop_npc_pos_center: 'Azura: Centro',
+  shop_npc_pos_right: 'Azura: Derecha',
+  shop_npc_pos_hidden: 'Azura: Fuera',
+  shop_npc_opt_left: 'Izquierda (Original)',
+  shop_npc_opt_center: 'Centro',
+  shop_npc_opt_right: 'Derecha',
+  shop_npc_opt_hidden: 'Fuera de escena',
+  shop_npc_pos_custom: 'Azura: Personalizada',
+  shop_npc_size_aria: 'Tamaño de Azura',
+  shop_npc_size_label: 'Tamaño'
+});
+Object.assign(I18N.en, {
+  shop_dev_export: 'Export layout',
+  shop_dev_export_aria: 'Export layout coordinates (Dev)',
+  shop_dev_export_done: 'Layout exported: JSON downloaded and copied to clipboard',
+  shop_npc_pos_left: 'Azura: Left',
+  shop_npc_pos_center: 'Azura: Center',
+  shop_npc_pos_right: 'Azura: Right',
+  shop_npc_pos_hidden: 'Azura: Away',
+  shop_npc_opt_left: 'Left (Original)',
+  shop_npc_opt_center: 'Center',
+  shop_npc_opt_right: 'Right',
+  shop_npc_opt_hidden: 'Off screen',
+  shop_npc_pos_custom: 'Azura: Custom',
+  shop_npc_size_aria: 'Azura size',
+  shop_npc_size_label: 'Size'
+});
+Object.assign(I18N.de, {
+  shop_dev_export: 'Layout exportieren',
+  shop_dev_export_aria: 'Layout-Koordinaten exportieren (Dev)',
+  shop_dev_export_done: 'Layout exportiert: JSON heruntergeladen und in die Zwischenablage kopiert',
+  shop_npc_pos_left: 'Azura: Links',
+  shop_npc_pos_center: 'Azura: Mitte',
+  shop_npc_pos_right: 'Azura: Rechts',
+  shop_npc_pos_hidden: 'Azura: Weg',
+  shop_npc_opt_left: 'Links (Original)',
+  shop_npc_opt_center: 'Mitte',
+  shop_npc_opt_right: 'Rechts',
+  shop_npc_opt_hidden: 'Außerhalb',
+  shop_npc_pos_custom: 'Azura: Individuell',
+  shop_npc_size_aria: 'Azura-Größe',
+  shop_npc_size_label: 'Größe'
+});

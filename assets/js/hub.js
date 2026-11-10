@@ -6621,6 +6621,8 @@ function refreshHubData() {
 function refreshHubLocale() {
   if (!hub.ready) return;
   updateLangButtons();
+  /* La etiqueta de posición de Azura se escribe desde JS: refrescarla aquí. */
+  if (typeof setNpcPosLabel === 'function') setNpcPosLabel('', currentShopNpcPos());
   renderHubIdentity();
   renderFavoriteCard();
   renderHubStats(false);
@@ -6990,12 +6992,8 @@ function getPlaygroundState(el) {
 function applyPlaygroundTransform(el, state) {
   const rot = state.rot ? ` rotate(${state.rot.toFixed(2)}deg)` : '';
   if (el.classList.contains('shop-npc')) {
-    /* Azura está anclada: solo cambia de tamaño. */
-    if (state.scale === 1 && !state.rot) {
-      el.style.removeProperty('transform');
-      return;
-    }
-    el.style.setProperty('transform', `translateX(-50%) scale(${state.scale})${rot}`, 'important');
+    /* Azura se desplaza en horizontal y cambia de tamaño solo con el slider. */
+    el.style.setProperty('transform', `translateX(calc(-50% + ${state.x}px)) scale(${state.scale})`, 'important');
   } else if (el.classList.contains('shop-stores')) {
     el.style.setProperty('transform', `translate(${state.x}px, calc(-50% + ${state.y}px))${rot} scale(${state.scale})`, 'important');
   } else {
@@ -7067,12 +7065,12 @@ function attachShopPlayground(el) {
     state.isDragging = false;
     state.hasMoved = false;
 
-    /* Azura está anclada al escenario: arrastrarla en horizontal solo la
-       hace más grande o más pequeña. */
+    /* Azura se arrastra en horizontal dentro del escenario; su tamaño
+       solo cambia con el slider del botón integrado. */
     const isNpc = el.classList.contains('shop-npc');
 
-    if (!isNpc) {
-      // Calcular límites de la escena de una sola vez
+    // Calcular límites de la escena de una sola vez
+    {
       const sRect = scene.getBoundingClientRect();
       const eRect = el.getBoundingClientRect();
       const pad = 12;
@@ -7114,7 +7112,7 @@ function attachShopPlayground(el) {
         state.hasMoved = true;
         el.classList.add('is-dragging');
         if (isNpc) {
-          el.classList.add('is-resizing');
+          setNpcPosLabel('', 'custom');
         } else {
           state.isDragging = true;
           const parentRec = el.closest('.shop-recommended');
@@ -7130,11 +7128,10 @@ function attachShopPlayground(el) {
       const dt = Math.max(1, now - lastMoveTime);
 
       if (isNpc) {
-        /* Arrastre horizontal = zoom. Sin desplazamiento de posición. */
-        const next = startScale * (1 + dx / 240);
-        state.scale = Math.max(0.55, Math.min(1.9, next));
-        state.rot = Math.max(-2.5, Math.min(2.5, dx / 60));
-        showPlaygroundScaleBadge(el, state.scale);
+        /* Desplazamiento lateral puro: sin zoom ni rotación. */
+        state.x = Math.max(state.minX, Math.min(state.maxX, startStateX + dx));
+        state.y = 0;
+        state.rot = 0;
       } else {
         const rawTargetX = startStateX + dx;
         const rawTargetY = startStateY + dy;
@@ -7195,9 +7192,10 @@ function attachShopPlayground(el) {
     window.addEventListener('pointercancel', onPointerUp, { passive: false });
   });
 
-  // Modificación de tamaño con rueda del ratón
+  // Modificación de tamaño con rueda del ratón (los packs; Azura usa su slider)
   el.addEventListener('wheel', (e) => {
     if (!isShopDesktop()) return;
+    if (el.classList.contains('shop-npc')) return;
     e.preventDefault();
     e.stopPropagation();
 
@@ -7292,13 +7290,15 @@ function triggerPlaygroundBounce(el) {
 }
 
 function setNpcPosLabel(text, posKey) {
+  const key = posKey || 'left';
+  const resolved = typeof t === 'function' ? t(`shop_npc_pos_${key}`) : text;
   const label = document.getElementById('shop-npc-pos-label');
-  if (label) label.textContent = text;
+  if (label) label.textContent = resolved || text;
 
   const menu = document.getElementById('shop-npc-pos-menu');
   if (menu) {
     Array.from(menu.querySelectorAll('[data-npc-pos]')).forEach((btn) => {
-      btn.classList.toggle('is-selected', btn.dataset.npcPos === posKey);
+      btn.classList.toggle('is-selected', btn.dataset.npcPos === key);
     });
   }
 }
@@ -7319,7 +7319,6 @@ function setShopNpcPosition(pos) {
   state.isDragging = false;
   state.x = 0;
   state.y = 0;
-  state.scale = 1;
 
   npc.style.removeProperty('transform');
   npc.classList.remove('pos-center', 'pos-left', 'pos-right', 'pos-hidden');
@@ -7337,6 +7336,10 @@ function setShopNpcPosition(pos) {
     npc.classList.add('pos-hidden');
     setNpcPosLabel('Azura: Fuera', 'hidden');
   }
+
+  /* Conserva el tamaño elegido con el slider al cambiar de posición. */
+  if (pos !== 'hidden' && state.scale !== 1) applyPlaygroundTransform(npc, state);
+  syncShopNpcSizeUi();
 }
 
 function resetShopPlayground() {
@@ -7368,24 +7371,161 @@ function resetShopPlayground() {
 
   const npc = document.querySelector('.shop-npc');
   if (npc) {
-    npc.classList.remove('pos-left', 'pos-right', 'pos-hidden');
-    npc.classList.add('pos-center');
+    npc.classList.remove('pos-center', 'pos-right', 'pos-hidden');
+    npc.classList.add('pos-left');
   }
-  setNpcPosLabel('Azura: Centro', 'center');
+  setNpcPosLabel('Azura: Izquierda', 'left');
+  syncShopNpcSizeUi();
 
   if (typeof toast === 'function') {
     toast('¡Playground restablecido al diseño original!', { type: 'success' });
   }
 }
 
+function currentShopNpcPos() {
+  const npc = document.querySelector('.shop-npc');
+  if (!npc) return 'left';
+  if (Math.abs(getPlaygroundState(npc).x) > 0.5) return 'custom';
+  if (npc.classList.contains('pos-left')) return 'left';
+  if (npc.classList.contains('pos-right')) return 'right';
+  if (npc.classList.contains('pos-hidden')) return 'hidden';
+  if (npc.classList.contains('pos-center')) return 'center';
+  return 'left';
+}
+
+function setShopNpcScale(scale, options = {}) {
+  const npc = document.querySelector('.shop-npc');
+  if (!npc) return;
+  const state = getPlaygroundState(npc);
+  state.scale = Math.max(0.55, Math.min(1.9, Number(scale) || 1));
+  state.rot = 0;
+  applyPlaygroundTransform(npc, state);
+  syncShopNpcSizeUi();
+  if (!options.silent) showPlaygroundScaleBadge(npc, state.scale);
+}
+
+function syncShopNpcSizeUi() {
+  const range = document.getElementById('shop-npc-size-range');
+  const output = document.getElementById('shop-npc-size-value');
+  const npc = document.querySelector('.shop-npc');
+  if (!range || !output || !npc) return;
+  const percent = Math.round(getPlaygroundState(npc).scale * 100);
+  range.value = String(percent);
+  output.textContent = `${percent}%`;
+}
+
+function setupShopNpcSizeUi() {
+  const box = document.getElementById('shop-npc-size');
+  const range = document.getElementById('shop-npc-size-range');
+  if (!box || !range) return;
+
+  /* El slider vive dentro del menú: sus eventos no deben cerrarlo ni
+     iniciar arrastres del escenario. */
+  box.addEventListener('pointerdown', (e) => e.stopPropagation());
+  box.addEventListener('click', (e) => e.stopPropagation());
+  box.addEventListener('wheel', (e) => e.stopPropagation(), { passive: true });
+
+  if (!range._hasInput) {
+    range._hasInput = true;
+    range.addEventListener('input', () => {
+      setShopNpcScale(Number(range.value) / 100);
+    });
+  }
+
+  syncShopNpcSizeUi();
+}
+
+/* Dev tool: exporta las coordenadas reales del playground para poder
+   reproducir el layout exacto desde CSS sin adivinar. */
+function collectShopPlaygroundLayout() {
+  const scene = document.querySelector('.shop-scene');
+  if (!scene) return null;
+
+  const sRect = scene.getBoundingClientRect();
+  const px = (n) => Math.round(n * 10) / 10;
+  const pct = (n, total) => Math.round((n / total) * 1000) / 10;
+
+  const describe = (el, label) => {
+    const state = getPlaygroundState(el);
+    const r = el.getBoundingClientRect();
+    const left = r.left - sRect.left;
+    const top = r.top - sRect.top;
+    const centerX = left + r.width / 2;
+    const centerY = top + r.height / 2;
+    return {
+      id: getPlaygroundKey(el),
+      label: label || '',
+      offset: { x: px(state.x), y: px(state.y), scale: Math.round(state.scale * 100) / 100 },
+      scalePercent: Math.round(state.scale * 100),
+      rect: { left: px(left), top: px(top), width: px(r.width), height: px(r.height) },
+      center: { x: px(centerX), y: px(centerY) },
+      centerPct: { x: pct(centerX, sRect.width), y: pct(centerY, sRect.height) },
+      edgePct: {
+        left: pct(left, sRect.width),
+        top: pct(top, sRect.height),
+        right: pct(left + r.width, sRect.width),
+        bottom: pct(top + r.height, sRect.height)
+      }
+    };
+  };
+
+  const npc = document.querySelector('.shop-npc');
+  const stores = document.getElementById('shop-stores');
+  const packs = Array.from(document.querySelectorAll('#shop-recommended .shop-pack'));
+
+  return {
+    app: 'CardGram',
+    version: typeof APP_VERSION !== 'undefined' ? APP_VERSION : '0.5.5',
+    kind: 'shop-playground-layout',
+    exportedAt: new Date().toISOString(),
+    viewport: {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      pixelRatio: window.devicePixelRatio || 1
+    },
+    scene: { width: px(sRect.width), height: px(sRect.height) },
+    npc: Object.assign({ position: currentShopNpcPos() }, npc ? describe(npc, 'Azura') : {}),
+    stores: stores ? describe(stores, 'Astro~Verse') : null,
+    packs: packs.map((pack) => describe(pack, (pack.querySelector('.shop-pack-name') || {}).textContent || '')),
+    notes: 'rect / center / edgePct / centerPct se miden sobre .shop-scene (px y %). offset es el translate del playground sobre la posición CSS base; scale es el zoom del playground. npc.position: left | center | right | hidden | custom (custom = desplazada a mano con el ratón). npc.scalePercent: tamaño elegido con el slider dentro de Azura. Envía este archivo al agente para fijar el layout por defecto.'
+  };
+}
+
+function exportShopPlaygroundLayout() {
+  const layout = collectShopPlaygroundLayout();
+  if (!layout) return null;
+
+  const json = JSON.stringify(layout, null, 2);
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `cardgram-shop-layout-${stamp}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 4000);
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(json).catch(() => {});
+  }
+  if (typeof toast === 'function') {
+    const label = typeof t === 'function' ? t('shop_dev_export_done') : 'Layout exportado como JSON';
+    toast(label, { type: 'success' });
+  }
+  return layout;
+}
+
 function setupShopPlaygroundAll() {
   if (!isShopDesktop()) return;
 
-  // 1. Azura (NPC)
+  // 1. Azura (NPC) — por defecto a la izquierda, como en el mockup.
   const npc = document.querySelector('.shop-npc');
   if (npc) {
-    if (!npc.classList.contains('pos-left') && !npc.classList.contains('pos-right') && !npc.classList.contains('pos-hidden')) {
-      npc.classList.add('pos-center');
+    if (!npc.classList.contains('pos-left') && !npc.classList.contains('pos-right') && !npc.classList.contains('pos-hidden') && !npc.classList.contains('pos-center')) {
+      npc.classList.add('pos-left');
+      setNpcPosLabel('Azura: Izquierda', 'left');
     }
     attachShopPlayground(npc);
   }
@@ -7408,6 +7548,7 @@ function setupShopPlaygroundAll() {
       const open = posMenu.hidden;
       posMenu.hidden = !open;
       posBtn.setAttribute('aria-expanded', String(open));
+      if (open) syncShopNpcSizeUi();
     });
 
     posMenu.addEventListener('click', (e) => {
@@ -7436,4 +7577,20 @@ function setupShopPlaygroundAll() {
       resetShopPlayground();
     });
   }
+
+  // 6. Slider de tamaño integrado en Azura
+  setupShopNpcSizeUi();
+
+  // 7. Exportador de layout (dev): JSON con las coordenadas exactas
+  const exportBtn = document.getElementById('shop-playground-export');
+  if (exportBtn && !exportBtn._hasClick) {
+    exportBtn._hasClick = true;
+    exportBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      exportShopPlaygroundLayout();
+    });
+  }
 }
+
+window.exportShopLayout = collectShopPlaygroundLayout;

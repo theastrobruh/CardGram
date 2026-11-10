@@ -262,3 +262,12 @@ One shared button contract, three placements: `.hub-sound-btn` (desktop topbar, 
 - `data-sound="none"` stops the generic pointerdown tick so the toggle does not double-fire.
 - `is-muted` swaps the wave icon for the crossed one (rules in `app.css` §2).
 - State lives in `cardgram.sound.v1`; labels in `i18n.js` as `ui_sound_toggle` (ES/EN/DE).
+
+## Shop playground toolbar (desktop only)
+
+`#shop-playground-bar` sits at `top: 14px; right: 20px` inside `.shop-scene`, on the same vertical axis as `.hub-back` and `.shop-topbar-center` (all 40 px tall, centred at cy 112 at 1440). It only renders at `min-width: 981px`.
+
+- `#shop-npc-pos-btn` + `#shop-npc-pos-menu`: Azura position. **Default is `pos-left`** (JS in `setupShopPlaygroundAll`); the menu labels are `shop_npc_opt_*` / the trigger `shop_npc_pos_*` in `hub-i18n.js`.
+- `#shop-playground-reset`: clears drag/zoom offsets and returns Azura to the left.
+- `#shop-playground-export` (`.shop-playground-dev`): developer tool. Calls `exportShopPlaygroundLayout()` → downloads `cardgram-shop-layout-<ISO>.json` with the live rect / centre / edge percentages of the NPC, store and every pack, plus the playground `offset` and `scale`. `window.exportShopLayout()` returns the same object without downloading. Use that JSON to hard-code an approved layout instead of eyeballing pixels.
+- Pack column width is fluid on desktop (`clamp()`); at `>=1600px` the pack row is centred on the scene and the store sits at `right: 10%`.

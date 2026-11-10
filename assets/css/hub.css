@@ -14959,7 +14959,8 @@ body:not(.is-home-route) .hub-mobile-quick {
   .shop-topbar-center {
     position: absolute !important;
     left: 50% !important;
-    transform: translateX(-50%) !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
@@ -14981,11 +14982,11 @@ body:not(.is-home-route) .hub-mobile-quick {
     object-fit: contain !important;
   }
 
-  /* Los 3 Booster Packs a la izquierda de Azura, alineados horizontalmente */
+  /* Los 3 Booster Packs centrados en la escena, algo por debajo del centro */
   .shop-recommended {
     position: absolute !important;
     left: 3.5% !important;
-    top: 52% !important;
+    top: 62.5% !important;
     transform: translateY(-50%) !important;
     display: flex !important;
     flex-direction: row !important;
@@ -16172,9 +16173,7 @@ body:not(.is-home-route) .hub-mobile-quick {
     top: calc(100% + 8px) !important;
     right: 0 !important;
     min-width: 190px !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
+    background: rgba(255, 255, 255, 0.97) !important;
     border: 1.5px solid rgba(255, 255, 255, 0.98) !important;
     border-radius: 18px !important;
     box-shadow: 0 16px 36px rgba(4, 30, 40, 0.2) !important;
@@ -16273,15 +16272,17 @@ body:not(.is-home-route) .hub-mobile-quick {
     pointer-events: none !important;
   }
 
-  /* Toolbar containing both buttons side-by-side with no collision */
+  /* Toolbar containing both buttons side-by-side with no collision.
+     Alineada al mismo eje vertical que el botón de volver y los chips
+     centrales, y al mismo margen derecho que .shop-topbar. */
   .shop-playground-bar {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    gap: 12px !important;
+    gap: 10px !important;
     position: absolute !important;
-    top: 20px !important;
-    right: 28px !important;
+    top: 14px !important;
+    right: 20px !important;
     z-index: 40 !important;
   }
 
@@ -16292,7 +16293,8 @@ body:not(.is-home-route) .hub-mobile-quick {
     display: inline-flex !important;
     align-items: center !important;
     gap: 8px !important;
-    padding: 8px 18px !important;
+    min-height: 40px !important;
+    padding: 0 16px !important;
     border-radius: 999px !important;
     background: rgba(255, 255, 255, 0.88) !important;
     backdrop-filter: blur(16px) !important;
@@ -16312,6 +16314,38 @@ body:not(.is-home-route) .hub-mobile-quick {
     border-color: #00f2fe !important;
     box-shadow: 0 12px 28px rgba(0, 242, 254, 0.35) !important;
     color: #032b35 !important;
+  }
+
+  /* Botón de developer: misma familia, un punto más discreto. */
+  .shop-playground-bar .shop-playground-dev {
+    gap: 6px !important;
+    padding: 0 12px !important;
+    background: rgba(255, 255, 255, 0.62) !important;
+    border-color: rgba(255, 255, 255, 0.8) !important;
+    color: #0a5f6e !important;
+    font-size: 0.66rem !important;
+    letter-spacing: 0.02em !important;
+    text-transform: uppercase !important;
+  }
+
+  .shop-playground-bar .shop-playground-dev .icon {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+@media (min-width: 981px) and (max-width: 1279px) {
+  .shop-playground-bar,
+  .shop-playground-bar .shop-playground-dev {
+    gap: 6px !important;
+  }
+
+  .shop-playground-bar .shop-playground-dev span {
+    display: none !important;
+  }
+
+  .shop-playground-bar .shop-playground-dev {
+    padding: 0 10px !important;
   }
 }
 
@@ -17413,4 +17447,128 @@ body.welcome-open {
   letter-spacing: 0.26em;
   text-transform: uppercase;
   color: rgba(233, 255, 251, 0.66);
+}
+
+/* ==========================================================================
+   SHOP · disposición del escenario según el mockup (rev 230)
+   Azura por defecto a la izquierda, packs centrados en pantallas anchas y
+   tienda alineada a la derecha. Las coordenadas finas se pueden exportar
+   con el botón DEV del playground.
+   ========================================================================== */
+@media (min-width: 981px) and (max-width: 1599px) {
+  .shop-recommended {
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    gap: 18px !important;
+  }
+
+  .shop-recommended .shop-pack {
+    width: clamp(140px, 11.5vw, 200px) !important;
+    max-width: clamp(140px, 11.5vw, 200px) !important;
+    flex: 0 0 clamp(140px, 11.5vw, 200px) !important;
+  }
+
+  .shop-stores {
+    right: 3% !important;
+    width: 240px !important;
+  }
+
+  .shop-store-art {
+    height: 300px !important;
+  }
+}
+
+@media (min-width: 1600px) {
+  .shop-recommended {
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  .shop-stores {
+    right: 10% !important;
+  }
+}
+
+/* ==========================================================================
+   SHOP · Azura: arrastre lateral + tamaño desde el menú (rev 236)
+   Sin zoom por arrastre ni por rueda: el tamaño se cambia con el slider que
+   vive dentro del menú del botón "Azura".
+   ========================================================================== */
+@media (min-width: 981px) {
+  .shop-npc {
+    cursor: grab !important;
+    touch-action: none;
+  }
+
+  .shop-npc.is-dragging {
+    cursor: grabbing !important;
+  }
+
+  /* El hover ya no agranda a Azura: el tamaño es decisión del slider. */
+  .shop-npc:hover {
+    scale: 1 !important;
+  }
+
+  .shop-npc-size {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-top: 4px;
+    padding: 9px 8px 5px;
+    border-top: 1px solid rgba(4, 30, 40, 0.08);
+  }
+
+  .shop-npc-size-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 0.56rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #0a5f6e;
+  }
+
+  .shop-npc-size-head output {
+    font-size: 0.68rem;
+    letter-spacing: 0;
+    color: #043642;
+  }
+
+  .shop-npc-size-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #7cebdd, #2f8fdd);
+    outline: none;
+    cursor: pointer;
+  }
+
+  .shop-npc-size-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid #00a9bd;
+    box-shadow: 0 2px 6px rgba(4, 30, 40, 0.3);
+    cursor: pointer;
+  }
+
+  .shop-npc-size-range::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid #00a9bd;
+    box-shadow: 0 2px 6px rgba(4, 30, 40, 0.3);
+    cursor: pointer;
+  }
+
+  .shop-npc-size-range:focus-visible {
+    box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.35);
+  }
 }

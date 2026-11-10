@@ -12,24 +12,24 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=228">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=228">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=238">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=238">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=228" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=228" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=228" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=228" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=228" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=228" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=228" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=228" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=228" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=228" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=228" defer></script>
-  <script src="assets/js/welcome.js?v=0.5.5&rev=228" defer></script>
-  <script src="assets/js/boot.js?v=0.5.5&rev=228" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=238" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=238" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=238" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=238" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=238" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=238" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=238" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=238" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=238" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=238" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=238" defer></script>
+  <script src="assets/js/welcome.js?v=0.5.5&rev=238" defer></script>
+  <script src="assets/js/boot.js?v=0.5.5&rev=238" defer></script>
 </head>
 <body data-view="hub" class="booting">
   <div class="boot-screen" id="boot-screen">
@@ -191,6 +191,9 @@
     <symbol id="i-download" viewBox="0 0 24 24">
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
       <path d="M7 10l5 5 5-5M12 15V3"></path>
+    </symbol>
+    <symbol id="i-code" viewBox="0 0 24 24">
+      <path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"></path>
     </symbol>
     <symbol id="i-eye" viewBox="0 0 24 24">
       <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path>
@@ -799,27 +802,38 @@
                 <div class="shop-npc-position-picker" id="shop-npc-position-picker">
                   <button class="shop-playground-btn" id="shop-npc-pos-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Posición de Azura">
                     <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
-                    <span id="shop-npc-pos-label">Azura: Centro</span>
+                    <span id="shop-npc-pos-label">Azura: Izquierda</span>
                     <svg class="icon chevron-icon" aria-hidden="true"><use href="#i-chevron"></use></svg>
                   </button>
                   <div class="shop-npc-pos-menu" id="shop-npc-pos-menu" hidden>
-                    <button type="button" class="shop-npc-pos-opt is-selected" data-npc-pos="center">
-                      <span class="pos-dot"></span><span>Centro (Original)</span>
+                    <button type="button" class="shop-npc-pos-opt is-selected" data-npc-pos="left">
+                      <span class="pos-dot"></span><span data-i18n="shop_npc_opt_left">Izquierda (Original)</span>
                     </button>
-                    <button type="button" class="shop-npc-pos-opt" data-npc-pos="left">
-                      <span class="pos-dot"></span><span>Izquierda</span>
+                    <button type="button" class="shop-npc-pos-opt" data-npc-pos="center">
+                      <span class="pos-dot"></span><span data-i18n="shop_npc_opt_center">Centro</span>
                     </button>
                     <button type="button" class="shop-npc-pos-opt" data-npc-pos="right">
-                      <span class="pos-dot"></span><span>Derecha</span>
+                      <span class="pos-dot"></span><span data-i18n="shop_npc_opt_right">Derecha</span>
                     </button>
                     <button type="button" class="shop-npc-pos-opt" data-npc-pos="hidden">
-                      <span class="pos-dot"></span><span>Fuera de escena</span>
+                      <span class="pos-dot"></span><span data-i18n="shop_npc_opt_hidden">Fuera de escena</span>
                     </button>
+                    <div class="shop-npc-size" id="shop-npc-size">
+                      <div class="shop-npc-size-head">
+                        <span data-i18n="shop_npc_size_label">Tamaño</span>
+                        <output id="shop-npc-size-value" for="shop-npc-size-range">100%</output>
+                      </div>
+                      <input class="shop-npc-size-range" id="shop-npc-size-range" type="range" min="55" max="190" step="1" value="100" aria-label="Tamaño de Azura" data-i18n-aria-label="shop_npc_size_aria">
+                    </div>
                   </div>
                 </div>
                 <button class="shop-playground-btn shop-playground-reset" id="shop-playground-reset" type="button" aria-label="Restablecer Playground" title="Restablecer posición y tamaño original de los elementos">
                   <svg class="icon" aria-hidden="true"><use href="#i-reset"></use></svg>
                   <span>Reset Playground</span>
+                </button>
+                <button class="shop-playground-btn shop-playground-dev" id="shop-playground-export" type="button" aria-label="Exportar coordenadas del layout (Dev)" title="Exportar coordenadas del layout (Dev)" data-i18n-aria-label="shop_dev_export_aria" data-i18n-title="shop_dev_export_aria">
+                  <svg class="icon" aria-hidden="true"><use href="#i-code"></use></svg>
+                  <span data-i18n="shop_dev_export">Export Layout</span>
                 </button>
               </div>
               <div class="shop-npc" aria-hidden="true">
