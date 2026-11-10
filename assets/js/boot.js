@@ -135,9 +135,9 @@
     try {
       const response = await fetch('assets/data/loading/manifest.json', { cache: 'no-store' });
       const data = response.ok ? await response.json() : null;
-      const mobile = window.matchMedia('(max-width: 980px)').matches;
+      /* Mismo arte en desktop y responsivo: siempre las imágenes de escritorio. */
       const selected = data
-        ? (mobile ? data.mobile : data.desktop) || data.desktop || data.images || null
+        ? data.desktop || data.images || data.mobile || null
         : null;
       const custom = selected
         ? selected.filter((src) => typeof src === 'string')

@@ -1470,6 +1470,9 @@ Object.assign(I18N.de, { shop_back_to_packs: 'Zurück', shop_pack_detail_hint: '
 Object.assign(I18N.es, { shop_pack_contents: 'Cartas del sobre', shop_pack_contents_aria: 'Ver las cartas del sobre', shop_pack_contents_kicker: 'Contenido del sobre' });
 Object.assign(I18N.en, { shop_pack_contents: 'Pack cards', shop_pack_contents_aria: 'See the cards inside this pack', shop_pack_contents_kicker: 'Pack contents' });
 Object.assign(I18N.de, { shop_pack_contents: 'Karten im Pack', shop_pack_contents_aria: 'Karten in diesem Pack ansehen', shop_pack_contents_kicker: 'Packinhalt' });
+Object.assign(I18N.es, { pack_seal_swipe_hint: 'Desliza hacia abajo la parte superior para abrir el sobre', pack_seal_swipe_aria: 'Desliza hacia abajo sobre la parte superior del sobre para abrirlo' });
+Object.assign(I18N.en, { pack_seal_swipe_hint: 'Swipe down the top edge to open the pack', pack_seal_swipe_aria: 'Swipe down on the top of the pack to open it' });
+Object.assign(I18N.de, { pack_seal_swipe_hint: 'Ziehe die Oberkante nach unten, um das Pack zu öffnen', pack_seal_swipe_aria: 'Ziehe am oberen Rand des Packs nach unten, um es zu öffnen' });
 Object.assign(I18N.es, { shop_pack_detail_reveal_hint: 'Toca cada carta para voltearla. Guarda tus nuevas cartas para completar el set.' });
 Object.assign(I18N.en, { shop_pack_detail_reveal_hint: 'Tap each card to flip it. Save your new cards to complete the set.' });
 Object.assign(I18N.de, { shop_pack_detail_reveal_hint: 'Tippe jede Karte zum Umdrehen. Speichere deine neuen Karten für das Set.' });
@@ -1724,3 +1727,10 @@ Object.assign(I18N.de, {
   shop_npc_size_aria: 'Azura-Größe',
   shop_npc_size_label: 'Größe'
 });
+Object.assign(I18N.es, { pack_card_swipe_hint: 'Desliza suavemente para ver la siguiente carta' });
+Object.assign(I18N.en, { pack_card_swipe_hint: 'Swipe gently to see the next card' });
+Object.assign(I18N.de, { pack_card_swipe_hint: 'Wische leicht, um die nächste Karte zu sehen' });
+
+Object.assign(I18N.es, { shop_pack_percent: '{percent}%' });
+Object.assign(I18N.en, { shop_pack_percent: '{percent}%' });
+Object.assign(I18N.de, { shop_pack_percent: '{percent}%' });

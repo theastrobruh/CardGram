@@ -246,6 +246,57 @@ function makeHubImage(src, alt) {
   return img;
 }
 
+/* --------------------------------------------------------------------------
+   Acabado holográfico global: cada superficie de carta recibe una capa de
+   brillo animada, la misma que el teatro de apertura de sobres.
+   -------------------------------------------------------------------------- */
+const HOLO_TARGETS = [
+  '.media-card-thumb',
+  '.hub-card-face',
+  '.hub-explorer-art',
+  '.shop-preview-card',
+  '.booster-card-face',
+  '.pack-card-face',
+  '.pack-theater-card-inner',
+  '.card-viewer-face',
+  '.deck-cover',
+  '.deck-cover-choice',
+  '.deck-builder-cover',
+  '.deck-selected-thumb',
+  '.collection-stack',
+  '.home-loose-card'
+].join(',');
+
+function addHoloTo(node) {
+  if (!node || node.nodeType !== 1) return;
+  if (node.classList.contains('card-holo')) return;
+  if (node.matches(HOLO_TARGETS) && !node.querySelector(':scope > .card-holo, :scope > .pack-theater-hologram')) {
+    const holo = document.createElement('span');
+    holo.className = 'card-holo';
+    holo.setAttribute('aria-hidden', 'true');
+    node.appendChild(holo);
+  }
+  if (node.querySelector) {
+    node.querySelectorAll(HOLO_TARGETS).forEach((target) => {
+      if (target.querySelector(':scope > .card-holo, :scope > .pack-theater-hologram')) return;
+      const holo = document.createElement('span');
+      holo.className = 'card-holo';
+      holo.setAttribute('aria-hidden', 'true');
+      target.appendChild(holo);
+    });
+  }
+}
+
+function initHoloFinish() {
+  addHoloTo(document.body);
+  const observer = new MutationObserver((records) => {
+    records.forEach((record) => {
+      record.addedNodes.forEach((node) => addHoloTo(node));
+    });
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
 function makeHubButton(className, text, data) {
   const button = document.createElement('button');
   button.type = 'button';
@@ -716,7 +767,8 @@ let packOverlayState = {
   currentIndex: 0,
   revealedSet: new Set(),
   isBurst: false,
-  viewMode: 'single'
+  viewMode: 'single',
+  suppressTapUntil: 0
 };
 
 function clearPackTimers() {
@@ -729,6 +781,143 @@ function closePackOverlay() {
   clearPackTimers();
   hub.els.packOverlay.hidden = true;
   document.body.classList.remove('pack-open');
+}
+
+function setPackOverlayStage(stage) {
+  const overlay = hub.els.packOverlay;
+  if (!overlay) return;
+  overlay.classList.toggle('is-seal-stage', stage === 'seal');
+  overlay.classList.toggle('is-theater-stage', stage === 'theater');
+  overlay.classList.toggle('is-grid-stage', stage === 'grid');
+}
+
+/* Abrir el sobre deslizando hacia abajo su parte superior. */
+function setupPackSealSwipe() {
+  const seal = hub.els.packSeal;
+  if (!seal || seal._hasSwipe) return;
+  seal._hasSwipe = true;
+
+  let active = false;
+  let startX = 0;
+  let startY = 0;
+
+  const startsOnTop = (event) => {
+    const rect = seal.getBoundingClientRect();
+    return event.clientY - rect.top <= rect.height * 0.36;
+  };
+
+  seal.addEventListener('pointerdown', (event) => {
+    if (packOverlayState.isBurst) return;
+    if (event.button !== 0) return;
+    if (!startsOnTop(event)) return;
+    active = true;
+    startX = event.clientX;
+    startY = event.clientY;
+    seal.classList.add('is-tearing');
+    seal.style.setProperty('--tear-y', '0px');
+    seal.style.setProperty('--tear-x', '0px');
+    if (seal.setPointerCapture) {
+      try { seal.setPointerCapture(event.pointerId); } catch (error) { /* noop */ }
+    }
+    event.preventDefault();
+  });
+
+  seal.addEventListener('pointermove', (event) => {
+    if (!active) return;
+    const dx = event.clientX - startX;
+    const dy = event.clientY - startY;
+    const pull = Math.max(0, Math.min(dy, 150));
+    seal.style.setProperty('--tear-y', `${pull}px`);
+    seal.style.setProperty('--tear-x', `${Math.max(-20, Math.min(20, dx * 0.22))}px`);
+  });
+
+  const finish = (event) => {
+    if (!active) return;
+    active = false;
+    seal.classList.remove('is-tearing');
+    const dx = (event.clientX || 0) - startX;
+    const dy = (event.clientY || 0) - startY;
+    seal.style.setProperty('--tear-y', '0px');
+    seal.style.setProperty('--tear-x', '0px');
+    if (seal.releasePointerCapture) {
+      try { seal.releasePointerCapture(event.pointerId); } catch (error) { /* noop */ }
+    }
+    if (dy > 56 && dy > Math.abs(dx) * 0.55) {
+      triggerPackRip();
+    }
+  };
+
+  seal.addEventListener('pointerup', finish);
+  seal.addEventListener('pointercancel', finish);
+
+  seal.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      triggerPackRip();
+    }
+  });
+}
+
+/* En móvil las cartas se pasan una a una con un swipe suave. */
+function setupPackCardSwipe() {
+  const stage = document.getElementById('pack-theater-stage');
+  const card = hub.els.packTheaterCard;
+  if (!stage || !card || stage._hasSwipe) return;
+  stage._hasSwipe = true;
+
+  let active = false;
+  let pointerId = null;
+  let startX = 0;
+  let startY = 0;
+
+  const reset = () => {
+    active = false;
+    card.style.transition = 'translate 0.22s ease';
+    card.style.translate = '';
+  };
+
+  stage.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'mouse' && window.innerWidth > 980) return;
+    if (event.button !== 0) return;
+    active = true;
+    pointerId = event.pointerId;
+    startX = event.clientX;
+    startY = event.clientY;
+    card.style.transition = 'none';
+    if (stage.setPointerCapture) {
+      try { stage.setPointerCapture(event.pointerId); } catch (error) { /* noop */ }
+    }
+  });
+
+  stage.addEventListener('pointermove', (event) => {
+    if (!active || event.pointerId !== pointerId) return;
+    const dx = event.clientX - startX;
+    if (Math.abs(dx) < 3) return;
+    const pull = Math.max(-110, Math.min(110, dx * 0.55));
+    card.style.translate = `${pull}px 0`;
+  });
+
+  const finish = (event) => {
+    if (!active || event.pointerId !== pointerId) return;
+    const dx = event.clientX - startX;
+    const dy = event.clientY - startY;
+    reset();
+    if (stage.releasePointerCapture) {
+      try { stage.releasePointerCapture(event.pointerId); } catch (error) { /* noop */ }
+    }
+    const swipedSideways = Math.abs(dx) > 22 && Math.abs(dx) > Math.abs(dy) * 0.6;
+    const swipedUp = dy < -26 && Math.abs(dy) > Math.abs(dx);
+    if (swipedSideways || swipedUp) {
+      packOverlayState.suppressTapUntil = Date.now() + 400;
+      nextTheaterCard();
+    }
+  };
+
+  stage.addEventListener('pointerup', finish);
+  stage.addEventListener('pointercancel', reset);
+  stage.addEventListener('pointerleave', (event) => {
+    if (active && event.pointerId === pointerId) reset();
+  });
 }
 
 function triggerPackRip() {
@@ -744,6 +933,7 @@ function triggerPackRip() {
       if (hub.els.packTheaterWrap) hub.els.packTheaterWrap.hidden = false;
       if (hub.els.packHeadMeta) hub.els.packHeadMeta.hidden = false;
       if (hub.els.packToggleView) hub.els.packToggleView.hidden = false;
+      setPackOverlayStage('theater');
 
       if (hub.els.packRevealGrid) {
         hub.els.packRevealGrid.replaceChildren(
@@ -854,10 +1044,12 @@ function togglePackView(forceMode) {
     if (hub.els.packTheaterWrap) hub.els.packTheaterWrap.hidden = true;
     if (hub.els.packRevealGrid) hub.els.packRevealGrid.hidden = false;
     if (hub.els.packToggleViewText) hub.els.packToggleViewText.textContent = t('pack_theater_mode') || 'Modo cine';
+    setPackOverlayStage('grid');
   } else {
     if (hub.els.packTheaterWrap) hub.els.packTheaterWrap.hidden = false;
     if (hub.els.packRevealGrid) hub.els.packRevealGrid.hidden = true;
     if (hub.els.packToggleViewText) hub.els.packToggleViewText.textContent = t('pack_view_all') || 'Ver todas';
+    setPackOverlayStage('theater');
   }
 }
 
@@ -943,8 +1135,22 @@ function openPackOverlay() {
   if (hub.els.packEndActions) hub.els.packEndActions.hidden = true;
 
   hub.els.packOverlay.hidden = false;
+  setPackOverlayStage('seal');
+  setupPackSealSwipe();
+  setupPackCardSwipe();
+  syncPackTheaterHint();
   document.body.classList.add('pack-open');
   if (window.Sound) window.Sound.play('booster');
+}
+
+/* En móvil la pista del teatro invita a deslizar, no a tocar. */
+function syncPackTheaterHint() {
+  const hint = document.getElementById('pack-theater-tap-hint');
+  if (!hint) return;
+  const isMobile = window.matchMedia('(max-width: 980px)').matches;
+  const key = isMobile ? 'pack_card_swipe_hint' : 'pack_card_reveal_tap';
+  hint.setAttribute('data-i18n', key);
+  hint.textContent = t(key) || hint.textContent;
 }
 
 function openBoosterPack() {
@@ -1603,7 +1809,7 @@ function renderShopRecommended(sets) {
       meter.appendChild(fill);
       button.appendChild(meter);
 
-      button.appendChild(makeNode('small', 'shop-pack-count', countLabel('explore_pack_cards', collection.cards.length)));
+      button.appendChild(makeNode('small', 'shop-pack-count', t('shop_pack_percent', { percent })));
       return button;
     })
   );
@@ -5783,8 +5989,8 @@ function onHubClick(event) {
     return;
   }
 
-  // Interacción con sobre sellado
-  if (target.closest('#pack-seal') || target.closest('#pack-seal-trigger-btn')) {
+  // Interacción con sobre sellado: el sobre se abre deslizando su parte superior
+  if (target.closest('#pack-seal-trigger-btn')) {
     event.preventDefault();
     triggerPackRip();
     return;
@@ -5793,6 +5999,7 @@ function onHubClick(event) {
   // Interacción con carta en teatro / siguiente carta (Pokémon Pocket style)
   if (target.closest('#pack-theater-card') || target.closest('#pack-theater-next')) {
     event.preventDefault();
+    if (target.closest('#pack-theater-card') && Date.now() < packOverlayState.suppressTapUntil) return;
     nextTheaterCard();
     return;
   }
@@ -7098,8 +7305,10 @@ function attachShopPlayground(el) {
     state.hasMoved = false;
 
     /* Azura se arrastra en horizontal dentro del escenario; su tamaño
-       solo cambia con el slider del botón integrado. */
+       solo cambia con el slider del botón integrado. En pantallas táctiles
+       no se arrastra: el dedo solo la saluda. */
     const isNpc = el.classList.contains('shop-npc');
+    if (isNpc && e.pointerType && e.pointerType !== 'mouse') return;
 
     // Calcular límites de la escena de una sola vez
     {
@@ -7626,3 +7835,10 @@ function setupShopPlaygroundAll() {
 }
 
 window.exportShopLayout = collectShopPlaygroundLayout;
+
+/* Arranca el acabado holográfico cuando el DOM está listo. */
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initHoloFinish);
+} else {
+  initHoloFinish();
+}

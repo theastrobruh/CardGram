@@ -17860,3 +17860,751 @@ body.pack-open .shop-scene > :not(.shop-bg):not(.shop-light) {
     width: min(94vw, 560px) !important;
   }
 }
+
+/* ==========================================================================
+   OPENING PACK · Experiencia inmersiva y minimalista (rev 244)
+   - Solo el render del sobre y la invitación a deslizar.
+   - Se abre deslizando hacia abajo la parte superior del sobre.
+   - Al revelar cartas desaparecen los paneles: solo fondo + cartas.
+   ========================================================================== */
+.pack-overlay-shell {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 0 !important;
+  width: min(720px, 96vw) !important;
+}
+
+/* Cabecera reducida a un contador flotante + cerrar */
+.pack-overlay-head {
+  position: fixed !important;
+  top: 16px !important;
+  right: 16px !important;
+  left: auto !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  z-index: 9 !important;
+}
+
+.pack-overlay .pack-head-info {
+  display: none !important;
+}
+
+.pack-overlay-close {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  width: 36px !important;
+  height: 36px !important;
+}
+
+/* Etapa 1: el sobre, grande y limpio */
+.pack-seal-wrap {
+  min-height: 0 !important;
+  padding: 0 !important;
+  gap: 14px !important;
+}
+
+.pack-seal {
+  width: min(272px, 66vw) !important;
+  height: auto !important;
+  aspect-ratio: 300 / 420 !important;
+  cursor: grab !important;
+  touch-action: none !important;
+  box-shadow: 0 34px 60px rgba(0, 0, 0, 0.5) !important;
+}
+
+.pack-seal:active {
+  cursor: grabbing !important;
+}
+
+.pack-seal.is-tearing {
+  animation: none !important;
+  transition: none !important;
+  transform: translate(var(--tear-x, 0px), var(--tear-y, 0px)) rotate(-0.5deg) !important;
+}
+
+/* Banda superior que se puede "rasgar" */
+.pack-seal-tear {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 23%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.02) 70%);
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.72);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.16);
+}
+
+.pack-seal-tear-line {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: -5px;
+  height: 8px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 1.5px, transparent 2px) repeat-x;
+  background-size: 10px 8px;
+  opacity: 0.7;
+}
+
+/* Flecha animada + texto de invitación */
+.pack-seal-swipe-cue {
+  width: 18px;
+  height: 18px;
+  margin-top: -2px;
+  border-right: 3px solid rgba(255, 255, 255, 0.92);
+  border-bottom: 3px solid rgba(255, 255, 255, 0.92);
+  transform: rotate(45deg);
+  animation: packSwipeCue 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.55));
+}
+
+@keyframes packSwipeCue {
+  0%, 100% { transform: translateY(-5px) rotate(45deg); opacity: 0.35; }
+  50% { transform: translateY(5px) rotate(45deg); opacity: 1; }
+}
+
+.pack-seal-hint {
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-size: 0.62rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.75) !important;
+  max-width: 34ch;
+}
+
+/* Etapa 2 y 3: cartas sobre el fondo, sin panel detrás */
+.pack-theater-tap-hint {
+  color: rgba(255, 255, 255, 0.92) !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7) !important;
+}
+
+.pack-theater-stage {
+  padding: 0 !important;
+}
+
+.pack-reveal-grid {
+  background: transparent !important;
+}
+
+/* Los botones siguen siendo legibles sobre el fondo */
+.pack-overlay-actions .btn,
+.pack-end-actions .btn {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32) !important;
+}
+
+/* Inmersión total durante la apertura: sin barra del hub y viñeta superior */
+body.pack-open .hub-topbar {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.pack-overlay-backdrop {
+  background:
+    linear-gradient(180deg, rgba(4, 21, 29, 0.9) 0, rgba(4, 21, 29, 0.72) 70px, rgba(4, 21, 29, 0) 150px),
+    radial-gradient(ellipse at 50% 40%, rgba(4, 21, 29, 0.18) 0%, rgba(4, 21, 29, 0.6) 100%) !important;
+}
+
+.pack-theater-tap-hint {
+  font-size: 0.6rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.12em !important;
+  color: #ffffff !important;
+}
+
+/* Rejilla de cartas: ocupa el ancho del escenario (antes colapsaba a 0) */
+.pack-reveal-grid {
+  width: min(720px, 92vw) !important;
+  max-width: none !important;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+  gap: 12px !important;
+  padding: 12px 0 16px !important;
+  justify-items: stretch !important;
+}
+
+/* ==========================================================================
+   OPENING PACK · Solo el arte, a lo grande (rev 247)
+   - Fuera la caja contenedora: sin fondo, borde, radio ni etiquetas encima.
+   - Sobre +30% y cartas +30% para que dominen la pantalla.
+   ========================================================================== */
+.pack-seal {
+  width: min(76vw, 44vh, 440px) !important;
+  height: auto !important;
+  aspect-ratio: 300 / 420 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  filter: drop-shadow(0 30px 52px rgba(0, 0, 0, 0.58));
+}
+
+.pack-seal img {
+  opacity: 1 !important;
+}
+
+.pack-seal::after {
+  display: none !important;
+}
+
+.pack-seal-brand,
+.pack-seal-name {
+  display: none !important;
+}
+
+/* La banda superior queda solo como línea de rasgado, sin velo blanco */
+.pack-seal-tear {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.pack-seal-shine {
+  opacity: 0.5 !important;
+}
+
+/* Cartas reveladas: más grandes, sin recortar la composición */
+.pack-theater-card {
+  width: min(470px, 88vw, 50vh) !important;
+  height: min(630px, 68vh) !important;
+}
+
+.pack-theater-nav {
+  width: min(470px, 90vw) !important;
+}
+
+/* Rejilla: cartas más grandes, 3 columnas en escritorio */
+.pack-reveal-grid {
+  width: min(780px, 94vw) !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: 14px !important;
+}
+
+@media (max-width: 700px) {
+  .pack-reveal-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+  }
+}
+
+/* ==========================================================================
+   OPENING PACK · Pulido art-only (rev 248)
+   - Sin linea punteada sobre el arte: el sobre se ve limpio.
+   - Sin FABs del hub durante la apertura (inmersion total).
+   ========================================================================== */
+.pack-seal-tear {
+  border-bottom: 0 !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 100%) !important;
+}
+
+.pack-seal-tear-line {
+  opacity: 0.22 !important;
+}
+
+.pack-seal-shine {
+  opacity: 0.22 !important;
+}
+
+body.pack-open .hub-fab,
+body.pack-open .hub-fab-actions,
+body.pack-open .hub-settings-fab {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ==========================================================================
+   OPENING PACK · Experiencia art-only en desktop y responsivo (rev 249)
+   1. Sin banda de rasgado ni brillo encima del arte.
+   2. Azura: sin hover/zoom ni arrastre con el dedo en pantallas táctiles.
+   3. Pack view y apertura adaptados a móvil/tablet.
+   ========================================================================== */
+
+/* 1. El sobre queda como su arte, limpio */
+.pack-seal-tear,
+.pack-seal-tear-line,
+.pack-seal-shine {
+  display: none !important;
+}
+
+/* 2. Azura en pantallas táctiles: solo responde con un pop suave */
+@media (hover: none), (pointer: coarse) {
+  .shop-npc {
+    cursor: pointer !important;
+    touch-action: manipulation;
+  }
+
+  .shop-npc:hover {
+    scale: 1 !important;
+  }
+
+  .shop-npc.is-reacting {
+    animation: azuraTapPop 0.42s ease !important;
+  }
+}
+
+@keyframes azuraTapPop {
+  0%, 100% { scale: 1; }
+  45% { scale: 1.06; }
+}
+
+/* 3a. Pack view en móvil: pack grande, CTA por encima de la barra inferior */
+@media (max-width: 980px) {
+  .shop-pack-view-stage {
+    padding: 56px 12px 150px !important;
+  }
+
+  .shop-pack-view-open {
+    bottom: calc(82px + 18px) !important;
+  }
+
+  #shop-pack-view-img {
+    max-height: calc(100vh - 300px) !important;
+    max-width: min(88vw, 420px) !important;
+  }
+
+  /* Apertura inmersiva: fuera toda la interfaz del hub */
+  body.pack-open .hub-topbar,
+  body.pack-open .shop-mobile-bar,
+  body.pack-open .hub-mobile-nav,
+  body.pack-open .hub-menu-btn,
+  body.pack-open .hub-music-btn {
+    display: none !important;
+  }
+
+  .pack-overlay {
+    padding: 0 !important;
+  }
+
+  .pack-overlay-shell {
+    width: 100% !important;
+  }
+
+  .pack-seal-wrap {
+    padding: 72px 12px 90px !important;
+  }
+
+  .pack-seal {
+    width: min(80vw, 42vh, 380px) !important;
+  }
+
+  .pack-seal-hint {
+    max-width: 30ch !important;
+    font-size: 0.58rem !important;
+  }
+
+  .pack-theater-card {
+    width: min(84vw, 46vh) !important;
+    height: auto !important;
+    aspect-ratio: 470 / 630 !important;
+  }
+
+  .pack-theater-nav {
+    width: min(84vw, 420px) !important;
+  }
+
+  .pack-reveal-grid {
+    width: min(94vw, 640px) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+}
+
+/* 3b. Pantallas bajas (móvil horizontal): todo cabe sin solaparse */
+@media (max-width: 980px) and (max-height: 560px) {
+  .shop-pack-view-stage {
+    padding: 44px 10px 74px !important;
+  }
+
+  .shop-pack-view-open {
+    bottom: 66px !important;
+    min-height: 34px !important;
+  }
+
+  #shop-pack-view-img {
+    max-height: calc(100vh - 140px) !important;
+    max-width: min(52vw, 300px) !important;
+  }
+
+  .pack-seal-wrap {
+    padding: 52px 10px 56px !important;
+  }
+
+  .pack-seal {
+    width: min(38vw, 62vh) !important;
+  }
+
+  .pack-seal-hint {
+    font-size: 0.52rem !important;
+  }
+
+  .pack-theater-card {
+    width: min(40vw, 72vh) !important;
+  }
+
+  .pack-theater-nav {
+    width: min(42vw, 340px) !important;
+  }
+
+  .pack-reveal-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+}
+
+/* ==========================================================================
+   OPENING PACK · Responsivo fino (rev 250)
+   - Fondo oscuro bajo el overlay (sin franja clara al ocultar la barra).
+   - Rejilla con scroll y CTA siempre alcanzable; nada tapa el contador.
+   ========================================================================== */
+body.pack-open {
+  background: #04151d !important;
+}
+
+@media (max-width: 980px) {
+  .pack-overlay-shell {
+    height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .pack-reveal-grid {
+    padding: 66px 0 12px !important;
+  }
+
+  .pack-overlay-actions {
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 4 !important;
+    display: flex !important;
+    justify-content: center !important;
+    padding: 10px 0 calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+    background: linear-gradient(180deg, rgba(4, 21, 29, 0), rgba(4, 21, 29, 0.62)) !important;
+  }
+}
+
+/* ==========================================================================
+   SHOP MÓVIL · Avatar del user shop a la izquierda (rev 251)
+   - El chip del dueño (avatar + nombre) pasa al lado opuesto del edificio
+     Astro~Verse y se alinea con él.
+   - Edificio y avatar bajan ~15% para ocupar el espacio libre y quedar
+     simétricos.
+   ========================================================================== */
+@media (max-width: 980px) {
+  .shop-mobile-store {
+    bottom: 179px !important;
+  }
+
+  .shop-mobile-store-owner {
+    position: absolute !important;
+    top: 50% !important;
+    left: calc(178px - 100vw) !important;
+    translate: 0 -50% !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 4px !important;
+    width: 84px !important;
+    pointer-events: auto !important;
+  }
+}
+
+@media (max-width: 980px) and (max-height: 560px) {
+  .shop-mobile-store {
+    bottom: 96px !important;
+  }
+
+  .shop-mobile-store-owner {
+    top: 50% !important;
+  }
+}
+
+/* Móvil horizontal: la mini tienda no cabe sin tapar los sobres.
+   Se mantiene accesible desde la navegación (Explorar). */
+@media (max-width: 980px) and (max-height: 560px) {
+  .shop-mobile-store {
+    display: none !important;
+  }
+}
+
+/* Móvil: el sobre y el teatro se centran en la pantalla; la rejilla
+   empieza arriba y hace scroll. */
+@media (max-width: 980px) {
+  .pack-overlay-shell {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+
+  #pack-overlay.is-grid-stage .pack-overlay-shell {
+    justify-content: flex-start !important;
+  }
+}
+
+/* Móvil: durante la apertura el escenario de la Shop ocupa toda la altura
+   (sin franja distinta al fondo en la parte inferior). */
+@media (max-width: 980px) {
+  body.pack-open .hub-booster-panel {
+    height: 100vh !important;
+    min-height: 100vh !important;
+  }
+}
+
+/* ==========================================================================
+   OPENING PACK · Teatro móvil (rev 256)
+   - Una carta a la vez, lo más grande posible.
+   - Se pasa a la siguiente con un swipe suave (sin botones).
+   ========================================================================== */
+@media (max-width: 980px) {
+  .pack-theater-card {
+    width: min(96vw, 86vh) !important;
+    height: auto !important;
+    aspect-ratio: 470 / 630 !important;
+    cursor: grab !important;
+    touch-action: pan-y !important;
+  }
+
+  .pack-theater-nav {
+    width: min(96vw, 420px) !important;
+    justify-content: center !important;
+  }
+
+  .pack-theater-prev,
+  .pack-theater-next {
+    display: none !important;
+  }
+
+  .pack-theater-tap-hint {
+    font-size: 0.58rem !important;
+    letter-spacing: 0.14em !important;
+    text-align: center !important;
+  }
+}
+
+@media (max-width: 980px) and (max-height: 560px) {
+  .pack-theater-card {
+    width: min(30vw, 66vh) !important;
+  }
+
+  .pack-theater-nav {
+    display: none !important;
+  }
+}
+
+/* La última fila de la rejilla queda por encima del CTA fijo. */
+@media (max-width: 980px) {
+  .pack-reveal-grid {
+    padding-bottom: 78px !important;
+  }
+}
+
+/* ==========================================================================
+   ACABADO HOLOGRÁFICO GLOBAL · todas las cartas, en todas las pantallas
+   El brillo es el mismo del teatro de apertura de sobres.
+   ========================================================================== */
+.card-holo {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    118deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.12) 26%,
+    rgba(150, 246, 255, 0.18) 44%,
+    rgba(255, 255, 255, 0.09) 58%,
+    rgba(255, 255, 255, 0) 78%
+  );
+  background-size: 260% 260%;
+  animation: cardHoloDrift 11s ease-in-out infinite alternate;
+  mix-blend-mode: soft-light;
+  opacity: 0.9;
+}
+
+@keyframes cardHoloDrift {
+  0% { background-position: 0% 40%; }
+  100% { background-position: 100% 60%; }
+}
+
+.deck-cover,
+.deck-cover-choice,
+.deck-builder-cover {
+  position: relative;
+}
+
+.shop-preview-card .card-holo {
+  border-radius: 6px;
+}
+
+.collection-stack .card-holo {
+  border-radius: 9px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-holo { animation: none; }
+}
+
+/* La tienda de usuario recupera el hover de crecimiento: el contenedor de
+   arrastre desactivaba los eventos de puntero en sus hijos. */
+@media (min-width: 981px) {
+  .shop-stores .shop-store {
+    pointer-events: auto !important;
+  }
+
+  .shop-stores .shop-store * {
+    pointer-events: none !important;
+  }
+}
+
+/* ==========================================================================
+   BOOSTERS · flotación con gravedad al renderizar
+   Se reproduce una vez por render y termina en reposo para no pelear con el
+   arrastre del playground.
+   ========================================================================== */
+@keyframes shopPackRenderFloat {
+  0% {
+    transform: translate3d(0, 18px, 0) rotate(-2.4deg);
+    opacity: 0;
+  }
+  28% {
+    transform: translate3d(0, -12px, 0) rotate(1.6deg);
+    opacity: 1;
+  }
+  48% {
+    transform: translate3d(0, 4px, 0) rotate(-0.9deg);
+  }
+  66% {
+    transform: translate3d(0, -6px, 0) rotate(0.6deg);
+  }
+  82% {
+    transform: translate3d(0, 2px, 0) rotate(-0.3deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.shop-recommended .shop-pack.is-render-float {
+  animation: shopPackRenderFloat 1.9s cubic-bezier(0.33, 0, 0.2, 1) both !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-recommended .shop-pack.is-render-float {
+    animation: none !important;
+  }
+}
+
+/* La flotación continua deja paso a la flotación de render en todas las
+   pantallas: así no compite con el arrastre del playground. */
+.shop-recommended .shop-pack {
+  animation: none;
+}
+
+/* Azura un 6% más abajo en la Shop de escritorio. */
+@media (min-width: 981px) {
+  .shop-npc {
+    bottom: -6% !important;
+  }
+}
+
+/* ==========================================================================
+   BOOSTERS · flotación continua con gravedad (desktop y responsive)
+   Usa 	ranslate (no 	ransform) para no pelear con el arrastre del
+   playground, que escribe 	ransform inline.
+   ========================================================================== */
+@keyframes shopPackFloatGravity {
+  0%, 100% { translate: 0 0; }
+  25% { translate: 0 -7px; }
+  50% { translate: 0 -2px; }
+  75% { translate: 0 -9px; }
+}
+
+.shop-recommended .shop-pack:not(.is-dragging):not(.is-bouncing) {
+  animation: shopPackFloatGravity 7.6s ease-in-out infinite;
+}
+
+.shop-recommended .shop-pack:nth-child(2) {
+  animation-duration: 8.8s !important;
+  animation-delay: -1.4s !important;
+}
+
+.shop-recommended .shop-pack:nth-child(3) {
+  animation-duration: 9.4s !important;
+  animation-delay: -2.8s !important;
+}
+
+@media (min-width: 981px) {
+  .shop-recommended .shop-pack:not(.is-dragging):not(.is-bouncing) {
+    animation: shopPackFloatGravity 7.6s ease-in-out infinite !important;
+  }
+
+  /* Durante el arrastre manda el playground. */
+  .shop-recommended .shop-pack.is-dragging,
+  .shop-recommended .shop-pack.is-bouncing {
+    animation: none !important;
+    translate: 0 0 !important;
+  }
+
+  /* Hover: se pausa suavemente, no se reinicia. */
+  .shop-recommended .shop-pack:hover {
+    animation-name: shopPackFloatGravity !important;
+    animation-duration: 7.6s !important;
+    animation-timing-function: ease-in-out !important;
+    animation-iteration-count: infinite !important;
+    animation-play-state: paused !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-recommended .shop-pack {
+    animation: none !important;
+  }
+}
+
+/* Desfase del flotado por posición (después del shorthand para ganar). */
+.shop-recommended .shop-pack:not(.is-dragging):not(.is-bouncing):nth-child(2) {
+  animation-duration: 8.8s !important;
+  animation-delay: -1.4s !important;
+}
+
+.shop-recommended .shop-pack:not(.is-dragging):not(.is-bouncing):nth-child(3) {
+  animation-duration: 9.4s !important;
+  animation-delay: -2.8s !important;
+}
+
+/* La tienda del usuario flota como los sobres. */
+.shop-store,
+.shop-mobile-store {
+  animation: shopPackFloatGravity 8.2s ease-in-out infinite;
+}
+
+.shop-stores.is-dragging .shop-store {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-store,
+  .shop-mobile-store {
+    animation: none;
+  }
+}
+
+/* Azura ~15% más grande en la Shop de escritorio. */
+@media (min-width: 981px) {
+  .shop-npc {
+    width: min(644px, 54vw) !important;
+    height: 94.3vh !important;
+  }
+}
