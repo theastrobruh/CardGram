@@ -14,6 +14,7 @@
   const bar = document.getElementById('boot-bar');
   const bgA = document.getElementById('boot-bg-a');
   const bgB = document.getElementById('boot-bg-b');
+  const realityTag = document.getElementById('boot-reality-tag');
   const fallback = [
     'assets/data/cards/database/Mew Tarot/00 - The Fool.webp',
     'assets/data/cards/database/Champion-Verse/S01_GOKU.webp',
@@ -58,20 +59,32 @@
     if (bar) bar.style.width = `${value}%`;
   }
 
+  function updateRealityTag() {
+    if (!realityTag) return;
+    const total = Math.max(carousel.length, 1);
+    const current = (index % total) + 1;
+    realityTag.textContent = `REALITY ${String(current).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+  }
+
   function showImage(src) {
     if (!src) return;
     const next = active === bgA ? bgB : bgA;
-    const moves = [[1.2, -1], [-1.2, 1], [1, 1.2]];
-    const move = moves[index % moves.length];
+    /* Misma perspectiva, misma habitación: un empuje lento y constante. */
     next.style.backgroundImage = `url("${src}")`;
-    next.style.setProperty('--kb-x', `${move[0]}%`);
-    next.style.setProperty('--kb-y', `${move[1]}%`);
-    next.dataset.kb = String(index % 3);
+    next.style.setProperty('--kb-x', '0.9%');
+    next.style.setProperty('--kb-y', '-0.9%');
     next.classList.remove('is-on');
     void next.offsetWidth;
     next.classList.add('is-on');
     active.classList.remove('is-on');
     active = next;
+    updateRealityTag();
+
+    overlay.classList.add('is-shifting');
+    window.clearTimeout(showImage.shiftTimer);
+    showImage.shiftTimer = window.setTimeout(() => {
+      overlay.classList.remove('is-shifting');
+    }, 1300);
   }
 
   function playCarousel() {
@@ -122,16 +135,18 @@
     try {
       const response = await fetch('assets/data/loading/manifest.json', { cache: 'no-store' });
       const data = response.ok ? await response.json() : null;
-      // Utilizar un solo fondo unificado (desktop wide) tanto en móvil como en escritorio
-      const selected = data && Array.isArray(data.desktop) ? data.desktop : (data && Array.isArray(data.images) ? data.images : null);
+      const mobile = window.matchMedia('(max-width: 980px)').matches;
+      const selected = data
+        ? (mobile ? data.mobile : data.desktop) || data.desktop || data.images || null
+        : null;
       const custom = selected
         ? selected.filter((src) => typeof src === 'string')
         : [];
-      carousel.push(shopBackgroundForNow());
-      carousel.push(...shuffled(custom.length ? custom : fallback));
+      /* Orden curado: el mismo salón visto desde realidades alternativas. */
+      carousel.push(...(custom.length ? custom : fallback));
       images = carousel.concat(extra);
     } catch (error) {
-      carousel = [shopBackgroundForNow(), ...shuffled(fallback)];
+      carousel = [...fallback, shopBackgroundForNow()];
       images = carousel.concat(extra);
     }
 
@@ -140,9 +155,13 @@
     carousel = results.slice(0, carousel.length).filter(Boolean);
     if (carousel.length) {
       bgA.style.backgroundImage = `url("${carousel[0]}")`;
+      bgA.style.setProperty('--kb-x', '0.9%');
+      bgA.style.setProperty('--kb-y', '-0.9%');
       bgA.classList.add('is-on');
       active = bgA;
-      carouselTimer = window.setInterval(playCarousel, 5600);
+      index = 0;
+      updateRealityTag();
+      carouselTimer = window.setInterval(playCarousel, 7200);
     }
     finish();
   }

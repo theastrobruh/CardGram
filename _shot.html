@@ -26,6 +26,13 @@ f.addEventListener('load', () => {
       }
       const b = d.getElementById('boot-start');
       if (b && !b.hidden && !b.disabled) { b.click(); started.boot = true; setTimeout(go, 800); return; }
+      const welcome = d.getElementById('welcome-screen');
+      if (welcome && !welcome.hidden && route !== 'welcome') {
+        const we = d.getElementById('welcome-enter');
+        if (we) we.click();
+        setTimeout(go, 700);
+        return;
+      }
       if (!started.boot) { setTimeout(go, 300); return; }
       if (!started.routed && base !== 'home') {
         if (d.defaultView.location.hash !== '#/' + base) d.defaultView.location.hash = '#/' + base;

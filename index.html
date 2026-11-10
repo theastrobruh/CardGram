@@ -12,29 +12,32 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=222">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=222">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=223">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=223">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=222" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=222" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=222" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=222" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=222" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=222" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=222" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=222" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=222" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=222" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=222" defer></script>
-  <script src="assets/js/boot.js?v=0.5.5&rev=222" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=223" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=223" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=223" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=223" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=223" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=223" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=223" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=223" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=223" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=223" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=223" defer></script>
+  <script src="assets/js/welcome.js?v=0.5.5&rev=223" defer></script>
+  <script src="assets/js/boot.js?v=0.5.5&rev=223" defer></script>
 </head>
 <body data-view="hub" class="booting">
   <div class="boot-screen" id="boot-screen">
     <div class="boot-bg boot-bg-a" id="boot-bg-a"></div>
     <div class="boot-bg boot-bg-b" id="boot-bg-b"></div>
+    <div class="boot-reality" aria-hidden="true"><span></span><span></span><span></span></div>
     <div class="boot-vignette" aria-hidden="true"></div>
+    <span class="boot-reality-tag" id="boot-reality-tag" aria-hidden="true">REALITY 01</span>
     <div class="boot-top">
       <span class="boot-logo">CardGram</span>
       <span class="boot-version">v0.5.5</span>
@@ -58,6 +61,61 @@
       <div class="boot-progress" id="boot-progress"><span id="boot-bar"></span></div>
       <button class="boot-start" id="boot-start" type="button" hidden>Press Start</button>
       <p class="boot-hint" id="boot-hint">Cargando tu universo de cartas…</p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       Bienvenida para nuevos usuarios (primera visita)
+       ====================================================================== -->
+  <div class="welcome-screen" id="welcome-screen" role="dialog" aria-modal="true" aria-labelledby="welcome-title" hidden>
+    <div class="welcome-backdrop"></div>
+    <div class="welcome-card" tabindex="-1">
+      <header class="welcome-head">
+        <span class="welcome-badge"><span class="welcome-dot" aria-hidden="true"></span><span data-i18n="welcome_badge">ALPHA · Acceso anticipado</span></span>
+        <span class="welcome-version" data-version>v0.5.5</span>
+      </header>
+
+      <div class="welcome-body">
+        <p class="welcome-kicker" data-i18n="welcome_kicker">Bienvenido a CardGram</p>
+        <h1 id="welcome-title" data-i18n="welcome_title">Crea cartas. Hazlas tuyas. Compártelas.</h1>
+        <p class="welcome-lede" data-i18n="welcome_lede">CardGram nació de una idea simple: hacer videos rápidos de cartas en 3D para redes. Con el tiempo creció hasta convertirse en un estudio completo para crear cartas, abrir boosters de otros creadores y llevar tus oricas al mundo físico.</p>
+
+        <div class="welcome-grid">
+          <article class="welcome-item">
+            <span class="welcome-item-icon" aria-hidden="true"><svg class="icon"><use href="#i-palette"></use></svg></span>
+            <h2 data-i18n="welcome_item_studio_title">Un estudio 3D gratis</h2>
+            <p data-i18n="welcome_item_studio_copy">Diseña cartas con plantillas, arte propio y un motor 3D que no requiere instalar nada.</p>
+          </article>
+          <article class="welcome-item">
+            <span class="welcome-item-icon" aria-hidden="true"><svg class="icon"><use href="#i-video"></use></svg></span>
+            <h2 data-i18n="welcome_item_render_title">Renders listos para redes</h2>
+            <p data-i18n="welcome_item_render_copy">Genera fotos y videos con múltiples fondos para mostrar tus cartas como nunca.</p>
+          </article>
+          <article class="welcome-item">
+            <span class="welcome-item-icon" aria-hidden="true"><svg class="icon"><use href="#i-booster-pack"></use></svg></span>
+            <h2 data-i18n="welcome_item_packs_title">Boosters de la comunidad</h2>
+            <p data-i18n="welcome_item_packs_copy">Abre packs diarios y descubre los sobres que otros usuarios crean y venden.</p>
+          </article>
+          <article class="welcome-item">
+            <span class="welcome-item-icon" aria-hidden="true"><svg class="icon"><use href="#i-print"></use></svg></span>
+            <h2 data-i18n="welcome_item_inkra_title">Del pixel al papel</h2>
+            <p data-i18n="welcome_item_inkra_copy">Con Inkra puedes imprimir tus proxies y oricas a escala real, en casa.</p>
+          </article>
+        </div>
+
+        <div class="welcome-alpha">
+          <span class="welcome-alpha-icon" aria-hidden="true"><svg class="icon"><use href="#i-sparkles"></use></svg></span>
+          <div>
+            <strong data-i18n="welcome_alpha_title">Estás entre los primeros</strong>
+            <p data-i18n="welcome_alpha_copy">CardGram está en fase alpha. Estas funciones están en sus cimientos, pero ya puedes probarlas antes que nadie. Muy pocas personas tienen acceso en este momento: tu feedback define lo que viene.</p>
+          </div>
+        </div>
+      </div>
+
+      <footer class="welcome-actions">
+        <button class="btn btn-primary welcome-enter" id="welcome-enter" type="button" data-i18n="welcome_enter">Entrar a CardGram</button>
+        <button class="btn btn-ghost" id="welcome-learn" type="button" data-i18n="welcome_learn">Conocer la historia</button>
+      </footer>
     </div>
   </div>
 
@@ -1041,7 +1099,18 @@
               <div class="explore-creator-list" id="explore-creators"></div>
             </section>
 
-            <!-- 3. DETALLE DE LA PLAZA (DENTRO DE EXPLORE) -->
+            <!-- 3. Sobre CardGram -->
+            <section class="explore-block" id="explore-about-block">
+              <div class="hub-section-head">
+                <div>
+                  <h2 data-i18n="explore_about_title">Sobre CardGram</h2>
+                  <p data-i18n="explore_about_lede">La historia, la visión y el estado alpha de la plataforma.</p>
+                </div>
+              </div>
+              <div class="explore-creator-list" id="explore-about-list"></div>
+            </section>
+
+            <!-- 4. DETALLE DE LA PLAZA (DENTRO DE EXPLORE) -->
             <!-- PANTALLA 1: SELECCIÓN DE ALCANCE DE LA PLAZA (SOLO LOS DOS BOTONES SWITCH) -->
             <section class="explore-block" id="explore-plaza-picker-block" hidden>
               <button class="hub-back-inline" type="button" data-explore-plaza-back>
@@ -1285,6 +1354,110 @@
               </div>
               <p class="explore-roadmap-note" data-i18n="explore_roadmap_note">Crear, imprimir y compartir: las tres experiencias de CardGram en un solo lugar.</p>
             </section>
+          </section>
+
+          <!-- ------------------------------------------------------------
+               Sobre CardGram (historia, visión y estado alpha)
+               ------------------------------------------------------------ -->
+          <section class="hub-panel hub-about-panel" data-hub-panel="about" aria-labelledby="about-title" hidden>
+            <header class="hub-view-head">
+              <button class="hub-back" type="button" data-hub-route="explore" aria-label="Volver a Explorar" data-i18n-aria-label="hub_back_explore">
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+              </button>
+              <div class="hub-view-copy">
+                <h1 id="about-title" data-i18n="about_title">Sobre CardGram</h1>
+                <p data-i18n="about_lede">De una idea simple a un estudio de cartas 3D para toda la comunidad.</p>
+              </div>
+              <span class="hub-count-pill about-alpha-pill" data-i18n="about_alpha_pill">Alpha · Acceso limitado</span>
+            </header>
+
+            <div class="about-hero">
+              <span class="about-hero-glow" aria-hidden="true"></span>
+              <p class="about-hero-kicker" data-i18n="about_hero_kicker">La historia hasta aquí</p>
+              <h2 data-i18n="about_hero_title">Nació como un render. Creció como un universo.</h2>
+              <p data-i18n="about_hero_copy">CardGram empezó con una necesidad muy concreta: crear videos rápidos de cartas en 3D para redes sociales desde el navegador. Idea tras idea, ese experimento se convirtió en un espacio para diseñar cartas, generar renders, abrir boosters de otros creadores y llevar tus oricas al papel.</p>
+            </div>
+
+            <section class="about-section" aria-labelledby="about-timeline-title">
+              <div class="hub-section-head">
+                <div>
+                  <h2 id="about-timeline-title" data-i18n="about_timeline_title">Cómo llegamos hasta aquí</h2>
+                  <p data-i18n="about_timeline_lede">Tres etapas, una misma obsesión: que crear sea tan divertido como jugar.</p>
+                </div>
+              </div>
+              <div class="about-timeline">
+                <article class="about-step">
+                  <span class="about-step-index">01</span>
+                  <h3 data-i18n="about_step_1_title">La chispa</h3>
+                  <p data-i18n="about_step_1_copy">Videos rápidos de cartas en 3D para redes, sin instalar nada y sin pagar por un motor.</p>
+                </article>
+                <article class="about-step">
+                  <span class="about-step-index">02</span>
+                  <h3 data-i18n="about_step_2_title">El estudio</h3>
+                  <p data-i18n="about_step_2_copy">Plantillas, fondos y un motor 3D gratuito para que cualquiera cree su propia carta.</p>
+                </article>
+                <article class="about-step">
+                  <span class="about-step-index">03</span>
+                  <h3 data-i18n="about_step_3_title">La comunidad</h3>
+                  <p data-i18n="about_step_3_copy">Boosters creados y vendidos por usuarios, con aperturas, rarezas y colecciones compartidas.</p>
+                </article>
+              </div>
+            </section>
+
+            <section class="about-section" aria-labelledby="about-features-title">
+              <div class="hub-section-head">
+                <div>
+                  <h2 id="about-features-title" data-i18n="about_features_title">Lo que puedes hacer hoy</h2>
+                  <p data-i18n="about_features_lede">Funciones reales, en etapa temprana y listas para que las pruebes.</p>
+                </div>
+              </div>
+              <div class="about-features">
+                <article class="about-feature">
+                  <span class="about-feature-icon" aria-hidden="true"><svg class="icon"><use href="#i-palette"></use></svg></span>
+                  <h3 data-i18n="about_feature_studio_title">eCard Studio</h3>
+                  <p data-i18n="about_feature_studio_copy">Crea cartas 3D con arte propio, plantillas y acabados listos para exportar.</p>
+                </article>
+                <article class="about-feature">
+                  <span class="about-feature-icon" aria-hidden="true"><svg class="icon"><use href="#i-video"></use></svg></span>
+                  <h3 data-i18n="about_feature_render_title">Renders y videos</h3>
+                  <p data-i18n="about_feature_render_copy">Fotos y clips con múltiples fondos para publicar tus cartas en redes.</p>
+                </article>
+                <article class="about-feature">
+                  <span class="about-feature-icon" aria-hidden="true"><svg class="icon"><use href="#i-booster-pack"></use></svg></span>
+                  <h3 data-i18n="about_feature_packs_title">Boosters de usuarios</h3>
+                  <p data-i18n="about_feature_packs_copy">Descubre packs de la comunidad, ábrelos y completa colecciones.</p>
+                </article>
+                <article class="about-feature">
+                  <span class="about-feature-icon" aria-hidden="true"><svg class="icon"><use href="#i-print"></use></svg></span>
+                  <h3 data-i18n="about_feature_inkra_title">Inkra</h3>
+                  <p data-i18n="about_feature_inkra_copy">La app companion para imprimir proxies y oricas a escala real.</p>
+                </article>
+              </div>
+            </section>
+
+            <section class="about-alpha-card" aria-labelledby="about-alpha-title">
+              <span class="about-alpha-icon" aria-hidden="true"><svg class="icon"><use href="#i-sparkles"></use></svg></span>
+              <div>
+                <h2 id="about-alpha-title" data-i18n="about_alpha_title">Fase alpha: pocos lugares, mucho por construir</h2>
+                <p data-i18n="about_alpha_copy">CardGram todavía está en sus cimientos. Las funciones existen, tienen forma y están abiertas para que las pruebes antes que nadie. Eres parte del grupo reducido que está ayudando a definir lo que viene. Cada bug reportado y cada idea cuenta.</p>
+                <div class="about-alpha-chips">
+                  <span class="hub-chip" data-i18n="about_alpha_chip_1">Acceso anticipado</span>
+                  <span class="hub-chip" data-i18n="about_alpha_chip_2">Feedback directo</span>
+                  <span class="hub-chip" data-i18n="about_alpha_chip_3">Sin costo</span>
+                </div>
+              </div>
+            </section>
+
+            <div class="about-actions">
+              <button class="btn btn-primary btn-sm" type="button" id="about-replay-welcome">
+                <svg class="icon" aria-hidden="true"><use href="#i-sparkles"></use></svg>
+                <span data-i18n="about_replay_welcome">Ver la bienvenida otra vez</span>
+              </button>
+              <button class="btn btn-ghost btn-sm" type="button" data-hub-route="explore">
+                <svg class="icon" aria-hidden="true"><use href="#i-compass"></use></svg>
+                <span data-i18n="about_back_explore">Volver a Explorar</span>
+              </button>
+            </div>
           </section>
 
           <!-- ------------------------------------------------------------

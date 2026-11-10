@@ -98,7 +98,7 @@ const HUB_HOME_DEFAULT = {
   loose: []
 };
 
-const HUB_PANELS = ['home', 'booster', 'collections', 'explore', 'plaza', 'profile'];
+const HUB_PANELS = ['home', 'booster', 'collections', 'explore', 'plaza', 'about', 'profile'];
 
 const DECK_EMOJIS = [
   '🃏', '🔥', '🌙', '⭐', '✨', '🐉', '🦊', '🐱',
@@ -3000,7 +3000,21 @@ function syncHomeCardScale() {
   const drop = panel.querySelector('.home-drop-area');
   if (!drop) return;
   const width = drop.getBoundingClientRect().width;
-  if (width > 0) panel.style.setProperty('--home-mini-w', `${Math.round(width)}px`);
+  if (width <= 0) return;
+  panel.style.setProperty('--home-mini-w', `${Math.round(width)}px`);
+
+  /* Reparte la mano izquierda: misma anchura de carta que el deck, con
+     separación calculada para que el abanico no se salga del panel. */
+  const stack = panel.querySelector('.hub-player-stack');
+  const wrap = panel.querySelector('.hub-stack-wrap');
+  if (stack && wrap) {
+    const count = stack.children.length;
+    const available = wrap.clientWidth || panel.clientWidth;
+    const step = count > 1
+      ? Math.max(24, Math.min(width * 0.82, (available - width) / (count - 1)))
+      : 0;
+    panel.style.setProperty('--hand-step', `${Math.round(step)}px`);
+  }
 }
 
 function initHomeTable() {
@@ -4805,6 +4819,38 @@ function makeExplorePlazaCard() {
 }
 
 
+function makeExploreAboutCard() {
+  const button = makeHubButton('explore-creator explore-shop explore-about-card', null, { hubRoute: 'about' });
+  button.setAttribute('aria-label', t('about_title'));
+
+  const cover = makeNode('span', 'explore-shop-cover explore-about-cover');
+  const art = makeHubImage('assets/data/explore/About-Icon.webp', 'CardGram');
+  art.addEventListener('error', () => cover.classList.add('is-missing'), { once: true });
+  cover.appendChild(art);
+  const fallback = makeNode('span', 'explore-about-fallback');
+  fallback.appendChild(hubIcon('sparkles'));
+  fallback.appendChild(makeNode('strong', null, 'CardGram'));
+  cover.appendChild(fallback);
+  button.appendChild(cover);
+
+  const body = makeNode('span', 'explore-shop-body');
+  const avatar = makeNode('span', 'explore-shop-avatar explore-about-avatar');
+  avatar.appendChild(hubIcon('info'));
+  body.appendChild(avatar);
+
+  const copy = makeNode('span', 'explore-creator-copy');
+  copy.appendChild(makeNode('strong', null, t('about_title')));
+  copy.appendChild(makeNode('span', null, t('about_card_handle')));
+  copy.appendChild(makeNode('span', 'explore-creator-meta', t('about_card_meta')));
+  body.appendChild(copy);
+
+  const cta = makeNode('span', 'explore-shop-cta', t('about_card_cta'));
+  cta.appendChild(hubIcon('arrow-right'));
+  body.appendChild(cta);
+  button.appendChild(body);
+  return button;
+}
+
 let plazaScope = 'local';
 try {
   const savedScope = localStorage.getItem('cardgram.plaza.scope');
@@ -4859,6 +4905,7 @@ function renderExplore() {
 
   if (hub.els.explorePlazaEntryBlock) hub.els.explorePlazaEntryBlock.hidden = creatorOpen || inPlaza;
   if (hub.els.exploreCreatorsBlock) hub.els.exploreCreatorsBlock.hidden = creatorOpen || inPlaza;
+  if (hub.els.exploreAboutBlock) hub.els.exploreAboutBlock.hidden = creatorOpen || inPlaza;
   if (hub.els.exploreWantMore) hub.els.exploreWantMore.hidden = creatorOpen || inPlaza;
   if (hub.els.exploreRoadmap) hub.els.exploreRoadmap.hidden = creatorOpen || inPlaza;
 
@@ -4880,6 +4927,9 @@ function renderExplore() {
     }
     if (hub.els.exploreCreators) {
       hub.els.exploreCreators.replaceChildren(makeExploreCreatorCard());
+    }
+    if (hub.els.exploreAboutList) {
+      hub.els.exploreAboutList.replaceChildren(makeExploreAboutCard());
     }
     return;
   }
@@ -6801,6 +6851,8 @@ function cacheHubDom() {
   els.exploreWantMore = document.querySelector('.explore-want-more');
   els.exploreRoadmap = document.querySelector('.explore-roadmap');
   els.exploreCreatorsBlock = hubEl('explore-creators-block');
+  els.exploreAboutBlock = hubEl('explore-about-block');
+  els.exploreAboutList = hubEl('explore-about-list');
   els.explorePacksBlock = hubEl('explore-packs-block');
   els.explorePacks = hubEl('explore-packs');
   els.explorePackDetail = hubEl('explore-pack-detail');
@@ -6921,6 +6973,8 @@ function getPlaygroundState(el) {
       scale: 1,
       vx: 0,
       vy: 0,
+      rot: 0,
+      rotV: 0,
       animId: null,
       isDragging: false,
       hasMoved: false,
@@ -6934,18 +6988,18 @@ function getPlaygroundState(el) {
 }
 
 function applyPlaygroundTransform(el, state) {
+  const rot = state.rot ? ` rotate(${state.rot.toFixed(2)}deg)` : '';
   if (el.classList.contains('shop-npc')) {
-    if (el.classList.contains('pos-left') || el.classList.contains('pos-right') || el.classList.contains('pos-hidden')) {
-      if (state.x === 0 && state.y === 0 && state.scale === 1) {
-        el.style.removeProperty('transform');
-        return;
-      }
+    /* Azura está anclada: solo cambia de tamaño. */
+    if (state.scale === 1 && !state.rot) {
+      el.style.removeProperty('transform');
+      return;
     }
-    el.style.setProperty('transform', `translate(calc(-50% + ${state.x}px), ${state.y}px) scale(${state.scale})`, 'important');
+    el.style.setProperty('transform', `translateX(-50%) scale(${state.scale})${rot}`, 'important');
   } else if (el.classList.contains('shop-stores')) {
-    el.style.setProperty('transform', `translate(${state.x}px, calc(-50% + ${state.y}px)) scale(${state.scale})`, 'important');
+    el.style.setProperty('transform', `translate(${state.x}px, calc(-50% + ${state.y}px))${rot} scale(${state.scale})`, 'important');
   } else {
-    el.style.setProperty('transform', `translate3d(${state.x}px, ${state.y}px, 0) scale(${state.scale})`, 'important');
+    el.style.setProperty('transform', `translate3d(${state.x}px, ${state.y}px, 0)${rot} scale(${state.scale})`, 'important');
   }
 }
 
@@ -7013,30 +7067,31 @@ function attachShopPlayground(el) {
     state.isDragging = false;
     state.hasMoved = false;
 
-    // Si es Azura y tenía clase de preset, quitarla para permitir movimiento manual
-    if (el.classList.contains('shop-npc')) {
-      el.classList.remove('pos-center', 'pos-left', 'pos-right', 'pos-hidden');
-    }
+    /* Azura está anclada al escenario: arrastrarla en horizontal solo la
+       hace más grande o más pequeña. */
+    const isNpc = el.classList.contains('shop-npc');
 
-    // Calcular límites de la escena de una sola vez
-    const sRect = scene.getBoundingClientRect();
-    const eRect = el.getBoundingClientRect();
-    const pad = 12;
+    if (!isNpc) {
+      // Calcular límites de la escena de una sola vez
+      const sRect = scene.getBoundingClientRect();
+      const eRect = el.getBoundingClientRect();
+      const pad = 12;
 
-    state.minX = state.x + ((sRect.left + pad) - eRect.left);
-    state.maxX = state.x + ((sRect.right - pad) - eRect.right);
-    state.minY = state.y + ((sRect.top + pad) - eRect.top);
-    state.maxY = state.y + ((sRect.bottom - pad) - eRect.bottom);
+      state.minX = state.x + ((sRect.left + pad) - eRect.left);
+      state.maxX = state.x + ((sRect.right - pad) - eRect.right);
+      state.minY = state.y + ((sRect.top + pad) - eRect.top);
+      state.maxY = state.y + ((sRect.bottom - pad) - eRect.bottom);
 
-    if (state.maxX < state.minX) {
-      const mid = (state.minX + state.maxX) / 2;
-      state.minX = mid - 40;
-      state.maxX = mid + 40;
-    }
-    if (state.maxY < state.minY) {
-      const mid = (state.minY + state.maxY) / 2;
-      state.minY = mid - 40;
-      state.maxY = mid + 40;
+      if (state.maxX < state.minX) {
+        const mid = (state.minX + state.maxX) / 2;
+        state.minX = mid - 40;
+        state.maxX = mid + 40;
+      }
+      if (state.maxY < state.minY) {
+        const mid = (state.minY + state.maxY) / 2;
+        state.minY = mid - 40;
+        state.maxY = mid + 40;
+      }
     }
 
     try { el.setPointerCapture(e.pointerId); } catch (_) {}
@@ -7045,46 +7100,59 @@ function attachShopPlayground(el) {
     const startPointerY = e.clientY;
     const startStateX = state.x;
     const startStateY = state.y;
-
+    const startScale = state.scale;
     let lastMoveTime = performance.now();
     let lastMoveX = e.clientX;
     let lastMoveY = e.clientY;
 
     const onPointerMove = (moveEvent) => {
-      const dist = Math.hypot(moveEvent.clientX - startPointerX, moveEvent.clientY - startPointerY);
-      if (dist > 5) {
-        state.isDragging = true;
+      const dx = moveEvent.clientX - startPointerX;
+      const dy = moveEvent.clientY - startPointerY;
+      const dist = Math.hypot(dx, dy);
+
+      if (!state.hasMoved && dist > 4) {
         state.hasMoved = true;
         el.classList.add('is-dragging');
-        const parentRec = el.closest('.shop-recommended');
-        if (parentRec) parentRec.classList.add('has-dragging-pack');
-
-        if (el.classList.contains('shop-npc')) {
-          setNpcPosLabel('Azura: Libre', 'custom');
+        if (isNpc) {
+          el.classList.add('is-resizing');
+        } else {
+          state.isDragging = true;
+          const parentRec = el.closest('.shop-recommended');
+          if (parentRec) parentRec.classList.add('has-dragging-pack');
+          if (window.Sound) window.Sound.play('hover');
+          if (navigator.vibrate) navigator.vibrate(8);
         }
       }
 
-      if (state.isDragging) {
-        const rawTargetX = startStateX + (moveEvent.clientX - startPointerX);
-        const rawTargetY = startStateY + (moveEvent.clientY - startPointerY);
+      if (!state.hasMoved) return;
 
+      const now = performance.now();
+      const dt = Math.max(1, now - lastMoveTime);
+
+      if (isNpc) {
+        /* Arrastre horizontal = zoom. Sin desplazamiento de posición. */
+        const next = startScale * (1 + dx / 240);
+        state.scale = Math.max(0.55, Math.min(1.9, next));
+        state.rot = Math.max(-2.5, Math.min(2.5, dx / 60));
+        showPlaygroundScaleBadge(el, state.scale);
+      } else {
+        const rawTargetX = startStateX + dx;
+        const rawTargetY = startStateY + dy;
         state.x = Math.max(state.minX, Math.min(state.maxX, rawTargetX));
         state.y = Math.max(state.minY, Math.min(state.maxY, rawTargetY));
 
-        const now = performance.now();
-        const dt = Math.max(1, now - lastMoveTime);
         const instantVx = ((moveEvent.clientX - lastMoveX) / dt) * 16;
         const instantVy = ((moveEvent.clientY - lastMoveY) / dt) * 16;
-
-        state.vx = Math.max(-20, Math.min(20, instantVx));
-        state.vy = Math.max(-20, Math.min(20, instantVy));
-
-        lastMoveTime = now;
-        lastMoveX = moveEvent.clientX;
-        lastMoveY = moveEvent.clientY;
-
-        applyPlaygroundTransform(el, state);
+        state.vx = state.vx * 0.55 + Math.max(-26, Math.min(26, instantVx)) * 0.45;
+        state.vy = state.vy * 0.55 + Math.max(-26, Math.min(26, instantVy)) * 0.45;
+        state.rot = Math.max(-12, Math.min(12, state.vx * 0.55));
+        state.rotV = state.vx * 0.35;
       }
+
+      lastMoveTime = now;
+      lastMoveX = moveEvent.clientX;
+      lastMoveY = moveEvent.clientY;
+      applyPlaygroundTransform(el, state);
     };
 
     const onPointerUp = (upEvt) => {
@@ -7095,19 +7163,30 @@ function attachShopPlayground(el) {
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);
 
-      el.classList.remove('is-dragging');
+      el.classList.remove('is-dragging', 'is-resizing');
       const parentRec = el.closest('.shop-recommended');
       if (parentRec) parentRec.classList.remove('has-dragging-pack');
 
       if (state.hasMoved) {
         shopPlaygroundSuppressClick = Date.now() + 450;
+        if (window.Sound) window.Sound.play('cardSettle');
+        if (navigator.vibrate) navigator.vibrate(6);
       }
 
       state.isDragging = false;
 
+      if (isNpc) {
+        state.rot = 0;
+        applyPlaygroundTransform(el, state);
+        return;
+      }
+
       // Lanzamiento con física de rebote si llevaba velocidad
       if (state.hasMoved && Math.hypot(state.vx, state.vy) > 0.8) {
         runPlaygroundPhysics(el, state);
+      } else {
+        state.rot = 0;
+        applyPlaygroundTransform(el, state);
       }
     };
 
@@ -7123,7 +7202,9 @@ function attachShopPlayground(el) {
     e.stopPropagation();
 
     const zoom = e.deltaY < 0 ? 1.07 : 0.93;
-    state.scale = Math.max(0.4, Math.min(2.5, state.scale * zoom));
+    const min = el.classList.contains('shop-npc') ? 0.55 : 0.4;
+    const max = el.classList.contains('shop-npc') ? 1.9 : 2.5;
+    state.scale = Math.max(min, Math.min(max, state.scale * zoom));
     applyPlaygroundTransform(el, state);
     showPlaygroundScaleBadge(el, state.scale);
   }, { passive: false });
@@ -7131,42 +7212,49 @@ function attachShopPlayground(el) {
 
 function runPlaygroundPhysics(el, state) {
   if (state.animId) cancelAnimationFrame(state.animId);
+  let bounces = 0;
 
   function step() {
     if (state.isDragging) return;
 
     state.x += state.vx;
     state.y += state.vy;
+    state.rot += state.rotV;
 
-    // Fricción del aire
-    state.vx *= 0.96;
-    state.vy *= 0.96;
+    // Fricción del aire + giro que se asienta.
+    state.vx *= 0.955;
+    state.vy *= 0.955;
+    state.rotV *= 0.9;
 
     let bounced = false;
 
     // Rebote elástico en paredes
     if (state.x <= state.minX) {
       state.x = state.minX;
-      state.vx = Math.abs(state.vx) * 0.72; // hacia la derecha
+      state.vx = Math.abs(state.vx) * 0.7;
+      state.rotV += 1.6;
       bounced = true;
     } else if (state.x >= state.maxX) {
       state.x = state.maxX;
-      state.vx = -Math.abs(state.vx) * 0.72; // hacia la izquierda
+      state.vx = -Math.abs(state.vx) * 0.7;
+      state.rotV -= 1.6;
       bounced = true;
     }
 
     if (state.y <= state.minY) {
       state.y = state.minY;
-      state.vy = Math.abs(state.vy) * 0.72; // hacia abajo
+      state.vy = Math.abs(state.vy) * 0.7;
       bounced = true;
     } else if (state.y >= state.maxY) {
       state.y = state.maxY;
-      state.vy = -Math.abs(state.vy) * 0.72; // hacia arriba
+      state.vy = -Math.abs(state.vy) * 0.7;
       bounced = true;
     }
 
     if (bounced) {
+      bounces += 1;
       triggerPlaygroundBounce(el);
+      if (bounces < 4 && window.Sound) window.Sound.play('tap');
     }
 
     applyPlaygroundTransform(el, state);
@@ -7177,6 +7265,19 @@ function runPlaygroundPhysics(el, state) {
       state.animId = null;
       state.vx = 0;
       state.vy = 0;
+      state.rotV = 0;
+      /* Deja la carta perfectamente recta al detenerse. */
+      const settle = () => {
+        state.rot *= 0.8;
+        if (Math.abs(state.rot) > 0.15) {
+          applyPlaygroundTransform(el, state);
+          requestAnimationFrame(settle);
+        } else {
+          state.rot = 0;
+          applyPlaygroundTransform(el, state);
+        }
+      };
+      requestAnimationFrame(settle);
     }
   }
 
@@ -7211,6 +7312,8 @@ function setShopNpcPosition(pos) {
   }
   state.vx = 0;
   state.vy = 0;
+  state.rot = 0;
+  state.rotV = 0;
   state.isDragging = false;
   state.x = 0;
   state.y = 0;
@@ -7245,6 +7348,8 @@ function resetShopPlayground() {
     state.scale = 1;
     state.vx = 0;
     state.vy = 0;
+    state.rot = 0;
+    state.rotV = 0;
     state.isDragging = false;
     state.hasMoved = false;
   });
