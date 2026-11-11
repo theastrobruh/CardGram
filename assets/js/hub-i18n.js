@@ -1772,3 +1772,27 @@ Object.assign(I18N.de, {
   collections_size_huge_desc: 'Maximale Größe',
   collections_box_design: 'Deckbox-Design'
 });
+
+/* Navegación interna de pantallas y roadmap. */
+Object.assign(I18N.es, {
+  hub_subnav_back: 'Volver',
+  hub_subnav_home: 'Inicio',
+  explore_want_cta: 'Ver el roadmap',
+  explore_roadmap_back: 'Volver a Explorar',
+  settings_inventory_size: 'Tamaño del inventario'
+});
+Object.assign(I18N.en, {
+  hub_subnav_back: 'Back',
+  hub_subnav_home: 'Home',
+  explore_want_cta: 'See the roadmap',
+  explore_roadmap_back: 'Back to Explore',
+  settings_inventory_size: 'Inventory size'
+});
+Object.assign(I18N.de, {
+  hub_subnav_back: 'Zurück',
+  hub_subnav_home: 'Start',
+  explore_want_cta: 'Zur Roadmap',
+  explore_roadmap_back: 'Zurück zu Entdecken',
+  settings_inventory_size: 'Inventargröße'
+});
+

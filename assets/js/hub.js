@@ -1467,6 +1467,26 @@ let shopVendorInitialized = false;
 let shopPackArt = {};
 let shopPackArtLoaded = false;
 
+/* Azura · estado autónomo ------------------------------------------------- */
+let azuraIsAway = false;
+let azuraAwayTimer = 0;
+let azuraPoseTimer = 0;
+let azuraPoseHistory = [];
+const AZURA_POSES = {
+  leave: SHOP_VENDOR_SPRITES[13],
+  enter: SHOP_VENDOR_SPRITES[0],
+  annoyed: [SHOP_VENDOR_SPRITES[5], SHOP_VENDOR_SPRITES[6], SHOP_VENDOR_SPRITES[7]]
+};
+
+function pickAzuraPose() {
+  const pool = SHOP_VENDOR_SPRITES
+    .map((src, index) => ({ src, index }))
+    .filter((entry) => entry.index !== shopVendorIndex && !azuraPoseHistory.includes(entry.index));
+  const list = pool.length ? pool : SHOP_VENDOR_SPRITES.map((src, index) => ({ src, index }));
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+
 function shopTimeSlot(date = new Date()) {
   const hour = date.getHours();
   if (hour >= 5 && hour < 9) return 'dawn';
@@ -1682,24 +1702,59 @@ function initShopScene() {
   });
   if (hub.els.shopNpcA) hub.els.shopNpcA.src = SHOP_VENDOR_SPRITES[0];
   if (hub.els.shopNpcB) hub.els.shopNpcB.src = SHOP_VENDOR_SPRITES[1];
+  shopVendorIndex = Math.floor(Math.random() * SHOP_VENDOR_SPRITES.length);
+  shopVendorActive = 0;
+  if (hub.els.shopNpcA) {
+    hub.els.shopNpcA.src = SHOP_VENDOR_SPRITES[shopVendorIndex];
+    hub.els.shopNpcA.classList.add('is-active');
+  }
+  if (hub.els.shopNpcB) {
+    hub.els.shopNpcB.src = SHOP_VENDOR_SPRITES[(shopVendorIndex + 1) % SHOP_VENDOR_SPRITES.length];
+    hub.els.shopNpcB.classList.remove('is-active');
+  }
+  azuraPoseHistory = [shopVendorIndex];
+
+  /* Cambio de postura autónomo: orden aleatorio y cadencia irregular. */
   const swap = () => {
-    if (!hub.els.shopNpcA || !hub.els.shopNpcB) return;
-    shopVendorIndex = (shopVendorIndex + 1) % SHOP_VENDOR_SPRITES.length;
+    if (!hub.els.shopNpcA || !hub.els.shopNpcB || azuraIsAway) return;
+    const nextPose = pickAzuraPose();
+    shopVendorIndex = nextPose.index;
+    azuraPoseHistory.push(shopVendorIndex);
+    if (azuraPoseHistory.length > 5) azuraPoseHistory.shift();
+
     const next = shopVendorActive === 0 ? hub.els.shopNpcB : hub.els.shopNpcA;
     const prev = shopVendorActive === 0 ? hub.els.shopNpcA : hub.els.shopNpcB;
+
+    // Variación sutil: respiración con duración y desfase propios de cada pose.
+    next.style.animationDuration = `${(5.1 + Math.random() * 1.8).toFixed(2)}s`;
+    next.style.animationDelay = `${(-Math.random() * 2).toFixed(2)}s`;
     next.src = SHOP_VENDOR_SPRITES[shopVendorIndex];
     next.classList.add('is-active');
     prev.classList.remove('is-active');
     shopVendorActive = shopVendorActive === 0 ? 1 : 0;
-    speakShopLine('talk');
+
+    // No habla en cada cambio: solo de vez en cuando, para que se sienta viva.
+    if (Math.random() < 0.28) speakShopLine('talk');
   };
+
+  const queueAzuraPose = () => {
+    window.clearTimeout(azuraPoseTimer);
+    // Intervalos irregulares: a veces se mueve pronto, a veces se queda quieta.
+    const delay = 6200 + Math.random() * 7600;
+    azuraPoseTimer = window.setTimeout(() => {
+      if (hub.panel === 'booster' && !document.hidden) swap();
+      queueAzuraPose();
+    }, delay);
+  };
+
   if (hub.els.shopSpeech) {
     typeShopLine((SHOP_LINES[shopLang()] || SHOP_LINES.en)[0]);
   }
   renderShopAtmosphere();
   window.setTimeout(renderShopAtmosphere, 1200);
   window.clearInterval(shopVendorTimer);
-  shopVendorTimer = window.setInterval(swap, 4200 + Math.random() * 2200);
+  window.clearTimeout(azuraPoseTimer);
+  queueAzuraPose();
   window.clearInterval(shopClockTimer);
   shopClockTimer = window.setInterval(renderShopAtmosphere, 60000);
   scheduleShopIdle();
@@ -4257,11 +4312,6 @@ function renderUserCreatedCardsDetail() {
 
   copy.appendChild(actionRow);
 
-  // Tamaño de iconos y cartas del inventario.
-  const detailToolbar = makeNode('div', 'inventory-toolbar is-detail');
-  detailToolbar.appendChild(makeInventorySizeControl());
-  copy.appendChild(detailToolbar);
-
   // Selector de Box Art (Presets oficiales + Custom subidos)
   const selectorBox = makeNode('div', 'user-box-selector');
   const selectorHead = makeNode('div', 'user-box-selector-head');
@@ -5225,11 +5275,13 @@ function renderExplore() {
   if (hub.els.explorePlazaPickerBlock) hub.els.explorePlazaPickerBlock.hidden = plazaStep !== 'picker';
   if (hub.els.explorePlazaFeedBlock) hub.els.explorePlazaFeedBlock.hidden = plazaStep !== 'feed';
 
-  if (hub.els.explorePlazaEntryBlock) hub.els.explorePlazaEntryBlock.hidden = creatorOpen || inPlaza;
-  if (hub.els.exploreCreatorsBlock) hub.els.exploreCreatorsBlock.hidden = creatorOpen || inPlaza;
-  if (hub.els.exploreAboutBlock) hub.els.exploreAboutBlock.hidden = creatorOpen || inPlaza;
-  if (hub.els.exploreWantMore) hub.els.exploreWantMore.hidden = creatorOpen || inPlaza;
-  if (hub.els.exploreRoadmap) hub.els.exploreRoadmap.hidden = creatorOpen || inPlaza;
+  const lobbyHidden = creatorOpen || inPlaza || hub.exploreRoadmapOpen;
+  if (hub.els.explorePlazaEntryBlock) hub.els.explorePlazaEntryBlock.hidden = lobbyHidden;
+  if (hub.els.exploreCreatorsBlock) hub.els.exploreCreatorsBlock.hidden = lobbyHidden;
+  if (hub.els.exploreAboutBlock) hub.els.exploreAboutBlock.hidden = lobbyHidden;
+  if (hub.els.exploreHubGrid) hub.els.exploreHubGrid.hidden = lobbyHidden;
+  if (hub.els.exploreWantMore) hub.els.exploreWantMore.hidden = lobbyHidden;
+  if (hub.els.exploreRoadmap) hub.els.exploreRoadmap.hidden = !hub.exploreRoadmapOpen;
 
   if (hub.els.explorePackCount) {
     hub.els.explorePackCount.textContent = countLabel('explore_pack_count', packs.length);
@@ -5652,6 +5704,7 @@ function setActivePanel(panel, options = {}) {
   if (target !== 'explore') {
     hub.exploreCreatorId = null;
     hub.explorePackId = null;
+    hub.exploreRoadmapOpen = false;
   }
   if (target === 'collections') markBoosterMission();
   if (hub.ready) syncMobileDailyButton();
@@ -5664,7 +5717,9 @@ function setActivePanel(panel, options = {}) {
         ? 'packs'
         : target === 'explore'
           ? 'explore'
-          : 'home';
+          : target === 'about'
+            ? 'explore'
+            : 'home';
     window.Music.setScene(musicScene);
   }
 
@@ -6230,8 +6285,24 @@ function onHubClick(event) {
     hub.explorePlazaStep = 'picker';
     hub.exploreCreatorId = null;
     hub.explorePackId = null;
+    hub.exploreRoadmapOpen = false;
     renderExplore();
     if (window.Sound) window.Sound.play('flip');
+    return;
+  }
+
+  if (target.closest('[data-explore-roadmap-open]')) {
+    event.preventDefault();
+    hub.exploreRoadmapOpen = true;
+    renderExplore();
+    if (window.Sound) window.Sound.play('flip');
+    return;
+  }
+
+  if (target.closest('[data-explore-roadmap-back]')) {
+    event.preventDefault();
+    hub.exploreRoadmapOpen = false;
+    renderExplore();
     return;
   }
 
@@ -7198,6 +7269,7 @@ function cacheHubDom() {
   els.explorePlazaFeedBlock = hubEl('explore-plaza-feed-block');
   els.exploreWantMore = document.querySelector('.explore-want-more');
   els.exploreRoadmap = document.querySelector('.explore-roadmap');
+  els.exploreHubGrid = hubEl('explore-hub-grid');
   els.exploreCreatorsBlock = hubEl('explore-creators-block');
   els.exploreAboutBlock = hubEl('explore-about-block');
   els.exploreAboutList = hubEl('explore-about-list');
@@ -7257,6 +7329,9 @@ function setupHub() {
   loadHubState();
   loadDeckBoxes();
   loadInventorySize();
+  if (hub.els.inventoryToolbar) {
+    hub.els.inventoryToolbar.replaceChildren(makeInventorySizeControl());
+  }
   buildProfileFavoriteOptions();
   setupHubEvents();
   setupCardRatios();

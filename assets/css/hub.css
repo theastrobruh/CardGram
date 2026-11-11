@@ -19102,3 +19102,299 @@ html[data-inv-size="huge"] {
     --inv-gap: 26px;
   }
 }
+
+/* ==========================================================================
+   REV 280 · Shop packs, navegación interna de Explore y roadmap
+   ========================================================================== */
+
+/* Shop · packs más grandes, título más legible y barra de progreso compacta */
+@media (min-width: 981px) {
+  .shop-recommended .shop-pack {
+    width: 176px !important;
+    max-width: 176px !important;
+  }
+
+  .shop-recommended .shop-pack-art {
+    width: 167px !important;
+    height: 252px !important;
+  }
+
+  .shop-recommended .shop-pack-name {
+    font-size: 0.84rem !important;
+    line-height: 1.15 !important;
+    margin-top: 8px !important;
+  }
+
+  .shop-recommended .shop-pack-soda-meter {
+    width: 58px !important;
+    height: 7px !important;
+    margin: 4px auto 2px !important;
+  }
+
+  .shop-recommended .shop-pack-count {
+    font-size: 0.56rem !important;
+  }
+}
+
+/* Navegación interna · Volver + Inicio, centrados y minimalistas */
+.hub-subnav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: max-content;
+  max-width: 100%;
+  margin: 18px auto 18px;
+}
+
+.hub-subnav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 6px 16px rgba(6, 55, 74, 0.08), inset 0 1px 0 #ffffff;
+  color: #0b5563;
+  font: inherit;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hub-subnav-btn:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(6, 55, 74, 0.12), inset 0 1px 0 #ffffff;
+}
+
+.hub-subnav-btn .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Explore · los 3 accesos en una sola fila simétrica (desktop) */
+@media (min-width: 981px) {
+  #explore-hub-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: clamp(14px, 2vw, 30px);
+    margin: 6px 0 26px;
+    perspective: 1400px;
+  }
+
+  #explore-hub-grid .explore-block {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    margin: 0;
+  }
+
+  #explore-hub-grid .hub-section-head {
+    display: none !important;
+  }
+
+  #explore-hub-grid .explore-creator-list {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    width: 100%;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+
+  #explore-hub-grid .explore-shop {
+    flex: 1 1 auto !important;
+    width: 100%;
+    overflow: visible !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transform-style: preserve-3d;
+    filter: drop-shadow(0 26px 34px rgba(8, 62, 82, 0.2));
+    transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), filter 0.35s ease;
+  }
+
+  #explore-hub-grid .explore-shop:hover {
+    transform: translateY(-10px) rotateX(6deg) rotateY(-4deg) scale(1.03);
+    filter: drop-shadow(0 42px 48px rgba(8, 62, 82, 0.3));
+  }
+
+  #explore-hub-grid .explore-shop-cover {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: clamp(8px, 1.6vw, 24px) 0 2px !important;
+    overflow: visible !important;
+    background: transparent !important;
+  }
+
+  #explore-hub-grid .explore-shop-cover img {
+    width: auto !important;
+    max-width: 100% !important;
+    height: clamp(250px, 28vw, 400px) !important;
+    max-height: none !important;
+    object-fit: contain !important;
+    transform: none;
+    filter: drop-shadow(0 26px 30px rgba(8, 62, 82, 0.26));
+    transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  #explore-hub-grid .explore-shop:hover .explore-shop-cover img {
+    transform: scale(1.06) translateY(-6px);
+  }
+
+  #explore-hub-grid .explore-shop-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 8px 4px !important;
+    text-align: center;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  #explore-hub-grid .explore-shop-avatar {
+    display: none;
+  }
+
+  #explore-hub-grid .explore-creator-copy {
+    align-items: center;
+    text-align: center;
+  }
+
+  #explore-hub-grid .explore-shop-body .explore-creator-copy strong {
+    font-size: 1.08rem;
+  }
+
+  #explore-hub-grid .explore-shop-body .explore-creator-copy > span {
+    font-size: 0.64rem;
+    color: rgba(6, 59, 71, 0.72);
+  }
+
+  #explore-hub-grid .explore-shop-cta {
+    margin-top: 8px;
+    padding: 8px 16px;
+    font-size: 0.62rem;
+  }
+
+  /* Sobre CardGram: el render transparente manda */
+  #explore-hub-grid .explore-about-cover {
+    background: transparent !important;
+  }
+
+  #explore-hub-grid .explore-about-cover::before {
+    display: none;
+  }
+
+  #explore-hub-grid .explore-about-card .explore-shop-cover img {
+    object-fit: contain !important;
+    opacity: 1;
+  }
+}
+
+/* Want to see more · ahora es un botón que abre el roadmap */
+button.explore-want-more {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: #eafffb;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+button.explore-want-more:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 34px 64px rgba(3, 32, 40, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+button.explore-want-more:focus-visible {
+  outline: 2px solid #7cebdd;
+  outline-offset: 3px;
+}
+
+.explore-want-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 14px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(124, 235, 221, 0.55);
+  color: #eafffb;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.explore-want-cta .icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* Pantalla del roadmap */
+.explore-roadmap {
+  margin: 4px 0 8px;
+}
+
+.explore-roadmap[hidden] {
+  display: none !important;
+}
+
+/* Ajustes · el selector de tamaño vive dentro de Configuración */
+.hub-settings-row-inventory {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hub-settings-row-inventory .inventory-toolbar {
+  justify-content: flex-end !important;
+  margin: 0 !important;
+}
+
+/* ==========================================================================
+   REV 283 · Azura viva: respiración sutil y cambios de postura autónomos
+   ========================================================================== */
+.shop-npc-img.is-active {
+  animation: azuraBreathe 5.6s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+@keyframes azuraBreathe {
+  0%,
+  100% {
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    transform: scale(1.006) translateY(-3px);
+  }
+}
+
+.shop-npc.is-leaving-scene .shop-npc-img.is-active,
+.shop-npc.is-entering-scene .shop-npc-img.is-active {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-npc-img.is-active {
+    animation: none;
+  }
+}
+
+
+
