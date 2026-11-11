@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>QA · Pack opening</title>
+<style>
+  html, body { margin: 0; background: #06222b; }
+  body { display: flex; align-items: flex-start; gap: 16px; padding: 12px; }
+  iframe { border: 0; background: #000; }
+  #log { color: #9ff; font: 12px/1.5 monospace; white-space: pre-wrap; max-width: 420px; }
+</style>
+</head>
+<body>
+<iframe id="stage" src="../index.html?r=qa#/home" width="390" height="844"></iframe>
+<pre id="log">loading…</pre>
+<script>
+  const frame = document.getElementById('stage');
+  const log = document.getElementById('log');
+  const out = (value) => { log.textContent = JSON.stringify(value, null, 1); };
+  window.qa = { frame, out, log };
+</script>
+</body>
+</html>

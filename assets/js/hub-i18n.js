@@ -1476,9 +1476,9 @@ Object.assign(I18N.de, { shop_back_to_packs: 'Zurück', shop_pack_detail_hint: '
 Object.assign(I18N.es, { shop_pack_contents: 'Cartas del sobre', shop_pack_contents_aria: 'Ver las cartas del sobre', shop_pack_contents_kicker: 'Contenido del sobre' });
 Object.assign(I18N.en, { shop_pack_contents: 'Pack cards', shop_pack_contents_aria: 'See the cards inside this pack', shop_pack_contents_kicker: 'Pack contents' });
 Object.assign(I18N.de, { shop_pack_contents: 'Karten im Pack', shop_pack_contents_aria: 'Karten in diesem Pack ansehen', shop_pack_contents_kicker: 'Packinhalt' });
-Object.assign(I18N.es, { pack_seal_swipe_hint: 'Desliza hacia abajo la parte superior para abrir el sobre', pack_seal_swipe_aria: 'Desliza hacia abajo sobre la parte superior del sobre para abrirlo' });
-Object.assign(I18N.en, { pack_seal_swipe_hint: 'Swipe down the top edge to open the pack', pack_seal_swipe_aria: 'Swipe down on the top of the pack to open it' });
-Object.assign(I18N.de, { pack_seal_swipe_hint: 'Ziehe die Oberkante nach unten, um das Pack zu öffnen', pack_seal_swipe_aria: 'Ziehe am oberen Rand des Packs nach unten, um es zu öffnen' });
+Object.assign(I18N.es, { pack_seal_swipe_hint: 'Toca · sube un poco · suelta al bajar', pack_seal_swipe_aria: 'Toca el sobre, deslízalo un poco hacia arriba y suéltalo al volver abajo para abrirlo' });
+Object.assign(I18N.en, { pack_seal_swipe_hint: 'Tap · slide up · release on the way down', pack_seal_swipe_aria: 'Tap the pack, slide it up a little and release on the way down to open it' });
+Object.assign(I18N.de, { pack_seal_swipe_hint: 'Tippen · hochziehen · beim Zurückgehen loslassen', pack_seal_swipe_aria: 'Tippe das Pack an, ziehe es leicht nach oben und lasse es beim Zurückgehen los, um es zu öffnen' });
 Object.assign(I18N.es, { shop_pack_detail_reveal_hint: 'Toca cada carta para voltearla. Guarda tus nuevas cartas para completar el set.' });
 Object.assign(I18N.en, { shop_pack_detail_reveal_hint: 'Tap each card to flip it. Save your new cards to complete the set.' });
 Object.assign(I18N.de, { shop_pack_detail_reveal_hint: 'Tippe jede Karte zum Umdrehen. Speichere deine neuen Karten für das Set.' });
@@ -1802,3 +1802,50 @@ Object.assign(I18N.de, {
   settings_inventory_size: 'Inventargröße'
 });
 
+
+/* Apertura de sobres: carrusel de 11 y pila deslizable. */
+Object.assign(I18N.es, {
+  pack_choose_kicker: 'Elige tu sobre',
+  pack_choose_title: '11 sobres. Uno es tuyo.',
+  pack_choose_aria: 'Sobres disponibles',
+  pack_choose_hint: 'Desliza para girar · toca el sobre que elijas',
+  pack_choose_open: 'Abrir este sobre',
+  pack_carousel_count: '{n} de 11',
+  pack_carousel_pack: 'Sobre {n}',
+  pack_stack_hint: 'Desliza la carta para descubrir la siguiente',
+  pack_stack_last: 'Última carta · desliza para terminar'
+});
+Object.assign(I18N.en, {
+  pack_choose_kicker: 'Pick your pack',
+  pack_choose_title: '11 packs. One is yours.',
+  pack_choose_aria: 'Available packs',
+  pack_choose_hint: 'Swipe to spin · tap the pack you want',
+  pack_choose_open: 'Open this pack',
+  pack_carousel_count: '{n} of 11',
+  pack_carousel_pack: 'Pack {n}',
+  pack_stack_hint: 'Swipe the card to reveal the next one',
+  pack_stack_last: 'Last card · swipe to finish'
+});
+Object.assign(I18N.de, {
+  pack_choose_kicker: 'Wähle dein Pack',
+  pack_choose_title: '11 Packs. Eines gehört dir.',
+  pack_choose_aria: 'Verfügbare Packs',
+  pack_choose_hint: 'Wische zum Drehen · tippe das Pack an',
+  pack_choose_open: 'Dieses Pack öffnen',
+  pack_carousel_count: '{n} von 11',
+  pack_carousel_pack: 'Pack {n}',
+  pack_stack_hint: 'Wische die Karte weg, um die nächste zu sehen',
+  pack_stack_last: 'Letzte Karte · wischen zum Beenden'
+});
+
+
+/* Apertura del sobre: estado listo tras el toque. */
+Object.assign(I18N.es, {
+  pack_seal_hint_ready: 'Ahora sube y suelta al bajar'
+});
+Object.assign(I18N.en, {
+  pack_seal_hint_ready: 'Slide up, then release on the way down'
+});
+Object.assign(I18N.de, {
+  pack_seal_hint_ready: 'Jetzt hochziehen und beim Zurückgehen loslassen'
+});

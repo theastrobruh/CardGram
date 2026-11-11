@@ -377,6 +377,21 @@
       tone({ freq: 261.63, type: 'triangle', dur: 0.2, gain: 0.011 });
     },
 
+    /* Rasgado del sobre: aire descendente y chispa metálica. */
+    rip() {
+      air({ from: 3400, to: 280, dur: 0.46, gain: 0.045, q: 0.55 });
+      tone({ freq: 190, to: 84, type: 'sawtooth', dur: 0.2, gain: 0.018 });
+      chip([1318.51, 1975.53, 2637.02], { step: 0.028, dur: 0.1, gain: 0.009, send: 0.24 });
+    },
+
+    /* Apertura del sobre: oleada grave y destello ascendente. */
+    booster() {
+      tone({ freq: 98, to: 196, type: 'sine', dur: 0.62, gain: 0.05 });
+      tone({ freq: 196, to: 392, type: 'triangle', dur: 0.5, gain: 0.014, delay: 0.04 });
+      air({ from: 260, to: 4600, dur: 0.62, gain: 0.028, q: 0.7 });
+      chip([523.25, 783.99, 1046.5, 1567.98], { step: 0.075, dur: 0.3, gain: 0.012, send: 0.32 });
+    },
+
     /* Error suave: caída de chip, nunca estridente. */
     error() {
       tone({ freq: 233.08, to: 174.61, type: 'square', dur: 0.14, gain: 0.018 });

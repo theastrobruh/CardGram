@@ -12,26 +12,26 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=320">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=320">
-  <link rel="stylesheet" href="assets/css/devmode.css?v=0.5.5&rev=320">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=328">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=328">
+  <link rel="stylesheet" href="assets/css/devmode.css?v=0.5.5&rev=328">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=320" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=320" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=320" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=320" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=320" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=320" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=320" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=320" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=320" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=320" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=320" defer></script>
-  <script src="assets/js/welcome.js?v=0.5.5&rev=320" defer></script>
-  <script src="assets/js/boot.js?v=0.5.5&rev=320" defer></script>
-  <script src="assets/js/devmode.js?v=0.5.5&rev=320" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=328" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=328" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=328" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=328" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=328" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=328" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=328" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=328" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=328" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=328" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=328" defer></script>
+  <script src="assets/js/welcome.js?v=0.5.5&rev=328" defer></script>
+  <script src="assets/js/boot.js?v=0.5.5&rev=328" defer></script>
+  <script src="assets/js/devmode.js?v=0.5.5&rev=328" defer></script>
 </head>
 <body data-view="hub" class="booting">
   <div class="boot-screen" id="boot-screen">
@@ -1892,6 +1892,7 @@
     <!-- Apertura animada de sobres -->
     <div class="pack-overlay" id="pack-overlay" role="dialog" aria-modal="true" aria-labelledby="pack-overlay-title" hidden>
       <div class="pack-overlay-backdrop" data-pack-close></div>
+      <span class="pack-flash" aria-hidden="true"></span>
       <div class="pack-overlay-shell">
         <header class="pack-overlay-head">
           <div class="pack-head-info">
@@ -1908,36 +1909,52 @@
         </header>
 
         <!-- 1. ETAPA SOBRE SELLADO (DESLIZA LA PARTE SUPERIOR PARA ABRIR) -->
+        <!-- 0. CARRUSEL DE 11 SOBRES -->
+        <div class="pack-carousel-wrap" id="pack-carousel-wrap" hidden>
+          <div class="pack-carousel-copy">
+            <span class="pack-carousel-kicker" data-i18n="pack_choose_kicker">Elige tu sobre</span>
+            <h3 class="pack-carousel-title" data-i18n="pack_choose_title">11 sobres. Uno es tuyo.</h3>
+          </div>
+          <div class="pack-carousel-viewport" id="pack-carousel" role="group" aria-label="Sobres disponibles" data-i18n-aria-label="pack_choose_aria">
+            <div class="pack-carousel-track" id="pack-carousel-track"></div>
+          </div>
+          <div class="pack-carousel-meta">
+            <span class="pack-carousel-count" id="pack-carousel-count">01 / 11</span>
+            <span class="pack-carousel-name" id="pack-carousel-name"></span>
+          </div>
+          <div class="pack-carousel-actions">
+            <button class="pack-carousel-arrow" type="button" id="pack-carousel-prev" aria-label="Anterior">
+              <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+            </button>
+            <button class="btn btn-primary pack-carousel-open" type="button" id="pack-carousel-open" data-i18n="pack_choose_open">Abrir este sobre</button>
+            <button class="pack-carousel-arrow" type="button" id="pack-carousel-next" aria-label="Siguiente">
+              <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+            </button>
+          </div>
+          <p class="pack-carousel-hint" data-i18n="pack_choose_hint">Desliza para girar y toca el sobre que elijas</p>
+        </div>
+
         <div class="pack-seal-wrap" id="pack-seal-wrap">
-          <div class="pack-seal" id="pack-seal" tabindex="0" role="button" aria-label="Desliza hacia abajo sobre la parte superior del sobre para abrirlo" data-i18n-aria-label="pack_seal_swipe_aria">
+          <div class="pack-seal" id="pack-seal" tabindex="0" role="button" aria-label="Toca el sobre, deslízalo un poco hacia arriba y suéltalo al volver abajo para abrirlo" data-i18n-aria-label="pack_seal_swipe_aria">
             <span class="pack-seal-brand">CardGram</span>
             <img id="pack-seal-img" alt="" width="300" height="420">
             <span class="pack-seal-name" id="pack-seal-name"></span>
             <span class="pack-seal-shine" aria-hidden="true"></span>
             <span class="pack-seal-tear" aria-hidden="true"><span class="pack-seal-tear-line"></span></span>
+            <span class="pack-seal-grip" aria-hidden="true"><span class="pack-seal-grip-bar"></span><span class="pack-seal-grip-bar"></span></span>
             <span class="pack-seal-rip-fx" aria-hidden="true"></span>
           </div>
           <span class="pack-seal-swipe-cue" aria-hidden="true"></span>
-          <p class="pack-seal-hint" id="pack-seal-hint" data-i18n="pack_seal_swipe_hint">Desliza hacia abajo la parte superior para abrir el sobre</p>
+          <p class="pack-seal-hint" id="pack-seal-hint" data-i18n="pack_seal_swipe_hint">Toca el sobre, deslízalo un poco hacia arriba y suéltalo al bajar</p>
         </div>
 
         <!-- 2. ETAPA TEATRO CARTA POR CARTA (POKÉMON POCKET STYLE) -->
         <div class="pack-theater-wrap" id="pack-theater-wrap" hidden>
           <div class="pack-theater-stage" id="pack-theater-stage">
-            <div class="pack-theater-card" id="pack-theater-card" tabindex="0" role="button" aria-label="Toca para avanzar a la siguiente carta">
-              <div class="pack-theater-card-inner" id="pack-theater-card-inner">
-                <div class="pack-theater-face pack-theater-back">
-                  <img src="assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp" alt="CardGram Back">
-                </div>
-                <div class="pack-theater-face pack-theater-front" id="pack-theater-front">
-                  <!-- Inyectado dinámicamente -->
-                </div>
-              </div>
-              <div class="pack-theater-hologram" aria-hidden="true"></div>
-            </div>
+            <div class="pack-stack" id="pack-stack"></div>
           </div>
 
-          <div class="pack-theater-nav">
+<div class="pack-theater-nav">
             <button class="btn btn-ghost btn-sm pack-theater-prev" type="button" id="pack-theater-prev" aria-label="Carta anterior">
               <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
               <span>Anterior</span>

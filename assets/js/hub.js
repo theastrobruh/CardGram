@@ -376,6 +376,16 @@ function reduceMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
+/* Pulso táctil para los momentos clave de la apertura (móvil). */
+function haptic(pattern) {
+  if (typeof navigator === 'undefined' || !navigator.vibrate) return;
+  try {
+    navigator.vibrate(pattern);
+  } catch (error) {
+    /* noop */
+  }
+}
+
 function formatHubDate(timestamp) {
   try {
     return new Date(timestamp).toLocaleDateString(currentLang || 'en', {
@@ -837,7 +847,13 @@ let packOverlayState = {
   revealedSet: new Set(),
   isBurst: false,
   viewMode: 'single',
-  suppressTapUntil: 0
+  suppressTapUntil: 0,
+  carouselIndex: 0,
+  carouselPos: 0,
+  carouselBusy: false,
+  suppressCarouselTapUntil: 0,
+  animating: false,
+  dragCard: null
 };
 
 function clearPackTimers() {
@@ -848,6 +864,9 @@ function clearPackTimers() {
 function closePackOverlay() {
   if (!hub.els.packOverlay) return;
   clearPackTimers();
+  packOverlayState.animating = false;
+  packOverlayState.carouselBusy = false;
+  packOverlayState.dragCard = null;
   hub.els.packOverlay.hidden = true;
   document.body.classList.remove('pack-open');
 }
@@ -855,36 +874,75 @@ function closePackOverlay() {
 function setPackOverlayStage(stage) {
   const overlay = hub.els.packOverlay;
   if (!overlay) return;
+  overlay.classList.toggle('is-carousel-stage', stage === 'carousel');
   overlay.classList.toggle('is-seal-stage', stage === 'seal');
   overlay.classList.toggle('is-theater-stage', stage === 'theater');
   overlay.classList.toggle('is-grid-stage', stage === 'grid');
+
+  if (hub.els.packCarouselWrap) hub.els.packCarouselWrap.hidden = stage !== 'carousel';
+  if (hub.els.packSealWrap) hub.els.packSealWrap.hidden = stage !== 'seal';
+  if (hub.els.packTheaterWrap) hub.els.packTheaterWrap.hidden = stage !== 'theater';
+  if (hub.els.packRevealGrid) hub.els.packRevealGrid.hidden = stage !== 'grid';
+  if (hub.els.packHeadMeta) hub.els.packHeadMeta.hidden = stage === 'carousel' || stage === 'seal';
+  if (hub.els.packToggleView) hub.els.packToggleView.hidden = stage === 'carousel' || stage === 'seal';
+  if (hub.els.packRevealAll) hub.els.packRevealAll.hidden = stage !== 'theater';
 }
 
-/* Abrir el sobre deslizando hacia abajo su parte superior. */
+/* Abrir el sobre: toca o haz clic, deslízalo un poco hacia arriba y suéltalo
+   al volver hacia abajo. */
 function setupPackSealSwipe() {
   const seal = hub.els.packSeal;
   if (!seal || seal._hasSwipe) return;
   seal._hasSwipe = true;
 
+  const hintEl = () => document.getElementById('pack-seal-hint');
+  const setHint = (key) => {
+    const hint = hintEl();
+    if (!hint) return;
+    hint.setAttribute('data-i18n', key);
+    hint.textContent = t(key) || hint.textContent;
+  };
+
   let active = false;
+  let pointerId = null;
   let startX = 0;
   let startY = 0;
+  let peak = 0;
+  let moved = 0;
+  let armed = false;
 
-  const startsOnTop = (event) => {
-    const rect = seal.getBoundingClientRect();
-    return event.clientY - rect.top <= rect.height * 0.36;
+  const paintPull = (dx, dy) => {
+    const pull = Math.max(-150, Math.min(18, dy));
+    seal.style.setProperty('--pull-y', `${pull * 0.32}px`);
+    seal.style.setProperty('--tear-y', `${pull}px`);
+    seal.style.setProperty('--tear-x', `${Math.max(-16, Math.min(16, dx * 0.12))}px`);
+  };
+
+  const resetPull = () => {
+    seal.classList.remove('is-pulling', 'is-grabbed');
+    seal.style.removeProperty('--pull-y');
+    seal.style.setProperty('--tear-y', '0px');
+    seal.style.setProperty('--tear-x', '0px');
+  };
+
+  const markReady = () => {
+    seal.classList.add('is-ready');
+    setHint('pack_seal_hint_ready');
+    haptic(8);
   };
 
   seal.addEventListener('pointerdown', (event) => {
     if (packOverlayState.isBurst) return;
-    if (event.button !== 0) return;
-    if (!startsOnTop(event)) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
     active = true;
+    pointerId = event.pointerId;
     startX = event.clientX;
     startY = event.clientY;
-    seal.classList.add('is-tearing');
-    seal.style.setProperty('--tear-y', '0px');
-    seal.style.setProperty('--tear-x', '0px');
+    peak = 0;
+    moved = 0;
+    armed = false;
+    seal.classList.remove('is-ready');
+    seal.classList.add('is-grabbed');
     if (seal.setPointerCapture) {
       try { seal.setPointerCapture(event.pointerId); } catch (error) { /* noop */ }
     }
@@ -892,32 +950,42 @@ function setupPackSealSwipe() {
   });
 
   seal.addEventListener('pointermove', (event) => {
-    if (!active) return;
+    if (!active || event.pointerId !== pointerId) return;
     const dx = event.clientX - startX;
     const dy = event.clientY - startY;
-    const pull = Math.max(0, Math.min(dy, 150));
-    seal.style.setProperty('--tear-y', `${pull}px`);
-    seal.style.setProperty('--tear-x', `${Math.max(-20, Math.min(20, dx * 0.22))}px`);
+    moved = Math.max(moved, Math.abs(dx), Math.abs(dy));
+    if (moved < 4) return;
+    seal.classList.add('is-pulling');
+    if (dy < peak) peak = Math.max(-150, dy);
+    /* Listo para abrir cuando subió y ya regresó hacia abajo. */
+    if (peak <= -12 && dy >= peak + 10 && dy >= -18) armed = true;
+    paintPull(dx, dy);
   });
 
-  const finish = (event) => {
-    if (!active) return;
+  const finish = (event, cancelled) => {
+    if (!active || event.pointerId !== pointerId) return;
     active = false;
-    seal.classList.remove('is-tearing');
-    const dx = (event.clientX || 0) - startX;
-    const dy = (event.clientY || 0) - startY;
-    seal.style.setProperty('--tear-y', '0px');
-    seal.style.setProperty('--tear-x', '0px');
     if (seal.releasePointerCapture) {
       try { seal.releasePointerCapture(event.pointerId); } catch (error) { /* noop */ }
     }
-    if (dy > 56 && dy > Math.abs(dx) * 0.55) {
+    resetPull();
+    if (cancelled || packOverlayState.isBurst) return;
+
+    const dy = event.clientY - startY;
+    const lifted = peak <= -12;
+    const cameBack = dy >= peak + 8;
+
+    if (armed || (lifted && cameBack)) {
+      seal.classList.remove('is-ready');
       triggerPackRip();
+      return;
     }
+
+    markReady();
   };
 
-  seal.addEventListener('pointerup', finish);
-  seal.addEventListener('pointercancel', finish);
+  seal.addEventListener('pointerup', (event) => finish(event, false));
+  seal.addEventListener('pointercancel', (event) => finish(event, true));
 
   seal.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -927,122 +995,367 @@ function setupPackSealSwipe() {
   });
 }
 
-/* En móvil las cartas se pasan una a una con un swipe suave. */
-function setupPackCardSwipe() {
-  const stage = document.getElementById('pack-theater-stage');
-  const card = hub.els.packTheaterCard;
-  if (!stage || !card || stage._hasSwipe) return;
-  stage._hasSwipe = true;
+/* ------------------------------------------------- Carrusel de 11 sobres */
+const PACK_CAROUSEL_COUNT = 11;
+
+function packCarouselCollection() {
+  return (
+    HUB_CATALOG.collections.find((entry) => entry.id === hubBooster.setId) ||
+    boosterSets()[0] ||
+    null
+  );
+}
+
+function packCarouselArt(collection) {
+  if (!collection) return '';
+  return (
+    shopPackArt[collection.id] ||
+    collection.thumbCover ||
+    collection.cover ||
+    (collection.cards[0] && collection.cards[0].thumbFront) ||
+    ''
+  );
+}
+
+function buildPackCarousel() {
+  const track = hub.els.packCarouselTrack;
+  const collection = packCarouselCollection();
+  if (!track || !collection) return;
+
+  const art = packCarouselArt(collection);
+  const frag = document.createDocumentFragment();
+  for (let index = 0; index < PACK_CAROUSEL_COUNT; index += 1) {
+    const item = makeNode('button', 'pack-carousel-item');
+    item.type = 'button';
+    item.dataset.packIndex = String(index);
+    item.style.setProperty('--pack-delay', `${index * 0.11}s`);
+    item.setAttribute(
+      'aria-label',
+      `${collection.name} · ${t('pack_carousel_pack', { n: index + 1 })}`
+    );
+
+    item.appendChild(makeHubImage(art, collection.name));
+    const foil = makeNode('span', 'pack-carousel-foil');
+    foil.setAttribute('aria-hidden', 'true');
+    item.appendChild(foil);
+    item.appendChild(makeNode('span', 'pack-carousel-serial', String(index + 1).padStart(2, '0')));
+
+    item.addEventListener('click', () => handleCarouselItem(index));
+    frag.appendChild(item);
+  }
+  track.replaceChildren(frag);
+
+  packOverlayState.carouselIndex = 0;
+  packOverlayState.carouselPos = 0;
+  renderPackCarousel();
+  updatePackCarouselLabels();
+}
+
+function packCarouselGap() {
+  const track = hub.els.packCarouselTrack;
+  const item = track && track.querySelector('.pack-carousel-item');
+  const width = item ? item.offsetWidth : 0;
+  return Math.max(76, width * 0.62);
+}
+
+function renderPackCarousel() {
+  const track = hub.els.packCarouselTrack;
+  if (!track) return;
+  const gap = packCarouselGap();
+  const pos = packOverlayState.carouselPos;
+
+  Array.from(track.children).forEach((item, index) => {
+    const delta = index - pos;
+    const distance = Math.abs(delta);
+    const x = delta * gap;
+    const z = -Math.min(distance, 4) * 130;
+    const ry = Math.max(-58, Math.min(58, -delta * 30));
+    const scale = Math.max(0.46, 1 - Math.min(distance, 4) * 0.14);
+    const alpha = distance > 4.6 ? 0 : Math.max(0.34, 1 - distance * 0.15);
+
+    item.style.transform = `translate3d(calc(-50% + ${x}px), -50%, ${z}px) rotateY(${ry}deg) scale(${scale})`;
+    item.style.opacity = String(alpha);
+    item.style.zIndex = String(200 - Math.round(distance * 12));
+    item.style.pointerEvents = distance > 4.2 ? 'none' : '';
+    item.classList.toggle('is-center', distance < 0.5);
+  });
+}
+
+function updatePackCarouselLabels() {
+  const collection = packCarouselCollection();
+  const index = Math.max(0, Math.min(PACK_CAROUSEL_COUNT - 1, Math.round(packOverlayState.carouselPos)));
+  if (hub.els.packCarouselCount) {
+    hub.els.packCarouselCount.textContent = t('pack_carousel_count', { n: index + 1 });
+  }
+  if (hub.els.packCarouselName) {
+    hub.els.packCarouselName.textContent = collection ? collection.name : '';
+  }
+}
+
+function settlePackCarousel(index) {
+  const target = Math.max(0, Math.min(PACK_CAROUSEL_COUNT - 1, index));
+  packOverlayState.carouselIndex = target;
+  packOverlayState.carouselPos = target;
+  renderPackCarousel();
+  updatePackCarouselLabels();
+}
+
+function movePackCarousel(direction) {
+  if (packOverlayState.carouselBusy) return;
+  settlePackCarousel(Math.round(packOverlayState.carouselPos) + direction);
+  if (window.Sound) window.Sound.play('flip');
+}
+
+function handleCarouselItem(index) {
+  if (packOverlayState.carouselBusy) return;
+  if (Date.now() < packOverlayState.suppressCarouselTapUntil) return;
+  const current = Math.round(packOverlayState.carouselPos);
+  if (index !== current) {
+    settlePackCarousel(index);
+    if (window.Sound) window.Sound.play('flip');
+    return;
+  }
+  selectPackFromCarousel();
+}
+
+function selectPackFromCarousel() {
+  if (packOverlayState.carouselBusy) return;
+  const collection = packCarouselCollection();
+  if (!collection) return;
+
+  packOverlayState.carouselBusy = true;
+  const track = hub.els.packCarouselTrack;
+  const center = track && track.querySelector('.pack-carousel-item.is-center');
+  if (center) {
+    center.style.transition = 'transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.36s ease';
+    center.style.transform = 'translate3d(-50%, -50%, 360px) scale(1.14)';
+    center.style.opacity = '1';
+  }
+  if (hub.els.packCarouselWrap) hub.els.packCarouselWrap.classList.add('is-leaving');
+  if (window.Sound) window.Sound.play('flip');
+
+  if (!hubBooster.picks.length) {
+    hubBooster.setId = collection.id;
+    hubBooster.picks = drawBoosterCards(collection.id);
+    persistBooster();
+  }
+  packOverlayState.cards = hubBooster.picks.slice();
+
+  const delay = reduceMotion() ? 60 : 380;
+  window.setTimeout(() => {
+    if (hub.els.packCarouselWrap) {
+      hub.els.packCarouselWrap.classList.remove('is-leaving');
+      hub.els.packCarouselWrap.hidden = true;
+    }
+    if (track) {
+      track.classList.remove('is-chosen');
+      Array.from(track.children).forEach((item) => {
+        item.style.transition = '';
+        item.style.transform = '';
+        item.style.opacity = '';
+      });
+    }
+    preparePackSeal(collection);
+    setPackOverlayStage('seal');
+    packOverlayState.carouselBusy = false;
+    if (window.Sound) window.Sound.play('booster');
+  }, delay);
+}
+
+function setupPackCarouselControls() {
+  const bind = (node, fn) => {
+    if (!node || node._hasCarouselClick) return;
+    node._hasCarouselClick = true;
+    node.addEventListener('click', fn);
+  };
+  bind(hub.els.packCarouselPrev, () => movePackCarousel(-1));
+  bind(hub.els.packCarouselNext, () => movePackCarousel(1));
+  bind(hub.els.packCarouselOpen, () => selectPackFromCarousel());
+}
+
+function setupPackCarouselSwipe() {
+  const viewport = hub.els.packCarousel;
+  if (!viewport || viewport._hasSwipe) return;
+  viewport._hasSwipe = true;
 
   let active = false;
   let pointerId = null;
   let startX = 0;
-  let startY = 0;
+  let startPos = 0;
+  let moved = 0;
 
-  const reset = () => {
-    active = false;
-    card.style.transition = 'translate 0.22s ease';
-    card.style.translate = '';
+  const release = (event) => {
+    if (viewport.releasePointerCapture) {
+      try { viewport.releasePointerCapture(event.pointerId); } catch (error) { /* noop */ }
+    }
   };
 
-  stage.addEventListener('pointerdown', (event) => {
-    if (event.pointerType === 'mouse' && window.innerWidth > 980) return;
-    if (event.button !== 0) return;
+  viewport.addEventListener('pointerdown', (event) => {
+    if (packOverlayState.carouselBusy) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
     active = true;
+    moved = 0;
     pointerId = event.pointerId;
     startX = event.clientX;
-    startY = event.clientY;
-    card.style.transition = 'none';
-    if (stage.setPointerCapture) {
-      try { stage.setPointerCapture(event.pointerId); } catch (error) { /* noop */ }
+    startPos = packOverlayState.carouselPos;
+    if (hub.els.packCarouselTrack) hub.els.packCarouselTrack.classList.add('is-dragging');
+    if (viewport.setPointerCapture) {
+      try { viewport.setPointerCapture(event.pointerId); } catch (error) { /* noop */ }
     }
   });
 
-  stage.addEventListener('pointermove', (event) => {
+  viewport.addEventListener('pointermove', (event) => {
     if (!active || event.pointerId !== pointerId) return;
     const dx = event.clientX - startX;
-    if (Math.abs(dx) < 3) return;
-    const pull = Math.max(-110, Math.min(110, dx * 0.55));
-    card.style.translate = `${pull}px 0`;
+    moved = Math.max(moved, Math.abs(dx));
+    if (moved < 4) return;
+    const max = PACK_CAROUSEL_COUNT - 1;
+    let pos = startPos - dx / packCarouselGap();
+    if (pos < 0) pos *= 0.28;
+    if (pos > max) pos = max + (pos - max) * 0.28;
+    packOverlayState.carouselPos = Math.max(-0.6, Math.min(max + 0.6, pos));
+    renderPackCarousel();
+    updatePackCarouselLabels();
   });
 
   const finish = (event) => {
     if (!active || event.pointerId !== pointerId) return;
-    const dx = event.clientX - startX;
-    const dy = event.clientY - startY;
-    reset();
-    if (stage.releasePointerCapture) {
-      try { stage.releasePointerCapture(event.pointerId); } catch (error) { /* noop */ }
+    active = false;
+    if (hub.els.packCarouselTrack) hub.els.packCarouselTrack.classList.remove('is-dragging');
+    release(event);
+    if (moved < 6) {
+      renderPackCarousel();
+      return;
     }
-    const swipedSideways = Math.abs(dx) > 22 && Math.abs(dx) > Math.abs(dy) * 0.6;
-    const swipedUp = dy < -26 && Math.abs(dy) > Math.abs(dx);
-    if (swipedSideways || swipedUp) {
-      packOverlayState.suppressTapUntil = Date.now() + 400;
-      nextTheaterCard();
-    }
+    packOverlayState.suppressCarouselTapUntil = Date.now() + 320;
+    settlePackCarousel(Math.round(packOverlayState.carouselPos));
   };
 
-  stage.addEventListener('pointerup', finish);
-  stage.addEventListener('pointercancel', reset);
-  stage.addEventListener('pointerleave', (event) => {
-    if (active && event.pointerId === pointerId) reset();
+  viewport.addEventListener('pointerup', finish);
+  viewport.addEventListener('pointercancel', finish);
+
+  window.addEventListener('resize', () => {
+    if (!hub.els.packOverlay || hub.els.packOverlay.hidden) return;
+    if (!hub.els.packCarouselWrap || hub.els.packCarouselWrap.hidden) return;
+    renderPackCarousel();
+  });
+
+  viewport.addEventListener('wheel', (event) => {
+    if (!hub.els.packCarouselWrap || hub.els.packCarouselWrap.hidden) return;
+    const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+    if (Math.abs(delta) < 6) return;
+    event.preventDefault();
+    movePackCarousel(delta > 0 ? 1 : -1);
+  }, { passive: false });
+}
+
+/* ------------------------------------------------------- Sobre elegido */
+function preparePackSeal(collection) {
+  if (!collection) return;
+  if (hub.els.packSealImg) {
+    hub.els.packSealImg.src = packCarouselArt(collection);
+    hub.els.packSealImg.alt = collection.name;
+  }
+  if (hub.els.packSealName) hub.els.packSealName.textContent = collection.name;
+  const seal = hub.els.packSeal;
+  if (seal) {
+    seal.classList.remove('is-burst', 'is-tearing', 'is-ready', 'is-grabbed', 'is-pulling');
+    seal.style.setProperty('--tear-y', '0px');
+    seal.style.setProperty('--tear-x', '0px');
+    seal.style.removeProperty('--pull-y');
+  }
+  const hint = document.getElementById('pack-seal-hint');
+  if (hint) {
+    hint.setAttribute('data-i18n', 'pack_seal_swipe_hint');
+    hint.textContent = t('pack_seal_swipe_hint') || hint.textContent;
+  }
+}
+
+/* --------------------------------------------- Cartas apiladas deslizables */
+function buildPackStack() {
+  const stack = hub.els.packStack;
+  if (!stack) return;
+
+  const frag = document.createDocumentFragment();
+  packOverlayState.cards.forEach((cardId, index) => {
+    const card = HUB_CATALOG.byId(cardId);
+    if (!card) return;
+    const rarity = cardRarity(card);
+    const node = makeNode('article', `pack-stack-card rarity-${rarity.id}`);
+    node.dataset.packIndex = String(index);
+    node.dataset.rarity = rarity.id;
+
+    const img = makeHubImage(card.front || card.thumbFront || '', card.name);
+    img.className = 'pack-stack-img';
+    img.loading = index < 2 ? 'eager' : 'lazy';
+    node.appendChild(img);
+    const shine = makeNode('span', 'pack-stack-shine');
+    shine.setAttribute('aria-hidden', 'true');
+    node.appendChild(shine);
+
+    node.addEventListener('click', () => {
+      if (Date.now() < packOverlayState.suppressTapUntil) return;
+      if (!node.classList.contains('is-top')) return;
+      dismissTopCard(1);
+    });
+    frag.appendChild(node);
+  });
+  stack.replaceChildren(frag);
+  layoutPackStack();
+}
+
+function layoutPackStack() {
+  const stack = hub.els.packStack;
+  if (!stack) return;
+  const current = packOverlayState.currentIndex;
+  Array.from(stack.children).forEach((node) => {
+    const index = Number(node.dataset.packIndex);
+    const depth = index - current;
+    node.classList.toggle('is-top', depth === 0);
+    if (depth < 0) {
+      node.classList.add('is-gone');
+      node.style.transform = '';
+      node.style.zIndex = '';
+      node.setAttribute('aria-hidden', 'true');
+      return;
+    }
+    node.classList.remove('is-gone');
+    node.setAttribute('aria-hidden', depth === 0 ? 'false' : 'true');
+    const lift = Math.min(depth, 5);
+    const scale = 1 - lift * 0.036;
+    node.style.transform = `translate3d(0, ${-lift * 13}px, ${-lift * 16}px) scale(${scale})`;
+    node.style.zIndex = String(120 - depth);
+    node.style.opacity = depth > 5 ? '0' : '1';
   });
 }
 
-function triggerPackRip() {
-  if (packOverlayState.isBurst) return;
-  packOverlayState.isBurst = true;
-  if (hub.els.packSeal) hub.els.packSeal.classList.add('is-burst');
-  if (hub.els.packSealTriggerBtn) hub.els.packSealTriggerBtn.hidden = true;
-  if (window.Sound) window.Sound.play('burst');
-
-  packOverlayState.timers.push(
-    window.setTimeout(() => {
-      if (hub.els.packSealWrap) hub.els.packSealWrap.hidden = true;
-      if (hub.els.packTheaterWrap) hub.els.packTheaterWrap.hidden = false;
-      if (hub.els.packHeadMeta) hub.els.packHeadMeta.hidden = false;
-      if (hub.els.packToggleView) hub.els.packToggleView.hidden = false;
-      setPackOverlayStage('theater');
-
-      if (hub.els.packRevealGrid) {
-        hub.els.packRevealGrid.replaceChildren(
-          ...packOverlayState.cards
-            .map((id) => HUB_CATALOG.byId(id))
-            .filter(Boolean)
-            .map((card, index) => buildPackCard(card, index))
-        );
-      }
-      renderTheaterCard(0);
-    }, 650)
+function fillPackGrid() {
+  const grid = hub.els.packRevealGrid;
+  if (!grid || grid.children.length) return;
+  grid.replaceChildren(
+    ...packOverlayState.cards
+      .map((id) => HUB_CATALOG.byId(id))
+      .filter(Boolean)
+      .map((card, index) => buildPackCard(card, index))
   );
 }
 
 function renderTheaterCard(index) {
   if (!packOverlayState.cards.length) return;
-  if (index < 0) index = 0;
-  if (index >= packOverlayState.cards.length) index = packOverlayState.cards.length - 1;
-  packOverlayState.currentIndex = index;
-  packOverlayState.revealedSet.add(index);
-
-  const cardId = packOverlayState.cards[index];
-  const card = HUB_CATALOG.byId(cardId);
-  if (!card) return;
-
   const total = packOverlayState.cards.length;
-  const currentNum = index + 1;
+  index = Math.max(0, Math.min(total - 1, index));
+  packOverlayState.currentIndex = index;
+  for (let i = 0; i <= index; i += 1) packOverlayState.revealedSet.add(i);
 
   if (hub.els.packCardCounter) {
-    hub.els.packCardCounter.textContent = `${currentNum} / ${total}`;
+    hub.els.packCardCounter.textContent = `${Math.min(index + 1, total)} / ${total}`;
   }
   if (hub.els.packStepDots) {
     hub.els.packStepDots.innerHTML = packOverlayState.cards
       .map((_, i) => `<span class="pack-step-dot ${i === index ? 'is-active' : ''} ${packOverlayState.revealedSet.has(i) ? 'is-revealed' : ''}"></span>`)
       .join('');
   }
-
-  if (hub.els.packTheaterPrev) {
-    hub.els.packTheaterPrev.disabled = index === 0;
-  }
+  if (hub.els.packTheaterPrev) hub.els.packTheaterPrev.disabled = index === 0;
   if (hub.els.packTheaterNext) {
     if (index === total - 1) {
       hub.els.packTheaterNext.innerHTML = '<span>Completar</span><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>';
@@ -1051,58 +1364,84 @@ function renderTheaterCard(index) {
     }
   }
 
-  const rarity = cardRarity(card);
-  if (hub.els.packTheaterFront) {
-    hub.els.packTheaterFront.replaceChildren();
+  layoutPackStack();
+  updatePackStackHint();
 
-    const head = makeNode('div', 'pack-theater-card-head');
-    head.appendChild(makeNode('span', `pack-card-rarity rarity-${rarity.id}`, t(`rarity_${rarity.id}`)));
-    head.appendChild(makeNode('span', 'pack-theater-card-collection', card.collectionName || 'CardGram'));
-
-    const img = makeHubImage(card.thumbFront || card.front, card.name);
-    img.className = 'pack-theater-img';
-
-    const foot = makeNode('div', 'pack-theater-card-foot');
-    foot.appendChild(makeNode('strong', 'pack-theater-card-title', card.name));
-
-    hub.els.packTheaterFront.append(head, img, foot);
-  }
-
-  if (hub.els.packTheaterCard) {
-    hub.els.packTheaterCard.className = `pack-theater-card rarity-${rarity.id} is-revealed`;
-    hub.els.packTheaterCard.style.animation = 'none';
-    hub.els.packTheaterCard.offsetHeight;
-    hub.els.packTheaterCard.style.animation = '';
-  }
-
-  if (window.Sound) {
+  const top = packOverlayState.cards[index];
+  const card = top ? HUB_CATALOG.byId(top) : null;
+  if (card && window.Sound) {
+    const rarity = cardRarity(card);
     window.Sound.play(['legendary', 'mythic'].includes(rarity.id) ? 'success' : 'flip');
   }
+}
 
-  revealPackCard(index);
-
-  if (packOverlayState.revealedSet.size >= total) {
-    claimBoosterPackSilently();
-    if (hub.els.packEndActions) hub.els.packEndActions.hidden = false;
+function dismissTopCard(direction) {
+  if (packOverlayState.animating) return;
+  const stack = hub.els.packStack;
+  if (!stack) return;
+  const top = stack.querySelector('.pack-stack-card.is-top');
+  if (!top) {
+    completePackOpen();
+    return;
   }
+  packOverlayState.animating = true;
+  const reduced = reduceMotion();
+  const dir = direction >= 0 ? 1 : -1;
+
+  top.style.transition = reduced
+    ? 'opacity 0.16s ease'
+    : 'transform 0.44s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.36s ease';
+  top.style.transform = `translate3d(${dir * 135}%, ${reduced ? 0 : -6}%, 0) rotate(${dir * 13}deg)`;
+  top.style.opacity = '0';
+  packOverlayState.suppressTapUntil = Date.now() + 460;
+
+  const tier = top.dataset.rarity || 'common';
+  if (window.Sound) {
+    window.Sound.play(['legendary', 'mythic'].includes(tier) ? 'success' : 'flip');
+  }
+
+  window.setTimeout(() => {
+    top.classList.remove('is-top');
+    top.classList.add('is-gone');
+    top.style.transition = '';
+    top.style.transform = '';
+    top.style.opacity = '';
+    packOverlayState.revealedSet.add(packOverlayState.currentIndex);
+    packOverlayState.currentIndex += 1;
+    packOverlayState.animating = false;
+    if (packOverlayState.currentIndex >= packOverlayState.cards.length) {
+      completePackOpen();
+    } else {
+      renderTheaterCard(packOverlayState.currentIndex);
+    }
+  }, reduced ? 170 : 460);
+}
+
+function completePackOpen() {
+  packOverlayState.cards.forEach((_, index) => packOverlayState.revealedSet.add(index));
+  fillPackGrid();
+  if (hub.els.packRevealGrid) {
+    hub.els.packRevealGrid.querySelectorAll('.pack-card').forEach((card) => card.classList.add('is-revealed'));
+  }
+  if (hub.els.packRevealAll) hub.els.packRevealAll.hidden = true;
+  if (hub.els.packSave) hub.els.packSave.hidden = true;
+  if (hub.els.packEndActions) hub.els.packEndActions.hidden = false;
+  claimBoosterPackSilently();
+  togglePackView('grid');
 }
 
 function nextTheaterCard() {
-  const nextIdx = packOverlayState.currentIndex + 1;
-  if (nextIdx < packOverlayState.cards.length) {
-    renderTheaterCard(nextIdx);
-  } else {
-    claimBoosterPackSilently();
-    if (hub.els.packEndActions) hub.els.packEndActions.hidden = false;
-    togglePackView('grid');
+  if (packOverlayState.currentIndex >= packOverlayState.cards.length) {
+    completePackOpen();
+    return;
   }
+  dismissTopCard(1);
 }
 
 function prevTheaterCard() {
+  if (packOverlayState.animating) return;
   const prevIdx = packOverlayState.currentIndex - 1;
-  if (prevIdx >= 0) {
-    renderTheaterCard(prevIdx);
-  }
+  if (prevIdx >= 0) renderTheaterCard(prevIdx);
 }
 
 function togglePackView(forceMode) {
@@ -1110,16 +1449,16 @@ function togglePackView(forceMode) {
   packOverlayState.viewMode = targetMode;
 
   if (targetMode === 'grid') {
-    if (hub.els.packTheaterWrap) hub.els.packTheaterWrap.hidden = true;
-    if (hub.els.packRevealGrid) hub.els.packRevealGrid.hidden = false;
-    if (hub.els.packToggleViewText) hub.els.packToggleViewText.textContent = t('pack_theater_mode') || 'Modo cine';
+    fillPackGrid();
     setPackOverlayStage('grid');
+    if (hub.els.packToggleViewText) hub.els.packToggleViewText.textContent = t('pack_theater_mode') || 'Modo cine';
   } else {
-    if (hub.els.packTheaterWrap) hub.els.packTheaterWrap.hidden = false;
-    if (hub.els.packRevealGrid) hub.els.packRevealGrid.hidden = true;
-    if (hub.els.packToggleViewText) hub.els.packToggleViewText.textContent = t('pack_view_all') || 'Ver todas';
     setPackOverlayStage('theater');
+    const current = Math.min(packOverlayState.currentIndex, packOverlayState.cards.length - 1);
+    renderTheaterCard(Math.max(0, current));
+    if (hub.els.packToggleViewText) hub.els.packToggleViewText.textContent = t('pack_view_all') || 'Ver todas';
   }
+  syncPackTheaterHint();
 }
 
 function revealPackCard(index) {
@@ -1144,11 +1483,16 @@ function revealPackCard(index) {
 
 function revealAllPackCards() {
   clearPackTimers();
+  fillPackGrid();
   Array.from(hub.els.packRevealGrid.querySelectorAll('.pack-card')).forEach((card) => {
-    revealPackCard(Number(card.dataset.packCard));
+    card.classList.add('is-revealed');
   });
+  packOverlayState.cards.forEach((_, index) => packOverlayState.revealedSet.add(index));
   claimBoosterPackSilently();
+  if (hub.els.packRevealAll) hub.els.packRevealAll.hidden = true;
+  if (hub.els.packSave) hub.els.packSave.hidden = true;
   if (hub.els.packEndActions) hub.els.packEndActions.hidden = false;
+  togglePackView('grid');
 }
 
 function buildPackCard(card, index) {
@@ -1171,55 +1515,164 @@ function buildPackCard(card, index) {
   return button;
 }
 
+function triggerPackRip() {
+  if (packOverlayState.isBurst) return;
+  packOverlayState.isBurst = true;
+  if (hub.els.packSeal) hub.els.packSeal.classList.add('is-burst');
+  if (hub.els.packSealTriggerBtn) hub.els.packSealTriggerBtn.hidden = true;
+  if (hub.els.packOverlay) {
+    hub.els.packOverlay.classList.add('is-ripping');
+    window.setTimeout(() => {
+      if (hub.els.packOverlay) hub.els.packOverlay.classList.remove('is-ripping');
+    }, 900);
+  }
+  if (window.Sound) window.Sound.play('rip');
+  haptic([0, 26, 44, 20]);
+
+  const delay = reduceMotion() ? 120 : 650;
+  packOverlayState.timers.push(
+    window.setTimeout(() => {
+      setPackOverlayStage('theater');
+      buildPackStack();
+      renderTheaterCard(0);
+    }, delay)
+  );
+}
+
+/* En móvil las cartas se deslizan una sobre otra. */
+function setupPackCardSwipe() {
+  const stage = hub.els.packTheaterStage;
+  if (!stage || stage._hasSwipe) return;
+  stage._hasSwipe = true;
+
+  let active = false;
+  let pointerId = null;
+  let startX = 0;
+  let startY = 0;
+
+  const topCard = () => stage.querySelector('.pack-stack-card.is-top');
+
+  stage.addEventListener('pointerdown', (event) => {
+    if (packOverlayState.animating || packOverlayState.carouselBusy) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    const top = topCard();
+    if (!top) return;
+    active = true;
+    pointerId = event.pointerId;
+    startX = event.clientX;
+    startY = event.clientY;
+    packOverlayState.dragCard = top;
+    top.style.transition = 'none';
+    if (stage.setPointerCapture) {
+      try { stage.setPointerCapture(event.pointerId); } catch (error) { /* noop */ }
+    }
+  });
+
+  stage.addEventListener('pointermove', (event) => {
+    if (!active || event.pointerId !== pointerId) return;
+    const top = packOverlayState.dragCard;
+    if (!top) return;
+    const dx = event.clientX - startX;
+    const dy = event.clientY - startY;
+    if (Math.abs(dx) < 3 && Math.abs(dy) < 3) return;
+    top.style.transform = `translate3d(${dx}px, ${dy * 0.42}px, 0) rotate(${dx * 0.016}deg)`;
+    top.style.opacity = String(Math.max(0.5, 1 - Math.abs(dx) / 640));
+  });
+
+  const finish = (event) => {
+    if (!active || event.pointerId !== pointerId) return;
+    active = false;
+    const top = packOverlayState.dragCard;
+    packOverlayState.dragCard = null;
+    if (stage.releasePointerCapture) {
+      try { stage.releasePointerCapture(event.pointerId); } catch (error) { /* noop */ }
+    }
+    if (!top) return;
+    const dx = event.clientX - startX;
+    const dy = event.clientY - startY;
+    top.style.transition = 'transform 0.34s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.3s ease';
+    if (Math.abs(dx) > 64 || Math.abs(dy) > 64) {
+      packOverlayState.suppressTapUntil = Date.now() + 520;
+      dismissTopCard(dx >= 0 ? 1 : -1);
+    } else {
+      top.style.opacity = '1';
+      layoutPackStack();
+    }
+  };
+
+  stage.addEventListener('pointerup', finish);
+  stage.addEventListener('pointercancel', finish);
+  stage.addEventListener('pointerleave', (event) => {
+    if (!active || event.pointerId !== pointerId) return;
+    active = false;
+    const top = packOverlayState.dragCard;
+    packOverlayState.dragCard = null;
+    if (top) {
+      top.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+      top.style.opacity = '1';
+      layoutPackStack();
+    }
+  });
+}
+
+function updatePackStackHint() {
+  const hint = document.getElementById('pack-theater-tap-hint');
+  if (!hint) return;
+  const total = packOverlayState.cards.length;
+  const isLast = total > 0 && packOverlayState.currentIndex >= total - 1;
+  const key = isLast ? 'pack_stack_last' : 'pack_stack_hint';
+  hint.setAttribute('data-i18n', key);
+  hint.textContent = t(key) || hint.textContent;
+}
+
+function syncPackTheaterHint() {
+  updatePackStackHint();
+}
+
 function openPackOverlay() {
-  if (!hub.els.packOverlay || !hubBooster.picks.length) return;
-  const collection = HUB_CATALOG.collections.find((entry) => entry.id === hubBooster.setId);
+  if (!hub.els.packOverlay) return;
+  const collection = packCarouselCollection();
   if (!collection) return;
 
+  const resume = hubBooster.picks.length > 0;
   packOverlayState.cards = hubBooster.picks.slice();
   packOverlayState.grant = hubBooster.pendingGrant || null;
   packOverlayState.currentIndex = 0;
   packOverlayState.revealedSet = new Set();
   packOverlayState.isBurst = false;
   packOverlayState.viewMode = 'single';
+  packOverlayState.animating = false;
+  packOverlayState.carouselBusy = false;
+  packOverlayState.dragCard = null;
+  packOverlayState.suppressTapUntil = 0;
+  packOverlayState.suppressCarouselTapUntil = 0;
   clearPackTimers();
 
-  if (hub.els.packSealImg) {
-    hub.els.packSealImg.src = shopPackArt[collection.id] || collection.thumbCover || collection.cover || collection.cards[0]?.thumbFront || '';
-    hub.els.packSealImg.alt = collection.name;
-  }
-  if (hub.els.packSealName) hub.els.packSealName.textContent = collection.name;
-  if (hub.els.packSeal) hub.els.packSeal.classList.remove('is-burst');
-  if (hub.els.packSealWrap) hub.els.packSealWrap.hidden = false;
-  if (hub.els.packSealTriggerBtn) hub.els.packSealTriggerBtn.hidden = false;
-  if (hub.els.packTheaterWrap) hub.els.packTheaterWrap.hidden = true;
-  if (hub.els.packRevealGrid) {
-    hub.els.packRevealGrid.replaceChildren();
-    hub.els.packRevealGrid.hidden = true;
-  }
-  if (hub.els.packHeadMeta) hub.els.packHeadMeta.hidden = true;
-  if (hub.els.packToggleView) hub.els.packToggleView.hidden = true;
-  if (hub.els.packRevealAll) hub.els.packRevealAll.hidden = true;
-  if (hub.els.packSave) hub.els.packSave.hidden = true;
+  if (hub.els.packRevealGrid) hub.els.packRevealGrid.replaceChildren();
+  if (hub.els.packStack) hub.els.packStack.replaceChildren();
   if (hub.els.packEndActions) hub.els.packEndActions.hidden = true;
+  if (hub.els.packSave) hub.els.packSave.hidden = true;
+  if (hub.els.packRevealAll) hub.els.packRevealAll.hidden = true;
+  if (hub.els.packToggleView) hub.els.packToggleView.hidden = true;
 
   hub.els.packOverlay.hidden = false;
-  setPackOverlayStage('seal');
+  document.body.classList.add('pack-open');
   setupPackSealSwipe();
   setupPackCardSwipe();
+  setupPackCarouselControls();
   syncPackTheaterHint();
-  document.body.classList.add('pack-open');
-  if (window.Sound) window.Sound.play('booster');
-}
 
-/* En móvil la pista del teatro invita a deslizar, no a tocar. */
-function syncPackTheaterHint() {
-  const hint = document.getElementById('pack-theater-tap-hint');
-  if (!hint) return;
-  const isMobile = window.matchMedia('(max-width: 980px)').matches;
-  const key = isMobile ? 'pack_card_swipe_hint' : 'pack_card_reveal_tap';
-  hint.setAttribute('data-i18n', key);
-  hint.textContent = t(key) || hint.textContent;
+  if (resume) {
+    preparePackSeal(collection);
+    setPackOverlayStage('seal');
+    if (window.Sound) window.Sound.play('booster');
+    return;
+  }
+
+  buildPackCarousel();
+  setupPackCarouselSwipe();
+  setPackOverlayStage('carousel');
+  if (window.Sound) window.Sound.play('flip');
 }
 
 function openBoosterPack() {
@@ -1239,10 +1692,8 @@ function openBoosterPack() {
   if (!setId) return;
 
   hubBooster.setId = setId;
-  hubBooster.picks = drawBoosterCards(setId);
   hubBooster.pendingGrant = grant.id;
   persistBooster();
-  renderBooster();
   openPackOverlay();
 }
 
@@ -1907,10 +2358,8 @@ function openBoosterFromDetail() {
     const setId = hubBooster.setId || (boosterSets()[0] && boosterSets()[0].id);
     if (!setId) return;
     hubBooster.setId = setId;
-    hubBooster.picks = drawBoosterCards(setId);
     hubBooster.pendingGrant = grant.id;
     persistBooster();
-    renderBooster();
   }
   closeShopPackView();
   openPackOverlay();
@@ -6291,9 +6740,8 @@ function onHubClick(event) {
   }
 
   // Interacción con carta en teatro / siguiente carta (Pokémon Pocket style)
-  if (target.closest('#pack-theater-card') || target.closest('#pack-theater-next')) {
+  if (target.closest('#pack-theater-next')) {
     event.preventDefault();
-    if (target.closest('#pack-theater-card') && Date.now() < packOverlayState.suppressTapUntil) return;
     nextTheaterCard();
     return;
   }
@@ -7144,6 +7592,20 @@ function setupHubEvents() {
     closeCardViewer();
   });
 
+  /* Carrusel de sobres: flechas para girar, Enter para abrir el centrado. */
+  document.addEventListener('keydown', (event) => {
+    if (!hub.els.packOverlay || hub.els.packOverlay.hidden) return;
+    if (!hub.els.packCarouselWrap || hub.els.packCarouselWrap.hidden) return;
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+      event.preventDefault();
+      movePackCarousel(event.key === 'ArrowLeft' ? -1 : 1);
+    } else if (event.key === 'Enter' && !event.target.closest('button')) {
+      event.preventDefault();
+      selectPackFromCarousel();
+    }
+  });
+
   window.setInterval(updateBoosterClock, 1000);
   // Deshabilitar click derecho en modo escritorio
   document.addEventListener('contextmenu', (e) => {
@@ -7484,6 +7946,16 @@ function cacheHubDom() {
   els.viewerEdit = hubEl('card-viewer-edit');
   els.viewerClose = document.querySelector('.card-viewer-close');
   els.packOverlay = hubEl('pack-overlay');
+  els.packCarouselWrap = hubEl('pack-carousel-wrap');
+  els.packCarousel = hubEl('pack-carousel');
+  els.packCarouselTrack = hubEl('pack-carousel-track');
+  els.packCarouselPrev = hubEl('pack-carousel-prev');
+  els.packCarouselNext = hubEl('pack-carousel-next');
+  els.packCarouselOpen = hubEl('pack-carousel-open');
+  els.packCarouselCount = hubEl('pack-carousel-count');
+  els.packCarouselName = hubEl('pack-carousel-name');
+  els.packStack = hubEl('pack-stack');
+  els.packTheaterStage = hubEl('pack-theater-stage');
   els.packSeal = hubEl('pack-seal');
   els.packSealWrap = hubEl('pack-seal-wrap');
   els.packSealImg = hubEl('pack-seal-img');

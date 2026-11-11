@@ -19748,5 +19748,770 @@ button.explore-want-more:focus-visible {
   }
 }
 
+/* ==========================================================================
+   PACK OPENING · Carrusel de 11 sobres + pila deslizable (rev 321)
+   ========================================================================== */
+
+/* La apertura no scrollea: cada etapa ocupa la pantalla. */
+.pack-overlay.is-carousel-stage .pack-overlay-shell,
+.pack-overlay.is-theater-stage .pack-overlay-shell {
+  overflow: hidden !important;
+}
+
+/* ------------------------------------------------------------ Carrusel */
+.pack-carousel-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: min(76dvh, 660px);
+  animation: packCarouselIn 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transition: opacity 0.28s ease, transform 0.32s ease;
+}
+
+.pack-carousel-wrap.is-leaving {
+  opacity: 0;
+  transform: scale(1.04);
+}
+
+@keyframes packCarouselIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+.pack-carousel-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-align: center;
+}
+
+.pack-carousel-kicker {
+  font-size: 0.56rem;
+  font-weight: 900;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #7cebdd;
+  text-shadow: 0 0 16px rgba(0, 242, 254, 0.45);
+}
+
+.pack-carousel-title {
+  margin: 0;
+  font-size: clamp(1.05rem, 2.6vh, 1.5rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  text-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+}
+
+.pack-carousel-viewport {
+  position: relative;
+  width: 100%;
+  height: clamp(238px, 48vh, 430px);
+  perspective: 1500px;
+  perspective-origin: 50% 46%;
+  touch-action: pan-y;
+  cursor: grab;
+  overflow: hidden;
+}
+
+.pack-carousel-viewport:active {
+  cursor: grabbing;
+}
+
+.pack-carousel-viewport::before,
+.pack-carousel-viewport::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 14%;
+  z-index: 400;
+  pointer-events: none;
+}
+
+.pack-carousel-viewport::before {
+  left: 0;
+  background: linear-gradient(90deg, rgba(3, 16, 24, 0.55), transparent);
+}
+
+.pack-carousel-viewport::after {
+  right: 0;
+  background: linear-gradient(270deg, rgba(3, 16, 24, 0.55), transparent);
+}
+
+.pack-carousel-track {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.pack-carousel-item {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(120px, 26vh, 240px);
+  aspect-ratio: 300 / 420;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 13px;
+  background: transparent;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  transition: transform 0.46s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.32s ease;
+  filter: drop-shadow(0 24px 38px rgba(0, 0, 0, 0.55));
+  will-change: transform, opacity;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pack-carousel-track.is-dragging .pack-carousel-item {
+  transition: none;
+}
+
+.pack-carousel-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 13px;
+  pointer-events: none;
+}
+
+.pack-carousel-item.is-center {
+  filter:
+    drop-shadow(0 30px 48px rgba(0, 0, 0, 0.58))
+    drop-shadow(0 0 26px rgba(0, 242, 254, 0.4));
+}
+
+.pack-carousel-foil {
+  position: absolute;
+  inset: 0;
+  border-radius: 13px;
+  pointer-events: none;
+  background: linear-gradient(
+    118deg,
+    transparent 26%,
+    rgba(255, 255, 255, 0.5) 46%,
+    rgba(124, 235, 221, 0.35) 52%,
+    transparent 68%
+  );
+  background-size: 260% 260%;
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: packCarouselFoil 5.4s ease-in-out infinite;
+  animation-delay: var(--pack-delay, 0s);
+}
+
+.pack-carousel-item.is-center .pack-carousel-foil {
+  opacity: 0.55;
+}
+
+@keyframes packCarouselFoil {
+  0%, 100% { background-position: 130% 0%; opacity: 0.12; }
+  45% { background-position: -30% 40%; opacity: 0.5; }
+  55% { background-position: -30% 40%; opacity: 0.5; }
+}
+
+.pack-carousel-serial {
+  position: absolute;
+  left: 50%;
+  bottom: 7px;
+  transform: translateX(-50%);
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(3, 20, 28, 0.66);
+  border: 1px solid rgba(124, 235, 221, 0.5);
+  color: #eafffb;
+  font-size: 0.5rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.pack-carousel-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.pack-carousel-count {
+  color: #00f0ff;
+  font-weight: 900;
+  text-shadow: 0 0 12px rgba(0, 242, 254, 0.5);
+}
+
+.pack-carousel-name {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.pack-carousel-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pack-carousel-arrow {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.pack-carousel-arrow:hover {
+  background: rgba(0, 242, 254, 0.26);
+  border-color: rgba(124, 235, 221, 0.7);
+  transform: translateY(-1px);
+}
+
+.pack-carousel-arrow:disabled {
+  opacity: 0.32;
+  pointer-events: none;
+}
+
+.pack-carousel-arrow .icon {
+  width: 17px;
+  height: 17px;
+}
+
+.pack-carousel-open {
+  min-height: 44px;
+  padding: 0 28px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  box-shadow: 0 14px 30px rgba(0, 242, 254, 0.32);
+}
+
+.pack-carousel-hint {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 0.54rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+/* ------------------------------------------------------ Pila de cartas */
+.pack-theater-wrap {
+  width: 100%;
+  gap: 10px;
+}
+
+.pack-theater-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0 !important;
+  perspective: 1600px;
+  perspective-origin: 50% 55%;
+  touch-action: pan-y;
+}
+
+.pack-stack {
+  position: relative;
+  width: min(94vw, 430px, 46vh);
+  aspect-ratio: 567 / 760;
+  margin: 0 auto;
+  transform-style: preserve-3d;
+}
+
+.pack-stack-card {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #06131c;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.52);
+  cursor: grab;
+  touch-action: none;
+  transition: transform 0.5s cubic-bezier(0.2, 0.85, 0.25, 1), opacity 0.4s ease;
+  will-change: transform, opacity;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pack-stack-card.is-top {
+  cursor: grab;
+  box-shadow:
+    0 36px 72px rgba(0, 0, 0, 0.56),
+    0 0 36px rgba(0, 242, 254, 0.22);
+}
+
+.pack-stack-card.is-top:active {
+  cursor: grabbing;
+}
+
+.pack-stack-card.is-gone {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.pack-stack-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.pack-stack-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 38%,
+    rgba(0, 242, 254, 0.16) 54%,
+    transparent 72%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.55;
+}
+
+.pack-stack-card.rarity-legendary,
+.pack-stack-card.rarity-mythic {
+  border-color: rgba(255, 226, 140, 0.85);
+  box-shadow:
+    0 36px 72px rgba(0, 0, 0, 0.56),
+    0 0 42px rgba(255, 206, 92, 0.35);
+}
+
+.pack-theater-nav {
+  width: min(430px, 92vw) !important;
+  margin-top: 2px !important;
+}
+
+@media (max-width: 700px) {
+  .pack-carousel-wrap {
+    min-height: 0;
+    gap: 9px;
+  }
+
+  .pack-carousel-viewport {
+    height: clamp(210px, 40vh, 340px);
+  }
+
+  .pack-carousel-item {
+    width: clamp(122px, 26vh, 232px);
+  }
+
+  .pack-carousel-title {
+    font-size: 1.02rem;
+  }
+
+  .pack-carousel-hint {
+    font-size: 0.5rem;
+  }
+
+  .pack-carousel-arrow {
+    width: 36px;
+    height: 36px;
+  }
+
+  .pack-carousel-open {
+    min-height: 42px;
+    padding: 0 20px;
+    font-size: 0.66rem;
+  }
+
+  .pack-stack {
+    width: min(94vw, 46vh);
+  }
+
+  .pack-theater-nav {
+    width: min(94vw, 430px) !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .pack-carousel-count,
+  .pack-carousel-name {
+    font-size: 0.52rem;
+  }
+
+  .pack-carousel-actions {
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pack-carousel-foil {
+    animation: none;
+    opacity: 0.18;
+  }
+
+  .pack-carousel-wrap {
+    animation: none;
+  }
+
+  .pack-stack-card {
+    transition: opacity 0.18s ease;
+  }
+}
 
 
+/* ==========================================================================
+   PACK SEAL · Gesto de apertura: toca, sube y suelta al volver (rev 324)
+   - Tap o clic para agarrar el sobre.
+   - Desliza un poco hacia arriba: la banda superior se levanta.
+   - Al volver hacia abajo y soltar, el sobre se abre.
+   ========================================================================== */
+.pack-seal {
+  --pull-y: 0px;
+  --tear-y: 0px;
+  --tear-x: 0px;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.25s ease;
+}
+
+.pack-seal.is-grabbed {
+  animation: none !important;
+  transform: scale(0.985) !important;
+  transition: transform 0.14s ease !important;
+}
+
+.pack-seal.is-ready {
+  animation: packSealReady 2.2s cubic-bezier(0.4, 0, 0.3, 1) infinite !important;
+}
+
+@keyframes packSealReady {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  30% { transform: translate3d(0, -9px, 0) rotate(-0.7deg); }
+  62% { transform: translate3d(0, 2px, 0) rotate(0.4deg); }
+}
+
+.pack-seal.is-pulling {
+  animation: none !important;
+  transition: none !important;
+  transform: translate3d(0, var(--pull-y, 0px), 0) scale(1.012) !important;
+  filter: drop-shadow(0 18px 30px rgba(0, 242, 254, 0.3));
+}
+
+/* La banda superior se despega y deja ver el brillo de la abertura. */
+.pack-seal-tear {
+  transform: translate3d(var(--tear-x, 0px), var(--tear-y, 0px), 0);
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+}
+
+.pack-seal.is-pulling .pack-seal-tear {
+  transition: none;
+}
+
+.pack-seal-rip-fx {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 20.5%;
+  height: 12px;
+  z-index: 4;
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    50% 100% at 50% 50%,
+    rgba(255, 255, 255, 0.95),
+    rgba(124, 235, 221, 0.6) 45%,
+    transparent 78%
+  );
+  transform: translate3d(0, var(--tear-y, 0px), 0);
+  transition: opacity 0.18s ease;
+}
+
+.pack-seal.is-pulling .pack-seal-rip-fx,
+.pack-seal.is-grabbed .pack-seal-rip-fx {
+  opacity: 0.85;
+}
+
+.pack-seal.is-ready .pack-seal-rip-fx {
+  animation: packSealMouth 2.2s ease-in-out infinite;
+}
+
+@keyframes packSealMouth {
+  0%, 100% { opacity: 0.12; }
+  30% { opacity: 0.55; }
+}
+
+/* La flecha ahora invita a subir y volver a bajar. */
+.pack-seal-swipe-cue {
+  animation: packSwipeCueUpDown 1.8s ease-in-out infinite !important;
+}
+
+@keyframes packSwipeCueUpDown {
+  0% { transform: translateY(4px) rotate(45deg); opacity: 0.4; }
+  40%, 60% { transform: translateY(-7px) rotate(45deg); opacity: 1; }
+  100% { transform: translateY(4px) rotate(45deg); opacity: 0.4; }
+}
+
+.pack-seal-hint {
+  transition: opacity 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pack-seal.is-ready {
+    animation: none !important;
+  }
+
+  .pack-seal-swipe-cue {
+    animation: none !important;
+  }
+
+  .pack-seal.is-ready .pack-seal-rip-fx {
+    animation: none;
+    opacity: 0.3;
+  }
+}
+
+
+/* Asa de agarre: aparece al tocar y sube con el gesto. */
+.pack-seal-grip {
+  position: absolute;
+  left: 50%;
+  top: 9px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 24px;
+  border-radius: 999px;
+  background: rgba(4, 26, 36, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transform: translate3d(-50%, var(--tear-y, 0px), 0);
+  opacity: 0;
+  transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+}
+
+.pack-seal-grip-bar {
+  display: block;
+  width: 26px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 0 10px rgba(124, 235, 221, 0.7);
+}
+
+.pack-seal.is-ready .pack-seal-grip,
+.pack-seal.is-pulling .pack-seal-grip,
+.pack-seal.is-grabbed .pack-seal-grip {
+  opacity: 1;
+}
+
+.pack-seal.is-pulling .pack-seal-grip {
+  transition: opacity 0.18s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pack-seal-grip {
+    transition: opacity 0.18s ease;
+  }
+}
+
+
+/* ==========================================================================
+   PACK OPENING · Ritual: halo, destello y silencio visual (rev 326)
+   ========================================================================== */
+.pack-seal-wrap {
+  position: relative;
+}
+
+/* Halo que respira detrás del sobre */
+.pack-overlay.is-seal-stage .pack-seal-wrap::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(112vw, 660px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, rgba(0, 242, 254, 0.2) 0%, rgba(0, 242, 254, 0.08) 42%, transparent 68%);
+  filter: blur(6px);
+  animation: packHalo 6.4s ease-in-out infinite;
+}
+
+@keyframes packHalo {
+  0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.92); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.06); }
+}
+
+/* Entrada del sobre: sube y se asienta */
+.pack-overlay.is-seal-stage .pack-seal-wrap {
+  animation: packSealRise 0.62s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes packSealRise {
+  from { opacity: 0; transform: translateY(26px) scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Destello al rasgar */
+.pack-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.95), rgba(124, 235, 221, 0.5) 28%, transparent 60%);
+}
+
+.pack-overlay.is-ripping .pack-flash {
+  animation: packFlash 0.72s ease-out both;
+}
+
+@keyframes packFlash {
+  0% { opacity: 0; transform: scale(0.72); }
+  16% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.4); }
+}
+
+/* Teatro: la interfaz se retira, solo queda la carta */
+.pack-overlay.is-theater-stage .pack-overlay-close {
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+}
+
+.pack-overlay.is-theater-stage .pack-overlay-close:hover,
+.pack-overlay.is-theater-stage .pack-overlay-close:focus-visible {
+  opacity: 1;
+}
+
+.pack-overlay.is-theater-stage .pack-step-dots {
+  opacity: 0.75;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pack-overlay.is-seal-stage .pack-seal-wrap::before {
+    animation: none;
+    opacity: 0.6;
+  }
+
+  .pack-overlay.is-seal-stage .pack-seal-wrap {
+    animation: none;
+  }
+
+  .pack-overlay.is-ripping .pack-flash {
+    animation-duration: 0.2s;
+  }
+}
+
+
+/* ==========================================================================
+   PACK OPENING · El vacío alrededor del sobre (rev 327)
+   ========================================================================== */
+body.pack-open .shop-scene {
+  filter: blur(22px) brightness(0.38) saturate(0.85) !important;
+  transform: scale(1.06) !important;
+}
+
+.pack-overlay .pack-overlay-backdrop {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(6, 34, 46, 0.55) 0%, rgba(2, 12, 20, 0.95) 72%) !important;
+  backdrop-filter: blur(26px) saturate(1.15) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(1.15) !important;
+}
+
+/* El texto llega después del sobre: primer compás en silencio. */
+.pack-overlay.is-seal-stage .pack-seal-hint,
+.pack-overlay.is-seal-stage .pack-seal-swipe-cue {
+  animation: packHintIn 0.5s ease both;
+  animation-delay: 0.55s;
+}
+
+@keyframes packHintIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Durante el ritual no hay botones de desarrollo ni ruido del hub. */
+body.pack-open .dev-fab,
+body.pack-open #dev-toggle,
+body.pack-open .dev-trigger {
+  display: none !important;
+}
+
+.pack-overlay.is-seal-stage .pack-overlay-close {
+  opacity: 0.32;
+  transition: opacity 0.3s ease;
+}
+
+.pack-overlay.is-seal-stage .pack-overlay-close:hover,
+.pack-overlay.is-seal-stage .pack-overlay-close:focus-visible {
+  opacity: 1;
+}
+
+
+/* La lengüeta sigue al dedo sin salir del sobre. */
+.pack-seal-grip {
+  transform: translate3d(-50%, calc(var(--tear-y, 0px) * 0.32), 0);
+}
+
+/* La línea de apertura se enciende al tirar. */
+.pack-seal-rip-fx {
+  height: 14px !important;
+  top: 21% !important;
+  box-shadow: 0 0 26px rgba(124, 235, 221, 0.55);
+}
+
+.pack-seal.is-pulling .pack-seal-rip-fx,
+.pack-seal.is-grabbed .pack-seal-rip-fx {
+  opacity: 1;
+}
+
+/* Un hilo de luz marca el borde superior mientras se agarra. */
+.pack-seal::before {
+  content: "";
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 21.4%;
+  height: 1px;
+  z-index: 5;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+  opacity: 0;
+  transition: opacity 0.24s ease;
+  pointer-events: none;
+}
+
+.pack-seal.is-ready::before,
+.pack-seal.is-pulling::before,
+.pack-seal.is-grabbed::before {
+  opacity: 0.75;
+}
