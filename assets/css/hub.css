@@ -11206,7 +11206,7 @@ body.booting {
     right: auto;
     bottom: calc(24px + env(safe-area-inset-bottom));
     transform: translateX(-50%);
-    gap: 6px;
+    gap: 8px;
     padding: 0;
     background: transparent;
     border: 0;
@@ -11232,11 +11232,28 @@ body.booting {
   }
 
   .hub-mobile-menu-nav .hub-fab-btn {
-    width: 42px;
-    height: 42px;
+    width: 46px;
+    height: 46px;
     color: #07333f;
     border: 1px solid rgba(255, 255, 255, 0.96);
     box-shadow: 0 8px 18px rgba(8, 62, 82, 0.16), inset 0 1px 0 #ffffff;
+  }
+
+  /* Crear render: la cara del botón es la carta favorita del jugador. */
+  .hub-mobile-menu-nav .hub-fab-btn-studio {
+    overflow: visible;
+  }
+
+  .hub-mobile-menu-nav .hub-fab-btn-studio.has-favorite-art {
+    background-image: var(--fab-art, none) !important;
+    background-size: cover !important;
+    background-position: center 26% !important;
+    background-repeat: no-repeat !important;
+    color: transparent;
+  }
+
+  .hub-mobile-menu-nav .hub-fab-btn-studio.has-favorite-art .hub-fab-icon {
+    opacity: 0;
   }
 
   .hub-mobile-menu-nav .tone-a {
@@ -11265,8 +11282,8 @@ body.booting {
   }
 
   .hub-mobile-menu-nav .hub-fab-btn .hub-fab-icon {
-    width: 17px;
-    height: 17px;
+    width: 19px;
+    height: 19px;
   }
 }
 /* Selector de favoritas por set */
@@ -16515,10 +16532,15 @@ body:not(.is-home-route) .hub-mobile-quick {
   }
 
   .hub-home-panel .home-loose-card:hover,
-  .hub-home-panel .hub-stack-card:hover,
-  .hub-home-panel .hub-hand-deck-card:hover {
+  .hub-home-panel .hub-stack-card:hover {
     scale: 1.28;
     z-index: 90;
+  }
+
+  /* Las cartas apiladas detrás de la favorita no se maximizan al pasar el mouse. */
+  .hub-home-panel .hub-hand-deck-card:hover {
+    scale: 1;
+    z-index: auto;
   }
 
   .hub-home-panel .hub-favorite .hub-card-stage:hover {
@@ -17336,20 +17358,24 @@ body.welcome-open {
 
 /* --------------------------------------------------------------------------
    Explorar · tarjeta Sobre CardGram (misma familia que Plaza / Users Shop)
+   Mismo lenguaje visual: render limpio arriba y el nombre debajo.
    -------------------------------------------------------------------------- */
 .explore-about-card {
   cursor: pointer;
 }
 
+/* Sin velo oscuro: hereda el fondo de cristal de las demás tarjetas. */
 .explore-about-cover {
+  position: relative;
   background:
-    radial-gradient(80% 90% at 20% 10%, rgba(255, 255, 255, 0.4), transparent 60%),
-    linear-gradient(150deg, #0b5f6b, #07333f 65%, #04262f) !important;
+    radial-gradient(62% 78% at 50% 42%, rgba(122, 239, 227, 0.3), transparent 72%),
+    radial-gradient(90% 100% at 50% 120%, rgba(86, 176, 226, 0.22), transparent 70%),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.44), rgba(197, 238, 246, 0.3));
 }
 
 .explore-about-card .explore-shop-cover img {
-  object-fit: cover;
-  opacity: 0.95;
+  object-fit: contain;
+  opacity: 1;
 }
 
 .explore-about-fallback {
@@ -17360,18 +17386,14 @@ body.welcome-open {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  color: #e9fffb;
+  color: #04414b;
   text-align: center;
-}
-
-.explore-about-cover {
-  position: relative;
 }
 
 .explore-about-fallback .icon {
   width: 34px;
   height: 34px;
-  color: #7cebdd;
+  color: #0f7f8f;
 }
 
 .explore-about-fallback strong {
@@ -17388,15 +17410,21 @@ body.welcome-open {
   display: flex;
 }
 
+/* Avatar: retrato cuadrado de Azura, sin fondo ni icono. */
 .explore-about-avatar {
-  color: #05505c !important;
-  background: linear-gradient(160deg, #ffffff, rgba(124, 235, 221, 0.6)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.95);
+  padding: 0 !important;
+  overflow: hidden;
+  color: inherit !important;
+  background: #d8f6f3 !important;
+  border: 2px solid rgba(255, 255, 255, 0.96) !important;
+  box-shadow: 0 6px 14px rgba(8, 62, 82, 0.16) !important;
 }
 
-.explore-about-avatar .icon {
-  width: 16px;
-  height: 16px;
+.explore-about-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 /* --------------------------------------------------------------------------
@@ -17419,24 +17447,13 @@ body.welcome-open {
   }
 }
 
-/* Placeholder elegante mientras llega el render definitivo del botón. */
-.explore-about-cover::before {
-  content: '';
-  position: absolute;
-  inset: -30%;
-  background:
-    repeating-radial-gradient(circle at 50% 52%, rgba(124, 235, 221, 0.18) 0 1px, transparent 1px 46px),
-    conic-gradient(from 210deg at 50% 50%, rgba(124, 235, 221, 0.14), transparent 32%, rgba(255, 255, 255, 0.06) 62%, transparent 80%);
-  opacity: 0.9;
-  pointer-events: none;
-}
-
+/* Sin anillos decorativos: el render ya es limpio. */
 .explore-about-fallback {
   z-index: 1;
 }
 
 .explore-about-fallback strong {
-  text-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
 }
 
 .explore-about-fallback::after {
@@ -17446,7 +17463,7 @@ body.welcome-open {
   font-weight: 800;
   letter-spacing: 0.26em;
   text-transform: uppercase;
-  color: rgba(233, 255, 251, 0.66);
+  color: rgba(6, 59, 71, 0.6);
 }
 
 /* ==========================================================================
@@ -18718,6 +18735,12 @@ body.pack-open {
     max-width: 210px !important;
   }
 
+  /* Una sola caja creada: se centra en el ancho completo, sin columna huérfana. */
+  #created-grid {
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
+  }
+
   .deck-box-cover {
     height: 200px !important;
   }
@@ -19176,6 +19199,15 @@ html[data-inv-size="huge"] {
   height: 14px;
 }
 
+/* Inventario · misma pareja Volver/Inicio, pegada al encabezado */
+.hub-subnav-inventory {
+  margin: 4px auto 0;
+}
+
+.hub-subnav-inventory + .hub-view-head {
+  padding-top: 16px;
+}
+
 /* Explore · los 3 accesos en una sola fila simétrica (desktop) */
 @media (min-width: 981px) {
   #explore-hub-grid {
@@ -19393,6 +19425,205 @@ button.explore-want-more:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .shop-npc-img.is-active {
     animation: none;
+  }
+}
+
+/* ==========================================================================
+   REV 294 · Inicio de escritorio a lo ancho de la pantalla
+   El tablero ya no vive dentro de una columna estrecha: el lienzo ocupa el
+   ancho disponible y las cartas sueltas tienen sitio real alrededor.
+   ========================================================================== */
+@media (min-width: 981px) {
+  body.is-home-route .hub-scroll {
+    padding-left: clamp(10px, 1.3vw, 30px);
+    padding-right: clamp(10px, 1.3vw, 30px);
+  }
+
+  body.is-home-route .hub-shell {
+    width: 100%;
+    max-width: 1760px;
+    padding-inline: 0;
+  }
+
+  body.is-home-route .hub-home-panel[data-hub-panel="home"],
+  body.is-home-route .hub-home-panel[data-hub-panel="home"] .hub-dashboard {
+    width: 100%;
+  }
+}
+
+@media (min-width: 1500px) {
+  /* En pantallas anchas la favorita acompaña la escala del lienzo. */
+  .hub-favorite .hub-card-stage,
+  .hub-hand-deck-card {
+    width: min(
+      calc(clamp(400px, 28vw, 520px) * var(--hero-scale)),
+      calc((100dvh - 290px) * 0.7467),
+      100%
+    );
+  }
+}
+
+/* ==========================================================================
+   REV 297 · Rendimiento del lobby en móvil
+   En pantallas pequeñas se apagan los efectos que más castigan la GPU
+   (backdrop-filter, animaciones decorativas, sombras enormes) manteniendo
+   la misma identidad Aqua Glass.
+   ========================================================================== */
+@media (max-width: 980px) {
+  /* Fondo decorativo estático: sin animación, sin desenfoque y sin blend. */
+  body[data-view="hub"] .orb,
+  body[data-view="hub"] .bubble {
+    animation: none !important;
+    will-change: auto !important;
+    filter: none !important;
+  }
+
+  body[data-view="hub"] .aero-bg::after {
+    mix-blend-mode: normal;
+    opacity: 0.18;
+  }
+
+  /* Cristal sin backdrop-filter: capas translúcidas más sólidas. */
+  body[data-view="hub"] .hub-topbar,
+  body[data-view="hub"] .hub-player-panel,
+  body[data-view="hub"] .hub-explorer-panel,
+  body[data-view="hub"] .hub-fab-btn,
+  body[data-view="hub"] .hub-menu-btn,
+  body[data-view="hub"] .hub-music-btn,
+  body[data-view="hub"] .hub-layout-toggle,
+  body[data-view="hub"] .hub-card-surface,
+  body[data-view="hub"] .hub-showcase,
+  body[data-view="hub"] .hub-lang-menu,
+  body[data-view="hub"] .hub-sheet,
+  body[data-view="hub"] .hub-layout-dock {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Animaciones decorativas que no aportan información. */
+  body[data-view="hub"] .hub-orbit,
+  body[data-view="hub"] .hub-orbit span,
+  body[data-view="hub"] .hub-showcase-glow,
+  body[data-view="hub"] .card-holo,
+  body[data-view="hub"] .hub-vinyl,
+  body[data-view="hub"] .spinning-card-inner,
+  body[data-view="hub"] .hub-brand-pack,
+  body[data-view="hub"] .hub-kofi-ico,
+  body[data-view="hub"] .hub-card,
+  body[data-view="hub"] .hub-menu-btn,
+  body[data-view="hub"] .hub-music-btn svg,
+  body[data-view="hub"] .hub-brand-pack .icon {
+    animation: none !important;
+  }
+
+  body[data-view="hub"] .dev-toggle {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  body[data-view="hub"] .hub-veil {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Sombras contenidas: mismo relieve con menos área que repintar. */
+  body[data-view="hub"] .hub-player-panel,
+  body[data-view="hub"] .hub-explorer-panel,
+  body[data-view="hub"] .hub-card-surface,
+  body[data-view="hub"] .home-loose-card,
+  body[data-view="hub"] .hub-stack-card {
+    box-shadow: 0 10px 22px rgba(8, 62, 82, 0.14) !important;
+  }
+
+  /* El envoltorio de la carta no proyecta sombra: solo la superficie redondeada. */
+  body[data-view="hub"] .hub-showcase {
+    box-shadow: none !important;
+  }
+
+  /* Las tarjetas de álbum fuera de pantalla no se pintan. */
+  body[data-view="hub"] .hub-album-group {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 260px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-view="hub"] .orb,
+  body[data-view="hub"] .bubble,
+  body[data-view="hub"] .hub-orbit,
+  body[data-view="hub"] .hub-orbit span,
+  body[data-view="hub"] .hub-showcase-glow,
+  body[data-view="hub"] .hub-card,
+  body[data-view="hub"] .card-holo,
+  body[data-view="hub"] .hub-brand-pack {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   REV 305 · Inicio móvil · acciones rápidas junto al avatar
+   ========================================================================== */
+@media (max-width: 980px) {
+  body.is-home-route .hub-mobile-quick {
+    position: fixed;
+    top: var(--quick-top, 124px);
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    width: min(var(--quick-span, 250px), 88vw);
+    margin: 0;
+    padding: 0;
+    gap: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transform: translate(-50%, -50%);
+    z-index: 40;
+    pointer-events: none;
+  }
+
+  body.is-home-route .hub-mobile-quick-btn {
+    pointer-events: auto;
+  }
+}
+
+/* ==========================================================================
+   REV 305 · Navegación inferior móvil con etiqueta mínima
+   ========================================================================== */
+@media (max-width: 980px) {
+  .hub-fab-actions.hub-mobile-menu-nav {
+    bottom: calc(30px + env(safe-area-inset-bottom));
+    align-items: flex-start;
+  }
+
+  .hub-mobile-menu-nav .hub-fab-btn {
+    position: relative;
+    flex: 0 0 auto;
+  }
+
+  .hub-mobile-menu-nav .hub-fab-label {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.42rem;
+    font-weight: 900;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: #0a4c58;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0.72;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  .hub-mobile-menu-nav .hub-fab-btn-studio {
+    transform: scale(1);
+  }
+
+  .hub-mobile-menu-nav .hub-fab-btn-studio:hover {
+    transform: scale(1.04) translateY(-2px);
   }
 }
 

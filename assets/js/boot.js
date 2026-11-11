@@ -133,15 +133,28 @@
 
   async function boot() {
     try {
+      /* Fondos propios definidos desde el modo developer (si existen). */
+      let devCustom = [];
+      try {
+        const stored = JSON.parse(localStorage.getItem('cardgram.devmode.backgrounds.v1') || 'null');
+        if (stored && Array.isArray(stored.boot)) {
+          devCustom = stored.boot.filter((src) => typeof src === 'string');
+        }
+      } catch (error) {
+        devCustom = [];
+      }
+
       const response = await fetch('assets/data/loading/manifest.json', { cache: 'no-store' });
       const data = response.ok ? await response.json() : null;
       /* Mismo arte en desktop y responsivo: siempre las imágenes de escritorio. */
       const selected = data
         ? data.desktop || data.images || data.mobile || null
         : null;
-      const custom = selected
-        ? selected.filter((src) => typeof src === 'string')
-        : [];
+      const custom = devCustom.length
+        ? devCustom
+        : selected
+          ? selected.filter((src) => typeof src === 'string')
+          : [];
       /* Orden curado: el mismo salón visto desde realidades alternativas. */
       carousel.push(...(custom.length ? custom : fallback));
       images = carousel.concat(extra);

@@ -260,6 +260,7 @@ const hub = {
   explorerTimers: false,
   exploreCreatorId: null,
   explorePackId: null,
+  inventoryReturn: 'home',
   gachaIds: [],
   handDraft: [],
   handSetId: null,
@@ -1403,6 +1404,7 @@ function renderBoosterSetButtons(sets) {
 }
 
 const SHOP_VENDOR_SPRITES = Array.from({ length: 14 }, (_, index) => `assets/data/vendor/azura/webp/vendor-${index + 1}.webp`);
+const AZURA_DEFAULT_SPRITES = SHOP_VENDOR_SPRITES.slice();
 const SHOP_BACKGROUNDS = {
   dawn: 'assets/data/shop_assets/dawn.webp',
   day: 'assets/data/shop_assets/day.webp',
@@ -1472,6 +1474,9 @@ let azuraIsAway = false;
 let azuraAwayTimer = 0;
 let azuraPoseTimer = 0;
 let azuraPoseHistory = [];
+let azuraLastSwap = 0;
+let azuraAutoPaused = false;
+let azuraPace = 1;
 const AZURA_POSES = {
   leave: SHOP_VENDOR_SPRITES[13],
   enter: SHOP_VENDOR_SPRITES[0],
@@ -1479,12 +1484,116 @@ const AZURA_POSES = {
 };
 
 function pickAzuraPose() {
+  /* Las posturas de entrada/salida son solo para el saludo y la despedida:
+     nunca deben salir en el bucle autónomo o parece que Azura se marcha. */
+  const transitionFrames = [0, SHOP_VENDOR_SPRITES.length - 1];
   const pool = SHOP_VENDOR_SPRITES
     .map((src, index) => ({ src, index }))
+    .filter((entry) => !transitionFrames.includes(entry.index))
     .filter((entry) => entry.index !== shopVendorIndex && !azuraPoseHistory.includes(entry.index));
-  const list = pool.length ? pool : SHOP_VENDOR_SPRITES.map((src, index) => ({ src, index }));
+  const list = pool.length
+    ? pool
+    : SHOP_VENDOR_SPRITES
+        .map((src, index) => ({ src, index }))
+        .filter((entry) => !transitionFrames.includes(entry.index));
   return list[Math.floor(Math.random() * list.length)];
 }
+
+/* Aplica una pose concreta con el fundido existente. */
+function setAzuraPose(index, options) {
+  const opts = options || {};
+  if (!hub.els.shopNpcA || !hub.els.shopNpcB || azuraIsAway) return false;
+  /* Un cambio de pose nunca debe pisar al anterior: mínimo 4.5 s en escena. */
+  const now = performance.now();
+  if (!opts.force && azuraLastSwap && now - azuraLastSwap < 4500) return false;
+  const target = ((Number(index) % SHOP_VENDOR_SPRITES.length) + SHOP_VENDOR_SPRITES.length) % SHOP_VENDOR_SPRITES.length;
+  const next = shopVendorActive === 0 ? hub.els.shopNpcB : hub.els.shopNpcA;
+  const prev = shopVendorActive === 0 ? hub.els.shopNpcA : hub.els.shopNpcB;
+
+  next.src = SHOP_VENDOR_SPRITES[target];
+  next.classList.add('is-active');
+  prev.classList.remove('is-active');
+  shopVendorActive = shopVendorActive === 0 ? 1 : 0;
+  shopVendorIndex = target;
+  azuraLastSwap = now;
+  azuraPoseHistory.push(target);
+  if (azuraPoseHistory.length > 5) azuraPoseHistory.shift();
+
+  // No habla en cada cambio: solo de vez en cuando, para que se sienta viva.
+  if (!opts.silent && Math.random() < 0.28) speakShopLine('talk');
+  return true;
+}
+
+/* Bucle autónomo de posturas: cadencia irregular y siempre rearmado. */
+function queueAzuraPose() {
+  window.clearTimeout(azuraPoseTimer);
+  const delay = (6200 + Math.random() * 7600) * azuraPace;
+  azuraPoseTimer = window.setTimeout(() => {
+    try {
+      if (hub.panel === 'booster' && !document.hidden && !azuraAutoPaused) {
+        setAzuraPose(pickAzuraPose().index);
+      }
+    } finally {
+      /* El bucle se rearma siempre, aunque una pose falle. */
+      queueAzuraPose();
+    }
+  }, delay);
+}
+
+function setAzuraSprite(index, src) {
+  if (index < 0 || index >= SHOP_VENDOR_SPRITES.length || !src) return;
+  const old = SHOP_VENDOR_SPRITES[index];
+  SHOP_VENDOR_SPRITES[index] = src;
+  if (index === 0) AZURA_POSES.enter = src;
+  if (index === 13) AZURA_POSES.leave = src;
+  const annoyedIndex = AZURA_POSES.annoyed.indexOf(old);
+  if (annoyedIndex >= 0) AZURA_POSES.annoyed[annoyedIndex] = src;
+  [hub.els.shopNpcA, hub.els.shopNpcB].forEach((image) => {
+    if (image && image.getAttribute('src') === old) image.src = src;
+  });
+}
+
+window.CardGramAzura = {
+  get sprites() {
+    return SHOP_VENDOR_SPRITES.slice();
+  },
+  get defaults() {
+    return AZURA_DEFAULT_SPRITES.slice();
+  },
+  setSprite: setAzuraSprite,
+  restoreSprite(index) {
+    setAzuraSprite(index, AZURA_DEFAULT_SPRITES[index]);
+  },
+  setPose(index) {
+    return setAzuraPose(index, { silent: true });
+  },
+  setAuto(on) {
+    azuraAutoPaused = !on;
+    if (!azuraAutoPaused) {
+      window.clearTimeout(azuraPoseTimer);
+      azuraPoseTimer = window.setTimeout(() => {
+        if (hub.panel === 'booster' && !document.hidden && !azuraAutoPaused) setAzuraPose(pickAzuraPose().index);
+        queueAzuraPose();
+      }, 1200);
+    }
+  },
+  setPace(scale) {
+    azuraPace = scale === 'slow' ? 1.8 : scale === 'fast' ? 0.55 : 1;
+  },
+  getState() {
+    return { auto: !azuraAutoPaused, pace: azuraPace, index: shopVendorIndex, away: azuraIsAway };
+  },
+  debug() {
+    return {
+      panel: hub.panel,
+      hidden: document.hidden,
+      paused: azuraAutoPaused,
+      timer: azuraPoseTimer,
+      last: Math.round(azuraLastSwap),
+      history: azuraPoseHistory.slice()
+    };
+  }
+};
 
 
 function shopTimeSlot(date = new Date()) {
@@ -1648,13 +1757,10 @@ function triggerAzuraReturn() {
 }
 
 function scheduleAzuraAway() {
+  /* Azura ya no se marcha sola: el temporizador de inactividad la sacaba de
+     escena con opacidad 0 y no volvía nunca. Solo se va si se la llama. */
   window.clearTimeout(azuraAwayTimer);
-  // Cuando no se usa por un periodo largo (35 segundos sin interacción en la tienda)
-  azuraAwayTimer = window.setTimeout(() => {
-    if (hub.panel === 'booster' && !document.hidden) {
-      triggerAzuraLeave();
-    }
-  }, 35000);
+  azuraAwayTimer = 0;
 }
 
 function handleAzuraTap() {
@@ -1713,39 +1819,6 @@ function initShopScene() {
     hub.els.shopNpcB.classList.remove('is-active');
   }
   azuraPoseHistory = [shopVendorIndex];
-
-  /* Cambio de postura autónomo: orden aleatorio y cadencia irregular. */
-  const swap = () => {
-    if (!hub.els.shopNpcA || !hub.els.shopNpcB || azuraIsAway) return;
-    const nextPose = pickAzuraPose();
-    shopVendorIndex = nextPose.index;
-    azuraPoseHistory.push(shopVendorIndex);
-    if (azuraPoseHistory.length > 5) azuraPoseHistory.shift();
-
-    const next = shopVendorActive === 0 ? hub.els.shopNpcB : hub.els.shopNpcA;
-    const prev = shopVendorActive === 0 ? hub.els.shopNpcA : hub.els.shopNpcB;
-
-    // Variación sutil: respiración con duración y desfase propios de cada pose.
-    next.style.animationDuration = `${(5.1 + Math.random() * 1.8).toFixed(2)}s`;
-    next.style.animationDelay = `${(-Math.random() * 2).toFixed(2)}s`;
-    next.src = SHOP_VENDOR_SPRITES[shopVendorIndex];
-    next.classList.add('is-active');
-    prev.classList.remove('is-active');
-    shopVendorActive = shopVendorActive === 0 ? 1 : 0;
-
-    // No habla en cada cambio: solo de vez en cuando, para que se sienta viva.
-    if (Math.random() < 0.28) speakShopLine('talk');
-  };
-
-  const queueAzuraPose = () => {
-    window.clearTimeout(azuraPoseTimer);
-    // Intervalos irregulares: a veces se mueve pronto, a veces se queda quieta.
-    const delay = 6200 + Math.random() * 7600;
-    azuraPoseTimer = window.setTimeout(() => {
-      if (hub.panel === 'booster' && !document.hidden) swap();
-      queueAzuraPose();
-    }, delay);
-  };
 
   if (hub.els.shopSpeech) {
     typeShopLine((SHOP_LINES[shopLang()] || SHOP_LINES.en)[0]);
@@ -1955,6 +2028,7 @@ function renderBooster() {
   const pending = hubBooster.picks.length > 0;
 
   initShopScene();
+  queueAzuraPose();
   renderShopRecommended(sets);
   renderBoosterSetButtons(sets);
 
@@ -2845,6 +2919,16 @@ function renderFavoriteCard() {
     hub.els.card.setAttribute('aria-pressed', 'false');
   }
 
+  /* La acción «crear render» del móvil lleva la cara de la carta favorita. */
+  const studioFab = hub.root.querySelector('.hub-fab-btn-studio');
+  if (studioFab) {
+    const art = thumbOf(card);
+    if (art) {
+      studioFab.style.setProperty('--fab-art', `url("${new URL(art, document.baseURI).href}")`);
+      studioFab.classList.add('has-favorite-art');
+    }
+  }
+
   syncFavoriteMarks();
 }
 
@@ -3333,6 +3417,8 @@ function renderHomeTable() {
     );
   }
   syncHomeCardScale();
+  /* El avatar cambia de sitio al renderizar: recalcula las acciones rápidas. */
+  [0, 260, 900].forEach((ms) => window.setTimeout(syncMobileQuick, ms));
 }
 
 /* Iguala el tamaño de las cartas secundarias (mano y cartas sueltas) al del
@@ -3360,12 +3446,32 @@ function syncHomeCardScale() {
   }
 }
 
+/* Coloca las acciones rápidas del inicio móvil a los lados del avatar. */
+function syncMobileQuick() {
+  const quick = document.getElementById('hub-mobile-quick');
+  const avatar = document.getElementById('hub-player-avatar');
+  if (!quick || !avatar) return;
+  if (window.innerWidth > 980) {
+    document.documentElement.style.removeProperty('--quick-top');
+    document.documentElement.style.removeProperty('--quick-span');
+    return;
+  }
+  const rect = avatar.getBoundingClientRect();
+  if (!rect.width) return;
+  document.documentElement.style.setProperty('--quick-top', `${Math.round(rect.top + rect.height / 2)}px`);
+  document.documentElement.style.setProperty('--quick-span', `${Math.round(rect.width + 118)}px`);
+}
+
 function initHomeTable() {
   hubHome = sanitizeHome(storage.read(HUB_STORAGE.home, null));
   renderHomeTable();
+  syncMobileQuick();
   window.addEventListener('resize', () => {
     window.clearTimeout(initHomeTable.scaleTimer);
-    initHomeTable.scaleTimer = window.setTimeout(syncHomeCardScale, 120);
+    initHomeTable.scaleTimer = window.setTimeout(() => {
+      syncHomeCardScale();
+      syncMobileQuick();
+    }, 120);
   }, { passive: true });
 }
 
@@ -3734,9 +3840,19 @@ function startExplorerTimers() {
   if (hub.explorerTimers) return;
   hub.explorerTimers = true;
 
+  let tick = 0;
   window.setInterval(() => {
     if (hub.explorerMode !== 'gacha' || hub.panel !== 'home') return;
     if (document.body.dataset.view !== 'hub') return;
+    /* Pestaña en segundo plano: no tiene sentido repintar. */
+    if (document.hidden) return;
+    /* Mano oculta (otra pestaña del panel) o sin nodo: nada que refrescar. */
+    const hand = hub.els.explorerHand;
+    if (!hand || !hand.getClientRects().length) return;
+    tick += 1;
+    /* En móvil el cambio de mano se hace cada 15 s para no castigar el pintado. */
+    const slow = window.matchMedia('(max-width: 980px)').matches;
+    if (slow && tick % 3 !== 0) return;
     refreshGacha();
   }, 5000);
 }
@@ -5207,7 +5323,11 @@ function makeExploreAboutCard() {
 
   const body = makeNode('span', 'explore-shop-body');
   const avatar = makeNode('span', 'explore-shop-avatar explore-about-avatar');
-  avatar.appendChild(hubIcon('info'));
+  const face = makeHubImage('assets/data/explore/azura-avatar.jpg', 'Azura');
+  face.addEventListener('error', () => {
+    avatar.replaceChildren(hubIcon('info'));
+  }, { once: true });
+  avatar.appendChild(face);
   body.appendChild(avatar);
 
   const copy = makeNode('span', 'explore-creator-copy');
@@ -5700,6 +5820,10 @@ function closeCardViewer(options = {}) {
 
 function setActivePanel(panel, options = {}) {
   const target = panel === 'library' ? 'collections' : HUB_PANELS.includes(panel) ? panel : 'home';
+  /* Recuerda desde dónde entramos al Inventario para que "Volver" regrese ahí. */
+  if (target === 'collections' && hub.panel && hub.panel !== 'collections') {
+    hub.inventoryReturn = hub.panel;
+  }
   hub.panel = target;
   if (target !== 'explore') {
     hub.exploreCreatorId = null;
@@ -6428,6 +6552,14 @@ function onHubClick(event) {
 
   if (target.closest('[data-collection-back]') || target.closest('[data-deck-back]')) {
     navigate('collections');
+    return;
+  }
+
+  if (target.closest('[data-collections-back]')) {
+    /* En un detalle vuelve a la lista; si ya estamos en la lista, vuelve a la
+       sección desde la que entramos (Shop, Explorar, Inicio…). */
+    if (hub.collectionId || hub.deckId) navigate('collections');
+    else navigate(hub.inventoryReturn && hub.inventoryReturn !== 'collections' ? hub.inventoryReturn : 'home');
     return;
   }
 
