@@ -13053,6 +13053,57 @@ body:not(.is-home-route) .hub-mobile-quick {
   animation: bootMarkFloat 3.8s ease-in-out infinite;
 }
 
+/* Brillo y destello: el logo respira mientras se carga todo. */
+.boot-mark {
+  position: relative;
+  overflow: hidden;
+  animation: bootMarkFloat 3.8s ease-in-out infinite, bootMarkGlow 4.6s ease-in-out infinite;
+}
+
+.boot-mark::after {
+  content: '';
+  position: absolute;
+  inset: -20% -60%;
+  background: linear-gradient(
+    115deg,
+    transparent 34%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 66%
+  );
+  transform: translateX(-120%);
+  animation: bootMarkShine 3.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes bootMarkGlow {
+  0%, 100% {
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.38), 0 0 0 0 rgba(124, 235, 221, 0),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 22px 44px rgba(0, 0, 0, 0.42), 0 0 26px 6px rgba(124, 235, 221, 0.42),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+}
+
+@keyframes bootMarkShine {
+  0%, 12% { transform: translateX(-120%); }
+  55%, 100% { transform: translateX(120%); }
+}
+
+/* Versión compacta para la veladura de carga del estudio. */
+.cg-loader-mark {
+  width: 54px;
+  height: 70px;
+  margin-bottom: 2px;
+  border-radius: 11px;
+}
+
+.cg-loader-mark .boot-mark-svg {
+  width: 40px;
+  height: 40px;
+}
+
 .boot-mark-inner {
   display: flex;
   align-items: center;
@@ -19624,6 +19675,76 @@ button.explore-want-more:focus-visible {
 
   .hub-mobile-menu-nav .hub-fab-btn-studio:hover {
     transform: scale(1.04) translateY(-2px);
+  }
+}
+
+/* ==========================================================================
+   REV 312 · Navegación por deslizamiento y entrada en cascada
+   ========================================================================== */
+
+/* --- Deslizar entre secciones (solo móvil, lo activa hub.js) -------------- */
+.hub-main {
+  will-change: auto;
+}
+
+.hub-main.is-swiping {
+  will-change: transform, opacity;
+  touch-action: pan-y;
+}
+
+@keyframes hubSlideInFromRight {
+  from {
+    transform: translate3d(46%, 0, 0);
+    opacity: 0.12;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes hubSlideInFromLeft {
+  from {
+    transform: translate3d(-46%, 0, 0);
+    opacity: 0.12;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+.hub-main.is-slide-in-right {
+  animation: hubSlideInFromRight 380ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.hub-main.is-slide-in-left {
+  animation: hubSlideInFromLeft 380ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+/* --- Entrada en cascada: renders → textos → resto ------------------------- */
+@keyframes cgCascadeIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.cg-in {
+  animation: cgCascadeIn 560ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation-delay: var(--cg-delay, 0ms);
+}
+
+/* La cascada solo tiene sentido en pantallas que pueden permitírsela. */
+@media (prefers-reduced-motion: reduce) {
+  .cg-in,
+  .hub-main.is-slide-in-right,
+  .hub-main.is-slide-in-left {
+    animation: none !important;
   }
 }
 

@@ -131,6 +131,36 @@
     hint.textContent = 'Todo listo para comenzar';
   }
 
+  function wait(ms) {
+    return new Promise((resolve) => window.setTimeout(resolve, ms));
+  }
+
+  /* El lobby tiene que estar montado (y sus fuentes listas) antes de dejar
+     entrar: así nada aparece a medio dibujar detrás del logo. */
+  function waitForHub(timeout) {
+    return new Promise((resolve) => {
+      if (window.CardGramHubReady) {
+        resolve();
+        return;
+      }
+      let done = false;
+      const end = () => {
+        if (done) return;
+        done = true;
+        window.clearTimeout(waitForHub.timer);
+        resolve();
+      };
+      document.addEventListener('cardgram:hubready', end, { once: true });
+      waitForHub.timer = window.setTimeout(end, timeout || 9000);
+    });
+  }
+
+  function waitForFonts() {
+    return document.fonts && document.fonts.ready ? document.fonts.ready.catch(() => {}) : Promise.resolve();
+  }
+
+  const bootStartedAt = Date.now();
+
   async function boot() {
     try {
       /* Fondos propios definidos desde el modo developer (si existen). */
@@ -176,6 +206,11 @@
       updateRealityTag();
       carouselTimer = window.setInterval(playCarousel, 7200);
     }
+    if (hint) hint.textContent = 'Preparando tu estudio…';
+    await Promise.all([waitForHub(9000), waitForFonts()]);
+    /* Un respiro mínimo para que el logo se disfrute: nunca menos de 1.2 s. */
+    await wait(Math.max(0, 1200 - (Date.now() - bootStartedAt)));
+    if (hint) hint.textContent = 'Todo listo para comenzar';
     finish();
   }
 
@@ -185,6 +220,8 @@
     document.body.classList.remove('booting');
     if (window.Music && typeof window.Music.start === 'function') window.Music.start();
     if (window.Sound) window.Sound.play('success');
+    /* La primera pantalla del lobby entra en cascada mientras se desvela. */
+    window.setTimeout(() => document.dispatchEvent(new CustomEvent('cardgram:hubenter')), 120);
     window.setTimeout(() => {
       overlay.hidden = true;
       window.clearInterval(carouselTimer);

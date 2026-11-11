@@ -5904,6 +5904,10 @@ function setActivePanel(panel, options = {}) {
   if (options.scroll !== false) {
     hub.scroll.scrollTo({ top: 0, behavior: 'auto' });
   }
+
+  /* Entrada en cascada: primero los renders, después los textos y el resto. */
+  const cascadePanel = hub.root.querySelector(`.hub-panel[data-hub-panel="${target}"]`);
+  window.requestAnimationFrame(() => playPanelCascade(cascadePanel));
 }
 
 function showHub(panel) {
@@ -5923,7 +5927,8 @@ function showHub(panel) {
   renderHubIdentity();
 }
 
-function navigate(route) {
+function navigate(route, options) {
+  const opts = options || {};
   let clean = String(route || 'home').replace(/^#?\/*/, '');
   if (clean === 'library') clean = 'collections';
   const hash = `#/${clean}`;
@@ -5940,8 +5945,16 @@ function navigate(route) {
     location.hash = hash;
     return;
   }
-  if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.startViewTransition(() => applyRoute());
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (document.startViewTransition && !reduced && !opts.instant) {
+    try {
+      const transition = document.startViewTransition(() => applyRoute());
+      /* Una transición interrumpida por otra navegación no debe ensuciar la consola. */
+      if (transition && transition.finished) transition.finished.catch(() => {});
+      if (transition && transition.ready) transition.ready.catch(() => {});
+    } catch (error) {
+      applyRoute();
+    }
   } else {
     applyRoute();
   }
@@ -7149,6 +7162,239 @@ function setupHubEvents() {
     e.preventDefault();
   });
 
+  setupMobileSwipe();
+
+  /* La cascada de la primera pantalla se lanza al salir del arranque:
+     si no, se reproduciría detrás del logo y nadie la vería. */
+  document.addEventListener('cardgram:hubenter', () => {
+    if (document.body.dataset.view !== 'hub') return;
+    const active = hub.root.querySelector('.hub-panel.active:not([hidden])');
+    playPanelCascade(active);
+  });
+}
+
+/* --------------------------------------------------------------------------
+   Entrada en cascada de los paneles
+   Los renders aparecen primero, luego los textos y por último el resto.
+   -------------------------------------------------------------------------- */
+const CASCADE_WAVES = [
+  {
+    selector: 'img, .explore-shop-cover, .shop-pack-art, .deck-box-card, .hub-card-surface, .hub-brand-pack, .hub-empty-icon',
+    base: 0,
+    step: 34,
+    max: 14
+  },
+  {
+    selector: 'h1, h2, h3, .hub-section-head, .hub-view-copy, .hub-subnav, .hub-empty h2, .hub-empty p',
+    base: 160,
+    step: 28,
+    max: 12
+  },
+  {
+    selector: '.hub-card-grid, .hub-deck-grid, .explore-creator-list, .plaza-grid, .hub-empty, .shop-recommended, .shop-stores, .hub-stats, .hub-rail, .hub-mobile-quick, button, .hub-count-pill',
+    base: 270,
+    step: 24,
+    max: 14
+  }
+];
+let cascadeTimer = 0;
+
+function playPanelCascade(panel) {
+  if (!panel || !panel.isConnected) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  /* Los paneles ocultos no se animan: se vería un parpadeo al mostrarse. */
+  if (panel.hidden) return;
+  /* Durante el arranque la cascada quedaría tapada por el logo: se lanza al entrar. */
+  const boot = document.getElementById('boot-screen');
+  if (boot && !boot.hidden && !boot.classList.contains('is-leaving')) return;
+
+  /* Una cascada interrumpida no debe dejar clases pegadas: bloquearían el
+     hover de las tarjetas al quedar la animación en su estado final. */
+  clearPanelCascade();
+
+  const picked = [];
+  const seen = new Set();
+  CASCADE_WAVES.forEach((wave) => {
+    let count = 0;
+    panel.querySelectorAll(wave.selector).forEach((node) => {
+      if (count >= wave.max) return;
+      if (seen.has(node)) return;
+      /* Nada dentro de otro nodo animado: la cascada perdería el orden. */
+      if (picked.some((parent) => parent !== node && parent.contains(node))) return;
+      seen.add(node);
+      picked.push(node);
+      node.style.setProperty('--cg-delay', `${wave.base + count * wave.step}ms`);
+      node.classList.add('cg-in');
+      count += 1;
+    });
+  });
+
+  cascadeTimer = window.setTimeout(clearPanelCascade, 1500);
+}
+
+function clearPanelCascade() {
+  window.clearTimeout(cascadeTimer);
+  document.querySelectorAll('.cg-in').forEach((node) => {
+    node.classList.remove('cg-in');
+    node.style.removeProperty('--cg-delay');
+  });
+}
+
+/* --------------------------------------------------------------------------
+   Navegación por deslizamiento (móvil)
+   -------------------------------------------------------------------------- */
+const HUB_SWIPE_ROUTES = ['home', 'booster', 'collections', 'explore'];
+let hubSwipe = null;
+
+function hubMainEl() {
+  return document.getElementById('hub-main');
+}
+
+function canSwipePanels() {
+  if (window.innerWidth > 980) return false;
+  if (document.body.dataset.view !== 'hub') return false;
+  if (!hub.ready) return false;
+  if (HUB_SWIPE_ROUTES.indexOf(hub.panel) === -1) return false;
+  if (hub.panel === 'collections' && (hub.collectionId || hub.deckId)) return false;
+  if (hub.exploreCreatorId || hub.explorePackId || hub.exploreRoadmapOpen) return false;
+  if (document.querySelector('.hub-menu:not([hidden]), .hub-card-sheet:not([hidden]), dialog[open]')) return false;
+  return true;
+}
+
+function swipeFromBlockedNode(node) {
+  if (!(node instanceof Element)) return true;
+  const stop = document.getElementById('hub-main');
+  for (let el = node; el && el !== document.body; el = el.parentElement) {
+    if (
+      el.matches(
+        '.hub-showcase, .hub-card, .hub-card-surface, .shop-npc, .shop-pack, .hub-menu-panel, input, textarea, select, [data-no-swipe]'
+      )
+    ) {
+      return true;
+    }
+    if (el.scrollWidth > el.clientWidth + 12) {
+      const overflowX = window.getComputedStyle(el).overflowX;
+      if (overflowX === 'auto' || overflowX === 'scroll') return true;
+    }
+    if (el === stop) break;
+  }
+  return false;
+}
+
+function resetHubSwipe(main) {
+  if (!main) return;
+  main.style.transition = 'transform 280ms cubic-bezier(0.22, 0.61, 0.36, 1), opacity 280ms ease';
+  main.style.transform = 'translate3d(0,0,0)';
+  main.style.opacity = '1';
+  window.clearTimeout(resetHubSwipe.timer);
+  resetHubSwipe.timer = window.setTimeout(() => {
+    main.style.transition = '';
+    main.style.transform = '';
+    main.style.opacity = '';
+    main.classList.remove('is-swiping');
+  }, 300);
+}
+
+function slideHubTo(route, direction, main) {
+  const el = main || hubMainEl();
+  if (!el) {
+    navigate(route);
+    return;
+  }
+  el.classList.add('is-swiping');
+  el.style.transition = 'transform 230ms cubic-bezier(0.4, 0, 1, 1), opacity 230ms ease';
+  el.style.transform = `translate3d(${direction > 0 ? -46 : 46}%,0,0)`;
+  el.style.opacity = '0.12';
+
+  window.setTimeout(() => {
+    navigate(route, { instant: true });
+    el.style.transition = 'none';
+    el.style.transform = '';
+    el.style.opacity = '';
+    el.classList.remove('is-swiping');
+    const enter = direction > 0 ? 'is-slide-in-right' : 'is-slide-in-left';
+    el.classList.remove('is-slide-in-right', 'is-slide-in-left');
+    void el.offsetWidth;
+    el.classList.add(enter);
+    window.setTimeout(() => el.classList.remove(enter), 460);
+  }, 220);
+}
+
+function setupMobileSwipe() {
+  const root = hub.root;
+  if (!root || root.dataset.swipeBound === '1') return;
+  root.dataset.swipeBound = '1';
+
+  root.addEventListener(
+    'touchstart',
+    (event) => {
+      if (event.touches.length !== 1 || !canSwipePanels()) {
+        hubSwipe = null;
+        return;
+      }
+      if (swipeFromBlockedNode(event.target)) {
+        hubSwipe = null;
+        return;
+      }
+      const touch = event.touches[0];
+      hubSwipe = {
+        x: touch.clientX,
+        y: touch.clientY,
+        dx: 0,
+        dy: 0,
+        lock: null,
+        time: performance.now(),
+        main: hubMainEl()
+      };
+    },
+    { passive: true }
+  );
+
+  root.addEventListener(
+    'touchmove',
+    (event) => {
+      if (!hubSwipe || !hubSwipe.main || event.touches.length !== 1) return;
+      const touch = event.touches[0];
+      hubSwipe.dx = touch.clientX - hubSwipe.x;
+      hubSwipe.dy = touch.clientY - hubSwipe.y;
+      if (!hubSwipe.lock) {
+        if (Math.abs(hubSwipe.dx) < 10 && Math.abs(hubSwipe.dy) < 10) return;
+        hubSwipe.lock = Math.abs(hubSwipe.dx) > Math.abs(hubSwipe.dy) * 1.15 ? 'x' : 'y';
+        if (hubSwipe.lock === 'x') hubSwipe.main.classList.add('is-swiping');
+      }
+      if (hubSwipe.lock !== 'x') return;
+      const width = window.innerWidth || 390;
+      const damped = Math.max(-width * 0.34, Math.min(width * 0.34, hubSwipe.dx * 0.45));
+      hubSwipe.main.style.transform = `translate3d(${damped}px,0,0)`;
+      hubSwipe.main.style.opacity = String(Math.max(0.55, 1 - Math.abs(damped) / width));
+    },
+    { passive: true }
+  );
+
+  const finishSwipe = () => {
+    const state = hubSwipe;
+    hubSwipe = null;
+    if (!state || !state.main) return;
+    if (state.lock !== 'x') {
+      resetHubSwipe(state.main);
+      return;
+    }
+    const width = window.innerWidth || 390;
+    const elapsed = performance.now() - state.time;
+    const fast = Math.abs(state.dx) > 26 && elapsed < 300;
+    const far = Math.abs(state.dx) > Math.min(96, width * 0.22);
+    const direction = state.dx < 0 ? 1 : -1;
+    const nextIndex = HUB_SWIPE_ROUTES.indexOf(hub.panel) + direction;
+    const commit = (fast || far) && nextIndex >= 0 && nextIndex < HUB_SWIPE_ROUTES.length;
+    if (!commit) {
+      resetHubSwipe(state.main);
+      return;
+    }
+    slideHubTo(HUB_SWIPE_ROUTES[nextIndex], direction, state.main);
+  };
+
+  root.addEventListener('touchend', finishSwipe, { passive: true });
+  root.addEventListener('touchcancel', finishSwipe, { passive: true });
 }
 
 /* --------------------------------------------------------------------------
@@ -7486,6 +7732,8 @@ function setupHub() {
   renderHubStats(false);
   refreshCardRatios();
   warmThreeInIdle();
+  window.CardGramHubReady = true;
+  document.dispatchEvent(new CustomEvent('cardgram:hubready'));
 }
 
 window.addEventListener('load', () => {

@@ -2386,6 +2386,9 @@ input[type="range"]::-moz-range-thumb {
   to { transform: rotate(360deg); }
 }
 
+/* Logo animado como indicador de carga (misma marca que la pantalla de inicio) */
+
+
 .loading-title {
   font-size: 0.78rem;
   font-weight: 800;
@@ -2398,7 +2401,7 @@ input[type="range"]::-moz-range-thumb {
   color: var(--muted);
 }
 
-#loading-veil.is-error .spinner {
+#loading-veil.is-error .cg-loader-mark {
   display: none;
 }
 
