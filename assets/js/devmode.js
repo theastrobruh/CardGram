@@ -33,12 +33,24 @@
     azura: { slots: {}, auto: true, pace: 'normal' },
     backgrounds: { hub: null, hubVeil: 35, boot: [] },
     tab: 'inspector',
+    query: '',
     hover: null
   };
+
+  const NAV = [
+    { id: 'inspector', icon: '◎', label: 'Inspector', sub: 'Editar el elemento activo' },
+    { id: 'azura', icon: '✦', label: 'Azura', sub: 'Poses, ritmo y sprites' },
+    { id: 'assets', icon: '▣', label: 'Assets', sub: 'Imágenes e iconos' },
+    { id: 'backgrounds', icon: '▤', label: 'Fondos', sub: 'Inicio y bienvenida' }
+  ];
 
   let panel;
   let panelBody;
   let tabsEl;
+  let toolbarEl;
+  let toolbarSearch;
+  let toolbarCount;
+  let tabInfoEl;
   let toggleBtn;
   let hoverBox;
   let selectedBox;
@@ -49,6 +61,7 @@
   let lockError;
   let saveTimer = 0;
   let controls = [];
+  const sectionState = {};
 
   /* ------------------------------------------------------------------ utils */
   function el(tag, className, text) {
@@ -465,8 +478,7 @@
     );
 
     /* --- Inicio --- */
-    panelBody.appendChild(el('span', 'dev-subhead', 'Inicio · fondo'));
-
+    const hubSection = makeSection('Inicio · fondo', true, state.backgrounds.hub ? 'personalizado' : 'original');
     const hubRow = el('div', 'dev-bg-row');
     const hubPreview = el('div', 'dev-bg-preview');
     if (state.backgrounds.hub) {
@@ -506,7 +518,7 @@
       hubActions.appendChild(reset);
     }
     hubRow.appendChild(hubActions);
-    panelBody.appendChild(hubRow);
+    hubSection.body.appendChild(hubRow);
 
     const veilRow = el('div', 'dev-row');
     veilRow.appendChild(el('span', 'dev-label', 'Velo'));
@@ -534,13 +546,13 @@
     veilRange.addEventListener('input', () => commitVeil(veilRange.value));
     veilNum.addEventListener('input', () => commitVeil(veilNum.value));
     veilRow.append(veilRange, veilNum);
-    panelBody.appendChild(veilRow);
+    hubSection.body.appendChild(veilRow);
+    panelBody.appendChild(hubSection.details);
 
-    /* --- Bienvenida --- */
-    panelBody.appendChild(el('span', 'dev-subhead', 'Bienvenida · diapositivas'));
-
+    /* --- Bienvenida: diapositivas --- */
+    const bootSection = makeSection('Bienvenida · diapositivas', true, `${state.backgrounds.boot.length}/8`);
     const bootList = el('div', 'dev-bg-list');
-    panelBody.appendChild(bootList);
+    bootSection.body.appendChild(bootList);
 
     const renderBoot = () => {
       bootList.replaceChildren();
@@ -566,31 +578,47 @@
         remove.type = 'button';
         remove.addEventListener('click', () => {
           removeBootSlide(index);
-          renderBoot();
+          renderTab();
         });
         actions.appendChild(remove);
         row.appendChild(actions);
         bootList.appendChild(row);
       });
+      setSectionMeta(bootSection, `${state.backgrounds.boot.length}/8`);
     };
 
     const bootActions = el('div', 'dev-actions');
-    bootActions.appendChild(
-      filePickerButton('Añadir diapositiva', async (file) => {
+    const addSlides = el('label', 'dev-btn dev-btn-mini is-primary', 'Añadir diapositivas…');
+    const addSlidesInput = el('input');
+    addSlidesInput.type = 'file';
+    addSlidesInput.multiple = true;
+    addSlidesInput.accept = 'image/png,image/jpeg,image/webp,image/avif,image/gif';
+    addSlidesInput.hidden = true;
+    addSlides.appendChild(addSlidesInput);
+    addSlidesInput.addEventListener('change', async () => {
+      const files = Array.from(addSlidesInput.files || []);
+      addSlidesInput.value = '';
+      if (!files.length) return;
+      let added = 0;
+      for (const file of files) {
+        if (state.backgrounds.boot.length >= 8) break;
         try {
           const data = await resizeImageFile(file, 1440);
           state.backgrounds.boot.push(data);
-          if (saveBackgrounds()) {
-            applyBackgrounds();
-            renderBoot();
-          } else {
-            state.backgrounds.boot.pop();
-          }
+          added += 1;
         } catch (error) {
-          showDevNotice('No se pudo leer esa imagen.');
+          showDevNotice(`No se pudo leer ${file.name || 'una imagen'}.`);
         }
-      }, 'is-primary')
-    );
+      }
+      if (added && saveBackgrounds()) {
+        applyBackgrounds();
+        renderTab();
+      } else if (!added) {
+        showDevNotice('Máximo 8 diapositivas propias.');
+      }
+    });
+    bootActions.appendChild(addSlides);
+
     if (state.backgrounds.boot.length) {
       const clear = el('button', 'dev-btn is-danger', 'Restaurar carrusel');
       clear.type = 'button';
@@ -598,16 +626,17 @@
         state.backgrounds.boot = [];
         saveBackgrounds();
         applyBackgrounds();
-        renderBoot();
+        renderTab();
       });
       bootActions.appendChild(clear);
     }
-    panelBody.appendChild(bootActions);
+    bootSection.body.appendChild(bootActions);
+    panelBody.appendChild(bootSection.details);
     renderBoot();
 
     /* --- Elementos de la bienvenida --- */
-    panelBody.appendChild(el('span', 'dev-subhead', 'Bienvenida · elementos'));
-    panelBody.appendChild(
+    const elements = makeSection('Bienvenida · elementos', false);
+    elements.body.appendChild(
       el('p', 'dev-hint', 'Abre la bienvenida para inspeccionar y editar sus textos, botones y capas con el inspector.')
     );
 
@@ -623,11 +652,12 @@
     hideBoot.type = 'button';
     hideBoot.addEventListener('click', () => showBootPreview(false));
     bootPreviewActions.append(showBoot, hideBoot);
-    panelBody.appendChild(bootPreviewActions);
+    elements.body.appendChild(bootPreviewActions);
 
-    panelBody.appendChild(
+    elements.body.appendChild(
       el('p', 'dev-hint', 'Consejo: usa el inspector (◎) para recolocar o retocar cualquier elemento del inicio y de la bienvenida; los cambios se guardan por elemento.')
     );
+    panelBody.appendChild(elements.details);
   }
 
   function applyProp(prop, value) {
@@ -698,14 +728,210 @@
   }
 
   /* ----------------------------------------------------------------- panel */
-  function makeSection(title, open) {
+  function makeSection(title, open, meta) {
+    const key = `${state.tab}:${title}`;
     const details = el('details', 'dev-section');
-    if (open) details.open = true;
-    const summary = el('summary', null, title);
+    details.open = key in sectionState ? sectionState[key] : !!open;
+    details.addEventListener('toggle', () => { sectionState[key] = details.open; });
+    const summary = el('summary');
+    summary.appendChild(el('span', 'dev-section-name', title));
+    const metaEl = el('span', 'dev-section-meta', meta || '');
+    summary.appendChild(metaEl);
     details.appendChild(summary);
     const body = el('div', 'dev-section-body');
     details.appendChild(body);
-    return { details, body };
+    return { details, body, summary, metaEl };
+  }
+
+  /* --------------------------------------------------- secciones plegables */
+  function setSectionMeta(section, text) {
+    if (!section || !section.metaEl) return;
+    section.metaEl.textContent = text == null ? '' : String(text);
+  }
+
+  function visibleSections() {
+    if (!panelBody) return [];
+    return Array.from(panelBody.querySelectorAll('.dev-section')).filter((node) => !node.hidden);
+  }
+
+  function setAllSections(open) {
+    visibleSections().forEach((section) => { section.open = open; });
+  }
+
+  /* Filtro global: oculta filas y secciones que no coinciden y abre las que sí.
+     Sirve igual para poses, assets, fondos y controles del inspector. */
+  function applySectionFilter() {
+    if (!panelBody) return;
+    const query = String(state.query || '').trim().toLowerCase();
+    const sections = Array.from(panelBody.querySelectorAll('.dev-section'));
+    let shown = 0;
+
+    sections.forEach((section) => {
+      const rows = Array.from(
+        section.querySelectorAll('.dev-asset-row, .dev-pose, .dev-bg-row, .dev-batch-row')
+      );
+      let rowMatches = 0;
+      rows.forEach((row) => {
+        const match = !query || row.textContent.toLowerCase().includes(query);
+        row.hidden = !match;
+        if (match) rowMatches += 1;
+      });
+      const textMatch = !query || section.textContent.toLowerCase().includes(query);
+      const matched = query ? (rows.length ? rowMatches > 0 : textMatch) : true;
+      section.hidden = !matched;
+      if (query && matched) section.open = true;
+      if (matched) shown += 1;
+    });
+
+    if (toolbarCount) {
+      toolbarCount.textContent = query ? `${shown} ${shown === 1 ? 'sección' : 'secciones'}` : '';
+      toolbarCount.hidden = !query;
+    }
+    const empty = panelBody.querySelector('.dev-filter-empty');
+    if (query && !shown) {
+      if (!empty) {
+        const note = el('p', 'dev-empty dev-filter-empty', 'Sin coincidencias en esta sección.');
+        panelBody.appendChild(note);
+      }
+    } else if (empty) {
+      empty.remove();
+    }
+  }
+
+  /* --------------------------------------------------------------- lotes */
+  /* Reutilizable: mapea varios archivos a varios destinos y los aplica de golpe. */
+  function buildBatch({ targets, maxSide, hint, onApply, emptyLabel }) {
+    const wrap = el('div', 'dev-batch');
+    if (hint) wrap.appendChild(el('p', 'dev-hint', hint));
+
+    let entries = [];
+    const status = el('p', 'dev-hint dev-batch-status');
+    status.hidden = true;
+
+    const actions = el('div', 'dev-actions dev-batch-actions');
+    const picker = el('label', 'dev-btn is-primary');
+    const pickerLabel = el('span', null, 'Elegir imágenes…');
+    picker.appendChild(pickerLabel);
+    const input = el('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.accept = 'image/png,image/jpeg,image/webp,image/avif,image/gif';
+    input.hidden = true;
+    picker.appendChild(input);
+    actions.appendChild(picker);
+
+    const list = el('div', 'dev-batch-list');
+    const commits = el('div', 'dev-actions dev-batch-commit');
+    commits.hidden = true;
+
+    const assignDefaults = () => {
+      const used = new Set();
+      entries.forEach((entry, index) => {
+        const number = /(\d+)/.exec(entry.name);
+        let target = number ? targets[Number(number[1]) - 1] : null;
+        if (!target || used.has(target.id)) {
+          target = targets.find((item) => !used.has(item.id)) || targets[index % targets.length];
+        }
+        used.add(target.id);
+        entry.targetId = target.id;
+      });
+    };
+
+    const renderList = () => {
+      list.replaceChildren();
+      commits.hidden = !entries.length;
+      pickerLabel.textContent = entries.length ? 'Añadir más…' : 'Elegir imágenes…';
+      if (!entries.length) {
+        if (emptyLabel) list.appendChild(el('p', 'dev-empty', emptyLabel));
+        applyAll.textContent = '';
+        return;
+      }
+      entries.forEach((entry, index) => {
+        const row = el('div', 'dev-batch-row');
+        const thumb = el('img', 'dev-batch-thumb');
+        thumb.src = entry.data;
+        thumb.alt = '';
+        row.appendChild(thumb);
+
+        const copy = el('div', 'dev-batch-copy');
+        copy.appendChild(el('span', 'dev-batch-name', entry.name));
+        const select = el('select', 'dev-select');
+        targets.forEach((target) => {
+          const option = el('option', null, target.label);
+          option.value = target.id;
+          if (target.id === entry.targetId) option.selected = true;
+          select.appendChild(option);
+        });
+        select.addEventListener('change', () => { entry.targetId = select.value; });
+        copy.appendChild(select);
+        row.appendChild(copy);
+
+        const remove = el('button', 'dev-icon-btn dev-batch-remove', '×');
+        remove.type = 'button';
+        remove.title = 'Quitar del lote';
+        remove.addEventListener('click', () => {
+          entries.splice(index, 1);
+          renderList();
+        });
+        row.appendChild(remove);
+        list.appendChild(row);
+      });
+      applyAll.textContent = `Aplicar lote (${entries.length})`;
+    };
+
+    const applyAll = el('button', 'dev-btn is-primary', '');
+    applyAll.type = 'button';
+    applyAll.addEventListener('click', async () => {
+      if (!entries.length) return;
+      const payload = entries.map((entry) => ({ targetId: entry.targetId, data: entry.data, name: entry.name }));
+      applyAll.disabled = true;
+      status.hidden = false;
+      status.textContent = `Aplicando ${payload.length}…`;
+      try {
+        await onApply(payload);
+        status.textContent = `${payload.length} aplicadas.`;
+        entries = [];
+        renderList();
+      } catch (error) {
+        status.textContent = 'No se pudo aplicar el lote.';
+      } finally {
+        applyAll.disabled = false;
+        window.setTimeout(() => { status.hidden = true; }, 2600);
+      }
+    });
+
+    const reorder = el('button', 'dev-btn dev-btn-mini', 'Reasignar en orden');
+    reorder.type = 'button';
+    reorder.addEventListener('click', () => { assignDefaults(); renderList(); });
+
+    const clear = el('button', 'dev-btn dev-btn-mini is-danger', 'Vaciar lote');
+    clear.type = 'button';
+    clear.addEventListener('click', () => { entries = []; renderList(); });
+
+    input.addEventListener('change', async () => {
+      const files = Array.from(input.files || []);
+      input.value = '';
+      if (!files.length) return;
+      status.hidden = false;
+      status.textContent = `Leyendo ${files.length}…`;
+      for (const file of files) {
+        try {
+          const data = await resizeImageFile(file, maxSide || 512);
+          entries.push({ name: file.name || `imagen-${entries.length + 1}`, data, targetId: null });
+        } catch (error) {
+          showDevNotice(`No se pudo leer ${file.name || 'una imagen'}.`);
+        }
+      }
+      assignDefaults();
+      renderList();
+      status.textContent = `${entries.length} en el lote.`;
+      window.setTimeout(() => { status.hidden = !entries.length; }, 2200);
+    });
+
+    commits.append(applyAll, reorder, clear);
+    wrap.append(actions, status, list, commits);
+    renderList();
+    return wrap;
   }
 
   function makeRow(label) {
@@ -901,12 +1127,15 @@
   }
 
   function setTab(tab) {
-    state.tab = ['azura', 'assets', 'backgrounds'].includes(tab) ? tab : 'inspector';
+    state.tab = NAV.some((item) => item.id === tab) ? tab : 'inspector';
+    state.query = '';
+    if (toolbarSearch) toolbarSearch.value = '';
     renderTab();
   }
 
   function renderTab() {
     if (!panelBody) return;
+    const current = NAV.find((item) => item.id === state.tab) || NAV[0];
     if (tabsEl) {
       tabsEl.querySelectorAll('[data-dev-tab]').forEach((button) => {
         const on = button.dataset.devTab === state.tab;
@@ -914,16 +1143,18 @@
         button.setAttribute('aria-selected', String(on));
       });
     }
+    if (tabInfoEl) tabInfoEl.textContent = current.sub;
     const pick = panel && panel.querySelector('#dev-pick');
     if (pick) pick.hidden = state.tab !== 'inspector';
     if (state.tab === 'inspector') {
       buildControls();
-      return;
+    } else {
+      panelBody.replaceChildren();
+      if (state.tab === 'azura') buildAzuraPanel();
+      else if (state.tab === 'backgrounds') buildBackgroundsPanel();
+      else buildAssetsPanel();
     }
-    panelBody.replaceChildren();
-    if (state.tab === 'azura') buildAzuraPanel();
-    else if (state.tab === 'backgrounds') buildBackgroundsPanel();
-    else buildAssetsPanel();
+    applySectionFilter();
   }
 
   function filePickerButton(label, onFile, extraClass) {
@@ -947,8 +1178,11 @@
       panelBody.appendChild(el('p', 'dev-empty', 'Azura no está disponible en esta pantalla.'));
       return;
     }
-    const intro = el('p', 'dev-hint', 'Cambia cualquier pose, sube versiones propias y controla el ritmo autónomo. Los cambios se guardan en este navegador.');
-    panelBody.appendChild(intro);
+    const customCount = Object.keys(state.azura.slots).length;
+    const status = makeSection('Estado', true, `${customCount}/${api.sprites.length} personalizadas`);
+    status.body.appendChild(
+      el('p', 'dev-hint', 'Cambia cualquier pose, sube versiones propias y controla el ritmo autónomo. Los cambios se guardan en este navegador.')
+    );
 
     const autoRow = el('div', 'dev-toggle-row');
     autoRow.appendChild(el('span', 'dev-label', 'Poses automáticas'));
@@ -961,7 +1195,7 @@
       renderTab();
     });
     autoRow.appendChild(autoBtn);
-    panelBody.appendChild(autoRow);
+    status.body.appendChild(autoRow);
 
     const paceRow = el('div', 'dev-toggle-row');
     paceRow.appendChild(el('span', 'dev-label', 'Ritmo'));
@@ -982,9 +1216,18 @@
       api.setPace(pace.value);
     });
     paceRow.appendChild(pace);
-    panelBody.appendChild(paceRow);
+    status.body.appendChild(paceRow);
 
     const live = api.getState ? api.getState() : { index: 0 };
+    status.body.appendChild(
+      el('p', 'dev-hint', `Pose en pantalla: ${(live.index || 0) + 1}. Automático ${state.azura.auto ? 'activo' : 'pausado'} · ritmo ${state.azura.pace}.`)
+    );
+    panelBody.appendChild(status.details);
+
+    const poses = makeSection('Poses', true, `${api.sprites.length} slots`);
+    poses.body.appendChild(
+      el('p', 'dev-hint', 'Pulsa una miniatura para verla al instante; “Cambiar” reemplaza solo ese slot.')
+    );
     const grid = el('div', 'dev-pose-grid');
     api.sprites.forEach((src, index) => {
       const cell = el('div', 'dev-pose');
@@ -1033,8 +1276,28 @@
       cell.appendChild(actions);
       grid.appendChild(cell);
     });
-    panelBody.appendChild(grid);
+    poses.body.appendChild(grid);
+    panelBody.appendChild(poses.details);
 
+    /* --- Cambio por lote --- */
+    const batch = makeSection('Cambio por lote', false, `${api.sprites.length} destinos`);
+    batch.body.appendChild(
+      buildBatch({
+        targets: api.sprites.map((src, index) => ({
+          id: String(index),
+          label: `Pose ${index + 1}${state.azura.slots[index] ? ' · personalizada' : ''}`
+        })),
+        maxSide: 512,
+        hint: 'Selecciona varias imágenes a la vez. Se asignan por el número del nombre (pose-03 → slot 3) o en orden; puedes cambiar cada destino antes de aplicar.',
+        onApply: async (assignments) => {
+          assignments.forEach(({ targetId, data }) => replaceAzuraSlot(Number(targetId), data));
+          renderTab();
+        }
+      })
+    );
+    panelBody.appendChild(batch.details);
+
+    const advanced = makeSection('Avanzado', false);
     const actions = el('div', 'dev-actions');
     const reset = el('button', 'dev-btn is-danger', 'Restaurar Azura');
     reset.type = 'button';
@@ -1055,25 +1318,14 @@
       if (nav) nav.click();
     });
     actions.append(reset, show);
-    panelBody.appendChild(actions);
-    panelBody.appendChild(el('p', 'dev-hint', 'Consejo: pulsa una miniatura para ver esa pose al instante; “Cambiar” sube una versión alternativa para ese slot.'));
+    advanced.body.appendChild(actions);
+    advanced.body.appendChild(
+      el('p', 'dev-hint', 'Restaurar devuelve todas las poses originales y el ritmo normal. Los cambios viven solo en este navegador.')
+    );
+    panelBody.appendChild(advanced.details);
   }
 
   function buildAssetsPanel() {
-    const intro = el('p', 'dev-hint', 'Reemplaza las imágenes e iconos de la interfaz. Cada cambio se aplica a todas las apariciones de ese recurso y se guarda en este navegador.');
-    panelBody.appendChild(intro);
-
-    const search = el('input', 'dev-text dev-asset-search');
-    search.type = 'search';
-    search.placeholder = 'Buscar imagen o icono…';
-    panelBody.appendChild(search);
-
-    const summary = el('p', 'dev-hint');
-    panelBody.appendChild(summary);
-
-    const list = el('div', 'dev-assets');
-    panelBody.appendChild(list);
-
     const symbols = Array.from(document.querySelectorAll('symbol[id^="i-"]')).map((symbol) => `#${symbol.id}`);
 
     /* Clave estable por recurso: no depende de la posición en el DOM, así el
@@ -1081,140 +1333,190 @@
     const imageKey = (src) => `img[src="${cssAttr(src)}"]`;
     const iconKey = (href) => `use[href="${cssAttr(href)}"]`;
 
-    const renderList = () => {
-      const query = search.value.trim().toLowerCase();
-      list.replaceChildren();
-      let shown = 0;
+    const images = [];
+    Array.from(document.querySelectorAll('img')).forEach((node) => {
+      if (node.closest('.dev-panel, .dev-outline')) return;
+      let src = node.getAttribute('src') || '';
+      if (!src) return;
+      if (src.startsWith('data:')) {
+        /* Ya sustituida: la fila se mantiene con su archivo original para
+           poder cambiarla otra vez o restaurarla. */
+        const found = Object.entries(state.assets).find(([, patch]) => patch && patch.src === src);
+        if (!found || !found[1].original) return;
+        src = found[1].original;
+      }
+      if (images.some((item) => item.src === src)) return;
+      images.push({ src, node, key: imageKey(src), name: node.getAttribute('alt') || src.split('/').pop() || 'imagen' });
+    });
 
-      /* --- Imágenes: una fila por archivo distinto --- */
-      const imageMap = new Map();
-      Array.from(document.querySelectorAll('img')).forEach((node) => {
-        if (node.closest('.dev-panel, .dev-outline')) return;
-        let src = node.getAttribute('src') || '';
-        if (!src) return;
-        if (src.startsWith('data:')) {
-          /* Ya sustituida: la fila se mantiene con su archivo original para
-             poder cambiarla otra vez o restaurarla. */
-          const found = Object.entries(state.assets).find(([, patch]) => patch && patch.src === src);
-          if (!found || !found[1].original) return;
-          src = found[1].original;
+    const icons = [];
+    Array.from(document.querySelectorAll('svg use')).forEach((node) => {
+      if (node.closest('.dev-panel, .dev-outline')) return;
+      let href = node.getAttribute('href') || node.getAttribute('xlink:href') || '';
+      if (!href || !href.startsWith('#')) return;
+      const found = Object.entries(state.assets).find(
+        ([, patch]) => patch && patch.href === href && patch.original
+      );
+      if (found) href = found[1].original;
+      if (icons.some((item) => item.href === href)) return;
+      icons.push({ href, node, key: iconKey(href), name: href.replace('#i-', '').replace(/-/g, ' ') });
+    });
+
+    const changedKeys = Object.keys(state.assets).filter((key) => state.assets[key]);
+
+    panelBody.appendChild(
+      el('p', 'dev-hint', 'Reemplaza imágenes e iconos de la interfaz. Cada cambio se aplica a todas las apariciones de ese recurso y se guarda en este navegador.')
+    );
+
+    /* --- Cambio por lote --- */
+    const batch = makeSection('Cambio por lote', false, `${images.length} imágenes`);
+    batch.body.appendChild(
+      buildBatch({
+        targets: images.map((item) => ({ id: item.key, label: item.name })),
+        maxSide: 640,
+        hint: 'Selecciona varias imágenes y asígnalas a los recursos de la interfaz. Se emparejan en orden (o por número de nombre) y puedes cambiar cada destino antes de aplicar.',
+        onApply: async (assignments) => {
+          assignments.forEach(({ targetId, data }) => {
+            const item = images.find((entry) => entry.key === targetId);
+            if (item) setAssetOverride(item.key, 'src', data, item.node);
+          });
+          applyAssets();
+          renderTab();
         }
-        if (!imageMap.has(src)) imageMap.set(src, node);
-      });
+      })
+    );
+    panelBody.appendChild(batch.details);
 
-      if (imageMap.size) {
-        list.appendChild(el('span', 'dev-asset-group', `Imágenes · ${imageMap.size}`));
-        imageMap.forEach((node, src) => {
-          const name = node.getAttribute('alt') || src.split('/').pop() || 'imagen';
-          if (query && !(name + ' ' + src).toLowerCase().includes(query)) return;
-          const key = imageKey(src);
-          const patch = state.assets[key];
-          shown += 1;
-          const row = el('div', 'dev-asset-row');
+    /* --- Resumen de cambios --- */
+    if (changedKeys.length) {
+      const changedSection = makeSection('Con cambios', true, `${changedKeys.length}`);
+      changedKeys.forEach((key) => {
+        const patch = state.assets[key] || {};
+        const row = el('div', 'dev-asset-row');
+        if (patch.src) {
           const thumb = el('img', 'dev-asset-thumb');
-          thumb.src = patch && patch.src ? patch.src : src;
+          thumb.src = patch.src;
           thumb.alt = '';
           row.appendChild(thumb);
-          const copy = el('div', 'dev-asset-copy');
-          copy.appendChild(el('span', 'dev-asset-name', name));
-          copy.appendChild(el('span', 'dev-asset-path', src.split('/').slice(-2).join('/')));
-          row.appendChild(copy);
-          const actions = el('div', 'dev-asset-actions');
-          actions.appendChild(
-            filePickerButton('Cambiar', async (file) => {
-              try {
-                const data = await resizeImageFile(file, 640);
-                setAssetOverride(key, 'src', data, node);
-                applyAssets();
-                renderList();
-              } catch (error) {
-                showDevNotice('No se pudo leer esa imagen.');
-              }
-            })
-          );
-          if (patch && patch.src) {
-            const reset = el('button', 'dev-btn dev-btn-mini is-danger', 'Quitar');
-            reset.type = 'button';
-            reset.addEventListener('click', () => {
-              restoreAsset(key);
-              renderList();
-            });
-            actions.appendChild(reset);
-          }
-          row.appendChild(actions);
-          list.appendChild(row);
-        });
-      }
-
-      /* --- Iconos: una fila por símbolo usado --- */
-      const iconMap = new Map();
-      Array.from(document.querySelectorAll('svg use')).forEach((node) => {
-        if (node.closest('.dev-panel, .dev-outline')) return;
-        let href = node.getAttribute('href') || node.getAttribute('xlink:href') || '';
-        if (!href || !href.startsWith('#')) return;
-        const found = Object.entries(state.assets).find(
-          ([, patch]) => patch && patch.href === href && patch.original
-        );
-        if (found) href = found[1].original;
-        if (!iconMap.has(href)) iconMap.set(href, node);
-      });
-
-      if (iconMap.size) {
-        list.appendChild(el('span', 'dev-asset-group', `Iconos · ${iconMap.size}`));
-        iconMap.forEach((node, href) => {
-          const label = href.replace('#i-', '').replace(/-/g, ' ');
-          if (query && !(label + ' ' + href).toLowerCase().includes(query)) return;
-          const key = iconKey(href);
-          const patch = state.assets[key];
-          shown += 1;
-          const row = el('div', 'dev-asset-row');
+        } else {
           const preview = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
           preview.setAttribute('viewBox', '0 0 24 24');
           preview.setAttribute('class', 'dev-asset-icon');
           const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-          use.setAttribute('href', patch && patch.href ? patch.href : href);
+          use.setAttribute('href', patch.href || '');
           preview.appendChild(use);
           row.appendChild(preview);
-
-          const copy = el('div', 'dev-asset-copy');
-          copy.appendChild(el('span', 'dev-asset-name', label));
-          copy.appendChild(el('span', 'dev-asset-path', href));
-          row.appendChild(copy);
-
-          const actions = el('div', 'dev-asset-actions');
-          const select = el('select', 'dev-select dev-select-icon');
-          symbols.forEach((symbol) => {
-            const option = el('option', null, symbol.replace('#i-', ''));
-            option.value = symbol;
-            if (symbol === (patch && patch.href ? patch.href : href)) option.selected = true;
-            select.appendChild(option);
-          });
-          select.addEventListener('change', () => {
-            setAssetOverride(key, 'href', select.value, node);
-            applyAssets();
-            renderList();
-          });
-          actions.appendChild(select);
-          if (patch && patch.href) {
-            const reset = el('button', 'dev-btn dev-btn-mini is-danger', 'Quitar');
-            reset.type = 'button';
-            reset.addEventListener('click', () => {
-              restoreAsset(key);
-              renderList();
-            });
-            actions.appendChild(reset);
-          }
-          row.appendChild(actions);
-          list.appendChild(row);
+        }
+        const original = patch.original || key;
+        const copy = el('div', 'dev-asset-copy');
+        copy.appendChild(
+          el('span', 'dev-asset-name', patch.src ? (original.split('/').pop() || 'Imagen') : (patch.href || key).replace('#i-', ''))
+        );
+        copy.appendChild(el('span', 'dev-asset-path', original.replace(/^(img\[src=|use\[href=)"?|"?\]$/g, '')));
+        row.appendChild(copy);
+        const actions = el('div', 'dev-asset-actions');
+        const reset = el('button', 'dev-btn dev-btn-mini is-danger', 'Restaurar');
+        reset.type = 'button';
+        reset.addEventListener('click', () => {
+          restoreAsset(key);
+          renderTab();
         });
+        actions.appendChild(reset);
+        row.appendChild(actions);
+        changedSection.body.appendChild(row);
+      });
+      panelBody.appendChild(changedSection.details);
+    }
+
+    /* --- Imágenes --- */
+    const imageSection = makeSection('Imágenes', true, `${images.length}`);
+    if (!images.length) imageSection.body.appendChild(el('p', 'dev-empty', 'No hay imágenes en esta pantalla.'));
+    images.forEach((item) => {
+      const patch = state.assets[item.key];
+      const row = el('div', 'dev-asset-row');
+      const thumb = el('img', 'dev-asset-thumb');
+      thumb.src = patch && patch.src ? patch.src : item.src;
+      thumb.alt = '';
+      row.appendChild(thumb);
+
+      const copy = el('div', 'dev-asset-copy');
+      copy.appendChild(el('span', 'dev-asset-name', item.name));
+      copy.appendChild(el('span', 'dev-asset-path', item.src.split('/').slice(-2).join('/')));
+      row.appendChild(copy);
+
+      const actions = el('div', 'dev-asset-actions');
+      actions.appendChild(
+        filePickerButton('Cambiar', async (file) => {
+          try {
+            const data = await resizeImageFile(file, 640);
+            setAssetOverride(item.key, 'src', data, item.node);
+            applyAssets();
+            renderTab();
+          } catch (error) {
+            showDevNotice('No se pudo leer esa imagen.');
+          }
+        })
+      );
+      if (patch && patch.src) {
+        const reset = el('button', 'dev-btn dev-btn-mini is-danger', 'Quitar');
+        reset.type = 'button';
+        reset.addEventListener('click', () => {
+          restoreAsset(item.key);
+          renderTab();
+        });
+        actions.appendChild(reset);
       }
+      row.appendChild(actions);
+      imageSection.body.appendChild(row);
+    });
+    panelBody.appendChild(imageSection.details);
 
-      summary.textContent = query ? `${shown} coincidencias` : 'Todo lo que aparece en la interfaz activa.';
-      if (!shown) list.appendChild(el('p', 'dev-empty', 'No hay coincidencias en esta pantalla.'));
-    };
+    /* --- Iconos --- */
+    const iconSection = makeSection('Iconos', false, `${icons.length}`);
+    if (!icons.length) iconSection.body.appendChild(el('p', 'dev-empty', 'No hay iconos en esta pantalla.'));
+    icons.forEach((item) => {
+      const patch = state.assets[item.key];
+      const row = el('div', 'dev-asset-row');
+      const preview = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      preview.setAttribute('viewBox', '0 0 24 24');
+      preview.setAttribute('class', 'dev-asset-icon');
+      const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+      use.setAttribute('href', patch && patch.href ? patch.href : item.href);
+      preview.appendChild(use);
+      row.appendChild(preview);
 
-    search.addEventListener('input', renderList);
-    renderList();
+      const copy = el('div', 'dev-asset-copy');
+      copy.appendChild(el('span', 'dev-asset-name', item.name));
+      copy.appendChild(el('span', 'dev-asset-path', item.href));
+      row.appendChild(copy);
+
+      const actions = el('div', 'dev-asset-actions');
+      const select = el('select', 'dev-select dev-select-icon');
+      symbols.forEach((symbol) => {
+        const option = el('option', null, symbol.replace('#i-', ''));
+        option.value = symbol;
+        if (symbol === (patch && patch.href ? patch.href : item.href)) option.selected = true;
+        select.appendChild(option);
+      });
+      select.addEventListener('change', () => {
+        setAssetOverride(item.key, 'href', select.value, item.node);
+        applyAssets();
+        renderTab();
+      });
+      actions.appendChild(select);
+      if (patch && patch.href) {
+        const reset = el('button', 'dev-btn dev-btn-mini is-danger', 'Quitar');
+        reset.type = 'button';
+        reset.addEventListener('click', () => {
+          restoreAsset(item.key);
+          renderTab();
+        });
+        actions.appendChild(reset);
+      }
+      row.appendChild(actions);
+      iconSection.body.appendChild(row);
+    });
+    panelBody.appendChild(iconSection.details);
   }
 
   function showDevNotice(message) {
@@ -1570,20 +1872,48 @@
 
     tabsEl = el('div', 'dev-tabs');
     tabsEl.setAttribute('role', 'tablist');
-    [
-      ['inspector', 'Inspector'],
-      ['azura', 'Azura'],
-      ['assets', 'Assets'],
-      ['backgrounds', 'Fondos']
-    ].forEach(([id, label]) => {
-      const button = el('button', 'dev-tab', label);
+    NAV.forEach((item, index) => {
+      const button = el('button', 'dev-tab');
       button.type = 'button';
-      button.dataset.devTab = id;
+      button.dataset.devTab = item.id;
       button.setAttribute('role', 'tab');
-      button.addEventListener('click', () => setTab(id));
+      button.title = `${item.sub} · Alt+${index + 1}`;
+      button.appendChild(el('span', 'dev-tab-icon', item.icon));
+      const copy = el('span', 'dev-tab-copy');
+      copy.appendChild(el('span', 'dev-tab-label', item.label));
+      copy.appendChild(el('span', 'dev-tab-sub', item.sub));
+      button.appendChild(copy);
+      button.addEventListener('click', () => setTab(item.id));
       tabsEl.appendChild(button);
     });
     panel.appendChild(tabsEl);
+
+    tabInfoEl = el('p', 'dev-tab-info');
+    panel.appendChild(tabInfoEl);
+
+    toolbarEl = el('div', 'dev-toolbar');
+    toolbarSearch = el('input', 'dev-text dev-toolbar-search');
+    toolbarSearch.type = 'search';
+    toolbarSearch.placeholder = 'Buscar en esta sección…';
+    toolbarSearch.setAttribute('aria-label', 'Buscar en la sección activa');
+    toolbarSearch.addEventListener('input', () => {
+      state.query = toolbarSearch.value;
+      applySectionFilter();
+    });
+    toolbarCount = el('span', 'dev-toolbar-count');
+    toolbarCount.hidden = true;
+    const fold = el('button', 'dev-icon-btn dev-toolbar-fold', '⊟');
+    fold.type = 'button';
+    fold.title = 'Contraer o expandir todas las secciones';
+    fold.setAttribute('aria-label', 'Contraer o expandir secciones');
+    fold.addEventListener('click', () => {
+      const sections = visibleSections();
+      const anyOpen = sections.some((section) => section.open);
+      setAllSections(!anyOpen);
+      fold.classList.toggle('is-on', anyOpen);
+    });
+    toolbarEl.append(toolbarSearch, toolbarCount, fold);
+    panel.appendChild(toolbarEl);
 
     panelBody = el('div', 'dev-panel-body');
     panel.appendChild(panelBody);
@@ -1779,6 +2109,16 @@
       if (event.key === 'Escape' && state.active) {
         if (state.picker) setPicker(false);
         else setActive(false);
+        return;
+      }
+      /* Alt+1…4 salta entre secciones sin tocar el ratón. */
+      if (state.active && event.altKey && !event.ctrlKey && !event.metaKey) {
+        const index = Number(event.key) - 1;
+        if (index >= 0 && index < NAV.length) {
+          event.preventDefault();
+          setTab(NAV[index].id);
+          if (toolbarSearch) toolbarSearch.focus({ preventScroll: true });
+        }
       }
     });
 

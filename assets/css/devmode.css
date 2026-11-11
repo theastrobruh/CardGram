@@ -194,10 +194,30 @@
   overflow: hidden;
 }
 
+.dev-section-name {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dev-section-meta {
+  margin-left: 8px;
+  font-size: 0.44rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: rgba(157, 245, 233, 0.55);
+  white-space: nowrap;
+}
+
+.dev-section-meta:empty {
+  display: none;
+}
+
 .dev-section > summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 6px;
   padding: 8px 10px;
   font-size: 0.54rem;
   font-weight: 900;
@@ -420,41 +440,123 @@ body.dev-picking .dev-toggle {
   cursor: auto !important;
 }
 
-/* Pestañas ---------------------------------------------------------------- */
+/* Secciones del panel ----------------------------------------------------- */
 .dev-tabs {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
-  padding: 8px 10px;
-  border-bottom: 1px solid rgba(124, 235, 221, 0.14);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 9px 10px 7px;
+  border-bottom: 1px solid rgba(124, 235, 221, 0.12);
   background: rgba(0, 0, 0, 0.18);
 }
 
 .dev-tab {
-  min-height: 24px;
-  padding: 4px 4px;
-  border-radius: 7px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: rgba(223, 253, 248, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 7px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(124, 235, 221, 0.14);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(223, 253, 248, 0.68);
   font: inherit;
-  font-size: 0.46rem;
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  text-align: left;
   cursor: pointer;
   transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.dev-tab-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  background: rgba(0, 242, 254, 0.1);
+  color: #7cebdd;
+  font-size: 0.68rem;
+}
+
+.dev-tab-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.dev-tab-label {
+  font-size: 0.54rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.dev-tab-sub {
+  font-size: 0.44rem;
+  letter-spacing: 0.01em;
+  color: rgba(223, 253, 248, 0.48);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dev-tab:hover {
   color: #dffdf8;
   background: rgba(0, 242, 254, 0.08);
+  border-color: rgba(124, 235, 221, 0.3);
 }
 
 .dev-tab.is-active {
-  color: #03242d;
+  color: #eafffb;
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.22), rgba(124, 235, 221, 0.1));
+  border-color: rgba(124, 235, 221, 0.55);
+}
+
+.dev-tab.is-active .dev-tab-icon {
   background: linear-gradient(135deg, #00f2fe, #7cebdd);
-  border-color: rgba(255, 255, 255, 0.7);
+  color: #03242d;
+}
+
+.dev-tab.is-active .dev-tab-sub {
+  color: #9df5e9;
+}
+
+.dev-tab-info {
+  margin: 0;
+  padding: 6px 12px 0;
+  font-size: 0.44rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(157, 245, 233, 0.52);
+}
+
+.dev-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px 9px;
+}
+
+.dev-toolbar-search {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 26px;
+}
+
+.dev-toolbar-count {
+  font-size: 0.44rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(157, 245, 233, 0.6);
+  white-space: nowrap;
+}
+
+.dev-toolbar-fold {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
 }
 
 /* Azura ------------------------------------------------------------------- */
@@ -883,6 +985,75 @@ body.dev-picking .dev-toggle {
 .dev-lock-actions .dev-btn {
   min-height: 30px;
   font-size: 0.56rem;
+}
+
+/* Lotes de imágenes ------------------------------------------------------- */
+.dev-batch {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dev-batch-status {
+  margin: 0;
+  color: #9df5e9;
+}
+
+.dev-batch-actions {
+  margin: 0;
+}
+
+.dev-batch-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dev-batch-row {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 22px;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 9px;
+  border: 1px solid rgba(124, 235, 221, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.dev-batch-thumb {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.dev-batch-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dev-batch-name {
+  font-size: 0.48rem;
+  color: rgba(223, 253, 248, 0.75);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dev-batch-remove {
+  width: 22px;
+  height: 22px;
+}
+
+.dev-batch-commit {
+  margin-top: 2px;
+}
+
+.dev-batch-commit .dev-btn.is-primary {
+  flex: 1 1 auto;
 }
 
 @media (max-width: 980px) {
