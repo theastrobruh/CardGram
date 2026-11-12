@@ -1,0 +1,112 @@
+
+/* ==========================================================================
+   REV 337 · Sobres limpios en el carrusel
+   Fuera el velo holográfico y el halo cian: cada sobre se ve tal cual, sin
+   recuadro ni borde brillante alrededor.
+   ========================================================================== */
+.pack-carousel-foil,
+.pack-carousel-item .pack-carousel-foil {
+  display: none !important;
+  animation: none !important;
+  background: none !important;
+  opacity: 0 !important;
+}
+
+.pack-carousel-item,
+.pack-carousel-item.is-center,
+.pack-carousel-item:focus-visible {
+  filter: drop-shadow(0 22px 34px rgba(0, 0, 0, 0.52)) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.pack-carousel-item img {
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* ==========================================================================
+   REV 337 · Home escritorio · la pila mide lo mismo que la carta principal
+   ========================================================================== */
+@media (min-width: 981px) {
+  .hub-hand-deck-card {
+    width: clamp(238px, 20.7vw, 324px) !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ==========================================================================
+   REV 337 · Revelado completo en una sola pantalla (sin scroll)
+   La rejilla se ajusta al alto disponible: 6 cartas en fila en escritorio,
+   3×2 en tablet y 2×3 en móvil.
+   ========================================================================== */
+#pack-overlay.is-grid-stage .pack-overlay-shell {
+  height: auto !important;
+  max-height: 96dvh !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 12px 16px !important;
+}
+
+.pack-overlay.is-grid-stage .pack-reveal-grid {
+  width: 94vw;
+  max-width: min(1320px, 94vw);
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  justify-items: center !important;
+  align-items: center !important;
+}
+
+.pack-overlay.is-grid-stage .pack-card {
+  width: min(100%, 15vw, calc((100dvh - 300px) * 0.7467));
+  max-width: 100%;
+}
+
+.pack-overlay.is-grid-stage .pack-overlay-actions {
+  position: static !important;
+  flex: 0 0 auto;
+  padding: 6px 0 0 !important;
+  background: none !important;
+}
+
+@media (max-width: 980px) {
+  #pack-overlay.is-grid-stage .pack-overlay-shell {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+    justify-content: center !important;
+    padding: 10px 10px calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .pack-overlay.is-grid-stage .pack-reveal-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    width: min(94vw, 660px);
+    gap: 10px !important;
+    padding: 0 !important;
+  }
+
+  .pack-overlay.is-grid-stage .pack-card {
+    width: min(100%, 26vw, calc((100dvh - 260px) / 2 * 0.7467));
+  }
+}
+
+@media (max-width: 560px) {
+  .pack-overlay.is-grid-stage .pack-reveal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    width: min(92vw, 430px);
+    gap: 8px !important;
+  }
+
+  .pack-overlay.is-grid-stage .pack-card {
+    width: min(100%, 42vw, calc((100dvh - 240px) / 3 * 0.7467));
+  }
+
+  .pack-overlay.is-grid-stage .pack-overlay-actions {
+    padding: 4px 0 0 !important;
+  }
+}

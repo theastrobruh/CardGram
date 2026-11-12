@@ -240,6 +240,67 @@ function warmThreeInIdle() {
   }, 6000);
 }
 
+/* Las deck boxes pesan ~800 KB cada una. En lazy no empezaban a descargarse
+   hasta abrir Inventory, así que los renders tardaban segundos en salir.
+   Se dejan en caché mientras el usuario está en Home. */
+function warmInventoryArt() {
+  const connection = navigator.connection;
+  if (connection && connection.saveData) return;
+
+  const srcs = new Set();
+  Object.values(INVENTORY_DECK_BOXES).forEach((src) => {
+    if (src) srcs.add(src);
+  });
+  PRESET_DECK_BOXES.forEach((box) => {
+    if (box && box.src) srcs.add(box.src);
+  });
+  if (Array.isArray(hubDeckBoxes)) {
+    hubDeckBoxes.forEach((src) => {
+      if (src && !src.startsWith('data:')) srcs.add(src);
+    });
+  }
+
+  const run = () => {
+    srcs.forEach((src) => {
+      const img = new Image();
+      img.decoding = 'async';
+      img.fetchPriority = 'low';
+      img.src = src;
+    });
+  };
+  window.setTimeout(() => {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(run, { timeout: 2500 });
+    } else {
+      run();
+    }
+  }, 1200);
+}
+
+/* Azura aparece en Shop con sprites de ~150 KB. Se precargan los primeros
+   estados en segundo plano para que al entrar no haya un hueco en blanco. */
+function warmAzuraSprites() {
+  const connection = navigator.connection;
+  if (connection && connection.saveData) return;
+
+  const srcs = [
+    AZURA_IDLE_SPRITES[0],
+    AZURA_IDLE_SPRITES[1],
+    AZURA_AFK_SPRITES[0],
+    AZURA_REACT_SPRITES[0]
+  ].filter(Boolean);
+
+  const run = () => {
+    srcs.forEach((src) => {
+      const img = new Image();
+      img.decoding = 'async';
+      img.fetchPriority = 'low';
+      img.src = src;
+    });
+  };
+  window.setTimeout(run, 2200);
+}
+
 const hub = {
   ready: false,
   panel: 'home',
@@ -869,6 +930,7 @@ function closePackOverlay() {
   packOverlayState.dragCard = null;
   hub.els.packOverlay.hidden = true;
   document.body.classList.remove('pack-open');
+  document.body.classList.remove('pack-carousel');
 }
 
 function setPackOverlayStage(stage) {
@@ -878,6 +940,8 @@ function setPackOverlayStage(stage) {
   overlay.classList.toggle('is-seal-stage', stage === 'seal');
   overlay.classList.toggle('is-theater-stage', stage === 'theater');
   overlay.classList.toggle('is-grid-stage', stage === 'grid');
+  /* La clase del body deja respirar el fondo de la Shop mientras se elige sobre. */
+  document.body.classList.toggle('pack-carousel', stage === 'carousel');
 
   if (hub.els.packCarouselWrap) hub.els.packCarouselWrap.hidden = stage !== 'carousel';
   if (hub.els.packSealWrap) hub.els.packSealWrap.hidden = stage !== 'seal';
@@ -1035,9 +1099,6 @@ function buildPackCarousel() {
     );
 
     item.appendChild(makeHubImage(art, collection.name));
-    const foil = makeNode('span', 'pack-carousel-foil');
-    foil.setAttribute('aria-hidden', 'true');
-    item.appendChild(foil);
     item.appendChild(makeNode('span', 'pack-carousel-serial', String(index + 1).padStart(2, '0')));
 
     item.addEventListener('click', () => handleCarouselItem(index));
@@ -4113,10 +4174,25 @@ function syncMobileQuick() {
     document.documentElement.style.removeProperty('--quick-span');
     return;
   }
-  const rect = avatar.getBoundingClientRect();
-  if (!rect.width) return;
-  document.documentElement.style.setProperty('--quick-top', `${Math.round(rect.top + rect.height / 2)}px`);
-  document.documentElement.style.setProperty('--quick-span', `${Math.round(rect.width + 118)}px`);
+  /* Se usa la caja de maquetación (offsetTop/offsetWidth), no el rectángulo
+     pintado: las animaciones de entrada transforman el panel y hacían que
+     los botones saltaran al entrar en Inicio. */
+  if (!avatar.offsetWidth) return;
+  let top = 0;
+  let node = avatar;
+  while (node) {
+    top += node.offsetTop || 0;
+    node = node.offsetParent;
+  }
+  top = top - (window.scrollY || 0) + avatar.offsetHeight / 2;
+  if (!Number.isFinite(top)) return;
+  const span = avatar.offsetWidth + 118;
+  const style = document.documentElement.style;
+  const currentTop = parseFloat(style.getPropertyValue('--quick-top')) || 0;
+  const currentSpan = parseFloat(style.getPropertyValue('--quick-span')) || 0;
+  if (Math.abs(currentTop - top) >= 1) style.setProperty('--quick-top', `${Math.round(top)}px`);
+  if (Math.abs(currentSpan - span) >= 1) style.setProperty('--quick-span', `${Math.round(span)}px`);
+  quick.classList.add('is-positioned');
 }
 
 function initHomeTable() {
@@ -7955,6 +8031,10 @@ function canSwipePanels() {
   if (window.innerWidth > 980) return false;
   if (document.body.dataset.view !== 'hub') return false;
   if (!hub.ready) return false;
+  /* Con un sobre abierto el swipe pertenece al carrusel / al ritual, no a los
+     paneles: si no, al arrastrar el sobre se cambiaba de menú por detrás. */
+  if (document.body.classList.contains('pack-open')) return false;
+  if (hub.els.packOverlay && !hub.els.packOverlay.hidden) return false;
   if (HUB_SWIPE_ROUTES.indexOf(hub.panel) === -1) return false;
   if (hub.panel === 'collections' && (hub.collectionId || hub.deckId)) return false;
   if (hub.exploreCreatorId || hub.explorePackId || hub.exploreRoadmapOpen) return false;
@@ -7968,7 +8048,7 @@ function swipeFromBlockedNode(node) {
   for (let el = node; el && el !== document.body; el = el.parentElement) {
     if (
       el.matches(
-        '.hub-showcase, .hub-card, .hub-card-surface, .shop-npc, .shop-pack, .hub-menu-panel, input, textarea, select, [data-no-swipe]'
+        '.hub-showcase, .hub-card, .hub-card-surface, .shop-npc, .shop-pack, .hub-menu-panel, .pack-overlay, input, textarea, select, [data-no-swipe]'
       )
     ) {
       return true;
@@ -8443,6 +8523,8 @@ function setupHub() {
   renderHubStats(false);
   refreshCardRatios();
   warmThreeInIdle();
+  warmInventoryArt();
+  warmAzuraSprites();
   window.CardGramHubReady = true;
   document.dispatchEvent(new CustomEvent('cardgram:hubready'));
 }

@@ -1,0 +1,18 @@
+
+/* ==========================================================================
+   REV 335 · Carrusel de sobres apoyado en la escena de la Shop
+   Mientras eliges sobre no hay crowdfunding de por medio: el fondo es la
+   Shop, difuminada y sin interfaz, para que el gesto se sienta dentro del
+   sobre y no sobre la página.
+   ========================================================================== */
+body.pack-carousel .shop-scene {
+  filter: blur(14px) brightness(0.62) saturate(0.95) !important;
+  transform: scale(1.04) !important;
+}
+
+.pack-overlay.is-carousel-stage .pack-overlay-backdrop {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(6, 34, 46, 0.26) 0%, rgba(2, 12, 20, 0.7) 82%) !important;
+  backdrop-filter: blur(10px) saturate(1.1) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(1.1) !important;
+}

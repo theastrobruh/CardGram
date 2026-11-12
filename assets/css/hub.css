@@ -7555,7 +7555,8 @@ dialog {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: clamp(380px, 35vw, 470px);
+    /* Misma anchura que la carta principal: la pila queda simétrica. */
+    width: clamp(238px, 20.7vw, 324px);
     padding: 5px;
     border-radius: 20px;
     pointer-events: auto;
@@ -20662,5 +20663,191 @@ body.pack-open .dev-trigger {
   /* La carta principal de Home, un 10 % más contenida. */
   .hub-favorite .hub-card-stage {
     width: clamp(238px, 20.7vw, 324px);
+  }
+}
+
+/* ==========================================================================
+   REV 334 · Azura · entrada estable en móvil
+   La cascada animaba `transform`, que en móvil sustituía al translateX(-50%)
+   y la dejaba a media pantalla hasta terminar. Solo se anima la opacidad.
+   ========================================================================== */
+.shop-npc.cg-in {
+  animation-name: azuraCascadeIn;
+}
+
+@keyframes azuraCascadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 980px) {
+  /* En móvil la escena es más corta: entra antes y se asienta de inmediato. */
+  .shop-npc.cg-in {
+    animation-delay: 420ms !important;
+    animation-duration: 460ms;
+  }
+
+  /* Nunca debe quedarse a medio camino por una transición de posición. */
+  .shop-npc {
+    transition: opacity 0.4s ease !important;
+  }
+}
+
+/* ==========================================================================
+   REV 335 · El ritual del sobre se queda solo sobre el fondo de la Shop
+   El carrusel de sobres y la apertura no deben arrastrar la página de detrás:
+   cualquier swipe se queda dentro del sobre.
+   ========================================================================== */
+body.pack-open .hub-scroll {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+body.pack-open .pack-overlay,
+body.pack-open .pack-carousel-wrap,
+body.pack-open .pack-carousel-viewport {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+body.pack-open .pack-overlay-shell {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* La escena de fondo no responde a gestos mientras hay un sobre abierto. */
+body.pack-open .shop-scene {
+  touch-action: none;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   REV 335 · Carrusel de sobres apoyado en la escena de la Shop
+   Mientras eliges sobre el fondo es la propia Shop, difuminada y sin
+   interfaz: el gesto se siente dentro del sobre y no sobre la página.
+   ========================================================================== */
+body.pack-carousel .shop-scene {
+  filter: blur(14px) brightness(0.62) saturate(0.95) !important;
+  transform: scale(1.04) !important;
+}
+
+.pack-overlay.is-carousel-stage .pack-overlay-backdrop {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(6, 34, 46, 0.26) 0%, rgba(2, 12, 20, 0.7) 82%) !important;
+  backdrop-filter: blur(10px) saturate(1.1) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(1.1) !important;
+}
+
+/* ==========================================================================
+   REV 337 · Sobres limpios en el carrusel
+   Fuera el velo holográfico y el halo cian: cada sobre se ve tal cual, sin
+   recuadro ni borde brillante alrededor.
+   ========================================================================== */
+.pack-carousel-foil,
+.pack-carousel-item .pack-carousel-foil {
+  display: none !important;
+  animation: none !important;
+  background: none !important;
+  opacity: 0 !important;
+}
+
+.pack-carousel-item,
+.pack-carousel-item.is-center,
+.pack-carousel-item:focus-visible {
+  filter: drop-shadow(0 22px 34px rgba(0, 0, 0, 0.52)) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.pack-carousel-item img {
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* ==========================================================================
+   REV 337 · Home escritorio · la pila mide lo mismo que la carta principal
+   ========================================================================== */
+@media (min-width: 981px) {
+  .hub-hand-deck-card {
+    width: clamp(238px, 20.7vw, 324px) !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ==========================================================================
+   REV 337 · Revelado completo en una sola pantalla (sin scroll)
+   La rejilla se ajusta al alto disponible: 6 cartas en fila en escritorio,
+   3×2 en tablet y 2×3 en móvil.
+   ========================================================================== */
+#pack-overlay.is-grid-stage .pack-overlay-shell {
+  width: min(1360px, 96vw) !important;
+  height: auto !important;
+  max-height: 96dvh !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 12px 16px !important;
+}
+
+.pack-overlay.is-grid-stage .pack-reveal-grid {
+  width: 94vw !important;
+  max-width: min(1320px, 94vw) !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  justify-items: center !important;
+  align-items: center !important;
+}
+
+.pack-overlay.is-grid-stage .pack-card {
+  width: min(100%, 15vw, calc((100dvh - 300px) * 0.7467));
+  max-width: 100%;
+}
+
+.pack-overlay.is-grid-stage .pack-overlay-actions {
+  position: static !important;
+  flex: 0 0 auto;
+  padding: 6px 0 0 !important;
+  background: none !important;
+}
+
+@media (max-width: 980px) {
+  #pack-overlay.is-grid-stage .pack-overlay-shell {
+    width: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+    justify-content: center !important;
+    padding: 46px 10px calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .pack-overlay.is-grid-stage .pack-reveal-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    width: min(94vw, 660px) !important;
+    gap: 10px !important;
+    padding: 0 !important;
+  }
+
+  .pack-overlay.is-grid-stage .pack-card {
+    width: min(100%, 26vw, calc((100dvh - 260px) / 2 * 0.7467));
+  }
+}
+
+@media (max-width: 560px) {
+  .pack-overlay.is-grid-stage .pack-reveal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    width: min(92vw, 430px) !important;
+    gap: 8px !important;
+  }
+
+  .pack-overlay.is-grid-stage .pack-card {
+    width: min(100%, 42vw, calc((100dvh - 240px) / 3 * 0.7467));
+  }
+
+  .pack-overlay.is-grid-stage .pack-overlay-actions {
+    padding: 4px 0 0 !important;
   }
 }
