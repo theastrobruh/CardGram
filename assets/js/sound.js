@@ -392,6 +392,13 @@
       chip([523.25, 783.99, 1046.5, 1567.98], { step: 0.075, dur: 0.3, gain: 0.012, send: 0.32 });
     },
 
+    /* Derechazo de Azura: golpe seco con cuerpo grave. */
+    punch() {
+      tone({ freq: 220, to: 62, type: 'sawtooth', dur: 0.13, gain: 0.05 });
+      tone({ freq: 92, to: 44, type: 'sine', dur: 0.22, gain: 0.06 });
+      air({ from: 2200, to: 180, dur: 0.16, gain: 0.05, q: 1.1 });
+    },
+
     /* Error suave: caída de chip, nunca estridente. */
     error() {
       tone({ freq: 233.08, to: 174.61, type: 'square', dur: 0.14, gain: 0.018 });

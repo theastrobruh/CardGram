@@ -1854,7 +1854,10 @@ function renderBoosterSetButtons(sets) {
   );
 }
 
-const SHOP_VENDOR_SPRITES = Array.from({ length: 14 }, (_, index) => `assets/data/vendor/azura/webp/vendor-${index + 1}.webp`);
+const SHOP_VENDOR_SPRITES = Array.from(
+  { length: 12 },
+  (_, index) => `assets/data/vendor/azura/webp/azura-idle-${String(index).padStart(2, '0')}.webp`
+);
 const AZURA_DEFAULT_SPRITES = SHOP_VENDOR_SPRITES.slice();
 const SHOP_BACKGROUNDS = {
   dawn: 'assets/data/shop_assets/dawn.webp',
@@ -1920,86 +1923,304 @@ let shopVendorInitialized = false;
 let shopPackArt = {};
 let shopPackArtLoaded = false;
 
-/* Azura · estado autónomo ------------------------------------------------- */
-let azuraIsAway = false;
+/* Azura · estados ---------------------------------------------------------
+   1. idle  · posturas normales mientras compras.
+   2. afk   · tras 1 minuto sin interactuar se va durmiendo poco a poco
+              (una postura nueva cada 30 s hasta quedarse dormida).
+   3. react · cada tap la molesta un poco más; al sexto te suelta un derechazo
+              y vuelve a su estado normal como si nada.
+   ------------------------------------------------------------------------- */
+const AZURA_IDLE_SPRITES = Array.from(
+  { length: 12 },
+  (_, index) => `assets/data/vendor/azura/webp/azura-idle-${String(index).padStart(2, '0')}.webp`
+);
+const AZURA_AFK_SPRITES = Array.from(
+  { length: 5 },
+  (_, index) => `assets/data/vendor/azura/webp/azura-afk-${String(index).padStart(2, '0')}.webp`
+);
+const AZURA_REACT_SPRITES = Array.from(
+  { length: 6 },
+  (_, index) => `assets/data/vendor/azura/webp/azura-react-${String(index + 1).padStart(2, '0')}.webp`
+);
+const AZURA_IDLE_DELAY = 60000;
+const AZURA_AFK_STEP = 30000;
+const AZURA_TAP_RESET = 4200;
+
+const AZURA_REACT_LINES = {
+  es: [
+    '¿Otra vez? Tengo trabajo.',
+    'Te estoy viendo. Literalmente.',
+    'Vale, ya empieza a cansar.',
+    'Un tap más y lo vas a lamentar.',
+    'Te lo advertí, ¿eh?',
+    '¡Ya basta!'
+  ],
+  en: [
+    'Again? I have work to do.',
+    'I can see you. Literally.',
+    'Okay, this is getting old.',
+    'One more tap and you will regret it.',
+    'I warned you, alright?',
+    'That is enough!'
+  ],
+  de: [
+    'Schon wieder? Ich habe zu tun.',
+    'Ich sehe dich. Wortwörtlich.',
+    'Okay, das wird langsam alt.',
+    'Noch ein Tipp und du bereust es.',
+    'Ich habe dich gewarnt, ja?',
+    'Jetzt reicht es!'
+  ]
+};
+
+const AZURA_SLEEP_LINES = {
+  es: 'Mmm… ¿qué? Estaba descansando.',
+  en: 'Mmm… what? I was resting.',
+  de: 'Mmm… was? Ich habe geruht.'
+};
+
+let azuraMode = 'idle';
+let azuraIdleTimer = 0;
+let azuraAfkTimer = 0;
+let azuraAfkStep = 0;
+let azuraReactTimer = 0;
+let azuraTapCount = 0;
+let azuraTapResetTimer = 0;
+let azuraPunching = false;
 let azuraAwayTimer = 0;
 let azuraPoseTimer = 0;
 let azuraPoseHistory = [];
 let azuraLastSwap = 0;
 let azuraAutoPaused = false;
 let azuraPace = 1;
-const AZURA_POSES = {
-  leave: SHOP_VENDOR_SPRITES[13],
-  enter: SHOP_VENDOR_SPRITES[0],
-  annoyed: [SHOP_VENDOR_SPRITES[5], SHOP_VENDOR_SPRITES[6], SHOP_VENDOR_SPRITES[7]]
-};
+
+function azuraImages() {
+  return [hub.els.shopNpcA, hub.els.shopNpcB];
+}
+
+/* Cambia el sprite con el cruce de siempre. */
+function azuraShow(src, options) {
+  const opts = options || {};
+  const nodes = azuraImages();
+  if (!nodes[0] || !nodes[1] || !src) return false;
+  const next = shopVendorActive === 0 ? nodes[1] : nodes[0];
+  const prev = shopVendorActive === 0 ? nodes[0] : nodes[1];
+  next.src = src;
+  next.classList.add('is-active');
+  prev.classList.remove('is-active');
+  shopVendorActive = shopVendorActive === 0 ? 1 : 0;
+  azuraLastSwap = performance.now();
+  if (opts.index !== undefined) {
+    shopVendorIndex = opts.index;
+    azuraPoseHistory.push(opts.index);
+    if (azuraPoseHistory.length > 5) azuraPoseHistory.shift();
+  }
+  if (opts.haptic) haptic(opts.haptic);
+  return true;
+}
 
 function pickAzuraPose() {
-  /* Las posturas de entrada/salida son solo para el saludo y la despedida:
-     nunca deben salir en el bucle autónomo o parece que Azura se marcha. */
-  const transitionFrames = [0, SHOP_VENDOR_SPRITES.length - 1];
-  const pool = SHOP_VENDOR_SPRITES
-    .map((src, index) => ({ src, index }))
-    .filter((entry) => !transitionFrames.includes(entry.index))
-    .filter((entry) => entry.index !== shopVendorIndex && !azuraPoseHistory.includes(entry.index));
-  const list = pool.length
-    ? pool
-    : SHOP_VENDOR_SPRITES
-        .map((src, index) => ({ src, index }))
-        .filter((entry) => !transitionFrames.includes(entry.index));
+  const pool = SHOP_VENDOR_SPRITES.map((src, index) => ({ src, index })).filter(
+    (entry) => entry.index !== shopVendorIndex && !azuraPoseHistory.includes(entry.index)
+  );
+  const list = pool.length ? pool : SHOP_VENDOR_SPRITES.map((src, index) => ({ src, index }));
   return list[Math.floor(Math.random() * list.length)];
 }
 
 /* Aplica una pose concreta con el fundido existente. */
 function setAzuraPose(index, options) {
   const opts = options || {};
-  if (!hub.els.shopNpcA || !hub.els.shopNpcB || azuraIsAway) return false;
-  /* Un cambio de pose nunca debe pisar al anterior: mínimo 4.5 s en escena. */
+  if (!hub.els.shopNpcA || !hub.els.shopNpcB) return false;
   const now = performance.now();
   if (!opts.force && azuraLastSwap && now - azuraLastSwap < 4500) return false;
-  const target = ((Number(index) % SHOP_VENDOR_SPRITES.length) + SHOP_VENDOR_SPRITES.length) % SHOP_VENDOR_SPRITES.length;
-  const next = shopVendorActive === 0 ? hub.els.shopNpcB : hub.els.shopNpcA;
-  const prev = shopVendorActive === 0 ? hub.els.shopNpcA : hub.els.shopNpcB;
-
-  next.src = SHOP_VENDOR_SPRITES[target];
-  next.classList.add('is-active');
-  prev.classList.remove('is-active');
-  shopVendorActive = shopVendorActive === 0 ? 1 : 0;
-  shopVendorIndex = target;
-  azuraLastSwap = now;
-  azuraPoseHistory.push(target);
-  if (azuraPoseHistory.length > 5) azuraPoseHistory.shift();
-
-  // No habla en cada cambio: solo de vez en cuando, para que se sienta viva.
+  const total = SHOP_VENDOR_SPRITES.length;
+  const target = ((Number(index) % total) + total) % total;
+  const ok = azuraShow(SHOP_VENDOR_SPRITES[target], { index: target });
+  if (!ok) return false;
   if (!opts.silent && Math.random() < 0.28) speakShopLine('talk');
   return true;
 }
 
-/* Bucle autónomo de posturas: cadencia irregular y siempre rearmado. */
+/* Bucle autónomo de posturas: solo cuando está en estado normal. */
 function queueAzuraPose() {
   window.clearTimeout(azuraPoseTimer);
   const delay = (6200 + Math.random() * 7600) * azuraPace;
   azuraPoseTimer = window.setTimeout(() => {
     try {
-      if (hub.panel === 'booster' && !document.hidden && !azuraAutoPaused) {
+      if (
+        hub.panel === 'booster' &&
+        !document.hidden &&
+        !azuraAutoPaused &&
+        azuraMode === 'idle' &&
+        !azuraPunching
+      ) {
         setAzuraPose(pickAzuraPose().index);
       }
     } finally {
-      /* El bucle se rearma siempre, aunque una pose falle. */
       queueAzuraPose();
     }
   }, delay);
+}
+
+/* -------------------------------- Estado AFK ------------------------------ */
+function armAzuraIdle() {
+  window.clearTimeout(azuraIdleTimer);
+  azuraIdleTimer = 0;
+  if (hub.panel !== 'booster') return;
+  azuraIdleTimer = window.setTimeout(enterAzuraAfk, AZURA_IDLE_DELAY);
+}
+
+function enterAzuraAfk() {
+  if (hub.panel !== 'booster' || document.hidden) {
+    armAzuraIdle();
+    return;
+  }
+  if (azuraMode === 'react' || azuraPunching) {
+    armAzuraIdle();
+    return;
+  }
+  azuraMode = 'afk';
+  azuraAfkStep = 0;
+  window.clearTimeout(azuraPoseTimer);
+  azuraShow(AZURA_AFK_SPRITES[0]);
+  scheduleAzuraAfkStep();
+}
+
+function scheduleAzuraAfkStep() {
+  window.clearTimeout(azuraAfkTimer);
+  azuraAfkTimer = window.setTimeout(() => {
+    if (azuraMode !== 'afk' || hub.panel !== 'booster' || document.hidden) return;
+    if (azuraAfkStep < AZURA_AFK_SPRITES.length - 1) {
+      azuraAfkStep += 1;
+      azuraShow(AZURA_AFK_SPRITES[azuraAfkStep]);
+      scheduleAzuraAfkStep();
+    }
+  }, AZURA_AFK_STEP);
+}
+
+function wakeAzura(options) {
+  const opts = options || {};
+  window.clearTimeout(azuraAfkTimer);
+  azuraAfkStep = 0;
+  if (azuraMode !== 'afk') {
+    azuraMode = 'idle';
+    armAzuraIdle();
+    return false;
+  }
+  azuraMode = 'idle';
+  azuraShow(AZURA_IDLE_SPRITES[opts.silent ? 1 : 0], { index: 0 });
+  queueAzuraPose();
+  armAzuraIdle();
+  return true;
+}
+
+/* Cualquier señal de vida en la tienda reinicia la espera. */
+function noteAzuraInteraction() {
+  if (hub.panel !== 'booster') return;
+  if (azuraMode === 'afk') {
+    wakeAzura({ silent: true });
+    return;
+  }
+  armAzuraIdle();
+}
+
+/* ------------------------------ Estado react ----------------------------- */
+function azuraReactLine(step) {
+  const lang = document.documentElement.lang;
+  const lines = AZURA_REACT_LINES[lang] || AZURA_REACT_LINES.en;
+  return lines[Math.max(0, Math.min(lines.length - 1, step - 1))];
+}
+
+function scheduleAzuraCalmDown() {
+  window.clearTimeout(azuraTapResetTimer);
+  azuraTapResetTimer = window.setTimeout(() => {
+    azuraTapCount = 0;
+    if (azuraMode === 'react' && !azuraPunching) {
+      azuraMode = 'idle';
+      azuraShow(AZURA_IDLE_SPRITES[0], { index: 0 });
+      queueAzuraPose();
+      armAzuraIdle();
+    }
+  }, AZURA_TAP_RESET);
+}
+
+function azuraPunch() {
+  if (azuraPunching) return;
+  azuraPunching = true;
+  window.clearTimeout(azuraPoseTimer);
+  const npc = hub.els.shopNpcContainer || document.querySelector('.shop-npc');
+  const scene = document.querySelector('.shop-scene');
+  if (npc) {
+    npc.classList.remove('is-punching');
+    void npc.offsetWidth;
+    npc.classList.add('is-punching');
+  }
+  if (scene) {
+    scene.classList.remove('is-hit');
+    void scene.offsetWidth;
+    scene.classList.add('is-hit');
+  }
+  if (window.Sound) window.Sound.play('punch');
+  haptic([0, 55, 80, 40]);
+  if (hub.els.shopSpeech) typeShopLine(azuraReactLine(6), false);
+
+  window.clearTimeout(azuraReactTimer);
+  azuraReactTimer = window.setTimeout(() => {
+    if (npc) npc.classList.remove('is-punching');
+    if (scene) scene.classList.remove('is-hit');
+    azuraPunching = false;
+    azuraTapCount = 0;
+    azuraMode = 'idle';
+    azuraShow(AZURA_IDLE_SPRITES[0], { index: 0 });
+    queueAzuraPose();
+    armAzuraIdle();
+  }, 1600);
+}
+
+function handleAzuraTap() {
+  scheduleAzuraAway();
+  if (azuraPunching) return;
+
+  /* Si está dormida, el tap solo la despierta: todavía no está enfadada. */
+  if (azuraMode === 'afk') {
+    wakeAzura();
+    if (hub.els.shopSpeech) {
+      const lang = document.documentElement.lang;
+      typeShopLine(AZURA_SLEEP_LINES[lang] || AZURA_SLEEP_LINES.en, false);
+    }
+    if (window.Sound) window.Sound.play('tap');
+    return;
+  }
+
+  noteAzuraInteraction();
+  azuraMode = 'react';
+  window.clearTimeout(azuraPoseTimer);
+  azuraTapCount = Math.min(azuraTapCount + 1, AZURA_REACT_SPRITES.length);
+  azuraShow(AZURA_REACT_SPRITES[azuraTapCount - 1], { haptic: 8 + azuraTapCount * 4 });
+
+  const npc = hub.els.shopNpcContainer || document.querySelector('.shop-npc');
+  if (npc) {
+    npc.classList.remove('is-reacting');
+    void npc.offsetWidth;
+    npc.classList.add('is-reacting');
+    window.setTimeout(() => npc.classList.remove('is-reacting'), 720);
+  }
+
+  if (azuraTapCount >= AZURA_REACT_SPRITES.length) {
+    azuraPunch();
+    return;
+  }
+
+  if (hub.els.shopSpeech) typeShopLine(azuraReactLine(azuraTapCount), false);
+  if (window.Sound) window.Sound.play('tap');
+  scheduleAzuraCalmDown();
 }
 
 function setAzuraSprite(index, src) {
   if (index < 0 || index >= SHOP_VENDOR_SPRITES.length || !src) return;
   const old = SHOP_VENDOR_SPRITES[index];
   SHOP_VENDOR_SPRITES[index] = src;
-  if (index === 0) AZURA_POSES.enter = src;
-  if (index === 13) AZURA_POSES.leave = src;
-  const annoyedIndex = AZURA_POSES.annoyed.indexOf(old);
-  if (annoyedIndex >= 0) AZURA_POSES.annoyed[annoyedIndex] = src;
-  [hub.els.shopNpcA, hub.els.shopNpcB].forEach((image) => {
+  azuraImages().forEach((image) => {
     if (image && image.getAttribute('src') === old) image.src = src;
   });
 }
@@ -2011,12 +2232,21 @@ window.CardGramAzura = {
   get defaults() {
     return AZURA_DEFAULT_SPRITES.slice();
   },
+  get idle() {
+    return AZURA_IDLE_SPRITES.slice();
+  },
+  get afk() {
+    return AZURA_AFK_SPRITES.slice();
+  },
+  get react() {
+    return AZURA_REACT_SPRITES.slice();
+  },
   setSprite: setAzuraSprite,
   restoreSprite(index) {
     setAzuraSprite(index, AZURA_DEFAULT_SPRITES[index]);
   },
   setPose(index) {
-    return setAzuraPose(index, { silent: true });
+    return setAzuraPose(index, { silent: true, force: true });
   },
   setAuto(on) {
     azuraAutoPaused = !on;
@@ -2031,14 +2261,51 @@ window.CardGramAzura = {
   setPace(scale) {
     azuraPace = scale === 'slow' ? 1.8 : scale === 'fast' ? 0.55 : 1;
   },
+  /* Atajos para probar los estados sin esperar. */
+  enterAfk() {
+    enterAzuraAfk();
+    return azuraMode;
+  },
+  wake() {
+    wakeAzura();
+    return azuraMode;
+  },
+  tap() {
+    handleAzuraTap();
+    return azuraTapCount;
+  },
+  resetTap() {
+    azuraTapCount = 0;
+    azuraMode = 'idle';
+    azuraPunching = false;
+    window.clearTimeout(azuraReactTimer);
+    const npc = hub.els.shopNpcContainer || document.querySelector('.shop-npc');
+    const scene = document.querySelector('.shop-scene');
+    if (npc) npc.classList.remove('is-punching', 'is-reacting');
+    if (scene) scene.classList.remove('is-hit');
+    azuraShow(AZURA_IDLE_SPRITES[0], { index: 0 });
+  },
   getState() {
-    return { auto: !azuraAutoPaused, pace: azuraPace, index: shopVendorIndex, away: azuraIsAway };
+    return {
+      auto: !azuraAutoPaused,
+      pace: azuraPace,
+      index: shopVendorIndex,
+      mode: azuraMode,
+      afkStep: azuraAfkStep,
+      taps: azuraTapCount,
+      punching: azuraPunching
+    };
   },
   debug() {
     return {
       panel: hub.panel,
       hidden: document.hidden,
       paused: azuraAutoPaused,
+      mode: azuraMode,
+      afkStep: azuraAfkStep,
+      taps: azuraTapCount,
+      idleTimer: azuraIdleTimer,
+      afkTimer: azuraAfkTimer,
       timer: azuraPoseTimer,
       last: Math.round(azuraLastSwap),
       history: azuraPoseHistory.slice()
@@ -2046,6 +2313,12 @@ window.CardGramAzura = {
   }
 };
 
+/* Azura ya no se marcha sola: el temporizador de inactividad la sacaba de
+   escena con opacidad 0 y no volvía nunca. Solo se va si se la llama. */
+function scheduleAzuraAway() {
+  window.clearTimeout(azuraAwayTimer);
+  azuraAwayTimer = 0;
+}
 
 function shopTimeSlot(date = new Date()) {
   const hour = date.getHours();
@@ -2168,7 +2441,6 @@ function loadShopPackArt() {
     .catch(() => {});
 }
 
-
 function triggerShopTransitionAnimation(newSlot) {
   const npcContainer = hub.els.shopNpcContainer || document.querySelector('.shop-npc');
   if (!npcContainer) return;
@@ -2178,82 +2450,11 @@ function triggerShopTransitionAnimation(newSlot) {
   }, 1500);
 }
 
-function triggerAzuraLeave() {
-  if (azuraIsAway || hub.panel !== 'booster') return;
-  azuraIsAway = true;
-  const npcContainer = hub.els.shopNpcContainer || document.querySelector('.shop-npc');
-  if (npcContainer) {
-    const activeImg = shopVendorActive === 0 ? hub.els.shopNpcA : hub.els.shopNpcB;
-    if (activeImg) activeImg.src = AZURA_POSES.leave;
-    window.setTimeout(() => {
-      npcContainer.classList.add('is-leaving-scene');
-    }, 400);
-  }
-}
-
-function triggerAzuraReturn() {
-  if (!azuraIsAway) return;
-  azuraIsAway = false;
-  const npcContainer = hub.els.shopNpcContainer || document.querySelector('.shop-npc');
-  if (npcContainer) {
-    npcContainer.classList.remove('is-leaving-scene');
-    const activeImg = shopVendorActive === 0 ? hub.els.shopNpcA : hub.els.shopNpcB;
-    if (activeImg) activeImg.src = AZURA_POSES.enter;
-    npcContainer.classList.add('is-entering-scene');
-    window.setTimeout(() => {
-      npcContainer.classList.remove('is-entering-scene');
-    }, 900);
-  }
-  scheduleAzuraAway();
-}
-
-function scheduleAzuraAway() {
-  /* Azura ya no se marcha sola: el temporizador de inactividad la sacaba de
-     escena con opacidad 0 y no volvía nunca. Solo se va si se la llama. */
-  window.clearTimeout(azuraAwayTimer);
-  azuraAwayTimer = 0;
-}
-
-function handleAzuraTap() {
-  scheduleAzuraAway();
-  const npcContainer = hub.els.shopNpcContainer || document.querySelector('.shop-npc');
-  if (npcContainer) {
-    npcContainer.classList.remove('is-reacting');
-    void npcContainer.offsetWidth;
-    npcContainer.classList.add('is-reacting');
-    window.setTimeout(() => npcContainer.classList.remove('is-reacting'), 720);
-  }
-  if (azuraIsAway) {
-    triggerAzuraReturn();
-    return;
-  }
-  azuraTapCount += 1;
-  window.clearTimeout(azuraTapResetTimer);
-  azuraTapResetTimer = window.setTimeout(() => {
-    azuraTapCount = 0;
-  }, 3500);
-
-  // Si se hace demasiados taps consecutivos (4 o más), adopta postura irritada/molesta
-  if (azuraTapCount >= 4) {
-    const annoyedSrc = AZURA_POSES.annoyed[Math.floor(Math.random() * AZURA_POSES.annoyed.length)];
-    const activeImg = shopVendorActive === 0 ? hub.els.shopNpcA : hub.els.shopNpcB;
-    if (activeImg) activeImg.src = annoyedSrc;
-    if (hub.els.shopSpeech) {
-      const annoyedLine = document.documentElement.lang === 'es'
-        ? '¡Oye! Ya te vi, no tienes que picarme la pantalla.'
-        : "Hey! I see you, you don't need to poke me repeatedly.";
-      typeShopLine(annoyedLine);
-    }
-  } else {
-    speakShopLine('talk');
-  }
-}
-
 function initShopScene() {
   if (shopVendorInitialized) return;
   shopVendorInitialized = true;
   loadShopPackArt();
-  SHOP_VENDOR_SPRITES.forEach((src) => {
+  [...AZURA_IDLE_SPRITES, ...AZURA_AFK_SPRITES, ...AZURA_REACT_SPRITES].forEach((src) => {
     const image = new Image();
     image.src = src;
   });
@@ -2278,7 +2479,10 @@ function initShopScene() {
   window.setTimeout(renderShopAtmosphere, 1200);
   window.clearInterval(shopVendorTimer);
   window.clearTimeout(azuraPoseTimer);
+  azuraMode = 'idle';
+  azuraTapCount = 0;
   queueAzuraPose();
+  armAzuraIdle();
   window.clearInterval(shopClockTimer);
   shopClockTimer = window.setInterval(renderShopAtmosphere, 60000);
   scheduleShopIdle();
@@ -2309,6 +2513,10 @@ function bindShopNpcMotion() {
     npc.style.setProperty('--npc-px', '0');
     npc.style.setProperty('--npc-py', '0');
   });
+  /* Cualquier señal de vida en la tienda despierta a Azura y reinicia la espera. */
+  scene.addEventListener('pointerdown', noteAzuraInteraction, { passive: true });
+  scene.addEventListener('wheel', noteAzuraInteraction, { passive: true });
+  document.addEventListener('keydown', noteAzuraInteraction, { passive: true });
   npc.addEventListener('click', () => handleAzuraTap());
 }
 
@@ -3579,8 +3787,8 @@ function sanitizeHome(raw) {
   }
   if (Array.isArray(raw.loose)) {
     data.loose = raw.loose
-      .filter((entry) => entry && typeof entry.id === 'string' && HUB_CATALOG.byId(entry.id))
-      .slice(0, 6)
+.filter((entry) => entry && typeof entry.id === 'string' && HUB_CATALOG.byId(entry.id))
+.slice(0, 9)
       .map((entry) => ({
         id: entry.id,
         x: Math.min(0.92, Math.max(0.02, Number(entry.x) || 0.5)),
@@ -3689,7 +3897,7 @@ function drawHomeDeckCard() {
 function addHomeLooseCard() {
   const card = homeDropCard();
   if (!card) return;
-  if (hubHome.loose.length >= 6) {
+  if (hubHome.loose.length >= 9) {
     toast(t('home_loose_full'), { type: 'warning' });
     return;
   }
@@ -7659,6 +7867,28 @@ const CASCADE_WAVES = [
     max: 14
   }
 ];
+
+/* Ritmos propios de Shop e Inventory: primero el objeto, luego su etiqueta. */
+const CASCADE_SEQUENCES = {
+  booster: [
+    /* 1. Los sobres, uno tras otro. */
+    { selector: '.shop-pack-art', base: 0, step: 70, max: 12 },
+    /* 2. Sus nombres y el porcentaje. */
+    { selector: '.shop-pack strong, .shop-pack small', base: 260, step: 55, max: 24 },
+    /* 3. El icono de la tienda y su nombre. */
+    { selector: '.shop-store-art, .shop-store-name', base: 470, step: 60, max: 6 },
+    /* 4. El avatar del creador y su texto. */
+    { selector: '.shop-store-avatar, .shop-store-user', base: 600, step: 60, max: 6 },
+    /* 5. Azura cierra la escena. */
+    { selector: '.shop-npc', base: 760, step: 0, max: 1 }
+  ],
+  collections: [
+    /* 1. Los renders de las deck boxes, uno a uno. */
+    { selector: '.deck-box-img', base: 0, step: 95, max: 12 },
+    /* 2. Sus nombres y el resto de la información. */
+    { selector: '.deck-box-title, .deck-box-desc', base: 420, step: 48, max: 26 }
+  ]
+};
 let cascadeTimer = 0;
 
 function playPanelCascade(panel) {
@@ -7676,22 +7906,31 @@ function playPanelCascade(panel) {
 
   const picked = [];
   const seen = new Set();
-  CASCADE_WAVES.forEach((wave) => {
+  let lastDelay = 0;
+
+  const applyWave = (wave) => {
     let count = 0;
     panel.querySelectorAll(wave.selector).forEach((node) => {
       if (count >= wave.max) return;
       if (seen.has(node)) return;
-      /* Nada dentro de otro nodo animado: la cascada perdería el orden. */
-      if (picked.some((parent) => parent !== node && parent.contains(node))) return;
+      /* Nada dentro de otro nodo animado (ni envolviendo a uno ya animado):
+         la cascada perdería el orden. */
+      if (picked.some((other) => other !== node && (other.contains(node) || node.contains(other)))) return;
       seen.add(node);
       picked.push(node);
-      node.style.setProperty('--cg-delay', `${wave.base + count * wave.step}ms`);
+      const delay = wave.base + count * wave.step;
+      node.style.setProperty('--cg-delay', `${delay}ms`);
       node.classList.add('cg-in');
+      lastDelay = Math.max(lastDelay, delay);
       count += 1;
     });
-  });
+  };
 
-  cascadeTimer = window.setTimeout(clearPanelCascade, 1500);
+  const sequence = CASCADE_SEQUENCES[panel.dataset.hubPanel || ''];
+  if (sequence) sequence.forEach(applyWave);
+  CASCADE_WAVES.forEach(applyWave);
+
+  cascadeTimer = window.setTimeout(clearPanelCascade, Math.max(1500, lastDelay + 900));
 }
 
 function clearPanelCascade() {
@@ -8569,7 +8808,14 @@ function setNpcPosLabel(text, posKey) {
   const key = posKey || 'left';
   const resolved = typeof t === 'function' ? t(`shop_npc_pos_${key}`) : text;
   const label = document.getElementById('shop-npc-pos-label');
-  if (label) label.textContent = resolved || text;
+  /* La barra solo muestra "Azura"; la posición vive en el menú. */
+  if (label) label.textContent = 'Azura';
+
+  const picker = document.getElementById('shop-npc-pos-btn');
+  if (picker) {
+    picker.setAttribute('aria-label', resolved ? `Azura · ${resolved}` : 'Azura');
+    picker.setAttribute('title', resolved ? `Azura · ${resolved}` : 'Azura');
+  }
 
   const menu = document.getElementById('shop-npc-pos-menu');
   if (menu) {

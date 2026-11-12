@@ -1367,7 +1367,7 @@ Object.assign(I18N.es, {
   home_deck_hint: 'Toca el deck para sacar una carta.', home_deck_empty: 'Esta fuente no tiene cartas.',
   home_draw_source: 'Fuente del Draw', home_draw_count: 'Cartas por Draw',
   home_deck_source: 'Fuente del Deck', home_clear_loose: 'Recoger cartas sueltas',
-  home_loose_full: 'Ya tienes 6 cartas sueltas en la mesa.', home_loose_duplicate: 'Esa carta ya está en la mesa.',
+  home_loose_full: 'Ya tienes 9 cartas sueltas en la mesa.', home_loose_duplicate: 'Esa carta ya está en la mesa.',
   home_loose_remove: 'Recoger carta', home_source_all: 'Colección completa'
 });
 Object.assign(I18N.en, {
@@ -1378,7 +1378,7 @@ Object.assign(I18N.en, {
   home_deck_hint: 'Tap the deck to draw a card.', home_deck_empty: 'This source has no cards.',
   home_draw_source: 'Draw source', home_draw_count: 'Cards per draw',
   home_deck_source: 'Deck source', home_clear_loose: 'Collect loose cards',
-  home_loose_full: 'You already have 6 loose cards on the table.', home_loose_duplicate: 'That card is already on the table.',
+  home_loose_full: 'You already have 9 loose cards on the table.', home_loose_duplicate: 'That card is already on the table.',
   home_loose_remove: 'Collect card', home_source_all: 'Full collection'
 });
 Object.assign(I18N.de, {
@@ -1389,7 +1389,7 @@ Object.assign(I18N.de, {
   home_deck_hint: 'Tippe auf das Deck, um eine Karte zu ziehen.', home_deck_empty: 'Diese Quelle hat keine Karten.',
   home_draw_source: 'Draw-Quelle', home_draw_count: 'Karten pro Draw',
   home_deck_source: 'Deck-Quelle', home_clear_loose: 'Lose Karten einsammeln',
-  home_loose_full: 'Du hast bereits 6 lose Karten auf dem Tisch.', home_loose_duplicate: 'Diese Karte liegt bereits auf dem Tisch.',
+  home_loose_full: 'Du hast bereits 9 lose Karten auf dem Tisch.', home_loose_duplicate: 'Diese Karte liegt bereits auf dem Tisch.',
   home_loose_remove: 'Karte einsammeln', home_source_all: 'Gesamte Sammlung'
 });
 Object.assign(I18N.es, {
