@@ -1073,3 +1073,11 @@ body.dev-picking .dev-toggle {
     max-height: calc(100dvh - 16px);
   }
 }
+
+/* Móvil: el botón DEV sube un 10% de la altura de pantalla para no tapar la
+   barra inferior ni los accesos de las pantallas. */
+@media (max-width: 980px) {
+  .dev-toggle {
+    bottom: calc(16px + 10dvh) !important;
+  }
+}

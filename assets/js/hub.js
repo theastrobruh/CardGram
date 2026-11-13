@@ -2605,6 +2605,8 @@ function bindShopNpcMotion() {
   hub.shopNpcMotionBound = true;
   scene.addEventListener('pointermove', (event) => {
     if (event.pointerType && event.pointerType !== 'mouse') return;
+    /* Dormida (o recién interrumpida): el ratón no la mueve ni la despierta. */
+    if (azuraMode === 'afk' || azuraMode === 'interrupted') return;
     const rect = npc.getBoundingClientRect();
     const px = Math.max(-1, Math.min(1, (event.clientX - (rect.left + rect.width / 2)) / (rect.width / 2)));
     const py = Math.max(-1, Math.min(1, (event.clientY - (rect.top + rect.height / 2)) / (rect.height / 2)));
@@ -2615,9 +2617,9 @@ function bindShopNpcMotion() {
     npc.style.setProperty('--npc-px', '0');
     npc.style.setProperty('--npc-py', '0');
   });
-  /* Cualquier señal de vida en la tienda despierta a Azura y reinicia la espera. */
+  /* Solo un clic/tap (o una tecla) cuenta como interacción: pasar el ratón
+     por encima no la despierta ni reinicia la espera del estado AFK. */
   scene.addEventListener('pointerdown', noteAzuraInteraction, { passive: true });
-  scene.addEventListener('wheel', noteAzuraInteraction, { passive: true });
   document.addEventListener('keydown', noteAzuraInteraction, { passive: true });
   npc.addEventListener('click', () => handleAzuraTap());
 }
@@ -2788,6 +2790,14 @@ function renderBooster() {
 
   initShopScene();
   queueAzuraPose();
+  /* Cada visita a la tienda rearma la cuenta de 1 minuto: initShopScene solo
+     corre una vez por carga, así que sin esto el AFK no llegaba nunca. */
+  if (azuraMode !== 'react' && azuraMode !== 'interrupted') {
+    azuraMode = 'idle';
+    azuraAfkStep = 0;
+    window.clearTimeout(azuraInterruptTimer);
+    armAzuraIdle();
+  }
   renderShopRecommended(sets);
   renderBoosterSetButtons(sets);
 

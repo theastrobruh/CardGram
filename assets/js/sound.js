@@ -564,6 +564,10 @@
       return 'navigate';
     }
 
+    /* Los accesos de Explore (La Plaza, tiendas, Sobre CardGram) suenan igual
+       que el resto de navegación: misma muestra para todos. */
+    if (node.closest('.explore-creator, .explore-shop')) return 'navigate';
+
     if (node.matches('.tab-btn, [role="tab"]')) return 'tab';
 
     if (node.closest('.hub-card')) return 'flip';

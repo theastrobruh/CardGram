@@ -20963,3 +20963,118 @@ body.pack-carousel .shop-scene {
 body.pack-open .shop-playground-bar {
   display: none !important;
 }
+
+/* ==========================================================================
+   REV 344 · Azura en móvil: 5% más abajo y por delante de la barra inferior
+   (la barra es solo un degradado decorativo, así no le corta los pies).
+   ========================================================================== */
+@media (max-width: 980px) {
+  .shop-npc {
+    /* El sprite termina a la altura del muslo: hay que esconder ese corte
+       detrás de la barra inferior. Bajamos la figura lo justo para que el
+       borde del arte quede 22px por debajo del borde de la barra, de modo
+       que ni el paralaje (-10px) ni el rebote de clic (-12px) lo destapen. */
+    bottom: 60px !important;
+    /* Detrás de la UI (sobres, tarjetas, badges): nunca por delante. */
+    z-index: 2 !important;
+    /* Refuerzo: los últimos 34px se desvanecen, así el corte no se lee
+       como una línea recta si asoma por encima de la barra. */
+    -webkit-mask-image: linear-gradient(to top, transparent 0, rgba(0, 0, 0, 0.55) 18px, #000 34px);
+    mask-image: linear-gradient(to top, transparent 0, rgba(0, 0, 0, 0.55) 18px, #000 34px);
+  }
+}
+
+/* ==========================================================================
+   REV 344 · La Plaza entra animada: primero los iconos, después el texto
+   ========================================================================== */
+@keyframes plazaIconIn {
+  from {
+    opacity: 0;
+    translate: 0 26px;
+    scale: 0.9;
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes plazaTextIn {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+#explore-plaza-picker-block:not([hidden]) .plaza-scope-card {
+  animation: plazaIconIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+#explore-plaza-picker-block:not([hidden]) .plaza-scope-card:nth-child(1) {
+  animation-delay: 0.04s;
+}
+
+#explore-plaza-picker-block:not([hidden]) .plaza-scope-card:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+#explore-plaza-picker-block:not([hidden]) .plaza-picker-head > * {
+  animation: plazaTextIn 0.6s var(--ease) both;
+}
+
+#explore-plaza-picker-block:not([hidden]) .plaza-picker-head > *:nth-child(1) {
+  animation-delay: 0.34s;
+}
+
+#explore-plaza-picker-block:not([hidden]) .plaza-picker-head > *:nth-child(2) {
+  animation-delay: 0.43s;
+}
+
+#explore-plaza-picker-block:not([hidden]) .plaza-picker-head > *:nth-child(3) {
+  animation-delay: 0.52s;
+}
+
+#explore-plaza-picker-block:not([hidden]) .plaza-scope-label-wrap {
+  animation: plazaTextIn 0.55s var(--ease) both;
+}
+
+#explore-plaza-picker-block:not([hidden]) .plaza-scope-card:nth-child(1) .plaza-scope-label-wrap {
+  animation-delay: 0.56s;
+}
+
+#explore-plaza-picker-block:not([hidden]) .plaza-scope-card:nth-child(2) .plaza-scope-label-wrap {
+  animation-delay: 0.68s;
+}
+
+/* Feed de La Plaza: banner primero, tarjetas en cascada. */
+#explore-plaza-feed-block:not([hidden]) .plaza-hero-banner {
+  animation: plazaTextIn 0.7s var(--ease) both;
+}
+
+#explore-plaza-feed-block:not([hidden]) .plaza-card {
+  animation: plazaIconIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+#explore-plaza-feed-block:not([hidden]) .plaza-card:nth-child(1) { animation-delay: 0.12s; }
+#explore-plaza-feed-block:not([hidden]) .plaza-card:nth-child(2) { animation-delay: 0.22s; }
+#explore-plaza-feed-block:not([hidden]) .plaza-card:nth-child(3) { animation-delay: 0.32s; }
+#explore-plaza-feed-block:not([hidden]) .plaza-card:nth-child(4) { animation-delay: 0.42s; }
+#explore-plaza-feed-block:not([hidden]) .plaza-card:nth-child(5) { animation-delay: 0.5s; }
+#explore-plaza-feed-block:not([hidden]) .plaza-card:nth-child(6) { animation-delay: 0.58s; }
+
+@media (prefers-reduced-motion: reduce) {
+  #explore-plaza-picker-block:not([hidden]) .plaza-scope-card,
+  #explore-plaza-picker-block:not([hidden]) .plaza-picker-head > *,
+  #explore-plaza-picker-block:not([hidden]) .plaza-scope-label-wrap,
+  #explore-plaza-feed-block:not([hidden]) .plaza-hero-banner,
+  #explore-plaza-feed-block:not([hidden]) .plaza-card {
+    animation: none !important;
+  }
+}
