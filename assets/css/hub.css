@@ -20832,7 +20832,10 @@ body.pack-carousel .shop-scene {
   }
 
   .pack-overlay.is-grid-stage .pack-card {
-    width: min(100%, 26vw, calc((100dvh - 260px) / 2 * 0.7467));
+    width: auto !important;
+    height: min(30vh, calc((100dvh - 210px) / 2));
+    max-width: 100%;
+    aspect-ratio: 896 / 1200;
   }
 }
 
@@ -20844,10 +20847,119 @@ body.pack-carousel .shop-scene {
   }
 
   .pack-overlay.is-grid-stage .pack-card {
-    width: min(100%, 42vw, calc((100dvh - 240px) / 3 * 0.7467));
+    width: auto !important;
+    height: min(30vh, calc((100dvh - 250px) / 3));
+    max-width: 100%;
+    aspect-ratio: 896 / 1200;
   }
 
   .pack-overlay.is-grid-stage .pack-overlay-actions {
     padding: 4px 0 0 !important;
   }
+}
+
+/* ==========================================================================
+   REV 342 · Resumen del sobre: solo tres accesos de icono, centrados abajo
+   - Tienda · Home · Inventario: círculos iguales, simétricos, al pie.
+   - Se ocultan los botones con texto y el conmutador de modo cine.
+   ========================================================================== */
+#pack-overlay.is-pack-done .pack-overlay-actions {
+  display: none !important;
+}
+
+/* Con todo a la vista, el contador y los puntos ya no aportan nada. */
+#pack-overlay.is-pack-done .pack-head-meta {
+  display: none !important;
+}
+
+/* La rejilla arranca arriba (lejos de la X de cerrar) y los accesos quedan
+   anclados al pie con el espacio libre en medio. */
+#pack-overlay.is-pack-done .pack-overlay-shell {
+  justify-content: flex-start !important;
+}
+
+#pack-overlay.is-pack-done .pack-reveal-grid {
+  margin-bottom: auto !important;
+  align-content: center !important;
+}
+
+@media (max-width: 980px) {
+  #pack-overlay.is-pack-done .pack-overlay-shell {
+    padding-top: 58px !important;
+  }
+}
+
+#pack-overlay.is-pack-done .pack-end-actions {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-wrap: nowrap !important;
+  gap: 18px !important;
+  width: 100% !important;
+  margin: auto auto 0 !important;
+  padding: 12px 0 calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+  background: none !important;
+}
+
+#pack-overlay.is-pack-done .pack-end-actions .btn.pack-end-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  min-height: 46px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background: rgba(6, 32, 41, 0.62) !important;
+  border: 1px solid rgba(150, 246, 255, 0.26) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.34) !important;
+  color: #eafcff !important;
+  text-shadow: none !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+#pack-overlay.is-pack-done .pack-end-actions .btn.pack-end-btn > span {
+  display: none !important;
+}
+
+#pack-overlay.is-pack-done .pack-end-actions .btn.pack-end-btn .icon {
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  stroke-width: 1.9;
+}
+
+#pack-overlay.is-pack-done .pack-end-actions .btn.pack-end-btn:hover,
+#pack-overlay.is-pack-done .pack-end-actions .btn.pack-end-btn:focus-visible {
+  background: rgba(12, 62, 76, 0.78) !important;
+  border-color: rgba(150, 246, 255, 0.62) !important;
+  transform: translateY(-1px);
+  outline: none !important;
+}
+
+#pack-overlay.is-pack-done .pack-end-actions .btn.pack-end-btn:active {
+  transform: scale(0.96);
+}
+
+@media (max-width: 560px) {
+  #pack-overlay.is-pack-done .pack-end-actions {
+    gap: 16px !important;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  #pack-overlay.is-pack-done .pack-end-actions .btn.pack-end-btn {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+}
+
+/* La barra de edición del playground no debe asomar sobre el sobre abierto. */
+body.pack-open .shop-playground-bar {
+  display: none !important;
 }

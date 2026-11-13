@@ -287,6 +287,7 @@ function warmAzuraSprites() {
     AZURA_IDLE_SPRITES[0],
     AZURA_IDLE_SPRITES[1],
     AZURA_AFK_SPRITES[0],
+    AZURA_AFK_INT_SPRITES[0],
     AZURA_REACT_SPRITES[0]
   ].filter(Boolean);
 
@@ -1478,6 +1479,15 @@ function dismissTopCard(direction) {
   }, reduced ? 170 : 460);
 }
 
+/* El resumen final (todas las cartas a la vista) cambia los botones: solo
+   quedan los tres accesos de icono (tienda, home, inventario). */
+function syncPackDoneState() {
+  const overlay = (hub.els && hub.els.packOverlay) || document.getElementById('pack-overlay');
+  if (!overlay) return;
+  const done = !!(hub.els && hub.els.packEndActions && !hub.els.packEndActions.hidden);
+  overlay.classList.toggle('is-pack-done', done);
+}
+
 function completePackOpen() {
   packOverlayState.cards.forEach((_, index) => packOverlayState.revealedSet.add(index));
   fillPackGrid();
@@ -1487,6 +1497,7 @@ function completePackOpen() {
   if (hub.els.packRevealAll) hub.els.packRevealAll.hidden = true;
   if (hub.els.packSave) hub.els.packSave.hidden = true;
   if (hub.els.packEndActions) hub.els.packEndActions.hidden = false;
+  syncPackDoneState();
   claimBoosterPackSilently();
   togglePackView('grid');
 }
@@ -1538,6 +1549,7 @@ function revealPackCard(index) {
     if (hub.els.packRevealAll) hub.els.packRevealAll.hidden = true;
     if (hub.els.packSave) hub.els.packSave.hidden = true;
     if (hub.els.packEndActions) hub.els.packEndActions.hidden = false;
+  syncPackDoneState();
     claimBoosterPackSilently();
   }
 }
@@ -1553,6 +1565,7 @@ function revealAllPackCards() {
   if (hub.els.packRevealAll) hub.els.packRevealAll.hidden = true;
   if (hub.els.packSave) hub.els.packSave.hidden = true;
   if (hub.els.packEndActions) hub.els.packEndActions.hidden = false;
+  syncPackDoneState();
   togglePackView('grid');
 }
 
@@ -1712,6 +1725,7 @@ function openPackOverlay() {
   if (hub.els.packRevealGrid) hub.els.packRevealGrid.replaceChildren();
   if (hub.els.packStack) hub.els.packStack.replaceChildren();
   if (hub.els.packEndActions) hub.els.packEndActions.hidden = true;
+  syncPackDoneState();
   if (hub.els.packSave) hub.els.packSave.hidden = true;
   if (hub.els.packRevealAll) hub.els.packRevealAll.hidden = true;
   if (hub.els.packToggleView) hub.els.packToggleView.hidden = true;
@@ -1916,7 +1930,7 @@ function renderBoosterSetButtons(sets) {
 }
 
 const SHOP_VENDOR_SPRITES = Array.from(
-  { length: 12 },
+  { length: 17 },
   (_, index) => `assets/data/vendor/azura/webp/azura-idle-${String(index).padStart(2, '0')}.webp`
 );
 const AZURA_DEFAULT_SPRITES = SHOP_VENDOR_SPRITES.slice();
@@ -1987,24 +2001,33 @@ let shopPackArtLoaded = false;
 /* Azura · estados ---------------------------------------------------------
    1. idle  · posturas normales mientras compras.
    2. afk   · tras 1 minuto sin interactuar se va durmiendo poco a poco
-              (una postura nueva cada 30 s hasta quedarse dormida).
+              (una postura nueva cada 15 s hasta quedarse dormida).
+              Cada pose tiene su versión "interrupted" para cuando la
+              despiertas justo en ese paso.
    3. react · cada tap la molesta un poco más; al sexto te suelta un derechazo
               y vuelve a su estado normal como si nada.
    ------------------------------------------------------------------------- */
 const AZURA_IDLE_SPRITES = Array.from(
-  { length: 12 },
+  { length: 17 },
   (_, index) => `assets/data/vendor/azura/webp/azura-idle-${String(index).padStart(2, '0')}.webp`
 );
 const AZURA_AFK_SPRITES = Array.from(
-  { length: 5 },
+  { length: 7 },
   (_, index) => `assets/data/vendor/azura/webp/azura-afk-${String(index).padStart(2, '0')}.webp`
 );
+/* Cada pose dormida tiene su versión "interrupted": es la cara que pone
+   cuando la despiertas justo en ese paso. */
+const AZURA_AFK_INT_SPRITES = Array.from(
+  { length: 7 },
+  (_, index) => `assets/data/vendor/azura/webp/azura-afk-int-${String(index).padStart(2, '0')}.webp`
+);
 const AZURA_REACT_SPRITES = Array.from(
-  { length: 6 },
+  { length: 8 },
   (_, index) => `assets/data/vendor/azura/webp/azura-react-${String(index + 1).padStart(2, '0')}.webp`
 );
 const AZURA_IDLE_DELAY = 60000;
-const AZURA_AFK_STEP = 30000;
+const AZURA_AFK_STEP = 15000;
+const AZURA_INTERRUPT_HOLD = 2800;
 const AZURA_TAP_RESET = 4200;
 
 const AZURA_REACT_LINES = {
@@ -2045,6 +2068,7 @@ let azuraIdleTimer = 0;
 let azuraAfkTimer = 0;
 let azuraAfkStep = 0;
 let azuraReactTimer = 0;
+let azuraInterruptTimer = 0;
 let azuraTapCount = 0;
 let azuraTapResetTimer = 0;
 let azuraPunching = false;
@@ -2136,7 +2160,7 @@ function enterAzuraAfk() {
     armAzuraIdle();
     return;
   }
-  if (azuraMode === 'react' || azuraPunching) {
+  if (azuraMode === 'react' || azuraMode === 'interrupted' || azuraPunching) {
     armAzuraIdle();
     return;
   }
@@ -2162,16 +2186,26 @@ function scheduleAzuraAfkStep() {
 function wakeAzura(options) {
   const opts = options || {};
   window.clearTimeout(azuraAfkTimer);
-  azuraAfkStep = 0;
-  if (azuraMode !== 'afk') {
+  if (azuraMode !== 'afk' && azuraMode !== 'interrupted') {
     azuraMode = 'idle';
     armAzuraIdle();
     return false;
   }
-  azuraMode = 'idle';
-  azuraShow(AZURA_IDLE_SPRITES[opts.silent ? 1 : 0], { index: 0 });
-  queueAzuraPose();
-  armAzuraIdle();
+  /* Se queda un momento en su pose interrumpida (la del paso en el que
+     estaba dormida) y después retoma las animaciones normales. */
+  const step = Math.max(0, Math.min(AZURA_AFK_INT_SPRITES.length - 1, azuraAfkStep));
+  azuraMode = 'interrupted';
+  azuraShow(AZURA_AFK_INT_SPRITES[step], { index: 0 });
+  if (opts.haptic !== false) haptic(10);
+  window.clearTimeout(azuraInterruptTimer);
+  azuraInterruptTimer = window.setTimeout(() => {
+    if (azuraMode !== 'interrupted') return;
+    azuraMode = 'idle';
+    azuraAfkStep = 0;
+    azuraShow(AZURA_IDLE_SPRITES[0], { index: 0 });
+    queueAzuraPose();
+    armAzuraIdle();
+  }, opts.hold || AZURA_INTERRUPT_HOLD);
   return true;
 }
 
@@ -2179,9 +2213,11 @@ function wakeAzura(options) {
 function noteAzuraInteraction() {
   if (hub.panel !== 'booster') return;
   if (azuraMode === 'afk') {
-    wakeAzura({ silent: true });
+    wakeAzura({ haptic: false });
     return;
   }
+  /* Si ya está en la reacción interrumpida, se deja que termine. */
+  if (azuraMode === 'interrupted') return;
   armAzuraIdle();
 }
 
@@ -2242,8 +2278,9 @@ function handleAzuraTap() {
   scheduleAzuraAway();
   if (azuraPunching) return;
 
-  /* Si está dormida, el tap solo la despierta: todavía no está enfadada. */
-  if (azuraMode === 'afk') {
+  /* Si está dormida (o recién interrumpida), el tap solo la despierta:
+     todavía no está enfadada. */
+  if (azuraMode === 'afk' || azuraMode === 'interrupted') {
     wakeAzura();
     if (hub.els.shopSpeech) {
       const lang = document.documentElement.lang;
@@ -2299,6 +2336,9 @@ window.CardGramAzura = {
   get afk() {
     return AZURA_AFK_SPRITES.slice();
   },
+  get afkInterrupted() {
+    return AZURA_AFK_INT_SPRITES.slice();
+  },
   get react() {
     return AZURA_REACT_SPRITES.slice();
   },
@@ -2340,6 +2380,7 @@ window.CardGramAzura = {
     azuraMode = 'idle';
     azuraPunching = false;
     window.clearTimeout(azuraReactTimer);
+    window.clearTimeout(azuraInterruptTimer);
     const npc = hub.els.shopNpcContainer || document.querySelector('.shop-npc');
     const scene = document.querySelector('.shop-scene');
     if (npc) npc.classList.remove('is-punching', 'is-reacting');
