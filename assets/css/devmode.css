@@ -28,6 +28,11 @@
   transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
 }
 
+/* Oculto por defecto: solo aparece si se activa desde Configuración. */
+.dev-toggle[hidden] {
+  display: none !important;
+}
+
 .dev-toggle:hover {
   opacity: 1;
   transform: translateY(-2px);
@@ -1221,4 +1226,30 @@ body.dev-picking .dev-toggle {
   font-family: var(--mono, monospace);
   font-size: 10px;
   color: rgba(157, 245, 233, 0.75);
+}
+
+/* Fila de Configuración que enciende el botón DEV (rev 357) */
+.hub-devmode-toggle {
+  gap: 6px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hub-devmode-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(7, 51, 63, 0.28);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hub-devmode-toggle.is-on {
+  color: #03242d;
+  background: linear-gradient(135deg, #00f2fe, #7cebdd);
+  box-shadow: 0 6px 16px rgba(0, 242, 254, 0.28);
+}
+
+.hub-devmode-toggle.is-on .hub-devmode-dot {
+  background: #03242d;
+  box-shadow: 0 0 0 3px rgba(3, 36, 45, 0.18);
 }

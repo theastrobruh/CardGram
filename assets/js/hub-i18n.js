@@ -995,7 +995,9 @@ Object.assign(I18N.es, {
   settings_sound: 'Sonido',
   settings_sfx: 'Efectos',
   settings_music: 'Música',
-  settings_layout: 'Composición'
+  settings_layout: 'Composición',
+  settings_dev: 'Modo desarrollador',
+  settings_dev_aria: 'Activar el modo desarrollador (pide PIN)'
 });
 Object.assign(I18N.en, {
   settings_title: 'Settings',
@@ -1003,7 +1005,9 @@ Object.assign(I18N.en, {
   settings_sound: 'Sound',
   settings_sfx: 'Effects',
   settings_music: 'Music',
-  settings_layout: 'Layout'
+  settings_layout: 'Layout',
+  settings_dev: 'Developer mode',
+  settings_dev_aria: 'Enable developer mode (asks for PIN)'
 });
 Object.assign(I18N.de, {
   settings_title: 'Einstellungen',
@@ -1011,7 +1015,9 @@ Object.assign(I18N.de, {
   settings_sound: 'Ton',
   settings_sfx: 'Effekte',
   settings_music: 'Musik',
-  settings_layout: 'Layout'
+  settings_layout: 'Layout',
+  settings_dev: 'Entwicklermodus',
+  settings_dev_aria: 'Entwicklermodus aktivieren (PIN nötig)'
 });
 Object.assign(I18N.es, {
   explore_lede: 'Packs de la comunidad y el camino de CardGram.',

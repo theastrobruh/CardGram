@@ -20,12 +20,14 @@
   const BG_KEY = 'cardgram.devmode.backgrounds.v1';
   const SHOP_KEY = 'cardgram.devmode.shop.v1';
   const UNLOCK_KEY = 'cardgram.devmode.unlocked';
+  const ENABLED_KEY = 'cardgram.dev.enabled';
   const DEV_PASSWORD = '0412';
   const PANEL_ID = 'dev-panel';
   const STYLE_ID = 'devmode-style';
 
   const state = {
     active: false,
+    enabled: false,
     picker: false,
     selected: null,
     selectedKey: null,
@@ -62,6 +64,8 @@
   let lockEl;
   let lockInput;
   let lockError;
+  let lockMode = 'open';
+  let settingsBtn;
   let saveTimer = 0;
   let controls = [];
   const sectionState = {};
@@ -2338,6 +2342,38 @@
     }
   }
 
+  /* El botón DEV nace oculto. Solo la activación desde Configuración (con
+     PIN) enciende el flag persistente que lo muestra. */
+  function readEnabled() {
+    try {
+      return localStorage.getItem(ENABLED_KEY) === '1';
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function isEnabled() {
+    return state.enabled === true;
+  }
+
+  function setEnabled(on) {
+    state.enabled = Boolean(on);
+    try {
+      localStorage.setItem(ENABLED_KEY, state.enabled ? '1' : '0');
+    } catch (error) {
+      /* Sin almacenamiento: el cambio vive lo que dure la página. */
+    }
+    if (toggleBtn) {
+      toggleBtn.hidden = !state.enabled;
+      if (!state.enabled) {
+        toggleBtn.setAttribute('aria-pressed', 'false');
+        toggleBtn.textContent = 'DEV';
+      }
+    }
+    if (!state.enabled) setActive(false);
+    syncSettingsRow();
+  }
+
   function buildLock() {
     lockEl = el('div', 'dev-lock');
     lockEl.hidden = true;
@@ -2376,7 +2412,12 @@
       if (lockInput.value.trim() === DEV_PASSWORD) {
         rememberUnlock();
         hideLock();
-        setActive(true);
+        if (lockMode === 'enable') {
+          setEnabled(true);
+          setActive(true);
+        } else {
+          setActive(true);
+        }
         return;
       }
       lockError.hidden = false;
@@ -2394,8 +2435,9 @@
     document.body.appendChild(lockEl);
   }
 
-  function showLock() {
+  function showLock(mode) {
     if (!lockEl) return;
+    lockMode = mode === 'enable' ? 'enable' : 'open';
     setActive(false);
     lockEl.hidden = false;
     if (lockError) lockError.hidden = true;
@@ -2413,12 +2455,14 @@
 
   function requestOpen() {
     if (state.active) return;
+    if (!isEnabled()) return;
     if (isUnlocked()) setActive(true);
     else showLock();
   }
 
   function requestToggle() {
     if (state.active) setActive(false);
+    else if (!isEnabled()) return;
     else if (isUnlocked()) setActive(true);
     else showLock();
   }
@@ -2428,8 +2472,38 @@
     toggleBtn.type = 'button';
     toggleBtn.title = 'Modo developer (Ctrl+Shift+D)';
     toggleBtn.setAttribute('aria-pressed', 'false');
+    toggleBtn.hidden = !state.enabled;
     toggleBtn.addEventListener('click', requestToggle);
     document.body.appendChild(toggleBtn);
+  }
+
+  /* ------------------------------------------------- fila en Configuración */
+  function syncSettingsRow() {
+    if (!settingsBtn) return;
+    const on = isEnabled();
+    settingsBtn.setAttribute('aria-pressed', String(on));
+    settingsBtn.classList.toggle('is-on', on);
+    const label = settingsBtn.querySelector('[data-devmode-state]');
+    if (label) label.textContent = on ? 'ON' : 'OFF';
+    settingsBtn.title = on ? 'Desactivar el modo desarrollador' : 'Activar el modo desarrollador (pide PIN)';
+  }
+
+  function bindSettingsRow() {
+    settingsBtn = document.getElementById('hub-devmode-toggle');
+    if (!settingsBtn) return;
+    syncSettingsRow();
+    settingsBtn.addEventListener('click', () => {
+      if (isEnabled()) {
+        setEnabled(false);
+        return;
+      }
+      if (isUnlocked()) {
+        setEnabled(true);
+        setActive(true);
+        return;
+      }
+      showLock('enable');
+    });
   }
 
   /* --------------------------------------------------------------- events */
@@ -2475,7 +2549,7 @@
     document.addEventListener('keydown', (event) => {
       if (event.ctrlKey && event.shiftKey && (event.key === 'D' || event.key === 'd')) {
         event.preventDefault();
-        requestToggle();
+        if (isEnabled()) requestToggle();
         return;
       }
       if (event.key === 'Escape' && lockEl && !lockEl.hidden) {
@@ -2539,6 +2613,7 @@
   /* ------------------------------------------------------------------ init */
   function init() {
     if (panel) return;
+    state.enabled = readEnabled();
     styleEl = el('style');
     styleEl.id = STYLE_ID;
     document.head.appendChild(styleEl);
@@ -2546,6 +2621,7 @@
     buildToggle();
     buildLock();
     buildPanel();
+    bindSettingsRow();
     ensureOverlays();
     loadEdits();
     loadAssets();
@@ -2561,6 +2637,7 @@
       close: () => setActive(false),
       toggle: requestToggle,
       lock: showLock,
+      setEnabled,
       select,
       backgrounds: {
         setHub: setHubBackground,
