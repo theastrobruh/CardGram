@@ -12,26 +12,26 @@
   <title>CardGram · v0.5.5</title>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237cebdd'/%3E%3Cstop offset='1' stop-color='%232f8fdd'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Crect x='17' y='11' width='30' height='42' rx='6' fill='%23ffffff' stroke='%230a6b78' stroke-width='2'/%3E%3Cellipse cx='32' cy='32' rx='10' ry='3.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%232f8fdd'/%3E%3Cpath d='M25 35.5 A 10 3.5 0 0 0 39 28.5' fill='none' stroke='%232ec4b6' stroke-width='2' transform='rotate(-25 32 32)'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=347">
-  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=347">
-  <link rel="stylesheet" href="assets/css/devmode.css?v=0.5.5&rev=347">
+  <link rel="stylesheet" href="assets/css/app.css?v=0.5.5&rev=356">
+  <link rel="stylesheet" href="assets/css/hub.css?v=0.5.5&rev=356">
+  <link rel="stylesheet" href="assets/css/devmode.css?v=0.5.5&rev=356">
 
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=347" defer></script>
-  <script src="assets/js/i18n.js?v=0.5.5&rev=347" defer></script>
-  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=347" defer></script>
-  <script src="assets/js/community.js?v=0.5.5&rev=347" defer></script>
-  <script src="assets/js/ambient.js?v=0.5.5&rev=347" defer></script>
-  <script src="assets/js/scene.js?v=0.5.5&rev=347" defer></script>
-  <script src="assets/js/export.js?v=0.5.5&rev=347" defer></script>
-  <script src="assets/js/sound.js?v=0.5.5&rev=347" defer></script>
-  <script src="assets/js/music.js?v=0.5.5&rev=347" defer></script>
-  <script src="assets/js/hub.js?v=0.5.5&rev=347" defer></script>
-  <script src="assets/js/app.js?v=0.5.5&rev=347" defer></script>
-  <script src="assets/js/welcome.js?v=0.5.5&rev=347" defer></script>
-  <script src="assets/js/boot.js?v=0.5.5&rev=347" defer></script>
-  <script src="assets/js/devmode.js?v=0.5.5&rev=347" defer></script>
+  <script src="assets/data/cards/catalog.js?v=0.5.5&rev=356" defer></script>
+  <script src="assets/js/i18n.js?v=0.5.5&rev=356" defer></script>
+  <script src="assets/js/hub-i18n.js?v=0.5.5&rev=356" defer></script>
+  <script src="assets/js/community.js?v=0.5.5&rev=356" defer></script>
+  <script src="assets/js/ambient.js?v=0.5.5&rev=356" defer></script>
+  <script src="assets/js/scene.js?v=0.5.5&rev=356" defer></script>
+  <script src="assets/js/export.js?v=0.5.5&rev=356" defer></script>
+  <script src="assets/js/sound.js?v=0.5.5&rev=356" defer></script>
+  <script src="assets/js/music.js?v=0.5.5&rev=356" defer></script>
+  <script src="assets/js/hub.js?v=0.5.5&rev=356" defer></script>
+  <script src="assets/js/app.js?v=0.5.5&rev=356" defer></script>
+  <script src="assets/js/welcome.js?v=0.5.5&rev=356" defer></script>
+  <script src="assets/js/boot.js?v=0.5.5&rev=356" defer></script>
+  <script src="assets/js/devmode.js?v=0.5.5&rev=356" defer></script>
 </head>
 <body data-view="hub" class="booting">
   <div class="boot-screen" id="boot-screen">
@@ -944,6 +944,12 @@
                Mis cartas (colecciones y decks)
                ------------------------------------------------------------ -->
           <section class="hub-panel" data-hub-panel="collections" aria-labelledby="collections-title" hidden>
+            <header class="hub-view-head">
+              <div class="hub-view-copy">
+                <h1 id="collections-title" data-i18n="collections_title">Colecciones y decks</h1>
+                <p data-i18n="collections_lede">Explora el catálogo o junta tus cartas favoritas en un deck propio.</p>
+              </div>
+            </header>
             <nav class="hub-subnav hub-subnav-inventory" aria-label="Navegación">
               <button class="hub-subnav-btn" type="button" data-collections-back>
                 <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
@@ -954,12 +960,6 @@
                 <span data-i18n="hub_subnav_home">Inicio</span>
               </button>
             </nav>
-            <header class="hub-view-head">
-              <div class="hub-view-copy">
-                <h1 id="collections-title" data-i18n="collections_title">Colecciones y decks</h1>
-                <p data-i18n="collections_lede">Explora el catálogo o junta tus cartas favoritas en un deck propio.</p>
-              </div>
-            </header>
 
             <div id="collections-overview">
               <section class="hub-section" aria-labelledby="collections-owned-title">

@@ -2078,9 +2078,30 @@ let azuraPoseHistory = [];
 let azuraLastSwap = 0;
 let azuraAutoPaused = false;
 let azuraPace = 1;
+let azuraHoloTimer = 0;
 
 function azuraImages() {
   return [hub.els.shopNpcA, hub.els.shopNpcB];
+}
+
+/* Aparición holográfica: barrido de escaneo + chispa de brillo al entrar y
+   cada vez que cambia de pose o de fase. */
+function azuraHolo(image) {
+  if (!image) return;
+  const npc = image.parentElement;
+  if (!npc) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  npc.classList.remove('is-holo');
+  image.classList.remove('is-holo');
+  /* Reinicia la animación aunque se llame dos veces seguidas. */
+  void npc.offsetWidth;
+  npc.classList.add('is-holo');
+  image.classList.add('is-holo');
+  window.clearTimeout(azuraHoloTimer);
+  azuraHoloTimer = window.setTimeout(() => {
+    npc.classList.remove('is-holo');
+    image.classList.remove('is-holo');
+  }, 700);
 }
 
 /* Cambia el sprite con el cruce de siempre. */
@@ -2095,6 +2116,7 @@ function azuraShow(src, options) {
   prev.classList.remove('is-active');
   shopVendorActive = shopVendorActive === 0 ? 1 : 0;
   azuraLastSwap = performance.now();
+  azuraHolo(next);
   if (opts.index !== undefined) {
     shopVendorIndex = opts.index;
     azuraPoseHistory.push(opts.index);
@@ -4274,20 +4296,41 @@ function makeBackStackCard() {
   return card;
 }
 
+/* Las tres cartas grandes de la vitrina salen SIEMPRE de las favoritas
+   elegidas por el usuario. DRAW cambia la mano del panel izquierdo, nunca
+   las secundarias que acompañan a la carta principal. */
+function showcaseDeckCards() {
+  const base = featuredCards().filter(Boolean);
+  const current = favoriteCard();
+  const list = base.slice();
+  if (current && !list.some((card) => card.id === current.id)) list.unshift(current);
+  return list;
+}
+
+/* Cartas que ocupan la vitrina principal: manda la selección del usuario.
+   Si todavía no eligió favoritas, se usa la mano robada con DRAW. */
+function showcaseStackCards() {
+  const ids = Array.isArray(hubProfile.featuredIds)
+    ? hubProfile.featuredIds.filter((id) => HUB_CATALOG.byId(id))
+    : [];
+  if (ids.length) return showcaseDeckCards().slice(0, 3);
+  return homeHandCards().slice(0, 3);
+}
+
 function renderFeaturedStack() {
   const stack = hub.els.playerStack;
   if (!stack) return;
 
-  const cards = homeHandCards().slice(0, 3);
+  const cards = showcaseStackCards();
   const signature = `${currentLang}|${cards.map((card) => card.id).join('|')}|${cards.length ? '1' : 'back'}`;
   stack.dataset.count = String(cards.length || 1);
   if (hub.featuredSignature === signature && stack.childElementCount) {
-    renderHandDeck(cards);
+    renderHandDeck(showcaseDeckCards());
     return;
   }
   hub.featuredSignature = signature;
   stack.replaceChildren(...(cards.length ? cards.map((card) => makeStackCard(card)) : [makeBackStackCard()]));
-  renderHandDeck(cards);
+  renderHandDeck(showcaseDeckCards());
 }
 
 /* --------------------------------------------------------------------------
@@ -6660,8 +6703,15 @@ function setActivePanel(panel, options = {}) {
     }
   }
 
-  if (target === 'booster') scheduleShopIdle();
-  else window.clearTimeout(shopIdleTimer);
+  if (target === 'booster') {
+    scheduleShopIdle();
+    /* Azura entra con el barrido holográfico, en el mismo compás que la tienda. */
+    window.clearTimeout(azuraHoloTimer);
+    window.setTimeout(() => {
+      const image = document.querySelector('.shop-npc-img.is-active');
+      if (image) azuraHolo(image);
+    }, 420);
+  } else window.clearTimeout(shopIdleTimer);
 
   if (target === 'home') {
     hub.homeVisits += 1;

@@ -18,6 +18,7 @@
   const ASSETS_KEY = 'cardgram.devmode.assets.v1';
   const AZURA_KEY = 'cardgram.devmode.azura.v1';
   const BG_KEY = 'cardgram.devmode.backgrounds.v1';
+  const SHOP_KEY = 'cardgram.devmode.shop.v1';
   const UNLOCK_KEY = 'cardgram.devmode.unlocked';
   const DEV_PASSWORD = '0412';
   const PANEL_ID = 'dev-panel';
@@ -32,6 +33,7 @@
     assets: {},
     azura: { slots: {}, auto: true, pace: 'normal' },
     backgrounds: { hub: null, hubVeil: 35, boot: [] },
+    shop: { device: 'desktop', target: '.shop-npc', values: { desktop: {}, mobile: {} } },
     tab: 'inspector',
     query: '',
     hover: null
@@ -40,6 +42,7 @@
   const NAV = [
     { id: 'inspector', icon: '◎', label: 'Inspector', sub: 'Editar el elemento activo' },
     { id: 'azura', icon: '✦', label: 'Azura', sub: 'Poses, ritmo y sprites' },
+    { id: 'shop', icon: '▦', label: 'Shop', sub: 'Mover y ajustar la tienda' },
     { id: 'assets', icon: '▣', label: 'Assets', sub: 'Imágenes e iconos' },
     { id: 'backgrounds', icon: '▤', label: 'Fondos', sub: 'Inicio y bienvenida' }
   ];
@@ -1151,6 +1154,7 @@
     } else {
       panelBody.replaceChildren();
       if (state.tab === 'azura') buildAzuraPanel();
+      else if (state.tab === 'shop') buildShopPanel();
       else if (state.tab === 'backgrounds') buildBackgroundsPanel();
       else buildAssetsPanel();
     }
@@ -1323,6 +1327,378 @@
       el('p', 'dev-hint', 'Restaurar devuelve todas las poses originales y el ritmo normal. Los cambios viven solo en este navegador.')
     );
     panelBody.appendChild(advanced.details);
+  }
+
+  /* ======================================================================
+     Shop · mover y ajustar cada pieza, por modo (desktop / mobile)
+     ==================================================================== */
+  const SHOP_TARGETS = [
+    { group: 'Escena', sel: '.shop-scene', label: 'Escena' },
+    { group: 'Escena', sel: '.shop-bg', label: 'Fondo' },
+    { group: 'Escena', sel: '.shop-light', label: 'Luz' },
+    { group: 'Azura', sel: '.shop-npc', label: 'Azura' },
+    { group: 'Azura', sel: '.shop-playground-bar', label: 'Controles de Azura' },
+    { group: 'Sobres', sel: '#shop-recommended', label: 'Carrusel de sobres' },
+    { group: 'Sobres', sel: '#shop-recommended .shop-pack', label: 'Sobres (todos)' },
+    { group: 'Sobres', sel: '.shop-pack-view', label: 'Vista del sobre' },
+    { group: 'Tienda', sel: '#shop-stores', label: 'Tienda Astro~Verse' },
+    { group: 'Tienda', sel: '.shop-mobile-store', label: 'Tienda móvil' },
+    { group: 'Tienda', sel: '.shop-mobile-bar', label: 'Barra inferior móvil' },
+    { group: 'HUD', sel: '.shop-topbar', label: 'Barra superior' },
+    { group: 'HUD', sel: '#shop-days', label: 'Contador de días' },
+    { group: 'HUD', sel: '.shop-status-row', label: 'Chips de estado' },
+    { group: 'HUD', sel: '.shop-daily', label: 'Panel diario' }
+  ];
+
+  const SHOP_DEFAULTS = { x: 0, y: 0, scale: 1, rotate: 0, opacity: 1, z: null };
+
+  let shopStyle = null;
+
+  function loadShop() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(SHOP_KEY) || 'null');
+      if (!raw || !raw.values) return;
+      state.shop.values = {
+        desktop: raw.values.desktop || {},
+        mobile: raw.values.mobile || {}
+      };
+      state.shop.device = raw.device === 'mobile' ? 'mobile' : 'desktop';
+      if (raw.target) state.shop.target = raw.target;
+    } catch (error) {
+      /* Sin ajustes guardados: se usan los del CSS. */
+    }
+  }
+
+  function saveShop() {
+    try {
+      localStorage.setItem(SHOP_KEY, JSON.stringify(state.shop));
+    } catch (error) {
+      /* Modo privado: los ajustes viven solo en esta sesión. */
+    }
+  }
+
+  function shopMap(mode) {
+    const key = mode || state.shop.device;
+    if (!state.shop.values[key]) state.shop.values[key] = {};
+    return state.shop.values[key];
+  }
+
+  function shopValue(sel, prop) {
+    const entry = shopMap()[sel];
+    const raw = entry ? entry[prop] : undefined;
+    return raw == null ? SHOP_DEFAULTS[prop] : raw;
+  }
+
+  function setShopValue(sel, prop, value) {
+    const map = shopMap();
+    const entry = map[sel] || (map[sel] = {});
+    const fallback = SHOP_DEFAULTS[prop];
+    const isDefault =
+      value == null ||
+      value === '' ||
+      (fallback === null ? value === null : Math.abs(Number(value) - Number(fallback)) < 0.0005);
+    if (isDefault) delete entry[prop];
+    else entry[prop] = prop === 'z' ? Math.round(Number(value)) : Number(value);
+    if (!Object.keys(entry).length) delete map[sel];
+    saveShop();
+    applyShop();
+  }
+
+  function shopRuleBody(sel, entry) {
+    const parts = [];
+    const x = Math.round(Number(entry.x) || 0);
+    const y = Math.round(Number(entry.y) || 0);
+    if (x || y) {
+      /* Azura conserva su paralaje: se suma al desplazamiento manual. */
+      parts.push(
+        sel === '.shop-npc'
+          ? `translate: calc(var(--npc-px, 0) * 14px + ${x}px) calc(var(--npc-py, 0) * 10px + ${y}px)`
+          : `translate: ${x}px ${y}px`
+      );
+    }
+    if (entry.scale != null && Math.abs(Number(entry.scale) - 1) > 0.0005) {
+      parts.push(`scale: ${Number(entry.scale).toFixed(3)}`);
+    }
+    if (entry.rotate) parts.push(`rotate: ${Number(entry.rotate).toFixed(2)}deg`);
+    if (entry.opacity != null && Number(entry.opacity) < 0.999) {
+      parts.push(`opacity: ${Number(entry.opacity).toFixed(2)}`);
+    }
+    if (entry.z != null) parts.push(`z-index: ${Math.round(Number(entry.z))}`);
+    if (!parts.length) return '';
+    return `${sel} {\n  ${parts.join('; ')} !important;\n}`;
+  }
+
+  function shopCssText() {
+    const build = (mode) => {
+      const map = state.shop.values[mode] || {};
+      return Object.entries(map)
+        .map(([sel, entry]) => shopRuleBody(sel, entry))
+        .filter(Boolean)
+        .join('\n');
+    };
+    const desktop = build('desktop');
+    const mobile = build('mobile');
+    const mobileBlock = mobile
+      ? `@media (max-width: 980px) {\n${mobile
+          .split('\n')
+          .map((line) => (line ? `  ${line}` : line))
+          .join('\n')}\n}`
+      : '';
+    return [desktop, mobileBlock].filter(Boolean).join('\n\n');
+  }
+
+  function applyShop() {
+    if (!shopStyle) {
+      shopStyle = document.createElement('style');
+      shopStyle.id = 'devmode-shop';
+      document.head.appendChild(shopStyle);
+    }
+    shopStyle.textContent = shopCssText();
+  }
+
+  function shopSlider(label, config, onInput) {
+    const row = el('div', 'dev-row');
+    row.appendChild(el('span', 'dev-label', label));
+    const wrap = el('div', 'dev-slider-wrap');
+    const range = el('input', 'dev-range');
+    range.type = 'range';
+    range.min = String(config.min);
+    range.max = String(config.max);
+    range.step = String(config.step);
+    range.value = String(config.value);
+    const num = el('input', 'dev-num');
+    num.type = 'number';
+    num.min = String(config.min);
+    num.max = String(config.max);
+    num.step = String(config.step);
+    num.value = String(Math.round(Number(config.value) * 100) / 100);
+    const push = (raw) => {
+      const parsed = Number(raw);
+      if (Number.isFinite(parsed)) onInput(parsed);
+    };
+    range.addEventListener('input', () => {
+      num.value = range.value;
+      push(range.value);
+    });
+    num.addEventListener('input', () => {
+      if (num.value === '') return;
+      range.value = num.value;
+      push(num.value);
+    });
+    wrap.append(range, num);
+    row.appendChild(wrap);
+    return row;
+  }
+
+  function buildShopPanel() {
+    const shop = state.shop;
+
+    panelBody.appendChild(
+      el(
+        'p',
+        'dev-hint',
+        'Mueve, escala y ordena cualquier pieza de la Shop. Cada ajuste se guarda para el modo activo y solo se aplica en ese ancho de pantalla.'
+      )
+    );
+
+    const devices = el('div', 'dev-shop-devices');
+    [
+      ['desktop', 'Desktop ≥ 981px'],
+      ['mobile', 'Mobile ≤ 980px']
+    ].forEach(([id, label]) => {
+      const button = el('button', `dev-btn dev-btn-mini${shop.device === id ? ' is-primary' : ''}`, label);
+      button.type = 'button';
+      button.addEventListener('click', () => {
+        shop.device = id;
+        saveShop();
+        renderTab();
+      });
+      devices.appendChild(button);
+    });
+    panelBody.appendChild(devices);
+
+    const quick = el('div', 'dev-actions');
+    const openShop = el('button', 'dev-btn is-primary', 'Abrir la Shop');
+    openShop.type = 'button';
+    openShop.addEventListener('click', () => {
+      const nav = document.querySelector('[data-hub-route="booster"]');
+      if (nav) nav.click();
+    });
+    const copyCss = el('button', 'dev-btn', 'Copiar CSS');
+    copyCss.type = 'button';
+    copyCss.addEventListener('click', () => {
+      const css = shopCssText();
+      if (!css) {
+        showDevNotice('Todavía no hay ajustes de Shop.');
+        return;
+      }
+      copyText(css);
+      showOutput(css);
+    });
+    quick.append(openShop, copyCss);
+    panelBody.appendChild(quick);
+
+    /* --- Lista de piezas --- */
+    const list = makeSection('Elementos', true, `${SHOP_TARGETS.length} piezas`);
+    list.body.appendChild(
+      el('p', 'dev-hint', 'Elige una pieza. El punto marca las que ya tienen ajustes en este modo.')
+    );
+    const grid = el('div', 'dev-shop-grid');
+    const groups = [];
+    SHOP_TARGETS.forEach((target) => {
+      if (!groups.includes(target.group)) groups.push(target.group);
+    });
+    groups.forEach((group) => {
+      const block = el('div', 'dev-shop-group');
+      block.appendChild(el('span', 'dev-shop-group-name', group));
+      const chips = el('div', 'dev-shop-chips');
+      SHOP_TARGETS.filter((target) => target.group === group).forEach((target) => {
+        const entry = shopMap()[target.sel];
+        const edited = entry && Object.keys(entry).length > 0;
+        const chip = el(
+          'button',
+          `dev-shop-chip${shop.target === target.sel ? ' is-active' : ''}${edited ? ' is-edited' : ''}`,
+          target.label
+        );
+        chip.type = 'button';
+        chip.dataset.shopTarget = target.sel;
+        chip.title = target.sel;
+        chip.addEventListener('click', () => {
+          shop.target = target.sel;
+          saveShop();
+          renderTab();
+        });
+        chips.appendChild(chip);
+      });
+      block.appendChild(chips);
+      grid.appendChild(block);
+    });
+    list.body.appendChild(grid);
+    panelBody.appendChild(list.details);
+
+    /* --- Ajustes de la pieza activa --- */
+    const target = SHOP_TARGETS.find((item) => item.sel === shop.target) || SHOP_TARGETS[0];
+    shop.target = target.sel;
+    const exists = Boolean(document.querySelector(target.sel));
+    const controls = makeSection(`Ajustes · ${target.label}`, true, shop.device);
+    controls.body.appendChild(el('code', 'dev-shop-selector', target.sel));
+    if (!exists) {
+      controls.body.appendChild(
+        el('p', 'dev-hint', 'Esta pieza no está en pantalla ahora mismo. Abre la Shop para verla mientras ajustas.')
+      );
+    }
+
+    const sel = target.sel;
+    const x = Number(shopValue(sel, 'x')) || 0;
+    const y = Number(shopValue(sel, 'y')) || 0;
+    const scale = Number(shopValue(sel, 'scale')) || 1;
+    const rotate = Number(shopValue(sel, 'rotate')) || 0;
+    const opacity = shopValue(sel, 'opacity');
+    const z = shopValue(sel, 'z');
+
+    controls.body.appendChild(
+      shopSlider('Desplazar X', { min: -320, max: 320, step: 1, value: x }, (value) => setShopValue(sel, 'x', value))
+    );
+    controls.body.appendChild(
+      shopSlider('Desplazar Y', { min: -320, max: 320, step: 1, value: y }, (value) => setShopValue(sel, 'y', value))
+    );
+
+    const nudge = el('div', 'dev-shop-nudge');
+    [
+      ['←', -10, 0],
+      ['↑', 0, -10],
+      ['↓', 0, 10],
+      ['→', 10, 0]
+    ].forEach(([label, dx, dy]) => {
+      const button = el('button', 'dev-btn dev-btn-mini', label);
+      button.type = 'button';
+      button.addEventListener('click', () => {
+        setShopValue(sel, 'x', Number(shopValue(sel, 'x')) + dx);
+        setShopValue(sel, 'y', Number(shopValue(sel, 'y')) + dy);
+        renderTab();
+      });
+      nudge.appendChild(button);
+    });
+    controls.body.appendChild(nudge);
+
+    controls.body.appendChild(
+      shopSlider('Escala %', { min: 20, max: 220, step: 1, value: Math.round(scale * 100) }, (value) =>
+        setShopValue(sel, 'scale', value / 100)
+      )
+    );
+    controls.body.appendChild(
+      shopSlider('Rotación °', { min: -45, max: 45, step: 1, value: rotate }, (value) =>
+        setShopValue(sel, 'rotate', value)
+      )
+    );
+    controls.body.appendChild(
+      shopSlider('Opacidad %', { min: 0, max: 100, step: 1, value: Math.round(opacity * 100) }, (value) =>
+        setShopValue(sel, 'opacity', value / 100)
+      )
+    );
+    controls.body.appendChild(
+      shopSlider('Capa (z-index)', { min: -5, max: 80, step: 1, value: z == null ? 0 : z }, (value) =>
+        setShopValue(sel, 'z', value)
+      )
+    );
+
+    const zRow = el('div', 'dev-shop-nudge');
+    const autoZ = el('button', 'dev-btn dev-btn-mini', 'Capa automática');
+    autoZ.type = 'button';
+    autoZ.addEventListener('click', () => {
+      setShopValue(sel, 'z', null);
+      renderTab();
+    });
+    const resetOne = el('button', 'dev-btn dev-btn-mini is-danger', 'Restaurar pieza');
+    resetOne.type = 'button';
+    resetOne.addEventListener('click', () => {
+      delete shopMap()[sel];
+      saveShop();
+      applyShop();
+      renderTab();
+    });
+    const inspect = el('button', 'dev-btn dev-btn-mini', 'Inspector completo');
+    inspect.type = 'button';
+    inspect.addEventListener('click', () => {
+      const node = document.querySelector(sel);
+      if (!node) {
+        showDevNotice('Abre la Shop para inspeccionar esa pieza.');
+        return;
+      }
+      setTab('inspector');
+      select(node);
+    });
+    zRow.append(autoZ, resetOne, inspect);
+    controls.body.appendChild(zRow);
+    panelBody.appendChild(controls.details);
+
+    /* --- Resumen por modo --- */
+    const summary = makeSection('Resumen de ajustes', false, '');
+    const table = el('div', 'dev-shop-summary');
+    ['desktop', 'mobile'].forEach((mode) => {
+      const map = state.shop.values[mode] || {};
+      const keys = Object.keys(map);
+      const row = el('div', 'dev-shop-summary-row');
+      row.appendChild(el('strong', 'dev-shop-summary-mode', mode === 'desktop' ? 'Desktop' : 'Mobile'));
+      row.appendChild(el('span', 'dev-shop-summary-count', `${keys.length} piezas`));
+      if (keys.length) {
+        const clear = el('button', 'dev-btn dev-btn-mini is-danger', 'Vaciar');
+        clear.type = 'button';
+        clear.addEventListener('click', () => {
+          state.shop.values[mode] = {};
+          saveShop();
+          applyShop();
+          renderTab();
+        });
+        row.appendChild(clear);
+      }
+      table.appendChild(row);
+    });
+    summary.body.appendChild(table);
+    summary.body.appendChild(
+      el('p', 'dev-hint', '«Copiar CSS» genera el bloque listo para pegar en hub.css respetando desktop y mobile.')
+    );
+    panelBody.appendChild(summary.details);
   }
 
   function buildAssetsPanel() {
@@ -2175,6 +2551,8 @@
     loadAssets();
     loadAzura();
     loadBackgrounds();
+    loadShop();
+    applyShop();
     bindGlobalEvents();
 
     window.CardGramDevMode = {

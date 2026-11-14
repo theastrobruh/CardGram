@@ -6581,10 +6581,14 @@ dialog {
   }
 
   .hub-kofi-coffee {
+    /* Estado base por si la animación se desactiva (modo rendimiento):
+       solo se ve la taza, nunca los dos iconos a la vez. */
+    opacity: 1;
     animation: kofiCoffee 5.6s ease-in-out infinite;
   }
 
   .hub-kofi-heart {
+    opacity: 0;
     animation: kofiHeart 5.6s ease-in-out infinite;
   }
 
@@ -11287,35 +11291,58 @@ body.booting {
     height: 19px;
   }
 }
-/* Selector de favoritas por set */
+/* Selector de favoritas por set: 6 sets visibles sin scroll */
 .hand-set-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  max-height: 52vh;
-  overflow-y: auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  max-height: none;
+  overflow-y: visible;
 }
 
 .hand-set-card {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 7px;
-  border-radius: 12px;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 11px;
   text-align: left;
   background: rgba(255, 255, 255, 0.58);
   border: 1px solid rgba(255, 255, 255, 0.9);
+  transition: transform 0.18s var(--ease), border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.hand-set-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(46, 196, 182, 0.6);
+  box-shadow: 0 8px 18px rgba(8, 62, 82, 0.14);
 }
 
 .hand-set-card img {
   width: 100%;
-  aspect-ratio: 1.25;
+  /* Anula el height del atributo (lo pone makeHubImage) para que mande
+     el aspect-ratio y no salgan portadas gigantes. */
+  height: auto;
+  max-height: none;
+  aspect-ratio: 1.5;
   object-fit: cover;
-  border-radius: 8px;
+  object-position: center 18%;
+  border-radius: 7px;
 }
 
 .hand-set-card strong {
-  font-size: 0.62rem;
+  display: block;
+  overflow: hidden;
+  font-size: 0.56rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 460px) {
+  .hand-set-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .hand-back-btn {
@@ -19251,13 +19278,9 @@ html[data-inv-size="huge"] {
   height: 14px;
 }
 
-/* Inventario · misma pareja Volver/Inicio, pegada al encabezado */
+/* Inventario - misma pareja Volver/Inicio, debajo del titulo como en Explore */
 .hub-subnav-inventory {
-  margin: 4px auto 0;
-}
-
-.hub-subnav-inventory + .hub-view-head {
-  padding-top: 16px;
+  margin: 0 auto 16px;
 }
 
 /* Explore · los 3 accesos en una sola fila simétrica (desktop) */
@@ -19560,7 +19583,6 @@ button.explore-want-more:focus-visible {
   body[data-view="hub"] .hub-vinyl,
   body[data-view="hub"] .spinning-card-inner,
   body[data-view="hub"] .hub-brand-pack,
-  body[data-view="hub"] .hub-kofi-ico,
   body[data-view="hub"] .hub-card,
   body[data-view="hub"] .hub-menu-btn,
   body[data-view="hub"] .hub-music-btn svg,
@@ -21077,4 +21099,444 @@ body.pack-open .shop-playground-bar {
   #explore-plaza-feed-block:not([hidden]) .plaza-card {
     animation: none !important;
   }
+}
+
+/* ==========================================================================
+   REV 348 · Coreografías de entrada por pantalla
+   Home: avatar → acciones → pila de cartas → carta principal → etiquetas →
+   nombre. Shop: sobres → tienda → avatar del dueño → HUD → (Azura).
+   Inventory y Explore: textos → subtextos → renders → nombres.
+   ========================================================================== */
+@keyframes hubRevealUp {
+  from { opacity: 0; translate: 0 18px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+@keyframes hubRevealFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes hubRevealPop {
+  from { opacity: 0; translate: 0 14px; scale: 0.9; }
+  to { opacity: 1; translate: 0 0; scale: 1; }
+}
+
+/* --- HOME ---------------------------------------------------------------- */
+.hub-panel.active .hub-player-avatar {
+  animation: hubRevealPop 0.62s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both;
+}
+
+.hub-panel.active .hub-player-actions > * {
+  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hub-panel.active .hub-player-actions > *:nth-child(1) { animation-delay: 0.18s; }
+.hub-panel.active .hub-player-actions > *:nth-child(2) { animation-delay: 0.24s; }
+.hub-panel.active .hub-player-actions > *:nth-child(3) { animation-delay: 0.3s; }
+
+.hub-panel.active .hub-stack-card {
+  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hub-panel.active .hub-stack-card:nth-child(1) { animation-delay: 0.36s; }
+.hub-panel.active .hub-stack-card:nth-child(2) { animation-delay: 0.42s; }
+.hub-panel.active .hub-stack-card:nth-child(3) { animation-delay: 0.48s; }
+
+.hub-panel.active .hub-hand-deck-card {
+  animation: hubRevealUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hub-panel.active .hub-hand-deck-card:nth-child(1) { animation-delay: 0.72s; }
+.hub-panel.active .hub-hand-deck-card:nth-child(2) { animation-delay: 0.8s; }
+
+.hub-panel.active .hub-card-tags {
+  animation: hubRevealUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 1.02s both;
+}
+
+.hub-panel.active .hub-card-name {
+  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 1.16s both;
+}
+
+.hub-panel.active .hub-card-sub {
+  animation: hubRevealUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) 1.26s both;
+}
+
+.hub-panel.active .hub-card-chips,
+.hub-panel.active .hub-card-actions {
+  animation: hubRevealFade 0.5s ease 1.36s both;
+}
+
+/* --- SHOP ---------------------------------------------------------------- */
+/* La entrada se anima en el arte del sobre para no pelear con el flotado
+   continuo (shopPackFloatGravity) que ya vive en el botón. */
+#shop-recommended .shop-pack-art {
+  animation: hubRevealPop 0.66s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+#shop-recommended .shop-pack-name {
+  animation: hubRevealUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+#shop-recommended .shop-pack:nth-child(1) .shop-pack-art { animation-delay: 0.06s; }
+#shop-recommended .shop-pack:nth-child(2) .shop-pack-art { animation-delay: 0.15s; }
+#shop-recommended .shop-pack:nth-child(3) .shop-pack-art { animation-delay: 0.24s; }
+#shop-recommended .shop-pack:nth-child(4) .shop-pack-art { animation-delay: 0.33s; }
+#shop-recommended .shop-pack:nth-child(5) .shop-pack-art { animation-delay: 0.42s; }
+#shop-recommended .shop-pack:nth-child(6) .shop-pack-art { animation-delay: 0.5s; }
+
+#shop-recommended .shop-pack:nth-child(1) .shop-pack-name { animation-delay: 0.34s; }
+#shop-recommended .shop-pack:nth-child(2) .shop-pack-name { animation-delay: 0.43s; }
+#shop-recommended .shop-pack:nth-child(3) .shop-pack-name { animation-delay: 0.52s; }
+#shop-recommended .shop-pack:nth-child(4) .shop-pack-name { animation-delay: 0.61s; }
+#shop-recommended .shop-pack:nth-child(5) .shop-pack-name { animation-delay: 0.7s; }
+#shop-recommended .shop-pack:nth-child(6) .shop-pack-name { animation-delay: 0.79s; }
+
+#shop-stores,
+.shop-mobile-store-building {
+  animation: hubRevealPop 0.62s cubic-bezier(0.16, 1, 0.3, 1) 0.44s both;
+}
+
+.shop-mobile-store-owner,
+#shop-stores .shop-store-owner {
+  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.56s both;
+}
+
+#shop-days {
+  animation: hubRevealUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.62s both;
+}
+
+.shop-status-chip {
+  animation: hubRevealUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.shop-status-chip:nth-child(1) { animation-delay: 0.7s; }
+.shop-status-chip:nth-child(2) { animation-delay: 0.78s; }
+
+/* --- INVENTORY + EXPLORE ------------------------------------------------ */
+.hub-panel.active .hub-view-head .hub-view-copy > h1 {
+  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.04s both;
+}
+
+.hub-panel.active .hub-view-head .hub-view-copy > p {
+  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both;
+}
+
+.hub-panel.active .hub-section-head > div {
+  animation: hubRevealUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.26s both;
+}
+
+/* 3) Renders de deck box (0.32s) · 4) nombres y % de complexión (0.56s+). */
+.hub-panel.active .deck-box-cover,
+.hub-panel.active .deck-card .deck-cover,
+.hub-panel.active .collection-card .collection-stack {
+  animation: hubRevealPop 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hub-panel.active .deck-box-card:nth-child(1) .deck-box-cover,
+.hub-panel.active .deck-card:nth-child(1) .deck-cover,
+.hub-panel.active .collection-card:nth-child(1) .collection-stack { animation-delay: 0.32s; }
+.hub-panel.active .deck-box-card:nth-child(2) .deck-box-cover,
+.hub-panel.active .deck-card:nth-child(2) .deck-cover,
+.hub-panel.active .collection-card:nth-child(2) .collection-stack { animation-delay: 0.37s; }
+.hub-panel.active .deck-box-card:nth-child(3) .deck-box-cover,
+.hub-panel.active .deck-card:nth-child(3) .deck-cover,
+.hub-panel.active .collection-card:nth-child(3) .collection-stack { animation-delay: 0.42s; }
+.hub-panel.active .deck-box-card:nth-child(4) .deck-box-cover,
+.hub-panel.active .deck-card:nth-child(4) .deck-cover,
+.hub-panel.active .collection-card:nth-child(4) .collection-stack { animation-delay: 0.47s; }
+.hub-panel.active .deck-box-card:nth-child(5) .deck-box-cover,
+.hub-panel.active .deck-card:nth-child(5) .deck-cover,
+.hub-panel.active .collection-card:nth-child(5) .collection-stack { animation-delay: 0.52s; }
+.hub-panel.active .deck-box-card:nth-child(6) .deck-box-cover,
+.hub-panel.active .deck-card:nth-child(6) .deck-cover,
+.hub-panel.active .collection-card:nth-child(6) .collection-stack { animation-delay: 0.57s; }
+
+.hub-panel.active .deck-box-title,
+.hub-panel.active .deck-box-desc,
+.hub-panel.active .deck-body > *,
+.hub-panel.active .collection-body > *,
+.hub-panel.active .collection-meta {
+  animation: hubRevealUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hub-panel.active .deck-box-title,
+.hub-panel.active .deck-body > *:nth-child(1),
+.hub-panel.active .collection-body > *:nth-child(1) { animation-delay: 0.56s; }
+.hub-panel.active .deck-box-desc,
+.hub-panel.active .deck-body > *:nth-child(2),
+.hub-panel.active .collection-body > *:nth-child(2) { animation-delay: 0.63s; }
+.hub-panel.active .deck-body > *:nth-child(3),
+.hub-panel.active .collection-body > *:nth-child(3) { animation-delay: 0.7s; }
+
+.hub-panel.active .collection-meta { animation-delay: 0.76s; }
+
+/* Rejillas sueltas (packs de Explore, cartas de colección). */
+.hub-panel.active .hub-card-grid > * {
+  animation: hubRevealPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hub-panel.active .hub-card-grid > *:nth-child(1) { animation-delay: 0.3s; }
+.hub-panel.active .hub-card-grid > *:nth-child(2) { animation-delay: 0.36s; }
+.hub-panel.active .hub-card-grid > *:nth-child(3) { animation-delay: 0.42s; }
+.hub-panel.active .hub-card-grid > *:nth-child(4) { animation-delay: 0.48s; }
+.hub-panel.active .hub-card-grid > *:nth-child(5) { animation-delay: 0.53s; }
+.hub-panel.active .hub-card-grid > *:nth-child(6) { animation-delay: 0.58s; }
+
+/* Explore: bloques y tarjetas del camino. */
+.hub-panel.active .explore-block {
+  animation: hubRevealUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hub-panel.active .explore-block:nth-child(1) { animation-delay: 0.06s; }
+.hub-panel.active .explore-block:nth-child(2) { animation-delay: 0.14s; }
+.hub-panel.active .explore-block:nth-child(3) { animation-delay: 0.22s; }
+.hub-panel.active .explore-block:nth-child(4) { animation-delay: 0.3s; }
+.hub-panel.active .explore-block:nth-child(5) { animation-delay: 0.38s; }
+.hub-panel.active .explore-block:nth-child(6) { animation-delay: 0.46s; }
+
+.hub-panel.active .roadmap-card,
+.hub-panel.active .plaza-card,
+.hub-panel.active .explore-plaza-card,
+.hub-panel.active .explore-about-card {
+  animation: hubRevealPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.34s both;
+}
+
+/* --- AZURA · aparición holográfica al entrar y al cambiar de pose --------- */
+@keyframes azuraHoloIn {
+  0% {
+    opacity: 0;
+    filter: brightness(2.6) saturate(1.7) hue-rotate(-16deg) blur(7px);
+  }
+  38% {
+    opacity: 0.85;
+    filter: brightness(1.7) saturate(1.35) blur(2px);
+  }
+  100% {
+    opacity: 1;
+    filter: brightness(1) saturate(1) blur(0);
+  }
+}
+
+@keyframes azuraHoloScan {
+  from { background-position-y: 0; opacity: 0.85; }
+  to { background-position-y: 46px; opacity: 0; }
+}
+
+.shop-npc-img.is-holo {
+  animation: azuraHoloIn 0.62s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.shop-npc.is-holo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(124, 235, 221, 0.3) 0 2px,
+    rgba(124, 235, 221, 0) 2px 5px
+  );
+  animation: azuraHoloScan 0.6s linear both;
+  mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-panel.active .hub-player-avatar,
+  .hub-panel.active .hub-player-actions > *,
+  .hub-panel.active .hub-stack-card,
+  .hub-panel.active .hub-hand-deck-card,
+  .hub-panel.active .hub-card-tags,
+  .hub-panel.active .hub-card-name,
+  .hub-panel.active .hub-card-sub,
+  .hub-panel.active .hub-card-chips,
+  .hub-panel.active .hub-card-actions,
+  #shop-recommended .shop-pack-art,
+  #shop-recommended .shop-pack-name,
+  #shop-stores,
+  .shop-mobile-store-building,
+  .shop-mobile-store-owner,
+  #shop-days,
+  .shop-status-chip,
+  .hub-panel.active .hub-view-head .hub-view-copy > h1,
+  .hub-panel.active .hub-view-head .hub-view-copy > p,
+  .hub-panel.active .hub-section-head > div,
+  .hub-panel.active .deck-box-cover,
+  .hub-panel.active .deck-card .deck-cover,
+  .hub-panel.active .collection-card .collection-stack,
+  .hub-panel.active .deck-box-title,
+  .hub-panel.active .deck-box-desc,
+  .hub-panel.active .deck-body > *,
+  .hub-panel.active .collection-body > *,
+  .hub-panel.active .collection-meta,
+  .hub-panel.active .hub-card-grid > *,
+  .hub-panel.active .roadmap-card,
+  .hub-panel.active .plaza-card,
+  .hub-panel.active .explore-plaza-card,
+  .hub-panel.active .explore-about-card,
+  .hub-panel.active .explore-block,
+  .shop-npc-img.is-holo,
+  .shop-npc.is-holo::after {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   REV 352 · Inmersión: holograma limpio y apertura sin ventanas
+   --------------------------------------------------------------------------
+   1) Azura: el barrido holográfico ya no pinta un rectángulo azul sobre el
+      recuadro del sprite; el efecto vive solo en los píxeles de la imagen.
+   2) Apertura de sobres: el desenfoque del fondo se aplica al fondo de la
+      escena y no a la escena completa (eso era lo que dibujaba el borde de
+      la "ventana" alrededor del sobre), y no se ve ninguna barra de scroll.
+   ========================================================================== */
+
+/* --- 1 · Azura holográfica, sin recuadro -------------------------------- */
+.shop-npc.is-holo::after {
+  content: none !important;
+  display: none !important;
+  animation: none !important;
+}
+
+@keyframes azuraHoloIn {
+  0% {
+    opacity: 0;
+    filter: brightness(3) saturate(2) hue-rotate(-24deg) blur(10px);
+  }
+  22% {
+    opacity: 0.7;
+    filter: brightness(1.9) saturate(1.5) hue-rotate(-10deg) blur(4px);
+  }
+  38% {
+    opacity: 0.45;
+    filter: brightness(2.4) saturate(1.7) blur(3px);
+  }
+  52% {
+    opacity: 0.95;
+    filter: brightness(1.35) saturate(1.2) blur(1px);
+  }
+  68% {
+    opacity: 0.8;
+    filter: brightness(1.5) saturate(1.3) blur(0.6px);
+  }
+  100% {
+    opacity: 1;
+    filter: brightness(1) saturate(1) blur(0);
+  }
+}
+
+.shop-npc-img.is-holo {
+  animation: azuraHoloIn 0.78s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+/* --- 2 · Apertura de sobres inmersiva ---------------------------------- */
+
+/* El filtro va al fondo, nunca a .shop-scene (creaba el rectángulo). */
+body.pack-open .shop-scene,
+body.pack-carousel .shop-scene {
+  filter: none !important;
+  transform: none !important;
+}
+
+/* El fondo del ritual es opaco: nada de la página se cuela detrás, así que
+   no quedan bordes ni recuadros de capas intermedias alrededor del sobre. */
+.pack-overlay.is-carousel-stage .pack-overlay-backdrop,
+.pack-overlay.is-theater-stage .pack-overlay-backdrop,
+.pack-overlay.is-seal-stage .pack-overlay-backdrop,
+.pack-overlay.is-grid-stage .pack-overlay-backdrop {
+  background: radial-gradient(circle at 50% 42%, rgba(3, 14, 20, 0.05) 0%, rgba(3, 14, 20, 0.32) 78%, rgba(3, 14, 20, 0.48) 100%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* El fondo de la Shop cubre TODO el ritual: sin franja cortada arriba. */
+body.pack-open .hub-topbar,
+body.pack-carousel .hub-topbar {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+body.pack-open .hub-booster-panel,
+body.pack-carousel .hub-booster-panel {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  z-index: 5 !important;
+}
+
+body.pack-open .shop-scene,
+body.pack-carousel .shop-scene {
+  height: 100% !important;
+  min-height: 100% !important;
+  border-radius: 0 !important;
+}
+/* Los degradados laterales del carrusel se leian como el marco de una
+   ventana alrededor del sobre: fuera. */
+.pack-carousel-viewport::before,
+.pack-carousel-viewport::after {
+  display: none !important;
+  background: none !important;
+}
+
+/* Ninguna barra de scroll durante el ritual del sobre. */
+.pack-overlay,
+.pack-overlay-shell,
+.pack-carousel-viewport,
+.shop-pack-contents-window,
+.shop-pack-view {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.pack-overlay *::-webkit-scrollbar,
+.shop-pack-contents-window::-webkit-scrollbar,
+.shop-pack-view::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* La ventana de contenido del sobre: una sola pieza de cristal, sin costuras. */
+.shop-pack-contents-window {
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 24px !important;
+  background: rgba(8, 32, 42, 0.92) !important;
+  box-shadow: 0 34px 70px rgba(2, 12, 20, 0.55) !important;
+  backdrop-filter: blur(18px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.2) !important;
+}
+
+.shop-pack-contents-head,
+.shop-pack-contents .shop-pack-view-cards,
+.shop-pack-contents .shop-pack-view-hint {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.shop-pack-contents-head h2,
+.shop-pack-contents-head .shop-pack-contents-kicker {
+  color: #eafffb !important;
+}
+
+.shop-pack-contents .shop-pack-view-hint {
+  color: rgba(224, 250, 247, 0.72) !important;
+}
+
+.shop-pack-contents .shop-pack-view-hint,
+.shop-pack-contents .shop-pack-view-cards {
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}
+
+.shop-pack-contents-close {
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.92) !important;
 }
