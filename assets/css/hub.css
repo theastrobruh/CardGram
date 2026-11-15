@@ -21450,6 +21450,30 @@ body.pack-carousel .shop-scene {
   -webkit-backdrop-filter: none !important;
 }
 
+/* El ritual ocupa toda la pantalla en cualquier fase, incluso si el body
+   pierde sus clases de apertura al cambiar de etapa: sin franja arriba. */
+body:has(#pack-overlay:not([hidden])) .hub-topbar {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+body:has(#pack-overlay:not([hidden])) .hub-booster-panel {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  z-index: 5 !important;
+}
+
+body:has(#pack-overlay:not([hidden])) .shop-scene {
+  height: 100% !important;
+  min-height: 100% !important;
+  border-radius: 0 !important;
+}
+
 /* El fondo de la Shop cubre TODO el ritual: sin franja cortada arriba. */
 body.pack-open .hub-topbar,
 body.pack-carousel .hub-topbar {
