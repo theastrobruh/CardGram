@@ -325,6 +325,7 @@ const hub = {
   inventoryReturn: 'home',
   gachaIds: [],
   handDraft: [],
+  handDrawn: false,
   handSetId: null,
   opening: false,
   presetsRendered: false,
@@ -3626,12 +3627,50 @@ function syncFavoriteMarks() {
   });
 }
 
+function isFavoriteEmpty() {
+  return Boolean(hubProfile.favoriteTouched) && featuredIdsList().length === 0;
+}
+
+function renderEmptyFavoriteCard() {
+  const backSrc = hubHome.backSrc || 'assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp';
+  const empty = hub.root ? hub.root.querySelector('.hub-favorite') : null;
+  if (empty) empty.classList.add('is-empty');
+
+  if (hub.els.cardFront) {
+    hub.els.cardFront.dataset.src = backSrc;
+    hub.els.cardFront.src = backSrc;
+    hub.els.cardFront.alt = '';
+    syncCardRatio(hub.els.cardFront);
+  }
+  if (hub.els.cardBack) hub.els.cardBack.alt = '';
+  if (hub.els.cardName) hub.els.cardName.textContent = '';
+  if (hub.els.cardSub) hub.els.cardSub.textContent = '';
+  if (hub.els.cardSheetSub) hub.els.cardSheetSub.textContent = '';
+  [hub.els.cardChips, hub.els.cardSheetChips, hub.els.cardTags].forEach((container) => {
+    if (container) container.replaceChildren();
+  });
+  if (hub.els.cardSheetLore) hub.els.cardSheetLore.hidden = true;
+  if (hub.els.card) {
+    hub.els.card.classList.remove('is-flipped');
+    hub.els.card.setAttribute('aria-pressed', 'false');
+  }
+  syncFavoriteMarks();
+}
+
 function renderFavoriteCard() {
   if (!hub.ready) return;
+  renderFeaturedStack();
+
+  if (isFavoriteEmpty()) {
+    renderEmptyFavoriteCard();
+    return;
+  }
+
+  const empty = hub.root ? hub.root.querySelector('.hub-favorite') : null;
+  if (empty) empty.classList.remove('is-empty');
+
   const card = favoriteCard();
   if (!card) return;
-
-  renderFeaturedStack();
 
   const frontSrc = thumbOf(card);
   const backSrc = backThumbOf(card);
@@ -3726,6 +3765,7 @@ function renderFavoriteCard() {
 function setFavoriteCard(cardId) {
   const card = HUB_CATALOG.byId(cardId);
   if (!card) return;
+  hub.handDrawn = false;
   hub.explorerShowcase = false;
   hubProfile.favoriteCardId = card.id;
   hubProfile.favoriteTouched = true;
@@ -3844,16 +3884,9 @@ function renderHandDeck(cards) {
 
   const navs = document.querySelectorAll('[data-hand-nav]');
 
-  /* La vitrina siempre enseña una pila: si la mano elegida tiene una sola
-     carta, se completan los huecos con cartas del catálogo. */
-  let deckCards = cards.slice();
-  if (deckCards.length && deckCards.length < 3) {
-    const used = new Set(deckCards.map((card) => card.id));
-    const extras = HUB_CATALOG.cards
-      .filter((card) => !used.has(card.id))
-      .slice(0, 3 - deckCards.length);
-    deckCards = deckCards.concat(extras);
-  }
+  /* Sin relleno aleatorio: si el usuario borró sus favoritas, la vitrina se
+     queda con una sola carta boca abajo y sin cartas secundarias. */
+  const deckCards = cards.slice();
 
   if (deckCards.length < 2) {
     deck.replaceChildren();
@@ -3998,6 +4031,7 @@ function drawHomeHand(options = {}) {
   }
   hubHome.drawCursor = (hubHome.drawCursor + count) % cards.length;
   hubHome.handIds = hand;
+  hub.handDrawn = true;
   saveHome();
   renderFeaturedStack();
   renderHomeTable();
@@ -4299,22 +4333,33 @@ function makeBackStackCard() {
 /* Las tres cartas grandes de la vitrina salen SIEMPRE de las favoritas
    elegidas por el usuario. DRAW cambia la mano del panel izquierdo, nunca
    las secundarias que acompañan a la carta principal. */
+function featuredIdsList() {
+  return Array.isArray(hubProfile.featuredIds)
+    ? hubProfile.featuredIds.filter((id) => HUB_CATALOG.byId(id))
+    : [];
+}
+
 function showcaseDeckCards() {
-  const base = featuredCards().filter(Boolean);
+  const ids = featuredIdsList();
+  if (!ids.length) return [];
+  const list = ids.map((id) => HUB_CATALOG.byId(id)).filter(Boolean);
   const current = favoriteCard();
-  const list = base.slice();
-  if (current && !list.some((card) => card.id === current.id)) list.unshift(current);
+  if (current && list.length && !list.some((card) => card.id === current.id)) {
+    list.unshift(current);
+  }
   return list;
 }
 
-/* Cartas que ocupan la vitrina principal: manda la selección del usuario.
-   Si todavía no eligió favoritas, se usa la mano robada con DRAW. */
+/* Cartas que ocupan la pila de la mano: la tirada de DRAW manda mientras
+   esté activa; si no, las favoritas del usuario. Sin favoritas no se rellena
+   con cartas aleatorias: queda una única carta boca abajo. */
 function showcaseStackCards() {
-  const ids = Array.isArray(hubProfile.featuredIds)
-    ? hubProfile.featuredIds.filter((id) => HUB_CATALOG.byId(id))
-    : [];
-  if (ids.length) return showcaseDeckCards().slice(0, 3);
-  return homeHandCards().slice(0, 3);
+  if (hub.handDrawn) {
+    const hand = homeHandCards().slice(0, 3);
+    if (hand.length) return hand;
+  }
+  if (featuredIdsList().length) return showcaseDeckCards().slice(0, 3);
+  return [];
 }
 
 function renderFeaturedStack() {
@@ -4324,6 +4369,9 @@ function renderFeaturedStack() {
   const cards = showcaseStackCards();
   const signature = `${currentLang}|${cards.map((card) => card.id).join('|')}|${cards.length ? '1' : 'back'}`;
   stack.dataset.count = String(cards.length || 1);
+  /* DRAW redeala sin la espera escalonada de la entrada: las cartas robadas
+     se ven las tres al instante. */
+  stack.classList.toggle('has-drawn', Boolean(hub.handDrawn));
   if (hub.featuredSignature === signature && stack.childElementCount) {
     renderHandDeck(showcaseDeckCards());
     return;
@@ -4407,6 +4455,7 @@ function toggleHandPick(cardId) {
 }
 
 function saveHand() {
+  hub.handDrawn = false;
   hubProfile.featuredIds = hub.handDraft.slice(0, 3);
   hubProfile.favoriteTouched = true;
   if (hubProfile.featuredIds.length) {
@@ -6042,8 +6091,9 @@ function makeExploreCreatorCard() {
   return button;
 }
 
-function makeExplorePackCard(collection) {
+function makeExplorePackCard(collection, index) {
   const button = makeHubButton('explore-pack', null, { explorePack: collection.id });
+  button.style.setProperty('--pack-i', String(index || 0));
   const pack = makeNode('span', 'explore-pack-3d');
   const cover = makeNode('span', 'explore-pack-cover');
   const customArt = shopPackArt[collection.id];
@@ -6261,7 +6311,16 @@ function renderExplore() {
   }
 
   if (hub.els.explorePacks) {
-    hub.els.explorePacks.replaceChildren(...packs.map((collection) => makeExplorePackCard(collection)));
+    hub.els.explorePacks.replaceChildren(
+      ...packs.map((collection, index) => makeExplorePackCard(collection, index))
+    );
+    const block = hub.els.explorePacksBlock;
+    if (block) {
+      block.style.setProperty('--pack-total', String(packs.length));
+      block.classList.remove('is-entering');
+      void block.offsetWidth;
+      block.classList.add('is-entering');
+    }
   }
 }
 
