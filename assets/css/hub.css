@@ -21571,28 +21571,28 @@ body.pack-carousel .shop-scene {
 
 /* --- 1 - Explore: packs uno a uno, luego el titulo y luego los CTAs ------ */
 @keyframes explorePackEnter {
-  from { opacity: 0; transform: translateY(22px) scale(0.9); }
+  from { opacity: 0; transform: translateY(30px) scale(0.94); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes exploreCopyEnter {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: none; }
 }
 
 #explore-packs-block.is-entering .explore-pack {
-  animation: explorePackEnter 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
-  animation-delay: calc(var(--pack-i, 0) * 0.11s);
+  animation: explorePackEnter 0.8s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
+  animation-delay: calc(var(--pack-i, 0) * 0.24s);
 }
 
 #explore-packs-block.is-entering .explore-block-head {
-  animation: exploreCopyEnter 0.5s ease backwards;
-  animation-delay: calc(var(--pack-total, 4) * 0.11s + 0.3s);
+  animation: exploreCopyEnter 0.7s ease backwards;
+  animation-delay: calc(var(--pack-total, 4) * 0.24s + 0.3s);
 }
 
 #explore-packs-block.is-entering .explore-pack-link {
-  animation: exploreCopyEnter 0.42s ease backwards;
-  animation-delay: calc(var(--pack-i, 0) * 0.05s + var(--pack-total, 4) * 0.11s + 0.55s);
+  animation: exploreCopyEnter 0.55s ease backwards;
+  animation-delay: calc(var(--pack-i, 0) * 0.07s + var(--pack-total, 4) * 0.24s + 0.62s);
 }
 
 /* --- 2 - Favoritas borradas: solo una carta boca abajo ------------------- */
@@ -21636,4 +21636,55 @@ body.pack-carousel .shop-scene {
 .hub-panel.active #hub-player-stack.has-drawn .hub-stack-card {
   animation: hubRevealUp 0.34s cubic-bezier(0.16, 1, 0.3, 1) both !important;
   animation-delay: 0s !important;
+}
+
+/* ==========================================================================
+   REV 363 - Reinicio de progreso en el menu de usuario
+   ========================================================================== */
+.hub-menu-reset {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 9px 10px;
+  border-radius: 13px;
+  text-align: left;
+  color: #8f1f38;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 138, 148, 0.34);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hub-menu-reset:hover,
+.hub-menu-reset:focus-visible {
+  background: rgba(255, 240, 242, 0.86);
+  border-color: rgba(255, 122, 140, 0.62);
+  box-shadow: 0 10px 20px rgba(160, 30, 50, 0.12), inset 0 1px 0 #ffffff;
+}
+
+.hub-menu-reset .hub-menu-item-icon {
+  color: #b3253f;
+  background: rgba(255, 154, 164, 0.2);
+  border-color: rgba(255, 255, 255, 0.82);
+}
+
+.hub-menu-reset .hub-menu-item-copy strong {
+  color: #8f1f38;
+}
+
+.hub-menu-reset .hub-menu-item-copy small {
+  color: rgba(143, 31, 56, 0.68);
+}
+.profile-reset {
+  margin-top: 14px;
+}
+.hub-menu-reset .hub-menu-item-copy {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
 }

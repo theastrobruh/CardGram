@@ -148,6 +148,7 @@ const HUB_HOME_DEFAULT = {
   drawCount: 3,
   deckSource: 'all',
   handIds: [],
+  handDrawn: false,
   drawCursor: 0,
   dropCardId: null,
   backSrc: 'assets/data/cards/database/_shared/thumbs/BACK_CARDGRAM.webp',
@@ -3766,6 +3767,8 @@ function setFavoriteCard(cardId) {
   const card = HUB_CATALOG.byId(cardId);
   if (!card) return;
   hub.handDrawn = false;
+  hubHome.handDrawn = false;
+  saveHome();
   hub.explorerShowcase = false;
   hubProfile.favoriteCardId = card.id;
   hubProfile.favoriteTouched = true;
@@ -3947,6 +3950,7 @@ function sanitizeHome(raw) {
   if (Array.isArray(raw.handIds)) {
     data.handIds = raw.handIds.filter((id) => HUB_CATALOG.byId(id)).slice(0, 5);
   }
+  data.handDrawn = Boolean(raw.handDrawn) && data.handIds.length > 0;
   const cursor = Number(raw.drawCursor);
   data.drawCursor = Number.isFinite(cursor) && cursor >= 0 ? Math.floor(cursor) : 0;
   if (typeof raw.dropCardId === 'string' && HUB_CATALOG.byId(raw.dropCardId)) {
@@ -4031,6 +4035,7 @@ function drawHomeHand(options = {}) {
   }
   hubHome.drawCursor = (hubHome.drawCursor + count) % cards.length;
   hubHome.handIds = hand;
+  hubHome.handDrawn = true;
   hub.handDrawn = true;
   saveHome();
   renderFeaturedStack();
@@ -4253,19 +4258,24 @@ function syncHomeCardScale() {
   if (!panel) return;
   const drop = panel.querySelector('.home-drop-area');
   if (!drop) return;
-  const width = drop.getBoundingClientRect().width;
-  if (width <= 0) return;
-  panel.style.setProperty('--home-mini-w', `${Math.round(width)}px`);
+  const dropWidth = drop.getBoundingClientRect().width;
+  if (dropWidth <= 0) return;
 
-  /* Reparte la mano izquierda: misma anchura de carta que el deck, con
-     separación calculada para que el abanico no se salga del panel. */
   const stack = panel.querySelector('.hub-player-stack');
   const wrap = panel.querySelector('.hub-stack-wrap');
+  const count = stack ? Math.max(1, stack.children.length) : 1;
+
+  /* Con 3 cartas o más la mano se encoge un poco para que el abanico quepa
+     entero dentro del panel y no tape el botón DRAW. */
+  const width = count >= 3 ? Math.round(dropWidth * 0.78) : Math.round(dropWidth);
+  panel.style.setProperty('--home-mini-w', `${width}px`);
+
+  /* Reparte la mano izquierda: separación calculada para que el abanico no
+     se salga del panel. */
   if (stack && wrap) {
-    const count = stack.children.length;
-    const available = wrap.clientWidth || panel.clientWidth;
+    const available = Math.max(width, (wrap.clientWidth || panel.clientWidth) - 6);
     const step = count > 1
-      ? Math.max(24, Math.min(width * 0.82, (available - width) / (count - 1)))
+      ? Math.max(20, Math.min(width * 0.82, (available - width) / (count - 1)))
       : 0;
     panel.style.setProperty('--hand-step', `${Math.round(step)}px`);
   }
@@ -4304,6 +4314,7 @@ function syncMobileQuick() {
 
 function initHomeTable() {
   hubHome = sanitizeHome(storage.read(HUB_STORAGE.home, null));
+  hub.handDrawn = Boolean(hubHome.handDrawn) && hubHome.handIds.length > 0;
   renderHomeTable();
   syncMobileQuick();
   window.addEventListener('resize', () => {
@@ -4378,6 +4389,9 @@ function renderFeaturedStack() {
   }
   hub.featuredSignature = signature;
   stack.replaceChildren(...(cards.length ? cards.map((card) => makeStackCard(card)) : [makeBackStackCard()]));
+  /* La geometría del abanico depende del número de cartas: recalcular al
+     cambiar la mano evita que 3 cartas se salgan del panel. */
+  syncHomeCardScale();
   renderHandDeck(showcaseDeckCards());
 }
 
@@ -4456,6 +4470,7 @@ function toggleHandPick(cardId) {
 
 function saveHand() {
   hub.handDrawn = false;
+  hubHome.handDrawn = false;
   hubProfile.featuredIds = hub.handDraft.slice(0, 3);
   hubProfile.favoriteTouched = true;
   if (hubProfile.featuredIds.length) {
@@ -6449,6 +6464,41 @@ function saveProfile() {
   toast(t('profile_saved'), { type: 'success' });
 }
 
+/* Reinicia el progreso del usuario en este dispositivo: colección, perfil,
+   decks, mano, layout y renders guardados. La configuración del estudio
+   (idioma, sonido, música y DEV) se conserva a propósito. */
+const HUB_RESET_KEYS = [
+  HUB_STORAGE.profile,
+  HUB_STORAGE.data,
+  HUB_STORAGE.booster,
+  HUB_STORAGE.layout,
+  HUB_STORAGE.home,
+  HUB_STORAGE.deckBoxes,
+  HUB_INVENTORY_SIZE_STORAGE,
+  'cardgram.presets.v2',
+  'cardgram.scenes.v1',
+  'cardgram.plaza.scope',
+  /* Claves antiguas sin prefijo (migraciones previas). */
+  'profile.v1',
+  'hub.v1',
+  'booster.v1',
+  'presets.v2',
+  'scenes.v1'
+];
+
+function resetHubProgress() {
+  if (!window.confirm(t('hub_reset_confirm'))) return;
+  HUB_RESET_KEYS.forEach((key) => {
+    try {
+      window.localStorage.removeItem(key);
+    } catch (error) {
+      /* Sin almacenamiento disponible: seguimos con el resto. */
+    }
+  });
+  if (hub.els.menu && !hub.els.menu.hidden) closeHubSheet({ restoreFocus: false, instant: true });
+  window.location.reload();
+}
+
 /* --------------------------------------------------------------------------
    Paneles y navegación
    -------------------------------------------------------------------------- */
@@ -7822,6 +7872,14 @@ function setupHubEvents() {
     node.addEventListener('click', () => closeHubSheet());
   });
 
+  if (hub.els.menuReset) {
+    hub.els.menuReset.addEventListener('click', resetHubProgress);
+  }
+
+  if (hub.els.profileReset) {
+    hub.els.profileReset.addEventListener('click', resetHubProgress);
+  }
+
   if (hub.els.explorerCarousel) {
     hub.els.explorerCarousel.addEventListener('keydown', (event) => {
       if (event.target !== hub.els.explorerCarousel) return;
@@ -8397,6 +8455,8 @@ function cacheHubDom() {
   els.menuStatCollections = hubEl('menu-stat-collections');
   els.menuStatDecks = hubEl('menu-stat-decks');
   els.menuStatRenders = hubEl('menu-stat-renders');
+  els.menuReset = hubEl('hub-menu-reset');
+  els.profileReset = hubEl('profile-reset');
   els.playerOpen = hubEl('hub-player-open');
   els.menuAvatar = hubEl('hub-menu-avatar');
   els.menuAvatarImg = hubEl('hub-menu-avatar-img');
