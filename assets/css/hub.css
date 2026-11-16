@@ -21870,3 +21870,19 @@ body.pack-carousel .shop-scene {
 .hub-panel.active .explore-about-card {
   animation: hubRevealPop 0.7s var(--calm-ease) 0.62s backwards;
 }
+
+/* ==========================================================================
+   REV 369 - Home escritorio: bloque jugador 25% a la derecha y DRAW 15% abajo
+   Solo se mueve el panel del jugador (avatar + mano + DRAW); el resto de la
+   mesa (carta principal, deck, acciones) conserva su posicion exacta.
+   Los valores los calcula syncHomeCardScale() sobre la maqueta del panel.
+   ========================================================================== */
+@media (min-width: 981px) {
+  .hub-player-panel {
+    translate: var(--home-panel-shift, 0px) 0;
+  }
+
+  .home-hand-controls {
+    translate: 0 var(--home-draw-drop, 0px);
+  }
+}

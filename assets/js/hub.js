@@ -4279,6 +4279,31 @@ function syncHomeCardScale() {
       : 0;
     panel.style.setProperty('--hand-step', `${Math.round(step)}px`);
   }
+
+  /* Escritorio: el bloque jugador (avatar + mano + DRAW) se desplaza un 25%
+     de su propio ancho hacia la derecha y el control de DRAW baja un 15% de
+     la altura del bloque. Se mide con offsetWidth/offsetHeight (maquetación),
+     no con el rectángulo pintado, para no acumular desplazamientos. */
+  const playerPanel = panel.querySelector('.hub-player-panel');
+  if (playerPanel) {
+    const layoutWidth = playerPanel.offsetWidth;
+    const layoutHeight = playerPanel.offsetHeight;
+    if (layoutWidth > 0 && layoutHeight > 0) {
+      playerPanel.style.setProperty('--home-panel-shift', `${Math.round(layoutWidth * 0.25)}px`);
+      /* 15% de la altura del bloque, sin sacar el botón de la pantalla en
+         ventanas bajas: se descuenta el desplazamiento ya aplicado para medir
+         la posición real de maquetación. */
+      let drop = Math.round(layoutHeight * 0.15);
+      const drawBtn = playerPanel.querySelector('#home-draw-btn');
+      if (drawBtn) {
+        const applied = parseFloat(playerPanel.style.getPropertyValue('--home-draw-drop')) || 0;
+        const baseBottom = drawBtn.getBoundingClientRect().bottom - applied;
+        const room = Math.floor(window.innerHeight - 24 - baseBottom);
+        drop = Math.max(0, Math.min(drop, room));
+      }
+      playerPanel.style.setProperty('--home-draw-drop', `${drop}px`);
+    }
+  }
 }
 
 /* Coloca las acciones rápidas del inicio móvil a los lados del avatar. */
@@ -4324,6 +4349,18 @@ function initHomeTable() {
       syncMobileQuick();
     }, 120);
   }, { passive: true });
+
+  /* La maqueta del panel cambia al asentarse la rejilla y al cambiar la mano:
+     un observador de tamaño mantiene los desplazamientos de escritorio con el
+     valor correcto sin acumular errores. */
+  const panel = document.querySelector('.hub-home-panel');
+  if (panel && 'ResizeObserver' in window) {
+    if (initHomeTable.panelObserver) initHomeTable.panelObserver.disconnect();
+    initHomeTable.panelObserver = new ResizeObserver(() => syncHomeCardScale());
+    initHomeTable.panelObserver.observe(panel);
+    const playerPanel = panel.querySelector('.hub-player-panel');
+    if (playerPanel) initHomeTable.panelObserver.observe(playerPanel);
+  }
 }
 
 function makeBackStackCard() {
