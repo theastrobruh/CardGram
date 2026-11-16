@@ -260,11 +260,17 @@ cd CardGram
 │       ├── sounds/             # UI sound samples
 │       ├── loading/            # Boot / loading realities
 │       └── readme/             # Logo, banner and roadmap art
+├── materials/                  # Depósito: arte nuevo que aún no usa la app
 ├── .github/workflows/
 │   └── deploy.yml              # GitHub Actions → GitHub Pages
 └── skills/
     └── cardgram-ui/            # Agent guide: file map, rules, references
 ```
+
+`materials/` es la carpeta de depósito: ahí llega el arte nuevo antes de que se
+integre en `assets/`. Nada de lo que hay dentro se carga en la app, así que se
+puede vaciar o reorganizar sin romper nada. Un archivo que ya no se usa se
+elimina de `assets/` (el historial de git lo conserva) en vez de acumularse.
 
 ---
 

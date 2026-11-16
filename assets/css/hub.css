@@ -21126,11 +21126,11 @@ body.pack-open .shop-playground-bar {
 
 /* --- HOME ---------------------------------------------------------------- */
 .hub-panel.active .hub-player-avatar {
-  animation: hubRevealPop 0.62s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both;
+  animation: hubRevealPop 0.62s cubic-bezier(0.16, 1, 0.3, 1) 0.06s backwards;
 }
 
 .hub-panel.active .hub-player-actions > * {
-  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .hub-panel.active .hub-player-actions > *:nth-child(1) { animation-delay: 0.18s; }
@@ -21138,7 +21138,7 @@ body.pack-open .shop-playground-bar {
 .hub-panel.active .hub-player-actions > *:nth-child(3) { animation-delay: 0.3s; }
 
 .hub-panel.active .hub-stack-card {
-  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .hub-panel.active .hub-stack-card:nth-child(1) { animation-delay: 0.36s; }
@@ -21146,38 +21146,38 @@ body.pack-open .shop-playground-bar {
 .hub-panel.active .hub-stack-card:nth-child(3) { animation-delay: 0.48s; }
 
 .hub-panel.active .hub-hand-deck-card {
-  animation: hubRevealUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hubRevealUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .hub-panel.active .hub-hand-deck-card:nth-child(1) { animation-delay: 0.72s; }
 .hub-panel.active .hub-hand-deck-card:nth-child(2) { animation-delay: 0.8s; }
 
 .hub-panel.active .hub-card-tags {
-  animation: hubRevealUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 1.02s both;
+  animation: hubRevealUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 1.02s backwards;
 }
 
 .hub-panel.active .hub-card-name {
-  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 1.16s both;
+  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 1.16s backwards;
 }
 
 .hub-panel.active .hub-card-sub {
-  animation: hubRevealUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) 1.26s both;
+  animation: hubRevealUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) 1.26s backwards;
 }
 
 .hub-panel.active .hub-card-chips,
 .hub-panel.active .hub-card-actions {
-  animation: hubRevealFade 0.5s ease 1.36s both;
+  animation: hubRevealFade 0.5s ease 1.36s backwards;
 }
 
 /* --- SHOP ---------------------------------------------------------------- */
 /* La entrada se anima en el arte del sobre para no pelear con el flotado
    continuo (shopPackFloatGravity) que ya vive en el botón. */
 #shop-recommended .shop-pack-art {
-  animation: hubRevealPop 0.66s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hubRevealPop 0.66s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 #shop-recommended .shop-pack-name {
-  animation: hubRevealUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hubRevealUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 #shop-recommended .shop-pack:nth-child(1) .shop-pack-art { animation-delay: 0.06s; }
@@ -21196,20 +21196,20 @@ body.pack-open .shop-playground-bar {
 
 #shop-stores,
 .shop-mobile-store-building {
-  animation: hubRevealPop 0.62s cubic-bezier(0.16, 1, 0.3, 1) 0.44s both;
+  animation: hubRevealPop 0.62s cubic-bezier(0.16, 1, 0.3, 1) 0.44s backwards;
 }
 
 .shop-mobile-store-owner,
 #shop-stores .shop-store-owner {
-  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.56s both;
+  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.56s backwards;
 }
 
 #shop-days {
-  animation: hubRevealUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.62s both;
+  animation: hubRevealUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.62s backwards;
 }
 
 .shop-status-chip {
-  animation: hubRevealUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hubRevealUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .shop-status-chip:nth-child(1) { animation-delay: 0.7s; }
@@ -21217,22 +21217,22 @@ body.pack-open .shop-playground-bar {
 
 /* --- INVENTORY + EXPLORE ------------------------------------------------ */
 .hub-panel.active .hub-view-head .hub-view-copy > h1 {
-  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.04s both;
+  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.04s backwards;
 }
 
 .hub-panel.active .hub-view-head .hub-view-copy > p {
-  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both;
+  animation: hubRevealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.16s backwards;
 }
 
 .hub-panel.active .hub-section-head > div {
-  animation: hubRevealUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.26s both;
+  animation: hubRevealUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.26s backwards;
 }
 
 /* 3) Renders de deck box (0.32s) · 4) nombres y % de complexión (0.56s+). */
 .hub-panel.active .deck-box-cover,
 .hub-panel.active .deck-card .deck-cover,
 .hub-panel.active .collection-card .collection-stack {
-  animation: hubRevealPop 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hubRevealPop 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .hub-panel.active .deck-box-card:nth-child(1) .deck-box-cover,
@@ -21259,7 +21259,7 @@ body.pack-open .shop-playground-bar {
 .hub-panel.active .deck-body > *,
 .hub-panel.active .collection-body > *,
 .hub-panel.active .collection-meta {
-  animation: hubRevealUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hubRevealUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .hub-panel.active .deck-box-title,
@@ -21275,7 +21275,7 @@ body.pack-open .shop-playground-bar {
 
 /* Rejillas sueltas (packs de Explore, cartas de colección). */
 .hub-panel.active .hub-card-grid > * {
-  animation: hubRevealPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hubRevealPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .hub-panel.active .hub-card-grid > *:nth-child(1) { animation-delay: 0.3s; }
@@ -21287,7 +21287,7 @@ body.pack-open .shop-playground-bar {
 
 /* Explore: bloques y tarjetas del camino. */
 .hub-panel.active .explore-block {
-  animation: hubRevealUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: hubRevealUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .hub-panel.active .explore-block:nth-child(1) { animation-delay: 0.06s; }
@@ -21301,7 +21301,7 @@ body.pack-open .shop-playground-bar {
 .hub-panel.active .plaza-card,
 .hub-panel.active .explore-plaza-card,
 .hub-panel.active .explore-about-card {
-  animation: hubRevealPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.34s both;
+  animation: hubRevealPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.34s backwards;
 }
 
 /* --- AZURA · aparición holográfica al entrar y al cambiar de pose --------- */
@@ -21636,7 +21636,7 @@ body.pack-carousel .shop-scene {
 
 /* --- 5 - DRAW: las 3 cartas robadas aparecen juntas, sin espera --------- */
 .hub-panel.active #hub-player-stack.has-drawn .hub-stack-card {
-  animation: hubRevealUp 0.34s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+  animation: hubRevealUp 0.34s cubic-bezier(0.16, 1, 0.3, 1) backwards !important;
   animation-delay: 0s !important;
 }
 
@@ -21702,11 +21702,11 @@ body.pack-carousel .shop-scene {
 
 /* --- Home: avatar, acciones, mano, carta principal ---------------------- */
 .hub-panel.active .hub-player-avatar {
-  animation: hubRevealPop 0.88s var(--calm-ease) 0.08s both;
+  animation: hubRevealPop 0.88s var(--calm-ease) 0.08s backwards;
 }
 
 .hub-panel.active .hub-player-actions > * {
-  animation: hubRevealUp 0.7s var(--calm-ease) both;
+  animation: hubRevealUp 0.7s var(--calm-ease) backwards;
 }
 
 .hub-panel.active .hub-player-actions > *:nth-child(1) { animation-delay: 0.26s; }
@@ -21714,7 +21714,7 @@ body.pack-carousel .shop-scene {
 .hub-panel.active .hub-player-actions > *:nth-child(3) { animation-delay: 0.46s; }
 
 .hub-panel.active .hub-stack-card {
-  animation: hubRevealUp 0.72s var(--calm-ease) both;
+  animation: hubRevealUp 0.72s var(--calm-ease) backwards;
 }
 
 .hub-panel.active .hub-stack-card:nth-child(1) { animation-delay: 0.52s; }
@@ -21723,29 +21723,29 @@ body.pack-carousel .shop-scene {
 
 /* La tirada de DRAW entra junta, pero con el pulso calmado. */
 .hub-panel.active #hub-player-stack.has-drawn .hub-stack-card {
-  animation: hubRevealUp 0.55s var(--calm-ease) 0s both !important;
+  animation: hubRevealUp 0.55s var(--calm-ease) 0s backwards !important;
 }
 
 .hub-panel.active .hub-hand-deck-card {
-  animation: hubRevealUp 0.7s var(--calm-ease) both;
+  animation: hubRevealUp 0.7s var(--calm-ease) backwards;
 }
 
 .hub-panel.active .hub-hand-deck-card:nth-child(1) { animation-delay: 0.98s; }
 .hub-panel.active .hub-hand-deck-card:nth-child(2) { animation-delay: 1.1s; }
 
-.hub-panel.active .hub-card-tags { animation: hubRevealUp 0.6s var(--calm-ease) 1.24s both; }
-.hub-panel.active .hub-card-name { animation: hubRevealUp 0.7s var(--calm-ease) 1.38s both; }
-.hub-panel.active .hub-card-sub { animation: hubRevealUp 0.6s var(--calm-ease) 1.54s both; }
+.hub-panel.active .hub-card-tags { animation: hubRevealUp 0.6s var(--calm-ease) 1.24s backwards; }
+.hub-panel.active .hub-card-name { animation: hubRevealUp 0.7s var(--calm-ease) 1.38s backwards; }
+.hub-panel.active .hub-card-sub { animation: hubRevealUp 0.6s var(--calm-ease) 1.54s backwards; }
 .hub-panel.active .hub-card-chips,
-.hub-panel.active .hub-card-actions { animation: hubRevealFade 0.6s ease 1.66s both; }
+.hub-panel.active .hub-card-actions { animation: hubRevealFade 0.6s ease 1.66s backwards; }
 
 /* --- Shop: sobres, tienda, dueña y HUD --------------------------------- */
 #shop-recommended .shop-pack-art {
-  animation: hubRevealPop 0.9s var(--calm-ease) both;
+  animation: hubRevealPop 0.9s var(--calm-ease) backwards;
 }
 
 #shop-recommended .shop-pack-name {
-  animation: hubRevealUp 0.6s var(--calm-ease) both;
+  animation: hubRevealUp 0.6s var(--calm-ease) backwards;
 }
 
 #shop-recommended .shop-pack:nth-child(1) .shop-pack-art { animation-delay: 0.1s; }
@@ -21764,20 +21764,20 @@ body.pack-carousel .shop-scene {
 
 #shop-stores,
 .shop-mobile-store-building {
-  animation: hubRevealPop 0.85s var(--calm-ease) 0.6s both;
+  animation: hubRevealPop 0.85s var(--calm-ease) 0.6s backwards;
 }
 
 .shop-mobile-store-owner,
 #shop-stores .shop-store-owner {
-  animation: hubRevealUp 0.65s var(--calm-ease) 0.76s both;
+  animation: hubRevealUp 0.65s var(--calm-ease) 0.76s backwards;
 }
 
 #shop-days {
-  animation: hubRevealUp 0.6s var(--calm-ease) 0.84s both;
+  animation: hubRevealUp 0.6s var(--calm-ease) 0.84s backwards;
 }
 
 .shop-status-chip {
-  animation: hubRevealUp 0.6s var(--calm-ease) both;
+  animation: hubRevealUp 0.6s var(--calm-ease) backwards;
 }
 
 .shop-status-chip:nth-child(1) { animation-delay: 0.94s; }
@@ -21785,22 +21785,22 @@ body.pack-carousel .shop-scene {
 
 /* --- Cabeceras de Inventory / Explore / Perfil ------------------------- */
 .hub-panel.active .hub-view-head .hub-view-copy > h1 {
-  animation: hubRevealUp 0.75s var(--calm-ease) 0.06s both;
+  animation: hubRevealUp 0.75s var(--calm-ease) 0.06s backwards;
 }
 
 .hub-panel.active .hub-view-head .hub-view-copy > p {
-  animation: hubRevealUp 0.75s var(--calm-ease) 0.24s both;
+  animation: hubRevealUp 0.75s var(--calm-ease) 0.24s backwards;
 }
 
 .hub-panel.active .hub-section-head > div {
-  animation: hubRevealUp 0.68s var(--calm-ease) 0.4s both;
+  animation: hubRevealUp 0.68s var(--calm-ease) 0.4s backwards;
 }
 
 /* --- Renders de deck boxes y colecciones ------------------------------- */
 .hub-panel.active .deck-box-cover,
 .hub-panel.active .deck-card .deck-cover,
 .hub-panel.active .collection-card .collection-stack {
-  animation: hubRevealPop 0.8s var(--calm-ease) both;
+  animation: hubRevealPop 0.8s var(--calm-ease) backwards;
 }
 
 .hub-panel.active .deck-box-card:nth-child(1) .deck-box-cover,
@@ -21827,7 +21827,7 @@ body.pack-carousel .shop-scene {
 .hub-panel.active .deck-body > *,
 .hub-panel.active .collection-body > *,
 .hub-panel.active .collection-meta {
-  animation: hubRevealUp 0.6s var(--calm-ease) both;
+  animation: hubRevealUp 0.6s var(--calm-ease) backwards;
 }
 
 .hub-panel.active .deck-box-title,
@@ -21842,7 +21842,7 @@ body.pack-carousel .shop-scene {
 
 /* --- Rejillas de cartas ------------------------------------------------ */
 .hub-panel.active .hub-card-grid > * {
-  animation: hubRevealPop 0.7s var(--calm-ease) 0.44s both;
+  animation: hubRevealPop 0.7s var(--calm-ease) 0.44s backwards;
 }
 
 .hub-panel.active .hub-card-grid > *:nth-child(1) { animation-delay: 0.44s; }
@@ -21854,7 +21854,7 @@ body.pack-carousel .shop-scene {
 
 /* --- Explore: bloques del lobby --------------------------------------- */
 .hub-panel.active .explore-block {
-  animation: hubRevealUp 0.8s var(--calm-ease) both;
+  animation: hubRevealUp 0.8s var(--calm-ease) backwards;
 }
 
 .hub-panel.active .explore-block:nth-child(1) { animation-delay: 0.1s; }
@@ -21868,5 +21868,5 @@ body.pack-carousel .shop-scene {
 .hub-panel.active .plaza-card,
 .hub-panel.active .explore-plaza-card,
 .hub-panel.active .explore-about-card {
-  animation: hubRevealPop 0.7s var(--calm-ease) 0.62s both;
+  animation: hubRevealPop 0.7s var(--calm-ease) 0.62s backwards;
 }
