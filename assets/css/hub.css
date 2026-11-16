@@ -19583,8 +19583,6 @@ button.explore-want-more:focus-visible {
   body[data-view="hub"] .hub-showcase-glow,
   body[data-view="hub"] .card-holo,
   body[data-view="hub"] .hub-vinyl,
-  body[data-view="hub"] .spinning-card-inner,
-  body[data-view="hub"] .hub-brand-pack,
   body[data-view="hub"] .hub-card,
   body[data-view="hub"] .hub-menu-btn,
   body[data-view="hub"] .hub-music-btn svg,
@@ -21878,11 +21876,82 @@ body.pack-carousel .shop-scene {
    Los valores los calcula syncHomeCardScale() sobre la maqueta del panel.
    ========================================================================== */
 @media (min-width: 981px) {
+  /* Desplazamiento por posicion relativa (no por translate): mover el panel
+     con una transformacion promocionaba la capa y dejaba las cartas de la
+     mano sin repintar. Con left/top el navegador repinta normal. */
   .hub-player-panel {
-    translate: var(--home-panel-shift, 0px) 0;
+    left: var(--home-panel-shift, 0px);
   }
 
   .home-hand-controls {
-    translate: 0 var(--home-draw-drop, 0px);
+    position: relative;
+    top: var(--home-draw-drop, 0px);
   }
+}
+
+/* ==========================================================================
+   REV 372 - Encabezado: logo giratorio en movil + glow breath del booster
+   El logo 3D vuelve a girar tambien en pantallas pequenas (ya no lo apaga
+   el bloque de rendimiento de REV 297) y el boton del booster respira con
+   un halo aqua en bucle, al ritmo pausado del resto de la app.
+   ========================================================================== */
+@keyframes brandPackGlowBreath {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    box-shadow:
+      0 8px 20px rgba(7, 61, 79, 0.18),
+      inset 0 1px 0 #ffffff,
+      0 0 0 0 rgba(47, 198, 180, 0),
+      0 0 0 0 rgba(124, 235, 221, 0);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow:
+      0 10px 24px rgba(7, 61, 79, 0.24),
+      inset 0 1px 0 #ffffff,
+      0 0 18px 6px rgba(47, 198, 180, 0.7),
+      0 0 34px 12px rgba(124, 235, 221, 0.34);
+  }
+}
+
+.hub-brand-pack,
+.hub-brand-pack.has-packs {
+  animation: brandPackGlowBreath 4.4s var(--calm-ease) infinite !important;
+}
+
+/* Halo suave por detras, sin tocar el icono ni el badge. */
+.hub-brand-pack::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(circle, rgba(60, 201, 216, 0.22), rgba(60, 201, 216, 0) 70%);
+  animation: brandPackHaloBreath 4.4s var(--calm-ease) infinite;
+}
+
+@keyframes brandPackHaloBreath {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.22);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hub-brand-pack,
+  .hub-brand-pack::after,
+  .hub-brand-pack.has-packs {
+    animation: none !important;
+  }
+}
+.hub-stack-card.is-settled,
+.hub-stack-card.is-settled:not(:first-child) {
+  animation: none !important;
 }

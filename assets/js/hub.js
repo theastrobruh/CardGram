@@ -3851,7 +3851,22 @@ function makeStackCard(card) {
   button.setAttribute('aria-pressed', String(selected));
   button.setAttribute('aria-label', explorerCardLabel(card, selected));
   button.appendChild(makeExplorerArt(card));
+  settleStackCard(button);
   return button;
+}
+
+/* Chrome deja la carta sin repintar cuando su capa nace dentro de una
+   animación de entrada. Al terminar, se retira la animación (clase
+   is-settled) para que la capa se suelte y la carta se pinte siempre. */
+function settleStackCard(node) {
+  node.addEventListener(
+    'animationend',
+    (event) => {
+      if (!/^hubReveal/.test(event.animationName || '')) return;
+      node.classList.add('is-settled');
+    },
+    { once: true }
+  );
 }
 
 /* Abanico de cartas destacadas del jugador en el panel izquierdo. */
@@ -4375,6 +4390,7 @@ function makeBackStackCard() {
     )
   );
   card.addEventListener('click', openHandDialog);
+  settleStackCard(card);
   return card;
 }
 
