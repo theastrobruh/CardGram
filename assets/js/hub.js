@@ -2081,6 +2081,8 @@ let azuraLastSwap = 0;
 let azuraAutoPaused = false;
 let azuraPace = 1;
 let azuraHoloTimer = 0;
+let azuraReactClassTimer = 0;
+let azuraWakeStamp = 0;
 
 function azuraImages() {
   return [hub.els.shopNpcA, hub.els.shopNpcB];
@@ -2094,7 +2096,12 @@ function azuraHolo(image) {
   if (!npc) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   npc.classList.remove('is-holo');
-  image.classList.remove('is-holo');
+  /* El sprite anterior también pierde la clase: su animación holográfica usa
+     fill-mode both y, si se quedaba puesta, lo mantenía opaco al 100% y se
+     veía una segunda Azura fantasma detrás de la pose actual. */
+  azuraImages().forEach((node) => {
+    if (node) node.classList.remove('is-holo');
+  });
   /* Reinicia la animación aunque se llame dos veces seguidas. */
   void npc.offsetWidth;
   npc.classList.add('is-holo');
@@ -2102,8 +2109,10 @@ function azuraHolo(image) {
   window.clearTimeout(azuraHoloTimer);
   azuraHoloTimer = window.setTimeout(() => {
     npc.classList.remove('is-holo');
-    image.classList.remove('is-holo');
-  }, 700);
+    azuraImages().forEach((node) => {
+      if (node) node.classList.remove('is-holo');
+    });
+  }, 780);
 }
 
 /* Cambia el sprite con el cruce de siempre. */
@@ -2219,6 +2228,7 @@ function wakeAzura(options) {
      estaba dormida) y después retoma las animaciones normales. */
   const step = Math.max(0, Math.min(AZURA_AFK_INT_SPRITES.length - 1, azuraAfkStep));
   azuraMode = 'interrupted';
+  azuraWakeStamp = performance.now();
   azuraShow(AZURA_AFK_INT_SPRITES[step], { index: 0 });
   if (opts.haptic !== false) haptic(10);
   window.clearTimeout(azuraInterruptTimer);
@@ -2305,7 +2315,10 @@ function handleAzuraTap() {
   /* Si está dormida (o recién interrumpida), el tap solo la despierta:
      todavía no está enfadada. */
   if (azuraMode === 'afk' || azuraMode === 'interrupted') {
-    wakeAzura();
+    /* El pointerdown ya la despertó: no se repite la sacudida ni el
+       temporizador de la pose interrumpida. */
+    const justWoke = azuraMode === 'interrupted' && performance.now() - azuraWakeStamp < 600;
+    if (!justWoke) wakeAzura();
     if (hub.els.shopSpeech) {
       const lang = document.documentElement.lang;
       typeShopLine(AZURA_SLEEP_LINES[lang] || AZURA_SLEEP_LINES.en, false);
@@ -2325,7 +2338,10 @@ function handleAzuraTap() {
     npc.classList.remove('is-reacting');
     void npc.offsetWidth;
     npc.classList.add('is-reacting');
-    window.setTimeout(() => npc.classList.remove('is-reacting'), 720);
+    /* Un solo temporizador: antes cada toque dejaba uno pendiente y podía
+       cortar el rebote de un toque posterior. */
+    window.clearTimeout(azuraReactClassTimer);
+    azuraReactClassTimer = window.setTimeout(() => npc.classList.remove('is-reacting'), 720);
   }
 
   if (azuraTapCount >= AZURA_REACT_SPRITES.length) {
@@ -2405,6 +2421,7 @@ window.CardGramAzura = {
     azuraPunching = false;
     window.clearTimeout(azuraReactTimer);
     window.clearTimeout(azuraInterruptTimer);
+    window.clearTimeout(azuraReactClassTimer);
     const npc = hub.els.shopNpcContainer || document.querySelector('.shop-npc');
     const scene = document.querySelector('.shop-scene');
     if (npc) npc.classList.remove('is-punching', 'is-reacting');
@@ -2580,7 +2597,7 @@ function initShopScene() {
   if (shopVendorInitialized) return;
   shopVendorInitialized = true;
   loadShopPackArt();
-  [...AZURA_IDLE_SPRITES, ...AZURA_AFK_SPRITES, ...AZURA_REACT_SPRITES].forEach((src) => {
+  [...AZURA_IDLE_SPRITES, ...AZURA_AFK_SPRITES, ...AZURA_AFK_INT_SPRITES, ...AZURA_REACT_SPRITES].forEach((src) => {
     const image = new Image();
     image.src = src;
   });
@@ -2646,6 +2663,13 @@ function bindShopNpcMotion() {
   scene.addEventListener('pointerdown', noteAzuraInteraction, { passive: true });
   document.addEventListener('keydown', noteAzuraInteraction, { passive: true });
   npc.addEventListener('click', () => handleAzuraTap());
+  /* Azura es interactiva: también responde con Enter y Espacio cuando el
+     foco está en ella, igual que un botón. */
+  npc.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ' && event.key !== 'Spacebar') return;
+    event.preventDefault();
+    handleAzuraTap();
+  });
 }
 
 function fillShopPackPreview(container, collection) {

@@ -16177,7 +16177,9 @@ body:not(.is-home-route) .hub-mobile-quick {
     -webkit-user-drag: none !important;
     cursor: grab !important;
     transform-origin: center bottom !important;
-    will-change: transform !important;
+    /* Sin will-change: al escalar con el slider la capa se rasterizaba a 1x
+       y luego se estiraba, y Azura salía borrosa. */
+    will-change: auto !important;
   }
 
   .shop-npc * {
@@ -21323,7 +21325,7 @@ body.pack-open .shop-playground-bar {
   to { background-position-y: 46px; opacity: 0; }
 }
 
-.shop-npc-img.is-holo {
+.shop-npc-img.is-active.is-holo {
   animation: azuraHoloIn 0.62s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
@@ -21426,7 +21428,7 @@ body.pack-open .shop-playground-bar {
   }
 }
 
-.shop-npc-img.is-holo {
+.shop-npc-img.is-active.is-holo {
   animation: azuraHoloIn 0.78s cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
 
@@ -21954,4 +21956,20 @@ body.pack-carousel .shop-scene {
 .hub-stack-card.is-settled,
 .hub-stack-card.is-settled:not(:first-child) {
   animation: none !important;
+}
+
+
+/* ==========================================================================
+   REV 377 - Azura: foco de teclado y arreglos de pintado
+   Azura es un control real (Enter/Espacio): necesita un anillo de foco
+   visible, discreto y solo para navegacion con teclado.
+   ========================================================================== */
+.shop-npc:focus {
+  outline: none;
+}
+
+.shop-npc:focus-visible {
+  outline: 2px dashed rgba(124, 235, 221, 0.95);
+  outline-offset: -14px;
+  border-radius: 26px;
 }

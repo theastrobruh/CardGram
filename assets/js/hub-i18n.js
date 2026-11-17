@@ -1726,7 +1726,8 @@ Object.assign(I18N.es, {
   shop_npc_opt_hidden: 'Fuera de escena',
   shop_npc_pos_custom: 'Azura: Personalizada',
   shop_npc_size_aria: 'Tamaño de Azura',
-  shop_npc_size_label: 'Tamaño'
+  shop_npc_size_label: 'Tamaño',
+  shop_npc_aria: 'Saludar a Azura'
 });
 Object.assign(I18N.en, {
   shop_dev_export: 'Export layout',
@@ -1742,7 +1743,8 @@ Object.assign(I18N.en, {
   shop_npc_opt_hidden: 'Off screen',
   shop_npc_pos_custom: 'Azura: Custom',
   shop_npc_size_aria: 'Azura size',
-  shop_npc_size_label: 'Size'
+  shop_npc_size_label: 'Size',
+  shop_npc_aria: 'Say hi to Azura'
 });
 Object.assign(I18N.de, {
   shop_dev_export: 'Layout exportieren',
@@ -1758,7 +1760,8 @@ Object.assign(I18N.de, {
   shop_npc_opt_hidden: 'Außerhalb',
   shop_npc_pos_custom: 'Azura: Individuell',
   shop_npc_size_aria: 'Azura-Größe',
-  shop_npc_size_label: 'Größe'
+  shop_npc_size_label: 'Größe',
+  shop_npc_aria: 'Azura begrüßen'
 });
 Object.assign(I18N.es, { pack_card_swipe_hint: 'Desliza suavemente para ver la siguiente carta' });
 Object.assign(I18N.en, { pack_card_swipe_hint: 'Swipe gently to see the next card' });
