@@ -1942,58 +1942,9 @@ const SHOP_BACKGROUNDS = {
   afternoon: 'assets/data/shop_assets/afternoon.webp',
   night: 'assets/data/shop_assets/night.webp'
 };
-const SHOP_LINES = {
-  es: [
-    'Ah, llegaste. Qué sorpresa… bueno, no tanta.',
-    'Los sobres no muerden. Creo.',
-    'Si sale una rara, fingiré sorpresa. Muy bien.',
-    'Doce horas de turno. Tú eliges, yo juzgo en silencio.',
-    'Ese pack tiene buen karma. Lo digo siempre.',
-    'No soy adivina, pero ese foil te está llamando.'
-  ],
-  en: [
-    'Oh, you showed up. Shocking. Not really.',
-    'Packs don\'t bite. Probably.',
-    'Pull a rare and I\'ll pretend to be impressed.',
-    'Twelve-hour shift. You pick, I judge silently.',
-    'That pack has good karma. I say that a lot.',
-    'Not a psychic, but that foil is calling you.'
-  ],
-  de: [
-    'Oh, du bist da. Überraschend. Nicht wirklich.',
-    'Packs beißen nicht. Wahrscheinlich.',
-    'Zieh eine Rare und ich tue überrascht. Sehr gut.',
-    'Zwölf Stunden Schicht. Du wählst, ich urteile still.',
-    'Das Pack hat gutes Karma. Sage ich oft.',
-    'Keine Wahrsagerin, aber dieses Foil ruft dich.'
-  ]
-};
 const SHOP_MOODS = ['🪷', '🫧', '🌸', '🍒', '🌙', '🎀', '🪻', '🍥', '✨', '🧋'];
-const SHOP_IDLE_LINES = {
-  es: [
-    '¿Sigues ahí? El polvo no se compra solo.',
-    'Puedes tocar los sobres, no muerden. Creo.',
-    'Si no decides pronto, subo el precio por aburrimiento.',
-    'Yo aquí, esperando. Como siempre.'
-  ],
-  en: [
-    'Still there? Dust doesn\'t buy itself.',
-    'You can touch the packs. They don\'t bite. Probably.',
-    'Decide soon or I raise the price out of boredom.',
-    'I\'ll be here. Waiting. As always.'
-  ],
-  de: [
-    'Noch da? Staub kauft sich nicht von selbst.',
-    'Du darfst die Packs anfassen. Sie beißen nicht. Wahrscheinlich.',
-    'Entscheide dich bald, sonst erhöhe ich den Preis aus Langeweile.',
-    'Ich bin hier. Warte. Wie immer.'
-  ]
-};
 let shopVendorTimer = 0;
 let shopClockTimer = 0;
-let shopTypeTimer = 0;
-let shopIdleTimer = 0;
-let shopLineCursor = 0;
 let shopVendorIndex = 0;
 let shopVendorActive = 0;
 let shopVendorInitialized = false;
@@ -2031,39 +1982,6 @@ const AZURA_IDLE_DELAY = 60000;
 const AZURA_AFK_STEP = 15000;
 const AZURA_INTERRUPT_HOLD = 2800;
 const AZURA_TAP_RESET = 4200;
-
-const AZURA_REACT_LINES = {
-  es: [
-    '¿Otra vez? Tengo trabajo.',
-    'Te estoy viendo. Literalmente.',
-    'Vale, ya empieza a cansar.',
-    'Un tap más y lo vas a lamentar.',
-    'Te lo advertí, ¿eh?',
-    '¡Ya basta!'
-  ],
-  en: [
-    'Again? I have work to do.',
-    'I can see you. Literally.',
-    'Okay, this is getting old.',
-    'One more tap and you will regret it.',
-    'I warned you, alright?',
-    'That is enough!'
-  ],
-  de: [
-    'Schon wieder? Ich habe zu tun.',
-    'Ich sehe dich. Wortwörtlich.',
-    'Okay, das wird langsam alt.',
-    'Noch ein Tipp und du bereust es.',
-    'Ich habe dich gewarnt, ja?',
-    'Jetzt reicht es!'
-  ]
-};
-
-const AZURA_SLEEP_LINES = {
-  es: 'Mmm… ¿qué? Estaba descansando.',
-  en: 'Mmm… what? I was resting.',
-  de: 'Mmm… was? Ich habe geruht.'
-};
 
 let azuraMode = 'idle';
 let azuraIdleTimer = 0;
@@ -2154,9 +2072,7 @@ function setAzuraPose(index, options) {
   const total = SHOP_VENDOR_SPRITES.length;
   const target = ((Number(index) % total) + total) % total;
   const ok = azuraShow(SHOP_VENDOR_SPRITES[target], { index: target });
-  if (!ok) return false;
-  if (!opts.silent && Math.random() < 0.28) speakShopLine('talk');
-  return true;
+  return ok;
 }
 
 /* Bucle autónomo de posturas: solo cuando está en estado normal. */
@@ -2256,12 +2172,6 @@ function noteAzuraInteraction() {
 }
 
 /* ------------------------------ Estado react ----------------------------- */
-function azuraReactLine(step) {
-  const lang = document.documentElement.lang;
-  const lines = AZURA_REACT_LINES[lang] || AZURA_REACT_LINES.en;
-  return lines[Math.max(0, Math.min(lines.length - 1, step - 1))];
-}
-
 function scheduleAzuraCalmDown() {
   window.clearTimeout(azuraTapResetTimer);
   azuraTapResetTimer = window.setTimeout(() => {
@@ -2293,7 +2203,6 @@ function azuraPunch() {
   }
   if (window.Sound) window.Sound.play('punch');
   haptic([0, 55, 80, 40]);
-  if (hub.els.shopSpeech) typeShopLine(azuraReactLine(6), false);
 
   window.clearTimeout(azuraReactTimer);
   azuraReactTimer = window.setTimeout(() => {
@@ -2319,10 +2228,6 @@ function handleAzuraTap() {
        temporizador de la pose interrumpida. */
     const justWoke = azuraMode === 'interrupted' && performance.now() - azuraWakeStamp < 600;
     if (!justWoke) wakeAzura();
-    if (hub.els.shopSpeech) {
-      const lang = document.documentElement.lang;
-      typeShopLine(AZURA_SLEEP_LINES[lang] || AZURA_SLEEP_LINES.en, false);
-    }
     if (window.Sound) window.Sound.play('tap');
     return;
   }
@@ -2349,7 +2254,6 @@ function handleAzuraTap() {
     return;
   }
 
-  if (hub.els.shopSpeech) typeShopLine(azuraReactLine(azuraTapCount), false);
   if (window.Sound) window.Sound.play('tap');
   scheduleAzuraCalmDown();
 }
@@ -2478,74 +2382,11 @@ function shopRemaining(ms) {
   return hours ? `${hours}h ${String(minutes).padStart(2, '0')}m` : `${minutes}m`;
 }
 
-function shopLang() {
-  const lang = document.documentElement.lang;
-  return SHOP_LINES[lang] ? lang : 'en';
-}
-
-function typeShopLine(text, instant = false) {
-  const speech = hub.els.shopSpeech;
-  if (!speech || typeof text !== 'string') return;
-  window.clearInterval(shopTypeTimer);
-  speech.classList.remove('is-typing');
-  if (instant) {
-    speech.textContent = text;
-    return;
-  }
-  speech.textContent = '';
-  speech.classList.add('is-typing');
-  let index = 0;
-  shopTypeTimer = window.setInterval(() => {
-    index += 1;
-    speech.textContent = text.slice(0, index);
-    if (index >= text.length) {
-      window.clearInterval(shopTypeTimer);
-      speech.classList.remove('is-typing');
-    }
-  }, 28);
-}
-
-function scheduleShopIdle() {
-  if (!hub.els.shopSpeech) return;
-  window.clearTimeout(shopIdleTimer);
-  shopIdleTimer = window.setTimeout(() => {
-    if (hub.panel !== 'booster' || document.hidden) {
-      scheduleShopIdle();
-      return;
-    }
-    speakShopLine('idle');
-  }, 17000);
-}
-
-function speakShopLine(kind = 'talk') {
-  if (!hub.els.shopSpeech) return;
-  const lang = shopLang();
-  const pool = kind === 'idle'
-    ? (SHOP_IDLE_LINES[lang] || SHOP_IDLE_LINES.en)
-    : (SHOP_LINES[lang] || SHOP_LINES.en);
-  if (!pool || !pool.length) return;
-  let line;
-  if (kind === 'idle') {
-    line = pool[Math.floor(Math.random() * pool.length)];
-  } else {
-    shopLineCursor = (shopLineCursor + 1) % pool.length;
-    line = pool[shopLineCursor];
-  }
-  typeShopLine(line);
-  hub.els.shopSpeech.dataset.lang = lang;
-  scheduleShopIdle();
-}
-
 function renderShopAtmosphere() {
   const now = new Date();
   const slot = shopTimeSlot(now);
   if (hub.els.shopBg) hub.els.shopBg.style.backgroundImage = `url("${SHOP_BACKGROUNDS[slot]}")`;
 
-  const lang = shopLang();
-  if (hub.els.shopSpeech && hub.els.shopSpeech.dataset.lang !== lang) {
-    typeShopLine((SHOP_LINES[lang] || SHOP_LINES.en)[0], true);
-    hub.els.shopSpeech.dataset.lang = lang;
-  }
   const mood = SHOP_MOODS[(Math.floor(now.getTime() / 86400000) + now.getDate()) % SHOP_MOODS.length];
   if (hub.els.shopMoodEmoji) hub.els.shopMoodEmoji.textContent = mood;
   if (hub.els.shopMood) hub.els.shopMood.setAttribute('aria-label', `Mood ${mood}`);
@@ -2615,9 +2456,6 @@ function initShopScene() {
   }
   azuraPoseHistory = [shopVendorIndex];
 
-  if (hub.els.shopSpeech) {
-    typeShopLine((SHOP_LINES[shopLang()] || SHOP_LINES.en)[0]);
-  }
   renderShopAtmosphere();
   window.setTimeout(renderShopAtmosphere, 1200);
   window.clearInterval(shopVendorTimer);
@@ -2628,13 +2466,6 @@ function initShopScene() {
   armAzuraIdle();
   window.clearInterval(shopClockTimer);
   shopClockTimer = window.setInterval(renderShopAtmosphere, 60000);
-  scheduleShopIdle();
-  if (!hub.shopInteractionBound) {
-    hub.shopInteractionBound = true;
-    document.addEventListener('click', () => {
-      if (hub.panel === 'booster') scheduleShopIdle();
-    }, { passive: true });
-  }
   bindShopNpcMotion();
 }
 
@@ -6890,14 +6721,13 @@ function setActivePanel(panel, options = {}) {
   }
 
   if (target === 'booster') {
-    scheduleShopIdle();
     /* Azura entra con el barrido holográfico, en el mismo compás que la tienda. */
     window.clearTimeout(azuraHoloTimer);
     window.setTimeout(() => {
       const image = document.querySelector('.shop-npc-img.is-active');
       if (image) azuraHolo(image);
     }, 420);
-  } else window.clearTimeout(shopIdleTimer);
+  }
 
   if (target === 'home') {
     hub.homeVisits += 1;
@@ -8653,7 +8483,6 @@ function cacheHubDom() {
   els.shopRecommended = hubEl('shop-recommended');
   els.shopNpcA = hubEl('shop-npc-a');
   els.shopNpcB = hubEl('shop-npc-b');
-  els.shopSpeech = hubEl('shop-speech-text');
   els.shopBg = document.querySelector('.shop-bg');
   els.shopMoodEmoji = hubEl('shop-mood-emoji');
   els.shopMood = hubEl('shop-mood');
@@ -9294,11 +9123,34 @@ function currentShopNpcPos() {
   return 'left';
 }
 
+/* Escala máxima que mantiene la cabeza de Azura dentro de la escena.
+   El sprite crece desde su borde inferior (transform-origin: center bottom),
+   así que el alto disponible es lo que hay entre ese borde y el techo del
+   escenario. Se recalcula con la geometría real: si la ventana cambia de
+   tamaño, el tope cambia con ella. */
+function shopNpcMaxScale() {
+  const npc = document.querySelector('.shop-npc');
+  const scene = document.querySelector('.shop-scene');
+  if (!npc || !scene) return 1.9;
+  const state = getPlaygroundState(npc);
+  const current = Math.max(0.01, Number(state.scale) || 1);
+  const npcRect = npc.getBoundingClientRect();
+  const sceneRect = scene.getBoundingClientRect();
+  /* Panel cerrado o pestaña oculta: sin geometría fiable se deja el máximo. */
+  if (npcRect.height < 20 || sceneRect.height < 20) return 1.9;
+  /* offsetHeight es el alto sin escalar: el rect cambia con la animación de
+     tamaño y daría un tope erróneo a mitad de transición. */
+  const naturalHeight = npc.offsetHeight || npcRect.height / current;
+  const fit = (npcRect.bottom - sceneRect.top) / naturalHeight;
+  const percent = Math.floor(fit * 100);
+  return Math.max(0.55, Math.min(1.9, percent / 100));
+}
+
 function setShopNpcScale(scale, options = {}) {
   const npc = document.querySelector('.shop-npc');
   if (!npc) return;
   const state = getPlaygroundState(npc);
-  state.scale = Math.max(0.55, Math.min(1.9, Number(scale) || 1));
+  state.scale = Math.max(0.55, Math.min(shopNpcMaxScale(), Number(scale) || 1));
   state.rot = 0;
   applyPlaygroundTransform(npc, state);
   syncShopNpcSizeUi();
@@ -9310,7 +9162,15 @@ function syncShopNpcSizeUi() {
   const output = document.getElementById('shop-npc-size-value');
   const npc = document.querySelector('.shop-npc');
   if (!range || !output || !npc) return;
-  const percent = Math.round(getPlaygroundState(npc).scale * 100);
+  const state = getPlaygroundState(npc);
+  const maxPercent = Math.round(shopNpcMaxScale() * 100);
+  if (Number(range.max) !== maxPercent) range.max = String(maxPercent);
+  /* Si el tope bajó (ventana más pequeña), la figura se ajusta sola. */
+  if (state.scale > maxPercent / 100 + 0.0001) {
+    state.scale = maxPercent / 100;
+    applyPlaygroundTransform(npc, state);
+  }
+  const percent = Math.min(maxPercent, Math.round(state.scale * 100));
   range.value = String(percent);
   output.textContent = `${percent}%`;
 }
@@ -9330,6 +9190,14 @@ function setupShopNpcSizeUi() {
     range._hasInput = true;
     range.addEventListener('input', () => {
       setShopNpcScale(Number(range.value) / 100);
+    });
+  }
+
+  /* El tope depende del alto de la ventana: al redimensionar se recalcula. */
+  if (!range._hasResize) {
+    range._hasResize = true;
+    window.addEventListener('resize', () => {
+      syncShopNpcSizeUi();
     });
   }
 

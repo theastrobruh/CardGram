@@ -1437,22 +1437,19 @@ Object.assign(I18N.de, {
 Object.assign(I18N.es, {
   hub_nav_booster: 'Shop', hub_nav_booster_full: 'Shop', booster_title: 'Shop',
   booster_lede: 'Elige tu pack diario, revisa el stock o entra a la computadora para ver otros vendedores.',
-  shop_computer: 'Computadora', shop_vendor_kicker: 'Shop vendor of the day',
-  shop_vendor_hello: 'Hello… Welcome to the Shop.', shop_daily_kicker: 'Daily Packs',
+  shop_computer: 'Computadora', shop_daily_kicker: 'Daily Packs',
   shop_selected_pack: 'Pack seleccionado', shop_recommended: 'Recomendados de hoy'
 });
 Object.assign(I18N.en, {
   hub_nav_booster: 'Shop', hub_nav_booster_full: 'Shop', booster_title: 'Shop',
   booster_lede: 'Pick your daily pack, check the stock or use the computer to browse other vendors.',
-  shop_computer: 'Computer', shop_vendor_kicker: 'Shop vendor of the day',
-  shop_vendor_hello: 'Hello… Welcome to the Shop.', shop_daily_kicker: 'Daily Packs',
+  shop_computer: 'Computer', shop_daily_kicker: 'Daily Packs',
   shop_selected_pack: 'Selected pack', shop_recommended: "Today's picks"
 });
 Object.assign(I18N.de, {
   hub_nav_booster: 'Shop', hub_nav_booster_full: 'Shop', booster_title: 'Shop',
   booster_lede: 'Wähle dein tägliches Pack, prüfe den Bestand oder nutze den Computer für andere Verkäufer.',
-  shop_computer: 'Computer', shop_vendor_kicker: 'Shop vendor of the day',
-  shop_vendor_hello: 'Hello… Welcome to the Shop.', shop_daily_kicker: 'Daily Packs',
+  shop_computer: 'Computer', shop_daily_kicker: 'Daily Packs',
   shop_selected_pack: 'Ausgewähltes Pack', shop_recommended: 'Heutige Empfehlungen'
 });
 Object.assign(I18N.es, { shop_daily_available: 'Daily Pack disponible', hub_favorites_edit: 'Editar cartas favoritas' });
