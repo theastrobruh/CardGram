@@ -2671,7 +2671,7 @@ function renderShopStores() {
   if (!container) return;
   setTimeout(setupShopPlaygroundAll, 50);
 
-  const button = makeHubButton('shop-store', null, { hubRoute: 'explore' });
+  const button = makeHubButton('shop-store', null, { exploreCreator: 'theastrobruh' });
   button.setAttribute('aria-label', t('shop_store_aria'));
 
   const building = makeNode('span', 'shop-store-building');
@@ -5180,44 +5180,24 @@ function renderCollectionsOverview() {
   if (newDeckCenter) newDeckCenter.hidden = !hasDecks;
 }
 
-function createLockedTeaser(collection, ownedCount) {
+function createEmptyOwnedNote(collection) {
   const total = collection.setSize || collection.cards.length;
-  const locked = Math.max(0, total - ownedCount);
-  if (!locked) return null;
 
-  const article = makeNode('article', 'media-card media-card-missing collection-locked-teaser');
-  const thumb = makeNode('div', 'media-card-thumb media-missing-thumb');
-  thumb.appendChild(hubIcon('layers'));
-  thumb.appendChild(makeNode('span', 'collection-locked-mark', '🔒'));
-  article.appendChild(thumb);
+  const note = makeNode('div', 'collection-empty-note');
+  note.appendChild(makeNode('span', 'collection-empty-note-icon', '🔒'));
 
-  const body = makeNode('div', 'media-card-body');
-  body.appendChild(
-    makeNode(
-      'h3',
-      null,
-      ownedCount
-        ? t('collections_locked_teaser_title', { count: locked })
-        : t('collections_no_owned_title')
-    )
-  );
-  body.appendChild(
-    makeNode(
-      'p',
-      null,
-      ownedCount
-        ? t('collections_locked_teaser_desc')
-        : t('collections_no_owned_desc', { total })
-    )
-  );
-  article.appendChild(body);
+  const copy = makeNode('div', 'collection-empty-note-copy');
+  copy.appendChild(makeNode('strong', null, t('collections_no_owned_title')));
+  copy.appendChild(makeNode('p', null, t('collections_no_owned_desc', { total })));
+  note.appendChild(copy);
 
-  const actions = makeNode('div', 'media-card-actions');
+  const actions = makeNode('div', 'collection-empty-note-actions');
   const boosters = makeHubButton('btn btn-primary btn-sm', t('collections_open_boosters'));
   boosters.dataset.hubRoute = 'booster';
   actions.appendChild(boosters);
-  article.appendChild(actions);
-  return article;
+  note.appendChild(actions);
+
+  return note;
 }
 
 function renderCollections() {
@@ -5491,8 +5471,9 @@ function renderCollectionDetail() {
         isFavorite: hubProfile.favoriteCardId === card.id
       })
     );
-    const teaser = createLockedTeaser(collection, ownedCount);
-    if (teaser) nodes.push(teaser);
+    // El inventario solo muestra cartas desbloqueadas. Sin cartas del set,
+    // se ofrece un aviso compacto en lugar de una tarjeta gigante bloqueada.
+    if (!nodes.length) nodes.push(createEmptyOwnedNote(collection));
     hub.els.collectionDetailGrid.replaceChildren(...nodes);
     hub.els.collectionDetailGrid.dataset.cardView = hubCardView;
   }
@@ -7350,8 +7331,13 @@ function onHubClick(event) {
   const exploreCreator = target.closest('[data-explore-creator]');
   if (exploreCreator) {
     event.preventDefault();
-    hub.exploreCreatorId = exploreCreator.dataset.exploreCreator;
+    const creatorId = exploreCreator.dataset.exploreCreator;
+    /* Desde la tienda hay que abrir el panel de Explorar antes de fijar el
+       creador; si no, el usuario se queda en el escaparate de la tienda. */
+    if (hub.panel !== 'explore') navigate('explore');
+    hub.exploreCreatorId = creatorId;
     hub.explorePackId = null;
+    hub.explorePlazaStep = null;
     renderExplore();
     return;
   }

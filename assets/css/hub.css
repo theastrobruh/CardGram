@@ -21919,8 +21919,8 @@ body.pack-carousel .shop-scene {
   border-radius: 13px;
 }
 
-#collection-detail-grid[data-card-view="compact"] .media-card:not(.collection-locked-teaser) .media-card-body,
-#collection-detail-grid[data-card-view="compact"] .media-card:not(.collection-locked-teaser) .media-card-actions {
+#collection-detail-grid[data-card-view="compact"] .media-card .media-card-body,
+#collection-detail-grid[data-card-view="compact"] .media-card .media-card-actions {
   display: none;
 }
 
@@ -21993,41 +21993,55 @@ body.pack-carousel .shop-scene {
   filter: grayscale(1);
 }
 
-/* La tarjeta-teaser de cartas bloqueadas ocupa una fila completa. */
-.collection-locked-teaser {
+/* Aviso compacto cuando el set todavía no tiene cartas desbloqueadas. */
+.collection-empty-note {
   grid-column: 1 / -1;
-  border-style: dashed;
-  border-color: rgba(9, 86, 104, 0.24);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px dashed rgba(9, 86, 104, 0.26);
+  border-radius: 18px;
   background: linear-gradient(158deg, rgba(218, 244, 250, 0.62), rgba(190, 227, 239, 0.32));
 }
 
-.collection-locked-teaser .media-missing-thumb {
-  position: relative;
-}
-
-.collection-locked-mark {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
+.collection-empty-note-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  font-size: 0.8rem;
-  background: rgba(6, 36, 46, 0.72);
-  box-shadow: 0 6px 16px rgba(3, 24, 32, 0.28);
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  font-size: 1rem;
+  opacity: 0.78;
+  filter: grayscale(1);
+  background: rgba(6, 36, 46, 0.08);
 }
 
-#collection-detail-grid[data-card-view="list"] .collection-locked-teaser {
-  flex-direction: row;
+.collection-empty-note-copy {
+  display: grid;
+  flex: 1 1 220px;
+  gap: 3px;
+  min-width: 0;
 }
 
-#collection-detail-grid[data-card-view="list"] .collection-locked-teaser .media-missing-thumb {
-  flex: 0 0 76px;
-  width: 76px;
-  aspect-ratio: 1 / 1;
+.collection-empty-note-copy strong {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #052b35;
+}
+
+.collection-empty-note-copy p {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.collection-empty-note-actions {
+  flex: 0 0 auto;
 }
 
 /* --- Tienda: cartas del sobre con bloqueo visible ------------------------ */
