@@ -8,6 +8,8 @@
   const overlay = document.getElementById('boot-screen');
   if (!overlay) return;
 
+  const tr = (key, fallbackText) => (typeof t === 'function' ? t(key) : fallbackText);
+
   const start = document.getElementById('boot-start');
   const hint = document.getElementById('boot-hint');
   const progress = document.getElementById('boot-progress');
@@ -99,7 +101,7 @@
     loaded = images.length;
     setProgress();
     if (progress) progress.hidden = true;
-    if (hint) hint.textContent = 'Todo listo para comenzar';
+    if (hint) hint.textContent = tr('boot_ready', 'Todo listo para comenzar');
     if (start) {
       start.hidden = false;
       start.focus({ preventScroll: true });
@@ -128,7 +130,7 @@
     if (ready) return;
     finish();
     if (progress) progress.hidden = true;
-    hint.textContent = 'Todo listo para comenzar';
+    hint.textContent = tr('boot_ready', 'Todo listo para comenzar');
   }
 
   function wait(ms) {
@@ -206,11 +208,11 @@
       updateRealityTag();
       carouselTimer = window.setInterval(playCarousel, 7200);
     }
-    if (hint) hint.textContent = 'Preparando tu estudio…';
+    if (hint) hint.textContent = tr('boot_preparing', 'Preparando tu estudio…');
     await Promise.all([waitForHub(9000), waitForFonts()]);
     /* Un respiro mínimo para que el logo se disfrute: nunca menos de 1.2 s. */
     await wait(Math.max(0, 1200 - (Date.now() - bootStartedAt)));
-    if (hint) hint.textContent = 'Todo listo para comenzar';
+    if (hint) hint.textContent = tr('boot_ready', 'Todo listo para comenzar');
     finish();
   }
 

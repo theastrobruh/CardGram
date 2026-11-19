@@ -545,7 +545,7 @@ function defaultFeaturedIds(favoriteId) {
 function sanitizeHubProfile(raw) {
   const fallbackFavorite = defaultFavoriteId();
   const base = {
-    name: '¿?',
+    name: 'Card Creator',
     handle: 'Fulanito',
     bio: '',
     avatar: null,
@@ -1897,7 +1897,8 @@ function renderBoosterSetButtons(sets) {
   container.replaceChildren(
     ...sets.map((collection) => {
       const owned = ownedIn(collection.id).length;
-      const total = collection.cards.length;
+      const catalogTotal = collection.cards.length;
+      const total = collection.setSize || catalogTotal;
       const button = makeHubButton('booster-set', null, { boosterSet: collection.id });
       button.setAttribute('aria-pressed', String(collection.id === hubBooster.setId));
       button.disabled = locked && collection.id !== hubBooster.setId;
@@ -1921,9 +1922,9 @@ function renderBoosterSetButtons(sets) {
 
       let badgeText;
       if (collection.id === hubBooster.setId && locked) badgeText = t('booster_set_locked');
-      else if (!collection.complete) badgeText = t('booster_set_size', { count: total, total: collection.setSize });
+      else if (!collection.complete) badgeText = t('booster_set_size', { count: catalogTotal, total });
       else if (owned >= total) badgeText = t('booster_set_complete');
-      else badgeText = t('booster_set_size', { count: total, total: collection.setSize });
+      else badgeText = t('booster_set_size', { count: catalogTotal, total });
       button.appendChild(makeNode('span', 'booster-set-badge', badgeText));
 
       return button;
@@ -2590,7 +2591,7 @@ function renderShopStores() {
   setTimeout(setupShopPlaygroundAll, 50);
 
   const button = makeHubButton('shop-store', null, { hubRoute: 'explore' });
-  button.setAttribute('aria-label', 'Visitar tienda Astro~Verse de theAstroBruh');
+  button.setAttribute('aria-label', t('shop_store_aria'));
 
   const building = makeNode('span', 'shop-store-building');
   const art = makeNode('span', 'shop-store-art');
@@ -2635,7 +2636,7 @@ function renderShopRecommended(sets) {
       button.appendChild(makeNode('strong', 'shop-pack-name', collection.name));
 
       const owned = ownedIn(collection.id).length;
-      const total = collection.cards.length;
+      const total = collection.setSize || collection.cards.length;
       const percent = total ? Math.round((owned / total) * 100) : 0;
 
       // Única barra de progreso de soda líquida suave y estética
@@ -2729,7 +2730,7 @@ function renderBooster() {
 
   if (hub.els.shopPackPercent) {
     const owned = collection ? ownedIn(collection.id).length : 0;
-    const total = collection ? collection.cards.length : 0;
+    const total = collection ? collection.setSize || collection.cards.length : 0;
     hub.els.shopPackPercent.textContent = `${total ? Math.round((owned / total) * 100) : 0}%`;
   }
   if (hub.els.shopRareCards) {
@@ -5058,7 +5059,7 @@ function renderCollectionsOverview() {
 
     const body = makeNode('span', 'deck-box-body');
     body.appendChild(makeNode('span', 'deck-box-title', t('collections_tab_created') || 'Cartas creadas'));
-    body.appendChild(makeNode('span', 'deck-box-desc', count === 1 ? '1 carta creada' : `${count} cartas creadas`));
+    body.appendChild(makeNode('span', 'deck-box-desc', countLabel('collections_created_cards', count)));
     button.appendChild(body);
 
     hub.els.createdGrid.replaceChildren(button);
@@ -5170,7 +5171,7 @@ function renderUserCreatedCardsDetail() {
   const stack = makeNode('div', 'collection-stack');
   const boxImg = makeNode('img', 'deck-box-img');
   boxImg.src = currentBoxSrc;
-  boxImg.alt = 'Cartas creadas';
+  boxImg.alt = t('collections_tab_created') || 'Cartas creadas';
   stack.appendChild(boxImg);
   hub.els.collectionDetailHead.appendChild(stack);
 
@@ -5184,7 +5185,7 @@ function renderUserCreatedCardsDetail() {
   const created = getUserPresets();
   const meta = makeNode('div', 'hub-detail-meta');
   meta.appendChild(
-    makeNode('span', 'hub-chip', created.length === 1 ? '1 carta creada' : `${created.length} cartas creadas`)
+    makeNode('span', 'hub-chip', countLabel('collections_created_cards', created.length))
   );
   copy.appendChild(meta);
 
@@ -5264,7 +5265,7 @@ function renderUserCreatedCardsDetail() {
       renderUserCreatedCardsDetail();
       renderCollections();
       if (typeof toast === 'function') {
-        toast('¡Box art del deck actualizado!', { type: 'success' });
+        toast(t('deck_box_art_updated'), { type: 'success' });
       }
     });
 
@@ -6080,7 +6081,7 @@ function renderExplorePackDetail(collection) {
 
 function makeExplorePlazaCard() {
   const button = makeHubButton('explore-creator explore-shop explore-plaza-card', null, { explorePlaza: 'true' });
-  button.setAttribute('aria-label', 'Entrar a La Plaza');
+  button.setAttribute('aria-label', t('explore_plaza_aria'));
 
   const cover = makeNode('span', 'explore-shop-cover explore-plaza-cover');
   cover.appendChild(makeHubImage('assets/data/explore/Plaza-Icon.webp', 'La Plaza'));
@@ -6095,11 +6096,11 @@ function makeExplorePlazaCard() {
   copy.appendChild(makeNode('strong', null, 'La Plaza'));
   copy.appendChild(makeNode('span', null, '@plaza · Ciudad de Panamá'));
   copy.appendChild(
-    makeNode('span', 'explore-creator-meta', 'Noticias & Torneos TCG')
+    makeNode('span', 'explore-creator-meta', t('explore_plaza_meta'))
   );
   body.appendChild(copy);
 
-  const cta = makeNode('span', 'explore-shop-cta', 'Entrar a La Plaza');
+  const cta = makeNode('span', 'explore-shop-cta', t('explore_plaza_cta'));
   cta.appendChild(hubIcon('arrow-right'));
   body.appendChild(cta);
   button.appendChild(body);
@@ -9108,7 +9109,7 @@ function resetShopPlayground() {
   syncShopNpcSizeUi();
 
   if (typeof toast === 'function') {
-    toast('¡Playground restablecido al diseño original!', { type: 'success' });
+    toast(t('playground_reset_done'), { type: 'success' });
   }
 }
 
