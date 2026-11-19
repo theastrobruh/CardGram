@@ -17793,11 +17793,7 @@ body.welcome-open {
   overflow: visible !important;
 }
 
-/* Aquí sí queremos ver las cartas que trae el sobre, no siluetas */
-.shop-pack-contents .shop-preview-card.is-locked img {
-  filter: none !important;
-  opacity: 1 !important;
-}
+/* Las cartas bloqueadas se muestran oscurecidas para motivar el desbloqueo. */
 
 .shop-pack-contents .shop-pack-view-hint {
   margin: 0 auto !important;
@@ -21864,3 +21860,370 @@ body.pack-carousel .shop-scene {
   outline-offset: -14px;
   border-radius: 26px;
 }
+
+/* ==========================================================================
+   CARTAS · cuatro modos de vista y desbloqueo progresivo (inventario/tienda)
+   ========================================================================== */
+
+/* --- Barra de modos ------------------------------------------------------ */
+.inventory-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.inventory-view-options {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.inventory-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 26px;
+}
+
+.inventory-view-btn .icon {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 auto;
+}
+
+.inventory-view-btn-label {
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  .inventory-view-btn {
+    min-width: 32px;
+    padding: 0 8px;
+  }
+
+  .inventory-view-btn-label {
+    display: none;
+  }
+}
+
+/* --- Inventario: cuadrícula / miniaturas / lista / vitrina --------------- */
+#collection-detail-grid[data-card-view="compact"] {
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)) !important;
+  gap: 10px !important;
+}
+
+#collection-detail-grid[data-card-view="compact"] .media-card {
+  gap: 0;
+  padding: 5px;
+  border-radius: 13px;
+}
+
+#collection-detail-grid[data-card-view="compact"] .media-card:not(.collection-locked-teaser) .media-card-body,
+#collection-detail-grid[data-card-view="compact"] .media-card:not(.collection-locked-teaser) .media-card-actions {
+  display: none;
+}
+
+#collection-detail-grid[data-card-view="list"] {
+  grid-template-columns: 1fr !important;
+  gap: 9px !important;
+}
+
+#collection-detail-grid[data-card-view="list"] .media-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px 14px;
+}
+
+#collection-detail-grid[data-card-view="list"] .media-card-thumb {
+  flex: 0 0 62px;
+  width: 62px;
+}
+
+#collection-detail-grid[data-card-view="list"] .media-card-body {
+  flex: 1 1 auto;
+  gap: 2px;
+}
+
+#collection-detail-grid[data-card-view="list"] .media-card-actions {
+  flex: 0 0 auto;
+  margin-top: 0;
+}
+
+#collection-detail-grid[data-card-view="list"] .media-card-actions .btn span {
+  display: none;
+}
+
+#collection-detail-grid[data-card-view="showcase"] {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+  gap: 20px !important;
+}
+
+#collection-detail-grid[data-card-view="showcase"] .media-card {
+  gap: 12px;
+  padding: 14px;
+  border-radius: 24px;
+}
+
+#collection-detail-grid[data-card-view="showcase"] .media-card-body h3 {
+  font-size: 0.95rem;
+}
+
+#collection-detail-grid[data-card-view="showcase"] .media-card-body p {
+  font-size: 0.7rem;
+}
+
+/* Cabecera del set sin cartas: nada de arte bloqueado, solo un candado. */
+.collection-stack.is-locked-stack {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px dashed rgba(9, 86, 104, 0.3);
+  background: linear-gradient(160deg, rgba(218, 244, 250, 0.82), rgba(180, 222, 236, 0.5));
+}
+
+.collection-stack-lock {
+  font-size: 1.35rem;
+  line-height: 1;
+  opacity: 0.72;
+  filter: grayscale(1);
+}
+
+/* La tarjeta-teaser de cartas bloqueadas ocupa una fila completa. */
+.collection-locked-teaser {
+  grid-column: 1 / -1;
+  border-style: dashed;
+  border-color: rgba(9, 86, 104, 0.24);
+  background: linear-gradient(158deg, rgba(218, 244, 250, 0.62), rgba(190, 227, 239, 0.32));
+}
+
+.collection-locked-teaser .media-missing-thumb {
+  position: relative;
+}
+
+.collection-locked-mark {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  background: rgba(6, 36, 46, 0.72);
+  box-shadow: 0 6px 16px rgba(3, 24, 32, 0.28);
+}
+
+#collection-detail-grid[data-card-view="list"] .collection-locked-teaser {
+  flex-direction: row;
+}
+
+#collection-detail-grid[data-card-view="list"] .collection-locked-teaser .media-missing-thumb {
+  flex: 0 0 76px;
+  width: 76px;
+  aspect-ratio: 1 / 1;
+}
+
+/* --- Tienda: cartas del sobre con bloqueo visible ------------------------ */
+.shop-preview-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.shop-preview-lock {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(3, 18, 25, 0.32) 0%, rgba(3, 18, 25, 0.72) 100%);
+  pointer-events: none;
+}
+
+.shop-preview-lock-icon {
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.9;
+  filter: grayscale(1) brightness(1.35);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.shop-preview-owned-mark {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  font-size: 0.5rem;
+  font-weight: 800;
+  color: #04262e;
+  background: linear-gradient(135deg, #7cebdd, #4facfe);
+  box-shadow: 0 2px 6px rgba(2, 30, 40, 0.35);
+  pointer-events: none;
+}
+
+/* En la tienda las bloqueadas se intuyen, pero el arte queda oscurecido. */
+.shop-pack-contents .shop-preview-card.is-locked img {
+  filter: grayscale(1) brightness(0.42) contrast(1.1) !important;
+  opacity: 0.5 !important;
+}
+
+.shop-pack-contents .shop-preview-card.is-owned img {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* --- Tienda: barra de modos sobre el cristal oscuro ---------------------- */
+.shop-pack-view-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px 6px !important;
+}
+
+.shop-pack-view-toolbar .inventory-size-label {
+  color: rgba(234, 255, 251, 0.72);
+}
+
+.shop-pack-view-toolbar .inventory-size-options {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: none;
+}
+
+.shop-pack-view-toolbar .inventory-size-btn {
+  color: #eafffb;
+}
+
+.shop-pack-view-toolbar .inventory-size-btn:hover {
+  background: rgba(0, 242, 254, 0.22);
+}
+
+.shop-pack-view-toolbar .inventory-size-btn.is-active {
+  background: linear-gradient(135deg, #00f2fe, #4facfe);
+  color: #03242d;
+  box-shadow: 0 6px 14px rgba(0, 242, 254, 0.38);
+}
+
+/* --- Tienda: los cuatro modos sobre la rejilla de cartas ----------------- */
+.shop-pack-view-cards[data-card-view] .shop-preview-card {
+  height: auto !important;
+}
+
+.shop-pack-view-cards[data-card-view] {
+  display: grid !important;
+  grid-auto-rows: max-content;
+  justify-content: center !important;
+  justify-items: center !important;
+  gap: 9px !important;
+  padding: 4px 20px 12px !important;
+  max-height: min(56vh, 430px);
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+.shop-pack-view-cards[data-card-view="grid"] {
+  grid-template-columns: repeat(auto-fill, 54px) !important;
+}
+
+.shop-pack-view-cards[data-card-view="grid"] .shop-preview-card {
+  flex-basis: 54px;
+  width: 54px !important;
+}
+
+.shop-pack-view-cards[data-card-view="grid"] .shop-preview-card img {
+  width: 54px !important;
+  height: 74px !important;
+}
+
+.shop-pack-view-cards[data-card-view="compact"] {
+  grid-template-columns: repeat(auto-fill, 40px) !important;
+  gap: 6px !important;
+}
+
+.shop-pack-view-cards[data-card-view="compact"] .shop-preview-card {
+  flex-basis: 40px;
+  width: 40px !important;
+}
+
+.shop-pack-view-cards[data-card-view="compact"] .shop-preview-card img {
+  width: 40px !important;
+  height: 56px !important;
+}
+
+.shop-pack-view-cards[data-card-view="list"] {
+  grid-template-columns: 1fr !important;
+  justify-items: stretch !important;
+  gap: 6px !important;
+}
+
+.shop-pack-view-cards[data-card-view="list"] .shop-preview-card {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  width: 100% !important;
+  padding: 5px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.shop-pack-view-cards[data-card-view="list"] .shop-preview-card img {
+  flex: 0 0 38px;
+  width: 38px !important;
+  height: 53px !important;
+}
+
+.shop-pack-view-cards[data-card-view="list"] .shop-preview-card::after {
+  content: attr(data-name);
+  flex: 1 1 auto;
+  min-width: 0;
+  color: rgba(234, 255, 251, 0.92);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shop-pack-view-cards[data-card-view="list"] .shop-preview-owned-mark {
+  position: static;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.shop-pack-view-cards[data-card-view="showcase"] {
+  grid-template-columns: repeat(auto-fill, 96px) !important;
+  gap: 12px !important;
+}
+
+.shop-pack-view-cards[data-card-view="showcase"] .shop-preview-card {
+  flex-basis: 96px;
+  width: 96px !important;
+}
+
+.shop-pack-view-cards[data-card-view="showcase"] .shop-preview-card img {
+  width: 96px !important;
+  height: 132px !important;
+}
+
+@media (max-width: 640px) {
+  .shop-pack-view-cards[data-card-view] {
+    max-height: 48vh;
+  }
+}
+

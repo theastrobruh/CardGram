@@ -115,6 +115,66 @@ function makeInventorySizeControl() {
   return wrap;
 }
 
+/* --------------------------------------------------------------------------
+   Cartas · cuatro modos de vista compartidos por inventario y tienda
+   -------------------------------------------------------------------------- */
+const HUB_CARD_VIEWS = [
+  { id: 'grid', icon: 'grid', key: 'card_view_grid' },
+  { id: 'compact', icon: 'cards', key: 'card_view_compact' },
+  { id: 'list', icon: 'menu', key: 'card_view_list' },
+  { id: 'showcase', icon: 'expand', key: 'card_view_showcase' }
+];
+const HUB_CARD_VIEW_STORAGE = 'cardgram.cardview.v1';
+let hubCardView = 'grid';
+
+function loadCardView() {
+  const raw = storage.read(HUB_CARD_VIEW_STORAGE, null);
+  const value = raw && typeof raw === 'object' ? raw.view : raw;
+  hubCardView = HUB_CARD_VIEWS.some((view) => view.id === value) ? value : 'grid';
+  applyCardView();
+}
+
+function applyCardView() {
+  document.querySelectorAll('[data-card-view-surface]').forEach((surface) => {
+    surface.dataset.cardView = hubCardView;
+  });
+  document.querySelectorAll('[data-card-view-btn]').forEach((btn) => {
+    const active = btn.dataset.cardViewBtn === hubCardView;
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-pressed', String(active));
+  });
+}
+
+function setCardView(view) {
+  if (!HUB_CARD_VIEWS.some((entry) => entry.id === view) || view === hubCardView) return;
+  hubCardView = view;
+  storage.write(HUB_CARD_VIEW_STORAGE, { view });
+  applyCardView();
+}
+
+function makeCardViewControl() {
+  const wrap = makeNode('div', 'inventory-view');
+  wrap.appendChild(makeNode('span', 'inventory-size-label', t('card_view_label') || 'Vista'));
+  const group = makeNode('div', 'inventory-size-options inventory-view-options');
+  group.setAttribute('role', 'group');
+  group.setAttribute('aria-label', t('card_view_aria') || 'Modo de vista');
+  HUB_CARD_VIEWS.forEach((view) => {
+    const active = view.id === hubCardView;
+    const btn = makeNode('button', `inventory-size-btn inventory-view-btn${active ? ' is-active' : ''}`);
+    btn.type = 'button';
+    btn.dataset.cardViewBtn = view.id;
+    btn.setAttribute('aria-pressed', String(active));
+    btn.setAttribute('aria-label', t(view.key));
+    btn.title = t(`${view.key}_desc`) || t(view.key);
+    btn.appendChild(hubIcon(view.icon));
+    btn.appendChild(makeNode('span', 'inventory-view-btn-label', t(view.key)));
+    btn.addEventListener('click', () => setCardView(view.id));
+    group.appendChild(btn);
+  });
+  wrap.appendChild(group);
+  return wrap;
+}
+
 function getUserPresets() {
   if (typeof presets !== 'undefined' && Array.isArray(presets) && presets.length) return presets;
   try {
@@ -2510,12 +2570,24 @@ function fillShopPackPreview(container, collection) {
   const cards = collection ? collection.cards.slice().sort((a, b) => cardRarity(a).weight - cardRarity(b).weight) : [];
   container.replaceChildren(
     ...cards.map((card) => {
-      const item = makeNode('span', `shop-preview-card${owned.has(card.id) ? ' is-owned' : ' is-locked'}`);
-      item.title = owned.has(card.id) ? card.name : `${card.name} · ${t('shop_locked')}`;
-      item.appendChild(makeHubImage(thumbOf(card), card.name));
+      const isOwned = owned.has(card.id);
+      const item = makeNode('span', `shop-preview-card${isOwned ? ' is-owned' : ' is-locked'}`);
+      item.title = isOwned ? card.name : `${card.name} · ${t('shop_locked')}`;
+      item.dataset.name = isOwned ? card.name : t('shop_locked');
+      item.setAttribute('aria-label', isOwned ? card.name : `${t('shop_locked')} · ${card.name}`);
+      item.appendChild(makeHubImage(thumbOf(card), isOwned ? card.name : ''));
+      if (!isOwned) {
+        const veil = makeNode('span', 'shop-preview-lock');
+        veil.setAttribute('aria-hidden', 'true');
+        veil.appendChild(makeNode('span', 'shop-preview-lock-icon', '🔒'));
+        item.appendChild(veil);
+      } else {
+        item.appendChild(makeNode('span', 'shop-preview-owned-mark', '✓'));
+      }
       return item;
     })
   );
+  container.dataset.cardView = hubCardView;
 }
 
 function renderShopPackDetail() {
@@ -2526,7 +2598,11 @@ function renderShopPackDetail() {
     hub.els.shopPackViewImg.alt = collection.name;
   }
   if (hub.els.shopPackViewName) hub.els.shopPackViewName.textContent = collection.name;
+  if (hub.els.shopPackViewToolbar) {
+    hub.els.shopPackViewToolbar.replaceChildren(makeCardViewControl());
+  }
   fillShopPackPreview(hub.els.shopPackViewCards, collection);
+  applyCardView();
 
   if (hub.els.shopPackOpen) {
     hub.els.shopPackOpen.hidden = false;
@@ -2535,7 +2611,12 @@ function renderShopPackDetail() {
     if (label) label.textContent = t('booster_open');
   }
   if (hub.els.shopPackViewHint) {
-    hub.els.shopPackViewHint.textContent = t('shop_pack_detail_hint') || 'Contenido del sobre y cartas que puedes conseguir.';
+    const ownedIds = new Set(ownedIn(collection.id));
+    const ownedCount = collection.cards.filter((card) => ownedIds.has(card.id)).length;
+    hub.els.shopPackViewHint.textContent = `${t('collections_owned_of', {
+      count: ownedCount,
+      total: collection.setSize || collection.cards.length
+    })} · ${t('shop_pack_detail_hint')}`;
   }
 }
 
@@ -5099,27 +5180,43 @@ function renderCollectionsOverview() {
   if (newDeckCenter) newDeckCenter.hidden = !hasDecks;
 }
 
-function createMissingCard(collection) {
-  const article = makeNode('article', 'media-card media-card-missing');
+function createLockedTeaser(collection, ownedCount) {
+  const total = collection.setSize || collection.cards.length;
+  const locked = Math.max(0, total - ownedCount);
+  if (!locked) return null;
+
+  const article = makeNode('article', 'media-card media-card-missing collection-locked-teaser');
   const thumb = makeNode('div', 'media-card-thumb media-missing-thumb');
-  thumb.appendChild(hubIcon('sparkles'));
+  thumb.appendChild(hubIcon('layers'));
+  thumb.appendChild(makeNode('span', 'collection-locked-mark', '🔒'));
   article.appendChild(thumb);
 
   const body = makeNode('div', 'media-card-body');
   body.appendChild(
-    makeNode('h3', null, t('collections_missing_card_title', { count: collection.missing }))
+    makeNode(
+      'h3',
+      null,
+      ownedCount
+        ? t('collections_locked_teaser_title', { count: locked })
+        : t('collections_no_owned_title')
+    )
   );
   body.appendChild(
     makeNode(
       'p',
       null,
-      t('collections_missing_card_desc', {
-        count: collection.cards.length,
-        total: collection.setSize
-      })
+      ownedCount
+        ? t('collections_locked_teaser_desc')
+        : t('collections_no_owned_desc', { total })
     )
   );
   article.appendChild(body);
+
+  const actions = makeNode('div', 'media-card-actions');
+  const boosters = makeHubButton('btn btn-primary btn-sm', t('collections_open_boosters'));
+  boosters.dataset.hubRoute = 'booster';
+  actions.appendChild(boosters);
+  article.appendChild(actions);
   return article;
 }
 
@@ -5326,15 +5423,28 @@ function renderCollectionDetail() {
     return;
   }
 
+  const ownedIds = new Set(ownedIn(collection.id));
+  const ownedCards = collection.cards.filter((card) => ownedIds.has(card.id));
+  const ownedCount = ownedCards.length;
+
+  if (hub.els.collectionDetailToolbar) {
+    hub.els.collectionDetailToolbar.replaceChildren(makeCardViewControl());
+  }
+
   if (hub.els.collectionDetailHead) {
     hub.els.collectionDetailHead.replaceChildren();
 
-    const stack = makeNode('div', 'collection-stack');
-    [microUrl(collection.thumbCover || collection.cover), ...collection.cards.map((card) => microOf(card))]
-      .filter(Boolean)
-      .filter((src, index, list) => list.indexOf(src) === index)
-      .slice(0, 3)
-      .forEach((src) => stack.appendChild(makeHubImage(src, '')));
+    const stack = makeNode('div', `collection-stack${ownedCards.length ? '' : ' is-locked-stack'}`);
+    if (ownedCards.length) {
+      ownedCards
+        .map((card) => microOf(card))
+        .filter(Boolean)
+        .filter((src, index, list) => list.indexOf(src) === index)
+        .slice(0, 3)
+        .forEach((src) => stack.appendChild(makeHubImage(src, '')));
+    } else {
+      stack.appendChild(makeNode('span', 'collection-stack-lock', '🔒'));
+    }
     hub.els.collectionDetailHead.appendChild(stack);
 
     const copy = makeNode('div', 'hub-detail-copy');
@@ -5344,28 +5454,20 @@ function renderCollectionDetail() {
       makeNode('p', null, localized(collection.description) || localized(collection.tagline))
     );
 
+    const total = collection.setSize || collection.cards.length;
+    const locked = Math.max(0, total - ownedCount);
     const meta = makeNode('div', 'hub-detail-meta');
     meta.appendChild(
-      makeNode('span', 'hub-chip', countLabel('hub_collection_cards', collection.cards.length))
+      makeNode('span', 'hub-chip', t('collections_owned_of', { count: ownedCount, total }))
     );
     if (collection.setSize) {
       meta.appendChild(
         makeNode(
           'span',
           'hub-chip',
-          t('collections_set_size', { count: collection.cards.length, total: collection.setSize })
-        )
-      );
-      meta.appendChild(
-        makeNode('span', 'hub-chip', t('collections_owned', { count: ownedIn(collection.id).length }))
-      );
-      meta.appendChild(
-        makeNode(
-          'span',
-          'hub-chip',
-          collection.complete
-            ? t('collections_set_complete')
-            : t('collections_set_missing', { count: collection.missing })
+          locked
+            ? t('collections_set_missing', { count: locked })
+            : t('collections_set_complete')
         )
       );
     }
@@ -5377,7 +5479,8 @@ function renderCollectionDetail() {
   }
 
   if (hub.els.collectionDetailGrid) {
-    const nodes = collection.cards.map((card) =>
+    // En el inventario solo se revelan las cartas ya desbloqueadas.
+    const nodes = ownedCards.map((card) =>
       createMediaCard({
         kind: 'catalog',
         id: card.id,
@@ -5388,9 +5491,12 @@ function renderCollectionDetail() {
         isFavorite: hubProfile.favoriteCardId === card.id
       })
     );
-    if (collection.missing > 0) nodes.push(createMissingCard(collection));
+    const teaser = createLockedTeaser(collection, ownedCount);
+    if (teaser) nodes.push(teaser);
     hub.els.collectionDetailGrid.replaceChildren(...nodes);
+    hub.els.collectionDetailGrid.dataset.cardView = hubCardView;
   }
+  applyCardView();
 }
 
 function deckZoneCards(deck, zone) {
@@ -8497,6 +8603,7 @@ function cacheHubDom() {
   els.shopPackViewImg = hubEl('shop-pack-view-img');
   els.shopPackViewName = hubEl('shop-pack-view-name');
   els.shopPackViewPercent = hubEl('shop-pack-view-percent');
+  els.shopPackViewToolbar = hubEl('shop-pack-view-toolbar');
   els.shopPackViewCards = hubEl('shop-pack-view-cards');
   els.shopPackViewReveal = hubEl('shop-pack-view-reveal');
   els.shopPackViewHint = hubEl('shop-pack-view-hint');
@@ -8549,6 +8656,7 @@ function cacheHubDom() {
   els.decksEmpty = hubEl('decks-empty');
   els.collectionDetail = hubEl('collection-detail');
   els.collectionDetailHead = hubEl('collection-detail-head');
+  els.collectionDetailToolbar = hubEl('collection-detail-toolbar');
   els.collectionDetailGrid = hubEl('collection-detail-grid');
   els.collectionsBack = hubEl('collections-view-back');
   els.deckDetail = hubEl('deck-detail');
@@ -8625,6 +8733,7 @@ function setupHub() {
   loadHubState();
   loadDeckBoxes();
   loadInventorySize();
+  loadCardView();
   if (hub.els.inventoryToolbar) {
     hub.els.inventoryToolbar.replaceChildren(makeInventorySizeControl());
   }

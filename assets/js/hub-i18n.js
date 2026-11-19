@@ -1980,3 +1980,65 @@ Object.assign(I18N.de, {
   explore_plaza_aria: 'La Plaza betreten',
   shop_store_aria: 'Astro~Verse-Shop von theAstroBruh besuchen'
 });
+
+/* Modos de vista de cartas y desbloqueo progresivo (ES/EN/DE). */
+Object.assign(I18N.es, {
+  card_view_label: 'Vista',
+  card_view_aria: 'Modo de vista de las cartas',
+  card_view_grid: 'Cuadrícula',
+  card_view_grid_desc: 'Tarjetas con nombre, set y favorito',
+  card_view_compact: 'Miniaturas',
+  card_view_compact_desc: 'Rejilla densa solo con el arte',
+  card_view_list: 'Lista',
+  card_view_list_desc: 'Una carta por fila con su nombre',
+  card_view_showcase: 'Vitrina',
+  card_view_showcase_desc: 'Arte grande para recrearte en el detalle',
+  collections_owned_of: '{count} de {total} desbloqueadas',
+  collections_locked_teaser_title: '{count} cartas por desbloquear',
+  collections_locked_teaser_desc: 'Consigue más cartas en los sobres o en el User Store para revelarlas aquí.',
+  collections_no_owned_title: 'Aún no tienes cartas de este set',
+  collections_no_owned_desc: 'Abre sobres o visita el User Store para desbloquear las {total} cartas del set.',
+  collections_open_boosters: 'Abrir sobres',
+  collections_detail_hint: 'Solo ves las cartas que has desbloqueado. El set completo, con las bloqueadas en gris, vive en el User Store.',
+  shop_pack_detail_hint: 'Cartas del set: en color las que ya tienes y en gris las que aún puedes desbloquear.'
+});
+Object.assign(I18N.en, {
+  card_view_label: 'View',
+  card_view_aria: 'Card view mode',
+  card_view_grid: 'Grid',
+  card_view_grid_desc: 'Cards with name, set and favorite',
+  card_view_compact: 'Thumbnails',
+  card_view_compact_desc: 'Dense grid with art only',
+  card_view_list: 'List',
+  card_view_list_desc: 'One card per row with its name',
+  card_view_showcase: 'Showcase',
+  card_view_showcase_desc: 'Large art to enjoy the details',
+  collections_owned_of: '{count} of {total} unlocked',
+  collections_locked_teaser_title: '{count} cards to unlock',
+  collections_locked_teaser_desc: 'Collect more cards from packs or the User Store to reveal them here.',
+  collections_no_owned_title: "You don't own any cards from this set yet",
+  collections_no_owned_desc: 'Open packs or visit the User Store to unlock all {total} cards in the set.',
+  collections_open_boosters: 'Open packs',
+  collections_detail_hint: 'You only see the cards you have unlocked. The full set, with locked cards in grey, lives in the User Store.',
+  shop_pack_detail_hint: 'Set cards: the ones you own in colour, the ones you can still unlock in grey.'
+});
+Object.assign(I18N.de, {
+  card_view_label: 'Ansicht',
+  card_view_aria: 'Kartenansicht',
+  card_view_grid: 'Raster',
+  card_view_grid_desc: 'Karten mit Name, Set und Favorit',
+  card_view_compact: 'Miniaturen',
+  card_view_compact_desc: 'Dichte Rasteransicht nur mit Artwork',
+  card_view_list: 'Liste',
+  card_view_list_desc: 'Eine Karte pro Zeile mit Namen',
+  card_view_showcase: 'Vitrine',
+  card_view_showcase_desc: 'Großes Artwork für alle Details',
+  collections_owned_of: '{count} von {total} freigeschaltet',
+  collections_locked_teaser_title: '{count} Karten noch zu entsperren',
+  collections_locked_teaser_desc: 'Sammle mehr Karten aus Packs oder im User Store, um sie hier zu enthüllen.',
+  collections_no_owned_title: 'Du hast noch keine Karten aus diesem Set',
+  collections_no_owned_desc: 'Öffne Packs oder besuche den User Store, um alle {total} Karten des Sets freizuschalten.',
+  collections_open_boosters: 'Packs öffnen',
+  collections_detail_hint: 'Du siehst nur die Karten, die du freigeschaltet hast. Das komplette Set mit grauen gesperrten Karten findest du im User Store.',
+  shop_pack_detail_hint: 'Karten des Sets: farbig, was du besitzt, grau, was du noch freischalten kannst.'
+});
