@@ -11190,21 +11190,9 @@ body.booting {
     box-shadow: 0 8px 18px rgba(8, 62, 82, 0.16), inset 0 1px 0 #ffffff;
   }
 
-  /* Crear render: la cara del botón es la carta favorita del jugador. */
+  /* Crear render: icono de varita, coherente con el resto de la navegación. */
   .hub-mobile-menu-nav .hub-fab-btn-studio {
     overflow: visible;
-  }
-
-  .hub-mobile-menu-nav .hub-fab-btn-studio.has-favorite-art {
-    background-image: var(--fab-art, none) !important;
-    background-size: cover !important;
-    background-position: center 26% !important;
-    background-repeat: no-repeat !important;
-    color: transparent;
-  }
-
-  .hub-mobile-menu-nav .hub-fab-btn-studio.has-favorite-art .hub-fab-icon {
-    opacity: 0;
   }
 
   .hub-mobile-menu-nav .tone-a {
@@ -21194,9 +21182,7 @@ body.pack-open .shop-playground-bar {
 .hub-panel.active .explore-block:nth-child(6) { animation-delay: 0.46s; }
 
 .hub-panel.active .roadmap-card,
-.hub-panel.active .plaza-card,
-.hub-panel.active .explore-plaza-card,
-.hub-panel.active .explore-about-card {
+.hub-panel.active .plaza-card {
   animation: hubRevealPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.34s backwards;
 }
 
@@ -21752,9 +21738,7 @@ body.pack-carousel .shop-scene {
 .hub-panel.active .explore-block:nth-child(6) { animation-delay: 0.6s; }
 
 .hub-panel.active .roadmap-card,
-.hub-panel.active .plaza-card,
-.hub-panel.active .explore-plaza-card,
-.hub-panel.active .explore-about-card {
+.hub-panel.active .plaza-card {
   animation: hubRevealPop 0.7s var(--calm-ease) 0.62s backwards;
 }
 

@@ -3687,16 +3687,6 @@ function renderFavoriteCard() {
     hub.els.card.setAttribute('aria-pressed', 'false');
   }
 
-  /* La acción «crear render» del móvil lleva la cara de la carta favorita. */
-  const studioFab = hub.root.querySelector('.hub-fab-btn-studio');
-  if (studioFab) {
-    const art = thumbOf(card);
-    if (art) {
-      studioFab.style.setProperty('--fab-art', `url("${new URL(art, document.baseURI).href}")`);
-      studioFab.classList.add('has-favorite-art');
-    }
-  }
-
   syncFavoriteMarks();
 }
 
@@ -8220,9 +8210,23 @@ function playPanelCascade(panel) {
     });
   };
 
-  const sequence = CASCADE_SEQUENCES[panel.dataset.hubPanel || ''];
+  const panelKey = panel.dataset.hubPanel || '';
+  const sequence = CASCADE_SEQUENCES[panelKey];
   if (sequence) sequence.forEach(applyWave);
   CASCADE_WAVES.forEach(applyWave);
+
+  /* Los accesos rápidos viven en la barra superior, fuera del panel, pero en
+     Home flanquean al avatar. Se suman a la cascada con el mismo ritmo para
+     que no aparezcan congelados antes que el resto de la pantalla. */
+  if (panelKey === 'home') {
+    document.querySelectorAll('.hub-mobile-quick-btn').forEach((node, index) => {
+      if (seen.has(node)) return;
+      const delay = 240 + index * 80;
+      node.style.setProperty('--cg-delay', `${delay}ms`);
+      node.classList.add('cg-in');
+      lastDelay = Math.max(lastDelay, delay);
+    });
+  }
 
   cascadeTimer = window.setTimeout(clearPanelCascade, Math.max(1500, lastDelay + 900));
 }
