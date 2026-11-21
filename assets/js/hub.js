@@ -667,6 +667,7 @@ function sanitizeHubProfile(raw) {
 function sanitizeHubData(raw) {
   const data = {
     reviewedCollections: [],
+    newCards: [],
     decks: [],
     exports: 0,
     lastRenderAt: null
@@ -679,6 +680,14 @@ function sanitizeHubData(raw) {
     data.reviewedCollections = Array.from(
       new Set(raw.reviewedCollections.filter((id) => validCollections.has(id)))
     );
+  }
+
+  /* Cartas recién obtenidas: conservan su insignia hasta que el jugador
+     entra a revisar el set al que pertenecen. */
+  if (Array.isArray(raw.newCards)) {
+    data.newCards = Array.from(
+      new Set(raw.newCards.filter((id) => HUB_CATALOG.byId(id)))
+    ).slice(0, 600);
   }
 
   const exportsCount = Number(raw.exports);
@@ -794,6 +803,7 @@ function sanitizeBooster(raw) {
     day: null,
     setId: null,
     picks: [],
+    freshPicks: [],
     claimed: false,
     usedGrants: [],
     missionDay: null,
@@ -813,6 +823,14 @@ function sanitizeBooster(raw) {
   if (Array.isArray(raw.picks)) {
     data.picks = raw.picks
       .filter((id) => HUB_CATALOG.byId(id))
+      .slice(0, 6);
+  }
+
+  /* Cartas del sobre que eran nuevas al robarlas: la insignia debe seguir
+     visible en la parrilla final aunque el set ya se haya reclamado. */
+  if (Array.isArray(raw.freshPicks)) {
+    data.freshPicks = raw.freshPicks
+      .filter((id) => data.picks.includes(id))
       .slice(0, 6);
   }
 
@@ -916,6 +934,10 @@ function boosterCardIsNew(cardId) {
   const card = HUB_CATALOG.byId(cardId);
   if (!card) return false;
   return !ownedIn(card.collectionId).includes(cardId);
+}
+
+function boosterPickIsNew(cardId) {
+  return boosterCardIsNew(cardId) || hubBooster.freshPicks.includes(cardId);
 }
 
 function cardRarity(card) {
@@ -1261,6 +1283,9 @@ function selectPackFromCarousel() {
   if (!hubBooster.picks.length) {
     hubBooster.setId = collection.id;
     hubBooster.picks = drawBoosterCards(collection.id);
+    hubBooster.freshPicks = hubBooster.picks.filter(
+      (cardId) => !ownedIn(collection.id).includes(cardId)
+    );
     persistBooster();
   }
   packOverlayState.cards = hubBooster.picks.slice();
@@ -1644,6 +1669,9 @@ function buildPackCard(card, index) {
   const front = makeNode('span', 'pack-card-face pack-card-front');
   front.appendChild(makeHubImage(card.thumbFront || card.front, card.name));
   front.appendChild(makeNode('span', `pack-card-rarity rarity-${rarity.id}`, t(`rarity_${rarity.id}`)));
+  if (boosterPickIsNew(card.id)) {
+    front.appendChild(makeNode('span', 'pack-card-new', t('hub_new')));
+  }
   front.appendChild(makeNode('span', 'pack-card-name', card.name));
   inner.append(back, front);
   button.appendChild(inner);
@@ -1842,16 +1870,21 @@ function claimBoosterPackSilently() {
   if (!collection) return;
 
   const owned = new Set(ownedIn(collection.id));
+  const addedIds = [];
   hubBooster.picks.forEach((cardId) => {
     const card = HUB_CATALOG.byId(cardId);
-    if (card && card.collectionId === collection.id) owned.add(cardId);
+    if (!card || card.collectionId !== collection.id || owned.has(cardId)) return;
+    owned.add(cardId);
+    addedIds.push(cardId);
   });
+  if (addedIds.length) markCardsNew(addedIds);
   hubBooster.owned[collection.id] = Array.from(owned);
   if (hubBooster.pendingGrant && !hubBooster.usedGrants.includes(hubBooster.pendingGrant)) {
     hubBooster.usedGrants.push(hubBooster.pendingGrant);
   }
   hubBooster.pendingGrant = null;
   hubBooster.picks = [];
+  hubBooster.freshPicks = [];
   persistBooster();
   renderBooster();
   renderCollectionRail();
@@ -1865,13 +1898,14 @@ function claimBoosterPack() {
   if (!collection) return;
 
   const owned = new Set(ownedIn(collection.id));
-  let added = 0;
+  const addedIds = [];
   hubBooster.picks.forEach((cardId) => {
     const card = HUB_CATALOG.byId(cardId);
     if (!card || card.collectionId !== collection.id || owned.has(cardId)) return;
     owned.add(cardId);
-    added += 1;
+    addedIds.push(cardId);
   });
+  if (addedIds.length) markCardsNew(addedIds);
 
   hubBooster.owned[collection.id] = Array.from(owned);
   if (hubBooster.pendingGrant && !hubBooster.usedGrants.includes(hubBooster.pendingGrant)) {
@@ -1879,6 +1913,7 @@ function claimBoosterPack() {
   }
   hubBooster.pendingGrant = null;
   hubBooster.picks = [];
+  hubBooster.freshPicks = [];
   hubBooster.day = dayKey();
   if (hubBooster.lastClaim !== hubBooster.day) {
     hubBooster.streak =
@@ -1891,7 +1926,7 @@ function claimBoosterPack() {
   renderBooster();
   renderCollectionRail();
   if (hub.panel === 'collections') renderCollections();
-  toast(t('booster_claim_toast', { count: added, set: collection.name }), {
+  toast(t('booster_claim_toast', { count: addedIds.length, set: collection.name }), {
     type: 'success',
     duration: 4200
   });
@@ -1921,7 +1956,10 @@ function makeBoosterCard(cardId, options = {}) {
   inner.append(backFace, frontFace);
   article.appendChild(inner);
 
-  if (card && boosterCardIsNew(card.id)) article.classList.add('is-new');
+  if (card && boosterPickIsNew(card.id)) {
+    article.classList.add('is-new');
+    frontFace.appendChild(makeNode('span', 'booster-card-new', t('hub_new')));
+  }
 
   if (options.open) {
     article.classList.add('is-open');
@@ -3774,6 +3812,8 @@ function makeStackCard(card) {
   const button = makeNode('button', 'hub-stack-card');
   button.type = 'button';
   button.dataset.favCard = card.id;
+  /* El clic abre la ficha de la carta (no la convierte en favorita). */
+  button.dataset.viewCard = card.id;
   button.title = card.name;
   button.setAttribute('aria-pressed', String(selected));
   button.setAttribute('aria-label', explorerCardLabel(card, selected));
@@ -3813,6 +3853,8 @@ function makeDeckCard(card) {
   const button = makeNode('button', 'hub-hand-deck-card');
   button.type = 'button';
   button.dataset.favCard = card.id;
+  /* Las cartas robadas con DRAW muestran su detalle al tocarlas. */
+  button.dataset.viewCard = card.id;
   button.title = card.name;
   button.setAttribute(
     'aria-label',
@@ -4830,6 +4872,7 @@ function createMediaCard(options) {
     subtitle,
     image,
     badge,
+    isNew,
     isFavorite,
     canDelete,
     preview
@@ -4859,6 +4902,7 @@ function createMediaCard(options) {
   }
 
   if (badge) thumb.appendChild(makeNode('span', 'media-badge', badge));
+  if (isNew) thumb.appendChild(makeNode('span', 'media-new-badge', t('hub_new')));
   article.appendChild(thumb);
 
   const body = makeNode('div', 'media-card-body');
@@ -5095,13 +5139,24 @@ function renderCollectionsOverview() {
       const count = owned.length;
       const total = collection.setSize || collection.cards.length;
       const percent = total ? Math.round((count / total) * 100) : 0;
+      const freshCount = hubData.newCards.filter((cardId) => {
+        const card = HUB_CATALOG.byId(cardId);
+        return card && card.collectionId === collection.id;
+      }).length;
       const button = makeHubButton('deck-box-card', null, { collectionId: collection.id });
+      /* Un set sin cartas desbloqueadas enseña su caja en negro: se ve tapada
+         por naturaleza y anima a abrir sobres para revelarla. */
+      if (count === 0) button.classList.add('is-locked');
+      if (freshCount) button.classList.add('has-new');
       const cover = makeNode('span', 'deck-box-cover');
       const boxImg = makeNode('img', 'deck-box-img');
       boxImg.src = inventoryBoxFor(collection);
       boxImg.alt = collection.name;
       boxImg.loading = 'lazy';
       cover.appendChild(boxImg);
+      if (freshCount) {
+        cover.appendChild(makeNode('span', 'deck-box-new', t('hub_new')));
+      }
       button.appendChild(cover);
 
       const body = makeNode('span', 'deck-box-body');
@@ -5226,6 +5281,30 @@ function markCollectionReviewed(id) {
   persistHubData();
   renderHubStats(false);
   renderCollectionRail();
+}
+
+/* Insignias de carta nueva: se guardan al reclamar un sobre y se retiran
+   cuando el jugador sale del set en el inventario. */
+function markCardsNew(cardIds) {
+  if (!Array.isArray(cardIds) || !cardIds.length) return;
+  const fresh = new Set(hubData.newCards);
+  cardIds.forEach((id) => {
+    if (HUB_CATALOG.byId(id)) fresh.add(id);
+  });
+  hubData.newCards = Array.from(fresh).slice(-600);
+  persistHubData();
+}
+
+function markCollectionCardsSeen(id) {
+  if (!id || !Array.isArray(hubData.newCards) || !hubData.newCards.length) return;
+  const before = hubData.newCards.length;
+  hubData.newCards = hubData.newCards.filter((cardId) => {
+    const card = HUB_CATALOG.byId(cardId);
+    return card && card.collectionId !== id;
+  });
+  if (hubData.newCards.length !== before) {
+    persistHubData();
+  }
 }
 
 
@@ -5458,6 +5537,7 @@ function renderCollectionDetail() {
         subtitle: `${collection.name} · ${card.set}`,
         image: thumbOf(card),
         badge: collection.shortName,
+        isNew: hubData.newCards.includes(card.id),
         isFavorite: hubProfile.favoriteCardId === card.id
       })
     );
@@ -6896,6 +6976,13 @@ function applyRoute() {
 
   if (key === hub.lastRoute) return;
   hub.lastRoute = key;
+
+  /* Al salir de un set, sus cartas nuevas dejan de llevar la insignia. */
+  const nextCollection =
+    head === 'collections' && parts[1] && parts[1] !== 'deck' ? parts[1] : null;
+  if (hub.collectionId && hub.collectionId !== nextCollection) {
+    markCollectionCardsSeen(hub.collectionId);
+  }
 
   if (hub.els && hub.els.shopPackView && !hub.els.shopPackView.hidden && key !== 'booster') {
     closeShopPackView();

@@ -7,7 +7,7 @@
 
 <br/>
 
-> **Real-time WebGL 3D showcase & reel creator for trading card artists, digital collectors, and content creators — zero install, runs in your browser.**
+> **Real-time WebGL 3D showcase & reel creator, plus a full collectible card hub — for trading card artists, digital collectors, and content creators. Zero install, runs in your browser.**
 
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)](https://github.com/theastrobruh/CardGram/actions)
 [![GitHub Pages](https://img.shields.io/badge/Live%20on-GitHub%20Pages-222?logo=github&logoColor=white)](https://theastrobruh.github.io/CardGram/)
@@ -50,17 +50,19 @@ CardGram is built by **[theAstroBruh](https://github.com/theastrobruh)** (Creati
 
 | | Update | Details |
 |---|---|---|
+| 🧭 | **Explore is live** | La Plaza (TCG news and events in Panama City, local/global scopes), theAstroBruh's shop and the CardGram About page, with a left-to-right entrance choreography |
+| 🃏 | **Real collection gameplay** | Daily booster with rarity-weighted pulls, "new card" badges across the booster results and the Inventory, and 0 % sets shown as black box art until you unlock them |
+| 🖱️ | **DRAW opens details** | Cards drawn on the desktop Home now open the card viewer (art, rarity, stats, lore, obtain note) instead of silently becoming your favorite |
 | 🛍️ | **Shop v2** | Daily pack, stock, Azura the vendor, computer for other sellers and an Astro~Verse store |
 | 🧪 | **Playable shop stage** | Drag boosters and the store, slide Azura sideways, reset the whole scene in one click |
 | 🎚️ | **Azura size control** | Native slider inside the **Azura** menu (55 %–190 %) — no accidental resizing with drag or wheel |
 | 🧑‍🔬 | **Export Layout (Dev)** | Downloads a JSON with every element's coordinates, scale and offset so the layout can be reproduced exactly |
-| 🧭 | **Top-bar polish** | Back button, day/shift chips and the playground toolbar share one axis, 40 px tall, with Azura on the left by default |
-| 📱 | **Mobile sheets** | Identity chip → vitrine → card details sheet → round menu sheet, plus a bottom-sheet card grid |
-| 🪪 | **About + Welcome** | Alpha intro, story, feature cards and the “replay welcome” flow |
+| 📱 | **Mobile navigation** | Bottom nav with a wand CREATE action, floating hand shortcuts beside the avatar, and sheets for menu, hand, card details and the mobile grid |
+| 🌍 | **Trilingual everywhere** | Studio, hub, shop, Explore and Plaza copy in **ES / EN / DE** |
 
 ---
 
-## ✨ Two Products, One Ecosystem
+## ✨ Three Surfaces, One Ecosystem
 
 ### 🏛️ Card Hub — Your Digital Collection Lobby
 
@@ -76,20 +78,22 @@ The **Card Hub** is your home base — a cinematic, card-first experience where 
 
 **🃏 My Cards** — Browse saved presets plus the full catalog, mark favorites, and jump into the studio with one tap.
 
-**📚 Collections & Decks** — Organized by set folders, with user-created decks featuring custom covers and card lists.
+**📚 Collections & Decks** — Organized by set folders, with user-created decks featuring custom covers, card lists, side decks and per-card copy limits.
 
 **👤 Profile** — Local avatar (square crop), creator name, handle, bio, and your featured favorite card.
+
+**🔍 Card viewer** — Open any card's art, rarity, type, stats, lore and acquisition note. Cards you don't own can be inspected and sent straight to their booster.
 
 </td>
 <td width="50%">
 
 **🎨 Reactive Ambient Background** — The lobby palette shifts in real-time, sampling pastel hues from your active card's artwork. The glow, shadow, and even the browser's theme color match.
 
-**📱 Card-First Mobile** — One identity chip → your card on a glass vitrine → a single round menu button. No clutter, the card is the UI.
+**📱 Card-First Mobile** — One identity chip → your card on a glass vitrine → bottom navigation and quick actions, with the card always as the UI.
 
-**🔍 Details On Demand** — Collection info, rarity, type, stats, and lore sit behind a compact ⓘ button, so the card always gets the spotlight.
+**🧭 Explore & La Plaza** — A live community surface: La Plaza's TCG news and events feed (local and global), creator shops and the CardGram story.
 
-**🌐 Explore (Coming Soon)** — Community feed shell and data adapter are ready and waiting for a backend.
+**🃏 Collection gameplay** — Daily boosters with rarity-weighted pulls, NEW badges for freshly obtained cards, black silhouettes for untouched sets, and a full results grid after every pack.
 
 </td>
 </tr>
@@ -155,9 +159,14 @@ The **eCard Studio** is where the magic happens — a full procedural 3D engine 
 |---|---|
 | 🎭 **Built-in Presets** | *Shadowblade Kinetic*, *Volt Striker*, *Aureon the Golden Maw*, and more |
 | 💿 **Custom Presets** | Save front/back/Full Art combos in browser storage |
+| 🃏 **Daily Booster** | One rarity-weighted pack per day with login/create/mission grants, streak tracking and a six-card results grid |
+| ✨ **New-card badges** | Freshly pulled cards stay marked **NEW** on the set box, in the Inventory grid and in the booster results until you review the set |
+| 🔒 **Locked sets** | Collections at 0 % display their box art as a black silhouette, revealed only as you unlock cards |
+| 🔍 **Card viewer** | Full-screen card details with flip, art, rarity, stats, lore and an "open booster" shortcut for cards you don't own |
+| 🖱️ **Home DRAW** | Draw 3 cards from any source into the hand fan; click one to inspect it, not to overwrite your favorite |
 | 🧪 **Shop Playground** | Drag boosters and the store with elastic physics; slide Azura sideways; resize her from the Azura menu; one-click reset |
 | 🧑‍🔬 **Layout Export (Dev)** | Download a JSON of every shop coordinate, offset and scale — the source of truth for future layout tweaks |
-| 🌍 **i18n** | Instant language switching: **English**, **Español**, **Deutsch** (studio, hub and the shop toolbar) |
+| 🌍 **i18n** | Instant language switching: **English**, **Español**, **Deutsch** (studio, hub, shop, Explore and Plaza) |
 | 🔊 **Sound Design** | Synthesized Web Audio palette with 5 gesture types — always mutable, never intrusive |
 | 🎵 **Music Modes** | *Immersive* (changes per screen) and *Chill* (continuous shuffle) with persisted volume and mute |
 | ⚡ **Lazy 3D** | No WebGL on load; render loop pauses while in the lobby |
@@ -178,9 +187,10 @@ Our vision is to transform CardGram from a **personal showcase tool** into a **l
 | Phase | Status | What's Coming |
 |---|---|---|
 | **eCard Studio** | ✅ Done | 3D engine, formats, export, presets |
-| **Card Hub** | ✅ Done | Lobby, collections, daily packs, shop stage + playground, profile, ambient |
+| **Card Hub** | ✅ Done | Lobby, collections, daily boosters, card viewer, shop stage + playground, profile, ambient |
+| **Explore · La Plaza** | ✅ Live | TCG news and events feed (local/global), creator shops, CardGram story |
 | **Inkra Print** | 🔧 Active | Real-scale layouts, batch printing, custom templates |
-| **Community** | 🌐 Planned | **Share your creations** — Public gallery, user profiles, social features |
+| **Community** | 🚧 Early | **Share your creations** — public gallery, user profiles, social features (first community surface: La Plaza) |
 | **Drops & Marketplace** | ✨ Future | **Create your own drops** — Design card sets, publish limited drops, community voting, trading |
 
 ### 🌐 The Community Vision
@@ -243,17 +253,25 @@ cd CardGram
 │   │   ├── app.js              # Core studio logic & UI
 │   │   ├── scene.js            # Three.js WebGL scene & card geometry
 │   │   ├── export.js           # PNG snapshot & video recording
-│   │   ├── hub.js              # Hub, shop, playground engine & layout export
+│   │   ├── hub.js              # Hub, shop, boosters, Explore and playground engine
 │   │   ├── ambient.js          # Reactive background palette
 │   │   ├── sound.js            # Synthesized Web Audio palette
 │   │   ├── music.js            # Background music (immersive / chill)
+│   │   ├── devmode.js          # Dev tools: layout export and playground helpers
 │   │   ├── i18n.js             # Studio translations (EN/ES/DE)
-│   │   ├── hub-i18n.js         # Hub + shop translations
+│   │   ├── hub-i18n.js         # Hub, shop, Explore and Plaza translations
 │   │   └── community.js        # Community feed adapter (prepared)
+│   ├── audio/
+│   │   ├── home/               # Per-screen music tracks
+│   │   ├── explore/
+│   │   ├── my-cards/
+│   │   └── playlist.json       # Music manifest for immersive / chill modes
 │   └── data/
 │       ├── cards/              # Per-collection folders + catalog.js
 │       │   ├── thumbs/         # WebP thumbnails
 │       │   └── tools/          # make-thumbs.py
+│       ├── explore/            # La Plaza, creator and About art
+│       ├── inventory/          # Deck-box art per collection
 │       ├── shop_assets/        # Shop background, lights, props
 │       ├── vendor/azura/       # Azura sprite frames (WebP)
 │       ├── shops/              # Astro~Verse store art and avatars
