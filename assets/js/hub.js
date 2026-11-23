@@ -7111,8 +7111,14 @@ async function openStudio(tab) {
     hideLoading();
   }
 
-  if (isMobile()) setSidebar(false, { persist: false });
-  else setSidebar(!state.sidebarCollapsed, { persist: false });
+  if (isMobile()) {
+    setSidebar(false, { persist: false });
+  } else {
+    /* El panel se abre por defecto al entrar al estudio (una vez por sesión). */
+    const openSidebar = hub.studioSidebarSeeded ? !state.sidebarCollapsed : true;
+    hub.studioSidebarSeeded = true;
+    setSidebar(openSidebar, { persist: false });
+  }
 
   activateTab(HUB_STUDIO_TABS[tab] || 'tab-deck');
   scheduleResize();

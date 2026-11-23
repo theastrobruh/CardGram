@@ -100,27 +100,227 @@ const PREVIEW_MICRO = new Map(
   ])
 );
 
-const CARD_TEMPLATES = [
-  { id: 'E1', name: 'E1', src: 'assets/data/cards/database/templates/E1.webp', thumb: 'assets/data/cards/database/templates/thumbs/E1.webp' },
-  { id: 'E2', name: 'E2', src: 'assets/data/cards/database/templates/E2.webp', thumb: 'assets/data/cards/database/templates/thumbs/E2.webp' },
-  { id: 'E3', name: 'E3', src: 'assets/data/cards/database/templates/E3.webp', thumb: 'assets/data/cards/database/templates/thumbs/E3.webp' }
+/* --------------------------------------------------------------------------
+   Estilos de carta: se dibujan en canvas, así que no dependen de archivos
+   externos y se ven nítidos en cualquier tamaño.
+   -------------------------------------------------------------------------- */
+const CARD_FONT = '"Segoe UI", "Trebuchet MS", system-ui, sans-serif';
+
+function cardRoundRect(ctx, x, y, w, h, r) {
+  const radius = Math.max(0, Math.min(r, w / 2, h / 2));
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.arcTo(x + w, y, x + w, y + h, radius);
+  ctx.arcTo(x + w, y + h, x, y + h, radius);
+  ctx.arcTo(x, y + h, x, y, radius);
+  ctx.arcTo(x, y, x + w, y, radius);
+  ctx.closePath();
+}
+
+function cardGradient(ctx, x0, y0, x1, y1, stops) {
+  const gradient = ctx.createLinearGradient(x0, y0, x1, y1);
+  stops.forEach(([offset, color]) => gradient.addColorStop(offset, color));
+  return gradient;
+}
+
+const CARD_VARIANTS = [
+  {
+    id: 'duel',
+    name: 'Duelo',
+    art: [0.085, 0.132, 0.83, 0.548],
+    artRadius: 0.022,
+    title: { x: 0.5, y: 0.076, size: 0.064, weight: 800, color: '#4a3410', align: 'center', max: 0.78 },
+    sub: { x: 0.5, y: 0.704, size: 0.034, weight: 700, color: '#8a6a2a', align: 'center', max: 0.8 },
+    desc: { x: 0.105, y: 0.742, w: 0.79, h: 0.158, size: 0.0265, weight: 500, color: '#4a3410', align: 'left', line: 1.45 },
+    base(ctx, W, H) {
+      ctx.fillStyle = cardGradient(ctx, 0, 0, W, H, [[0, '#f2d489'], [0.45, '#fbeec6'], [1, '#d5a548']]);
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#f8f0da';
+      cardRoundRect(ctx, W * 0.026, H * 0.018, W * 0.948, H * 0.964, W * 0.045);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(120, 84, 26, 0.1)';
+      cardRoundRect(ctx, W * 0.075, H * 0.058, W * 0.85, H * 0.07, W * 0.03);
+      ctx.fill();
+    },
+    frame(ctx, W, H, art) {
+      ctx.strokeStyle = '#a97a2c';
+      ctx.lineWidth = Math.max(2, W * 0.01);
+      cardRoundRect(ctx, art.x, art.y, art.w, art.h, art.r);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.62)';
+      ctx.lineWidth = Math.max(1, W * 0.005);
+      cardRoundRect(ctx, art.x + W * 0.008, art.y + W * 0.008, art.w - W * 0.016, art.h - W * 0.016, art.r * 0.8);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.66)';
+      cardRoundRect(ctx, W * 0.085, H * 0.726, W * 0.83, H * 0.194, W * 0.022);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(169, 122, 44, 0.45)';
+      ctx.lineWidth = Math.max(1, W * 0.004);
+      cardRoundRect(ctx, W * 0.085, H * 0.726, W * 0.83, H * 0.194, W * 0.022);
+      ctx.stroke();
+    }
+  },
+  {
+    id: 'glass',
+    name: 'Cristal',
+    art: [0.075, 0.112, 0.85, 0.578],
+    artRadius: 0.032,
+    title: { x: 0.5, y: 0.074, size: 0.062, weight: 800, color: '#0a4a58', align: 'center', max: 0.72 },
+    sub: { x: 0.5, y: 0.71, size: 0.032, weight: 700, color: '#1c8fa4', align: 'center', max: 0.78 },
+    desc: { x: 0.105, y: 0.748, w: 0.79, h: 0.15, size: 0.0265, weight: 500, color: '#0d4b57', align: 'left', line: 1.45 },
+    base(ctx, W, H) {
+      ctx.fillStyle = cardGradient(ctx, 0, 0, W, H, [[0, '#ffffff'], [0.52, '#eafcf9'], [1, '#c4e9f7']]);
+      ctx.fillRect(0, 0, W, H);
+      const halo = ctx.createRadialGradient(W * 0.5, H * 0.34, 0, W * 0.5, H * 0.34, W * 0.86);
+      halo.addColorStop(0, 'rgba(124, 235, 221, 0.42)');
+      halo.addColorStop(1, 'rgba(124, 235, 221, 0)');
+      ctx.fillStyle = halo;
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.92)';
+      ctx.lineWidth = W * 0.012;
+      cardRoundRect(ctx, W * 0.014, H * 0.012, W * 0.972, H * 0.976, W * 0.05);
+      ctx.stroke();
+    },
+    frame(ctx, W, H, art) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
+      cardRoundRect(ctx, W * 0.105, H * 0.058, W * 0.79, H * 0.068, W * 0.03);
+      ctx.fill();
+      ctx.save();
+      ctx.shadowColor = 'rgba(47, 143, 221, 0.32)';
+      ctx.shadowBlur = W * 0.045;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.96)';
+      ctx.lineWidth = W * 0.013;
+      cardRoundRect(ctx, art.x, art.y, art.w, art.h, art.r);
+      ctx.stroke();
+      ctx.restore();
+      ctx.strokeStyle = 'rgba(0, 180, 160, 0.42)';
+      ctx.lineWidth = Math.max(1, W * 0.004);
+      cardRoundRect(ctx, art.x, art.y, art.w, art.h, art.r);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.82)';
+      cardRoundRect(ctx, W * 0.085, H * 0.73, W * 0.83, H * 0.19, W * 0.026);
+      ctx.fill();
+      ctx.fillStyle = cardGradient(ctx, W * 0.085, 0, W * 0.915, 0, [[0, '#00b4a0'], [1, '#2f8fdd']]);
+      cardRoundRect(ctx, W * 0.085, H * 0.73, W * 0.83, Math.max(4, H * 0.006), Math.max(2, H * 0.003));
+      ctx.fill();
+    }
+  },
+  {
+    id: 'neon',
+    name: 'Neón',
+    art: [0.06, 0.135, 0.88, 0.575],
+    artRadius: 0.028,
+    title: { x: 0.5, y: 0.07, size: 0.062, weight: 800, color: '#eafcff', align: 'center', max: 0.8, glow: 'rgba(0, 229, 255, 0.75)' },
+    sub: { x: 0.5, y: 0.72, size: 0.032, weight: 700, color: '#7cebdd', align: 'center', max: 0.8, glow: 'rgba(0, 229, 255, 0.6)' },
+    desc: { x: 0.1, y: 0.756, w: 0.8, h: 0.15, size: 0.026, weight: 500, color: '#cdeff7', align: 'left', line: 1.45 },
+    base(ctx, W, H) {
+      ctx.fillStyle = cardGradient(ctx, 0, 0, W, H, [[0, '#062a33'], [0.5, '#0a3f4d'], [1, '#041d26']]);
+      ctx.fillRect(0, 0, W, H);
+      const glow = ctx.createRadialGradient(W * 0.5, H * 0.28, 0, W * 0.5, H * 0.28, W * 0.9);
+      glow.addColorStop(0, 'rgba(0, 229, 255, 0.22)');
+      glow.addColorStop(1, 'rgba(0, 229, 255, 0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = cardGradient(ctx, 0, 0, W, H, [[0, '#00e5ff'], [0.5, '#7cebdd'], [1, '#ff6ec7']]);
+      ctx.lineWidth = Math.max(3, W * 0.012);
+      cardRoundRect(ctx, W * 0.02, H * 0.016, W * 0.96, H * 0.968, W * 0.045);
+      ctx.stroke();
+    },
+    frame(ctx, W, H, art) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 229, 255, 0.7)';
+      ctx.shadowBlur = W * 0.05;
+      ctx.strokeStyle = '#5ff3ff';
+      ctx.lineWidth = Math.max(2, W * 0.008);
+      cardRoundRect(ctx, art.x, art.y, art.w, art.h, art.r);
+      ctx.stroke();
+      ctx.restore();
+      ctx.fillStyle = 'rgba(2, 22, 30, 0.72)';
+      cardRoundRect(ctx, W * 0.085, H * 0.74, W * 0.83, H * 0.18, W * 0.022);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(124, 235, 221, 0.5)';
+      ctx.lineWidth = Math.max(1, W * 0.003);
+      cardRoundRect(ctx, W * 0.085, H * 0.74, W * 0.83, H * 0.18, W * 0.022);
+      ctx.stroke();
+    }
+  },
+  {
+    id: 'royal',
+    name: 'Realeza',
+    art: [0.1, 0.155, 0.8, 0.545],
+    artRadius: 0.014,
+    title: { x: 0.5, y: 0.086, size: 0.06, weight: 800, color: '#f6e2a8', align: 'center', max: 0.76, glow: 'rgba(0, 0, 0, 0.5)' },
+    sub: { x: 0.5, y: 0.72, size: 0.031, weight: 700, color: '#e6c976', align: 'center', max: 0.78 },
+    desc: { x: 0.115, y: 0.756, w: 0.77, h: 0.148, size: 0.026, weight: 500, color: '#f0e6ff', align: 'left', line: 1.45 },
+    base(ctx, W, H) {
+      ctx.fillStyle = cardGradient(ctx, 0, 0, W, H, [[0, '#2a1440'], [0.5, '#41215f'], [1, '#1a0c2b']]);
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = 'rgba(230, 201, 118, 0.85)';
+      ctx.lineWidth = Math.max(2, W * 0.008);
+      cardRoundRect(ctx, W * 0.03, H * 0.022, W * 0.94, H * 0.956, W * 0.04);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(230, 201, 118, 0.4)';
+      ctx.lineWidth = Math.max(1, W * 0.003);
+      cardRoundRect(ctx, W * 0.05, H * 0.035, W * 0.9, H * 0.93, W * 0.03);
+      ctx.stroke();
+    },
+    frame(ctx, W, H, art) {
+      ctx.strokeStyle = '#e6c976';
+      ctx.lineWidth = Math.max(2, W * 0.009);
+      cardRoundRect(ctx, art.x, art.y, art.w, art.h, art.r);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(20, 8, 34, 0.66)';
+      cardRoundRect(ctx, W * 0.1, H * 0.74, W * 0.8, H * 0.178, W * 0.018);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(230, 201, 118, 0.55)';
+      ctx.lineWidth = Math.max(1, W * 0.003);
+      cardRoundRect(ctx, W * 0.1, H * 0.74, W * 0.8, H * 0.178, W * 0.018);
+      ctx.stroke();
+    }
+  },
+  {
+    id: 'full',
+    name: 'Full Art',
+    art: [0, 0, 1, 1],
+    artRadius: 0.045,
+    title: { x: 0.5, y: 0.082, size: 0.07, weight: 800, color: '#ffffff', align: 'center', max: 0.84, glow: 'rgba(0, 0, 0, 0.55)' },
+    sub: { x: 0.5, y: 0.162, size: 0.033, weight: 700, color: '#eafcff', align: 'center', max: 0.82, glow: 'rgba(0, 0, 0, 0.5)' },
+    desc: { x: 0.115, y: 0.79, w: 0.77, h: 0.135, size: 0.026, weight: 500, color: '#ffffff', align: 'left', line: 1.45 },
+    base(ctx, W, H) {
+      ctx.fillStyle = '#0b2b34';
+      ctx.fillRect(0, 0, W, H);
+    },
+    frame(ctx, W, H) {
+      const top = ctx.createLinearGradient(0, 0, 0, H * 0.42);
+      top.addColorStop(0, 'rgba(3, 24, 32, 0.78)');
+      top.addColorStop(1, 'rgba(3, 24, 32, 0)');
+      ctx.fillStyle = top;
+      ctx.fillRect(0, 0, W, H * 0.42);
+      const bottom = ctx.createLinearGradient(0, H * 0.62, 0, H);
+      bottom.addColorStop(0, 'rgba(3, 24, 32, 0)');
+      bottom.addColorStop(1, 'rgba(3, 24, 32, 0.88)');
+      ctx.fillStyle = bottom;
+      ctx.fillRect(0, H * 0.62, W, H * 0.38);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)';
+      ctx.lineWidth = Math.max(2, W * 0.008);
+      cardRoundRect(ctx, W * 0.012, H * 0.01, W * 0.976, H * 0.98, W * 0.04);
+      ctx.stroke();
+    }
+  }
 ];
+
+const CARD_VARIANT_MAP = new Map(CARD_VARIANTS.map((variant) => [variant.id, variant]));
 
 const templateState = {
   ready: false,
-  templateId: 'E1',
-  template: null,
+  variantId: 'duel',
   artwork: null,
-  artZoom: 130,
+  frame: null,
+  artZoom: 100,
   artX: 0,
   artY: 0,
-  templateZoom: 100,
-  templateX: 0,
-  templateY: 0,
-  textSize: 52,
-  textX: 50,
-  textY: 54,
-  textColor: '#ffffff'
+  textScale: 100,
+  textColor: null
 };
 
 const currentCard = { front: DEFAULT_CARD.front, back: DEFAULT_CARD.back, fullArt: DEFAULT_CARD.fullArt };
@@ -353,7 +553,7 @@ function sanitizePresets(raw) {
       if (!front || !back) return null;
 
       let name = String(item.name || '').trim().slice(0, MAX_PRESET_NAME);
-      if (!name) name = `Deck #${index + 1}`;
+      if (!name) name = `${t('preset_default_name')} ${index + 1}`;
 
       let id = typeof item.id === 'string' && /^[a-z0-9_-]{1,48}$/i.test(item.id) ? item.id : uid();
       while (usedIds.has(id)) id = uid();
@@ -537,7 +737,7 @@ function confirmAction({ title, message, confirmLabel }) {
 }
 
 function openPresetDialog() {
-  el.presetNameInput.value = `Deck #${presets.length + 1}`;
+  el.presetNameInput.value = `${t('preset_default_name')} ${presets.length + 1}`;
   el.presetDialog.showModal();
   setTimeout(() => {
     el.presetNameInput.focus();
@@ -1346,6 +1546,126 @@ function loadImageSource(src) {
   });
 }
 
+function paintCardTexts(ctx, W, H, variant, opts) {
+  const scale = clamp((opts.textScale || 100) / 100, 0.5, 2);
+  const titleText = (opts.title || '').trim();
+  const subText = (opts.subtitle || '').trim();
+  const descText = (opts.description || '').trim();
+
+  const drawSingle = (style, text, colorOverride) => {
+    if (!style || !text) return;
+    let size = W * style.size * scale;
+    const maxWidth = W * style.max;
+    ctx.save();
+    ctx.textAlign = style.align || 'center';
+    ctx.textBaseline = 'top';
+    ctx.font = `${style.weight || 700} ${size}px ${CARD_FONT}`;
+    while (size > 10 && ctx.measureText(text).width > maxWidth) {
+      size -= 2;
+      ctx.font = `${style.weight || 700} ${size}px ${CARD_FONT}`;
+    }
+    if (style.glow) {
+      ctx.shadowColor = style.glow;
+      ctx.shadowBlur = W * 0.018;
+    }
+    ctx.fillStyle = colorOverride || style.color;
+    ctx.fillText(text, W * style.x, H * style.y);
+    ctx.restore();
+  };
+
+  drawSingle(variant.title, titleText, opts.textColor);
+  drawSingle(variant.sub, subText, opts.textColor);
+
+  if (!descText || !variant.desc) return;
+  const d = variant.desc;
+  const size = W * d.size * scale;
+  const maxWidth = W * d.w;
+  const lineHeight = size * (d.line || 1.4);
+  const maxLines = Math.max(1, Math.floor((H * d.h) / lineHeight));
+
+  ctx.save();
+  ctx.textAlign = d.align || 'left';
+  ctx.textBaseline = 'top';
+  ctx.font = `${d.weight || 500} ${size}px ${CARD_FONT}`;
+
+  let lines = wrapCardText(ctx, descText, maxWidth);
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines);
+    let last = lines[maxLines - 1];
+    while (last.length > 1 && ctx.measureText(`${last}…`).width > maxWidth) last = last.slice(0, -1);
+    lines[maxLines - 1] = `${last.trim()}…`;
+  }
+
+  ctx.fillStyle = opts.textColor || d.color;
+  lines.forEach((line, index) => {
+    ctx.fillText(line, W * d.x, H * d.y + index * lineHeight);
+  });
+  ctx.restore();
+}
+
+function wrapCardText(ctx, text, maxWidth) {
+  const words = String(text).replace(/\s+/g, ' ').trim().split(' ');
+  const lines = [];
+  let line = '';
+  words.forEach((word) => {
+    const test = line ? `${line} ${word}` : word;
+    if (line && ctx.measureText(test).width > maxWidth) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+
+function paintCard(ctx, W, H, variant, opts) {
+  const art = {
+    x: variant.art[0] * W,
+    y: variant.art[1] * H,
+    w: variant.art[2] * W,
+    h: variant.art[3] * H,
+    r: variant.artRadius * W
+  };
+
+  ctx.save();
+  variant.base(ctx, W, H);
+  ctx.restore();
+
+  ctx.save();
+  cardRoundRect(ctx, art.x, art.y, art.w, art.h, art.r);
+  ctx.clip();
+  const image = opts.image;
+  if (image) {
+    const cover = Math.max(art.w / image.width, art.h / image.height);
+    const scale = cover * ((opts.zoom || 100) / 100);
+    const dw = image.width * scale;
+    const dh = image.height * scale;
+    const dx = art.x + (art.w - dw) / 2 + ((opts.offsetX || 0) / 100) * art.w;
+    const dy = art.y + (art.h - dh) / 2 + ((opts.offsetY || 0) / 100) * art.h;
+    ctx.drawImage(image, dx, dy, dw, dh);
+  } else {
+    ctx.fillStyle = cardGradient(ctx, art.x, art.y, art.x + art.w, art.y + art.h, [[0, '#7cebdd'], [0.5, '#3cc9d8'], [1, '#2f8fdd']]);
+    ctx.fillRect(art.x, art.y, art.w, art.h);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
+    ctx.beginPath();
+    ctx.arc(art.x + art.w * 0.5, art.y + art.h * 0.42, art.w * 0.26, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  ctx.save();
+  variant.frame(ctx, W, H, art);
+  ctx.restore();
+
+  paintCardTexts(ctx, W, H, variant, opts);
+}
+
+function currentVariant() {
+  return CARD_VARIANT_MAP.get(templateState.variantId) || CARD_VARIANTS[0];
+}
+
 function renderTemplateCanvas() {
   const canvas = el.templateCanvas;
   if (!canvas) return;
@@ -1358,114 +1678,137 @@ function renderTemplateCanvas() {
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 
-  if (templateState.artwork) {
-    const image = templateState.artwork;
-    const base = Math.max(width / image.width, height / image.height);
-    const scale = base * (templateState.artZoom / 100);
-    const w = image.width * scale;
-    const h = image.height * scale;
-    const x = (width - w) / 2 + (templateState.artX / 100) * width;
-    const y = (height - h) / 2 + (templateState.artY / 100) * height;
-    ctx.drawImage(image, x, y, w, h);
-  }
+  paintCard(ctx, width, height, currentVariant(), {
+    image: templateState.artwork,
+    zoom: templateState.artZoom,
+    offsetX: templateState.artX,
+    offsetY: templateState.artY,
+    textScale: templateState.textScale,
+    textColor: templateState.textColor,
+    title: el.templateTitle ? el.templateTitle.value : '',
+    subtitle: el.templateText ? el.templateText.value : '',
+    description: el.templateDesc ? el.templateDesc.value : ''
+  });
 
-  if (templateState.template) {
-    const image = templateState.template;
-    const scale = templateState.templateZoom / 100;
-    const w = width * scale;
-    const h = height * scale;
-    const x = (width - w) / 2 + (templateState.templateX / 100) * width;
-    const y = (height - h) / 2 + (templateState.templateY / 100) * height;
-    ctx.drawImage(image, x, y, w, h);
-  }
-
-  const text = el.templateText ? el.templateText.value.trim() : '';
-  if (text) {
-    ctx.save();
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = `800 ${templateState.textSize}px "Segoe UI Emoji", "Segoe UI", sans-serif`;
-    ctx.fillStyle = templateState.textColor;
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
-    ctx.shadowBlur = 10;
-    ctx.shadowOffsetY = 2;
-    ctx.fillText(text, (templateState.textX / 100) * width, (templateState.textY / 100) * height, width * 0.9);
-    ctx.restore();
+  if (templateState.frame) {
+    const frame = templateState.frame;
+    const cover = Math.max(width / frame.width, height / frame.height);
+    const dw = frame.width * cover;
+    const dh = frame.height * cover;
+    ctx.drawImage(frame, (width - dw) / 2, (height - dh) / 2, dw, dh);
   }
 }
 
 function markTemplateChoice() {
   if (!el.templateGallery) return;
   Array.from(el.templateGallery.querySelectorAll('.template-choice')).forEach((button) => {
-    button.classList.toggle('active', button.dataset.templateId === templateState.templateId);
+    const active = button.dataset.variantId === templateState.variantId;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-checked', String(active));
   });
 }
 
-function setTemplateImage(image, id) {
-  templateState.template = image;
-  templateState.templateId = id || null;
-  markTemplateChoice();
+function syncVariantColor() {
+  if (!el.templateColor) return;
+  el.templateColor.value = templateState.textColor || currentVariant().title.color;
+}
+
+function setTemplateFrame(image) {
+  templateState.frame = image;
   renderTemplateCanvas();
+}
+
+function renderVariantThumb(canvas, variant) {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  paintCard(ctx, canvas.width, canvas.height, variant, {
+    image: null,
+    title: variant.name,
+    subtitle: '',
+    description: '',
+    textScale: 100
+  });
+}
+
+function buildVariantGallery() {
+  if (!el.templateGallery) return;
+  el.templateGallery.replaceChildren(
+    ...CARD_VARIANTS.map((variant) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'template-choice';
+      button.dataset.variantId = variant.id;
+      button.setAttribute('role', 'radio');
+      button.setAttribute('aria-checked', 'false');
+      button.title = variant.name;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 132;
+      canvas.height = 176;
+      canvas.className = 'template-thumb';
+      canvas.setAttribute('aria-hidden', 'true');
+      renderVariantThumb(canvas, variant);
+
+      const label = document.createElement('span');
+      label.className = 'template-choice-label';
+      label.textContent = variant.name;
+
+      button.append(canvas, label);
+      button.addEventListener('click', () => {
+        templateState.variantId = variant.id;
+        templateState.textColor = null;
+        syncVariantColor();
+        markTemplateChoice();
+        renderTemplateCanvas();
+      });
+      return button;
+    })
+  );
 }
 
 async function ensureTemplateBuilder() {
   if (!el.templateBuilder || templateState.ready) return;
   templateState.ready = true;
+  syncVariantColor();
   try {
-    const [template, artwork] = await Promise.all([
-      loadImageSource(CARD_TEMPLATES[0].src),
-      loadImageSource(DEFAULT_CARD.front)
-    ]);
-    templateState.template = template;
-    templateState.artwork = artwork;
-    renderTemplateCanvas();
+    templateState.artwork = await loadImageSource(currentCard.front);
   } catch (error) {
-    console.warn('[CardGram] No se pudo preparar el constructor de plantillas', error);
+    console.warn('[CardGram] No se pudo preparar el editor de cartas', error);
   }
+  renderTemplateCanvas();
 }
 
 function resetTemplateBuilder() {
-  templateState.templateId = 'E1';
-  templateState.artZoom = 130;
+  templateState.variantId = CARD_VARIANTS[0].id;
+  templateState.frame = null;
+  templateState.artZoom = 100;
   templateState.artX = 0;
   templateState.artY = 0;
-  templateState.templateZoom = 100;
-  templateState.templateX = 0;
-  templateState.templateY = 0;
-  templateState.textSize = 52;
-  templateState.textX = 50;
-  templateState.textY = 54;
-  templateState.textColor = '#ffffff';
+  templateState.textScale = 100;
+  templateState.textColor = null;
+  if (el.templateTitle) el.templateTitle.value = '';
   if (el.templateText) el.templateText.value = '';
+  if (el.templateDesc) el.templateDesc.value = '';
   const values = {
-    'template-art-zoom': 130,
+    'template-art-zoom': 100,
     'template-art-x': 0,
     'template-art-y': 0,
-    'template-zoom': 100,
-    'template-x': 0,
-    'template-y': 0,
-    'template-text-size': 52,
-    'template-text-x': 50,
-    'template-text-y': 54
+    'template-text-size': 100
   };
   Object.entries(values).forEach(([id, value]) => {
     const input = document.getElementById(id);
     if (input) input.value = String(value);
   });
-  const color = document.getElementById('template-text-color');
-  if (color) color.value = '#ffffff';
+  syncVariantColor();
+  markTemplateChoice();
 
-  Promise.all([
-    loadImageSource(CARD_TEMPLATES[0].src),
-    loadImageSource(DEFAULT_CARD.front)
-  ])
-    .then(([template, artwork]) => {
-      templateState.template = template;
-      templateState.artwork = artwork;
-      markTemplateChoice();
+  loadImageSource(currentCard.front)
+    .then((image) => {
+      templateState.artwork = image;
       renderTemplateCanvas();
     })
-    .catch(() => {});
+    .catch(() => renderTemplateCanvas());
 }
 
 function applyTemplateToCard() {
@@ -1480,32 +1823,9 @@ function applyTemplateToCard() {
 function setupTemplateBuilder() {
   if (!el.templateBuilder || !el.templateGallery) return;
 
-  el.templateGallery.replaceChildren(
-    ...CARD_TEMPLATES.map((template) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'template-choice';
-      button.dataset.templateId = template.id;
-      button.title = template.name;
-      const img = document.createElement('img');
-      img.src = template.thumb;
-      img.alt = template.name;
-      img.width = 300;
-      img.height = 402;
-      img.loading = 'lazy';
-      button.appendChild(img);
-      button.addEventListener('click', async () => {
-        try {
-          const image = await loadImageSource(template.src);
-          setTemplateImage(image, template.id);
-        } catch (error) {
-          toast(t('upload_failed'), { type: 'error' });
-        }
-      });
-      return button;
-    })
-  );
+  buildVariantGallery();
   markTemplateChoice();
+  syncVariantColor();
 
   const bindRange = (id, key) => {
     const input = document.getElementById(id);
@@ -1518,24 +1838,18 @@ function setupTemplateBuilder() {
   bindRange('template-art-zoom', 'artZoom');
   bindRange('template-art-x', 'artX');
   bindRange('template-art-y', 'artY');
-  bindRange('template-zoom', 'templateZoom');
-  bindRange('template-x', 'templateX');
-  bindRange('template-y', 'templateY');
-  bindRange('template-text-size', 'textSize');
-  bindRange('template-text-x', 'textX');
-  bindRange('template-text-y', 'textY');
+  bindRange('template-text-size', 'textScale');
 
-  const color = document.getElementById('template-text-color');
-  if (color) {
-    color.addEventListener('input', () => {
-      templateState.textColor = color.value;
+  if (el.templateColor) {
+    el.templateColor.addEventListener('input', () => {
+      templateState.textColor = el.templateColor.value;
       renderTemplateCanvas();
     });
   }
 
-  if (el.templateText) {
-    el.templateText.addEventListener('input', renderTemplateCanvas);
-  }
+  [el.templateTitle, el.templateText, el.templateDesc].forEach((input) => {
+    if (input) input.addEventListener('input', renderTemplateCanvas);
+  });
 
   const emojis = document.getElementById('template-emojis');
   if (emojis) {
@@ -1553,8 +1867,7 @@ function setupTemplateBuilder() {
       el.templateFileInput.value = '';
       if (!file) return;
       try {
-        const image = await decodeImage(file);
-        setTemplateImage(image, null);
+        setTemplateFrame(await decodeImage(file));
       } catch (error) {
         toast(t('upload_failed'), { type: 'error' });
       }
@@ -1627,6 +1940,32 @@ function fxNextValue(list, current) {
   return list[(index + 1 + list.length) % list.length];
 }
 
+function syncFacesPopup() {
+  if (el.faceFrontImg) el.faceFrontImg.src = PREVIEW_FRONT.get(currentCard.front) || currentCard.front;
+  if (el.faceBackImg) el.faceBackImg.src = PREVIEW_BACK.get(currentCard.back) || currentCard.back;
+}
+
+function setFacesPopup(open) {
+  if (!el.facesPopup) return;
+  if (open) syncFacesPopup();
+  el.facesPopup.hidden = !open;
+  if (el.facesBtn) {
+    el.facesBtn.setAttribute('aria-expanded', String(open));
+    el.facesBtn.classList.toggle('is-open', open);
+  }
+}
+
+async function swapCardFaces() {
+  const { front, back } = currentCard;
+  if (!front || !back || front === back) return;
+  activePresetId = null;
+  syncPresetActive();
+  await applyCardImages(back, front, null);
+  renderPresets();
+  syncFacesPopup();
+  toast(t('faces_swapped'), { type: 'success' });
+}
+
 function syncFxRail() {
   const rail = el.fxRail;
   if (!rail) return;
@@ -1656,7 +1995,10 @@ function syncFxRail() {
     gravity: t(FX_FLOAT_KEYS[state.float] || 'floating'),
     alignment: `${t('pos_y')}: ${values.alignment}`,
     size: `${t('canvas_scale')}: ${values.size}`,
-    format: t(FX_FORMAT_KEYS[state.cardFormat] || 'card_format')
+    format: t(FX_FORMAT_KEYS[state.cardFormat] || 'card_format'),
+    snapshot: t('fx_snapshot'),
+    record: t('fx_record'),
+    faces: t('fx_faces')
   };
 
   rail.querySelectorAll('.fx-btn').forEach((button) => {
@@ -1681,6 +2023,23 @@ function setupFxRail() {
     if (!button || !rail.contains(button)) return;
 
     const name = button.getAttribute('data-fx');
+
+    if (name === 'snapshot') {
+      setFacesPopup(false);
+      exportSnapshot();
+      return;
+    }
+
+    if (name === 'record') {
+      setFacesPopup(false);
+      exportVideo();
+      return;
+    }
+
+    if (name === 'faces') {
+      setFacesPopup(Boolean(el.facesPopup && el.facesPopup.hidden));
+      return;
+    }
 
     if (name === 'orientation') {
       state.spinDir *= -1;
@@ -1726,6 +2085,41 @@ function setupFxRail() {
 
     syncFxRail();
     persistSettings();
+  });
+
+  if (el.facesSwap) {
+    el.facesSwap.addEventListener('click', (event) => {
+      event.stopPropagation();
+      swapCardFaces();
+    });
+  }
+
+  if (el.facesClose) {
+    el.facesClose.addEventListener('click', (event) => {
+      event.stopPropagation();
+      setFacesPopup(false);
+    });
+  }
+
+  if (el.faceFrontBtn) {
+    el.faceFrontBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (el.frontInput) el.frontInput.click();
+    });
+  }
+
+  if (el.faceBackBtn) {
+    el.faceBackBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (el.backInput) el.backInput.click();
+    });
+  }
+
+  document.addEventListener('click', (event) => {
+    if (!el.facesPopup || el.facesPopup.hidden) return;
+    if (el.facesPopup.contains(event.target)) return;
+    if (el.facesBtn && el.facesBtn.contains(event.target)) return;
+    setFacesPopup(false);
   });
 
   syncFxRail();
@@ -2652,6 +3046,17 @@ function cacheDom() {
   el.templateFileInput = $('#template-file-input');
   el.templateArtworkInput = $('#template-artwork-input');
   el.templateText = $('#template-text');
+  el.templateTitle = $('#template-title');
+  el.templateDesc = $('#template-desc');
+  el.templateColor = $('#template-text-color');
+  el.facesPopup = $('#faces-popup');
+  el.facesBtn = $('#fx-rail [data-fx="faces"]');
+  el.facesSwap = $('#faces-swap');
+  el.facesClose = $('#faces-close');
+  el.faceFrontBtn = $('#face-front-btn');
+  el.faceBackBtn = $('#face-back-btn');
+  el.faceFrontImg = $('#face-front-img');
+  el.faceBackImg = $('#face-back-img');
   el.templateApply = $('#template-apply');
   el.templateReset = $('#template-reset');
   el.uploadBack = $('#upload-back');

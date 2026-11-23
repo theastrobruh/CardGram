@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CardGram QA frame</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #102a33; }
+  iframe { display: block; border: 0; background: #eafaf7; }
+</style>
+</head>
+<body>
+<iframe id="app" title="CardGram QA"></iframe>
+<script>
+  const params = new URLSearchParams(location.search);
+  const width = Number(params.get('w')) || 1440;
+  const height = Number(params.get('h')) || 900;
+  const src = params.get('src') || '../index.html';
+
+  try {
+    if (params.get('reset') === '1') {
+      Object.keys(localStorage)
+        .filter((key) => key.startsWith('cardgram.'))
+        .forEach((key) => localStorage.removeItem(key));
+    }
+    localStorage.setItem('cardgram.welcome.v1', 'seen');
+  } catch (error) {
+    /* QA harness only. */
+  }
+
+  const frame = document.getElementById('app');
+  frame.width = width;
+  frame.height = height;
+  frame.style.width = width + 'px';
+  frame.style.height = height + 'px';
+  frame.src = src;
+  window.__qaFrame = frame;
+</script>
+</body>
+</html>
