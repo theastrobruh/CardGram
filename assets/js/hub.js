@@ -4078,46 +4078,14 @@ function removeHomeLooseCard(index) {
   renderHomeTable();
 }
 
-let homeLooseSuppressClick = 0;
-let homePhysicsWorld = null;
-
-function getHomePhysicsWorld() {
-  if (homePhysicsWorld) return homePhysicsWorld;
-  if (typeof AstroPhysics === 'undefined') return null;
-  homePhysicsWorld = new AstroPhysics.PhysicsWorld({
-    mode: 'tactile',
-    friction: 0.94,
-    restitution: 0.6,
-    collisionsEnabled: true,
-    tiltEnabled: true,
-    maxTilt: 16,
-    getBounds: () => {
-      const layer = hub.els.homeLooseLayer;
-      if (!layer) return null;
-      const rect = layer.getBoundingClientRect();
-      return {
-        left: 0,
-        top: 0,
-        right: rect.width || window.innerWidth,
-        bottom: rect.height || window.innerHeight
-      };
-    },
-    onImpact: (a, b) => {
-      if (typeof Sound !== 'undefined' && Sound.play) {
-        Sound.play('tap');
-      }
-    }
-  });
-  homePhysicsWorld.start();
-  return homePhysicsWorld;
-}
-
 function makeHomeLooseCard(entry, index) {
   const card = HUB_CATALOG.byId(entry.id);
   if (!card) return null;
   const button = makeNode('div', 'home-loose-card');
   button.tabIndex = 0;
   button.setAttribute('role', 'button');
+  button.style.left = `${entry.x * 100}%`;
+  button.style.top = `${entry.y * 100}%`;
   button.dataset.looseIndex = String(index);
   button.setAttribute('aria-label', card.name);
   button.appendChild(makeHubImage(thumbOf(card), card.name));
@@ -4129,150 +4097,62 @@ function makeHomeLooseCard(entry, index) {
   remove.appendChild(hubIcon('close'));
   button.appendChild(remove);
 
-  const tracker = typeof AstroPhysics !== 'undefined' ? new AstroPhysics.PointerVelocityTracker() : null;
-  const cardId = `loose-${index}`;
-  const world = getHomePhysicsWorld();
-
-  const syncDimensions = () => {
-    const layer = hub.els.homeLooseLayer;
-    const lRect = layer ? layer.getBoundingClientRect() : { width: window.innerWidth, height: window.innerHeight };
-    const bRect = button.getBoundingClientRect();
-    const w = bRect.width || 120;
-    const h = bRect.height || 160;
-    const pxX = entry.x * (lRect.width || window.innerWidth);
-    const pxY = entry.y * (lRect.height || window.innerHeight);
-    return { w, h, pxX, pxY, lWidth: lRect.width, lHeight: lRect.height };
-  };
-
-  const dim = syncDimensions();
-  let body = null;
-  if (world) {
-    body = world.addBody(cardId, {
-      kind: 'card',
-      x: dim.pxX,
-      y: dim.pxY,
-      width: dim.w,
-      height: dim.h,
-      mass: 1.2,
-      scale: 1,
-      el: button
-    });
-  } else {
-    button.style.left = `${entry.x * 100}%`;
-    button.style.top = `${entry.y * 100}%`;
-  }
-
   let startX = 0;
   let startY = 0;
-  let startBodyX = 0;
-  let startBodyY = 0;
+  let originX = entry.x;
+  let originY = entry.y;
   let moved = false;
   let dragging = false;
 
   button.addEventListener('pointerdown', (event) => {
     if (event.target.closest('[data-loose-remove]')) return;
-    if (event.button !== 0) return;
     event.preventDefault();
     dragging = true;
     moved = false;
     startX = event.clientX;
     startY = event.clientY;
-
-    if (body) {
-      body.isDragging = true;
-      body.vx = 0;
-      body.vy = 0;
-      body.angularVel = 0;
-      startBodyX = body.x;
-      startBodyY = body.y;
-      if (tracker) tracker.reset(event.clientX, event.clientY);
-    } else {
-      startBodyX = entry.x;
-      startBodyY = entry.y;
-    }
-
+    originX = entry.x;
+    originY = entry.y;
     button.classList.add('is-dragging');
-    try { button.setPointerCapture(event.pointerId); } catch (_) {}
+    button.setPointerCapture(event.pointerId);
   });
 
   button.addEventListener('pointermove', (event) => {
     if (!dragging) return;
-    const dx = event.clientX - startX;
-    const dy = event.clientY - startY;
-    if (!moved && Math.hypot(dx, dy) > 4) {
-      moved = true;
-      if (typeof Sound !== 'undefined' && Sound.play) Sound.play('hover');
-    }
-    if (!moved) return;
-
-    if (tracker) tracker.push(event.clientX, event.clientY);
-
-    const layer = hub.els.homeLooseLayer;
-    const lRect = layer ? layer.getBoundingClientRect() : { width: window.innerWidth, height: window.innerHeight };
-
-    if (body) {
-      body.x = Math.max(0, Math.min((lRect.width || window.innerWidth) - body.width, startBodyX + dx));
-      body.y = Math.max(0, Math.min((lRect.height || window.innerHeight) - body.height, startBodyY + dy));
-      body.targetAngle = Math.max(-14, Math.min(14, (event.movementX || 0) * 1.5));
-      entry.x = (lRect.width > 0) ? body.x / lRect.width : 0.5;
-      entry.y = (lRect.height > 0) ? body.y / lRect.height : 0.5;
-    } else {
-      entry.x = Math.min(0.94, Math.max(0, startBodyX + dx / lRect.width));
-      entry.y = Math.min(0.9, Math.max(0, startBodyY + dy / lRect.height));
-      button.style.left = `${entry.x * 100}%`;
-      button.style.top = `${entry.y * 100}%`;
-    }
+    const panel = document.querySelector('.hub-home-panel');
+    if (!panel) return;
+    const rect = panel.getBoundingClientRect();
+    const dx = (event.clientX - startX) / rect.width;
+    const dy = (event.clientY - startY) / rect.height;
+    if (Math.abs(event.clientX - startX) > 4 || Math.abs(event.clientY - startY) > 4) moved = true;
+    entry.x = Math.min(0.94, Math.max(0, originX + dx));
+    entry.y = Math.min(0.9, Math.max(0, originY + dy));
+    button.style.left = `${entry.x * 100}%`;
+    button.style.top = `${entry.y * 100}%`;
   });
 
-  const finish = (event) => {
+  const finish = () => {
     if (!dragging) return;
     dragging = false;
     button.classList.remove('is-dragging');
-    if (event && event.pointerId !== undefined) {
-      try { button.releasePointerCapture(event.pointerId); } catch (_) {}
-    }
-
-    if (body) {
-      body.isDragging = false;
-      if (moved && tracker) {
-        const vel = tracker.getVelocity();
-        body.vx = vel.vx;
-        body.vy = vel.vy;
-      }
-    }
-
-    if (moved) {
-      homeLooseSuppressClick = Date.now() + 400;
-      if (typeof Sound !== 'undefined' && Sound.play) Sound.play('cardSettle');
-    }
     saveHome();
   };
-
   button.addEventListener('pointerup', finish);
   button.addEventListener('pointercancel', finish);
-
   button.addEventListener('click', (event) => {
     if (event.target.closest('[data-loose-remove]')) {
       event.preventDefault();
-      if (world) world.removeBody(cardId);
       removeHomeLooseCard(index);
       return;
     }
-    if (moved || Date.now() < homeLooseSuppressClick) {
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
-    openCardViewer(card.id, button);
+    if (!moved) openCardViewer(card.id, button);
   });
-
   button.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       openCardViewer(card.id, button);
     }
   });
-
   return button;
 }
 
@@ -4344,9 +4224,6 @@ function renderHomeTable() {
 
   const layer = hub.els.homeLooseLayer;
   if (layer) {
-    if (homePhysicsWorld) {
-      homePhysicsWorld.clear();
-    }
     layer.replaceChildren(
       ...hubHome.loose
         .map((entry, index) => makeHomeLooseCard(entry, index))
@@ -8991,46 +8868,9 @@ window.addEventListener('load', () => {
    ========================================================================== */
 const shopPlaygroundStateByKey = new Map();
 let shopPlaygroundSuppressClick = 0;
-let shopPhysicsWorld = null;
 
 function isShopDesktop() {
   return window.matchMedia('(min-width: 981px)').matches;
-}
-
-function getShopPhysicsWorld() {
-  if (shopPhysicsWorld) return shopPhysicsWorld;
-  if (typeof AstroPhysics === 'undefined') return null;
-
-  shopPhysicsWorld = new AstroPhysics.PhysicsWorld({
-    mode: 'tactile',
-    friction: 0.955,
-    restitution: 0.7,
-    collisionsEnabled: true,
-    tiltEnabled: true,
-    maxTilt: 16,
-    getBounds: () => {
-      const scene = document.querySelector('.shop-scene');
-      if (!scene) return null;
-      const sRect = scene.getBoundingClientRect();
-      const pad = 12;
-      return {
-        left: pad,
-        top: pad,
-        right: sRect.width - pad,
-        bottom: sRect.height - pad
-      };
-    },
-    onImpact: (a, b) => {
-      const el = a && a.el;
-      if (el) triggerPlaygroundBounce(el);
-      if (typeof Sound !== 'undefined' && Sound.play) {
-        Sound.play('tap');
-      }
-    }
-  });
-
-  shopPhysicsWorld.start();
-  return shopPhysicsWorld;
 }
 
 function getPlaygroundKey(el) {
@@ -9092,6 +8932,7 @@ function showPlaygroundScaleBadge(el, scale) {
 
 function attachShopPlayground(el) {
   if (!el || el._hasPlaygroundAttached) {
+    // Si ya tiene listener pero es un nuevo elemento re-renderizado, restaurar su estado persistido
     if (el) {
       const state = getPlaygroundState(el);
       if (state.x !== 0 || state.y !== 0 || state.scale !== 1) {
@@ -9103,36 +8944,6 @@ function attachShopPlayground(el) {
   el._hasPlaygroundAttached = true;
 
   const state = getPlaygroundState(el);
-  const isNpc = el.classList.contains('shop-npc');
-  const isStores = el.classList.contains('shop-stores') || el.id === 'shop-stores';
-  const world = getShopPhysicsWorld();
-  const key = getPlaygroundKey(el);
-
-  // Registrar cuerpo en Astro Physics Engine
-  let body = null;
-  if (world) {
-    const rect = el.getBoundingClientRect();
-    body = world.addBody(key, {
-      kind: isNpc ? 'npc' : (isStores ? 'stores' : 'pack'),
-      x: state.x,
-      y: state.y,
-      width: rect.width || (isNpc ? 260 : 180),
-      height: rect.height || (isNpc ? 400 : 250),
-      mass: isNpc ? 10 : (isStores ? 8 : 1.5),
-      lockY: isNpc, // Azura reacciona pero solo moviéndose lateralmente
-      lockRotation: isNpc, // Azura se mantiene erguida
-      scale: state.scale,
-      el: el,
-      customRender: (b) => {
-        state.x = b.x;
-        state.y = b.y;
-        state.rot = b.angle;
-        state.vx = b.vx;
-        state.vy = b.vy;
-        applyPlaygroundTransform(el, state);
-      }
-    });
-  }
 
   // Restaurar posición si ya existía en memoria
   if (state.x !== 0 || state.y !== 0 || state.scale !== 1) {
@@ -9150,11 +8961,11 @@ function attachShopPlayground(el) {
       e.stopPropagation();
       return false;
     }
-  }, true);
+  }, true); // Capturing!
 
   el.addEventListener('pointerdown', (e) => {
     if (!isShopDesktop()) return;
-    if (e.button !== 0) return;
+    if (e.button !== 0) return; // Solo clic izquierdo
 
     const scene = document.querySelector('.shop-scene');
     if (!scene) return;
@@ -9168,17 +8979,13 @@ function attachShopPlayground(el) {
     state.isDragging = false;
     state.hasMoved = false;
 
-    if (body) {
-      body.isDragging = true;
-      body.vx = 0;
-      body.vy = 0;
-      body.angularVel = 0;
-      if (body.tracker) body.tracker.reset(e.clientX, e.clientY);
-    }
-
+    /* Azura se arrastra en horizontal dentro del escenario; su tamaño
+       solo cambia con el slider del botón integrado. En pantallas táctiles
+       no se arrastra: el dedo solo la saluda. */
+    const isNpc = el.classList.contains('shop-npc');
     if (isNpc && e.pointerType && e.pointerType !== 'mouse') return;
 
-    // Calcular límites de la escena
+    // Calcular límites de la escena de una sola vez
     {
       const sRect = scene.getBoundingClientRect();
       const eRect = el.getBoundingClientRect();
@@ -9207,6 +9014,7 @@ function attachShopPlayground(el) {
     const startPointerY = e.clientY;
     const startStateX = state.x;
     const startStateY = state.y;
+    const startScale = state.scale;
     let lastMoveTime = performance.now();
     let lastMoveX = e.clientX;
     let lastMoveY = e.clientY;
@@ -9232,22 +9040,14 @@ function attachShopPlayground(el) {
 
       if (!state.hasMoved) return;
 
-      if (body && body.tracker) {
-        body.tracker.push(moveEvent.clientX, moveEvent.clientY);
-      }
-
       const now = performance.now();
       const dt = Math.max(1, now - lastMoveTime);
 
       if (isNpc) {
+        /* Desplazamiento lateral puro: sin zoom ni rotación. */
         state.x = Math.max(state.minX, Math.min(state.maxX, startStateX + dx));
         state.y = 0;
         state.rot = 0;
-        if (body) {
-          body.x = state.x;
-          body.y = 0;
-          body.angle = 0;
-        }
       } else {
         const rawTargetX = startStateX + dx;
         const rawTargetY = startStateY + dy;
@@ -9258,14 +9058,8 @@ function attachShopPlayground(el) {
         const instantVy = ((moveEvent.clientY - lastMoveY) / dt) * 16;
         state.vx = state.vx * 0.55 + Math.max(-26, Math.min(26, instantVx)) * 0.45;
         state.vy = state.vy * 0.55 + Math.max(-26, Math.min(26, instantVy)) * 0.45;
-        state.rot = Math.max(-14, Math.min(14, state.vx * 0.5));
+        state.rot = Math.max(-12, Math.min(12, state.vx * 0.5));
         state.rotV = Math.max(-2.4, Math.min(2.4, state.vx * 0.12));
-
-        if (body) {
-          body.x = state.x;
-          body.y = state.y;
-          body.targetAngle = state.rot;
-        }
       }
 
       lastMoveTime = now;
@@ -9294,25 +9088,16 @@ function attachShopPlayground(el) {
 
       state.isDragging = false;
 
-      if (body) {
-        body.isDragging = false;
-        if (state.hasMoved && body.tracker) {
-          const vel = body.tracker.getVelocity();
-          body.vx = vel.vx;
-          body.vy = isNpc ? 0 : vel.vy;
-        }
-      }
-
       if (isNpc) {
         state.rot = 0;
         applyPlaygroundTransform(el, state);
         return;
       }
 
-      // Si no tenemos Astro Physics global, usar el fallback
-      if (!world && state.hasMoved && Math.hypot(state.vx, state.vy) > 0.8) {
+      // Lanzamiento con física de rebote si llevaba velocidad
+      if (state.hasMoved && Math.hypot(state.vx, state.vy) > 0.8) {
         runPlaygroundPhysics(el, state);
-      } else if (!world) {
+      } else {
         state.rot = 0;
         applyPlaygroundTransform(el, state);
       }
@@ -9323,7 +9108,7 @@ function attachShopPlayground(el) {
     window.addEventListener('pointercancel', onPointerUp, { passive: false });
   });
 
-  // Modificación de tamaño con rueda del ratón
+  // Modificación de tamaño con rueda del ratón (los packs; Azura usa su slider)
   el.addEventListener('wheel', (e) => {
     if (!isShopDesktop()) return;
     if (el.classList.contains('shop-npc')) return;
@@ -9334,7 +9119,6 @@ function attachShopPlayground(el) {
     const min = el.classList.contains('shop-npc') ? 0.55 : 0.4;
     const max = el.classList.contains('shop-npc') ? 1.9 : 2.5;
     state.scale = Math.max(min, Math.min(max, state.scale * zoom));
-    if (body) body.scale = state.scale;
     applyPlaygroundTransform(el, state);
     showPlaygroundScaleBadge(el, state.scale);
   }, { passive: false });
@@ -9482,18 +9266,6 @@ function setShopNpcPosition(pos) {
 }
 
 function resetShopPlayground() {
-  if (shopPhysicsWorld) {
-    shopPhysicsWorld.bodies.forEach((body) => {
-      body.vx = 0;
-      body.vy = 0;
-      body.angle = 0;
-      body.angularVel = 0;
-      body.isDragging = false;
-      body.x = 0;
-      body.y = 0;
-    });
-  }
-
   shopPlaygroundStateByKey.forEach((state) => {
     if (state.animId) {
       cancelAnimationFrame(state.animId);
