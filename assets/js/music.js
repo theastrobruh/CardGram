@@ -281,6 +281,30 @@
     });
   }
 
+  function studioTracks() {
+    return tracksFor('studio');
+  }
+
+  /* En el eCard Studio suenan solo sus 4 pistas: sin mezclar las de los menús.
+     El modo Chill sigue usando toda la secuencia y las radios. */
+  function playStudioTrack(index = 0) {
+    const list = studioTracks();
+    if (!list.length) {
+      stopMusic();
+      return;
+    }
+    const trackIndex = ((index % list.length) + list.length) % list.length;
+    state.studioIndex = trackIndex;
+    startTrack(list[trackIndex], {
+      scene: 'studio',
+      trackIndex,
+      loop: false,
+      onEnded: () => {
+        if (state.scene === 'studio' && state.mode !== 'chill') playStudioTrack(trackIndex + 1);
+      }
+    });
+  }
+
   function playScene(scene, force = false) {
     if (!state.enabled) return;
     if (!state.armed && !force) return;
@@ -291,8 +315,8 @@
       return;
     }
     if (scene === 'studio') {
-      if (state.current && !state.current.radio && !force) return;
-      playRandomTrack();
+      if (state.current && state.current.scene === 'studio' && !state.current.radio && !force) return;
+      playStudioTrack(Math.floor(Math.random() * Math.max(1, studioTracks().length)));
       return;
     }
     playSceneTrack(scene, 0, force);

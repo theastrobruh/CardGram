@@ -2686,7 +2686,9 @@ function applyFabPosition() {
     el.flowerMenu.style.top = '';
     el.flowerMenu.style.right = '';
     el.flowerMenu.style.bottom = '';
-    el.flowerMenu.classList.remove('petals-right', 'petals-down');
+    /* Por defecto el FAB vive junto al panel izquierdo: el abanico se abre a la derecha. */
+    el.flowerMenu.classList.add('petals-right');
+    el.flowerMenu.classList.remove('petals-down');
     return;
   }
 

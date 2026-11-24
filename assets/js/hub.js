@@ -8868,6 +8868,7 @@ window.addEventListener('load', () => {
    ========================================================================== */
 const shopPlaygroundStateByKey = new Map();
 let shopPlaygroundSuppressClick = 0;
+const SHOP_NPC_DEFAULT_SCALE = 0.88;
 
 function isShopDesktop() {
   return window.matchMedia('(min-width: 981px)').matches;
@@ -8886,7 +8887,8 @@ function getPlaygroundState(el) {
     shopPlaygroundStateByKey.set(key, {
       x: 0,
       y: 0,
-      scale: 1,
+      /* Azura entra al 88%: la escena queda más aireada. */
+      scale: key === 'npc' ? SHOP_NPC_DEFAULT_SCALE : 1,
       vx: 0,
       vy: 0,
       rot: 0,
@@ -9261,19 +9263,19 @@ function setShopNpcPosition(pos) {
   }
 
   /* Conserva el tamaño elegido con el slider al cambiar de posición. */
-  if (pos !== 'hidden' && state.scale !== 1) applyPlaygroundTransform(npc, state);
+  if (pos !== 'hidden') applyPlaygroundTransform(npc, state);
   syncShopNpcSizeUi();
 }
 
 function resetShopPlayground() {
-  shopPlaygroundStateByKey.forEach((state) => {
+  shopPlaygroundStateByKey.forEach((state, key) => {
     if (state.animId) {
       cancelAnimationFrame(state.animId);
       state.animId = null;
     }
     state.x = 0;
     state.y = 0;
-    state.scale = 1;
+    state.scale = key === 'npc' ? SHOP_NPC_DEFAULT_SCALE : 1;
     state.vx = 0;
     state.vy = 0;
     state.rot = 0;
@@ -9296,6 +9298,7 @@ function resetShopPlayground() {
   if (npc) {
     npc.classList.remove('pos-center', 'pos-right', 'pos-hidden');
     npc.classList.add('pos-left');
+    applyPlaygroundTransform(npc, getPlaygroundState(npc));
   }
   setNpcPosLabel('Azura: Izquierda', 'left');
   syncShopNpcSizeUi();
