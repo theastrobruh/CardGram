@@ -2,7 +2,7 @@
 
 <!-- Animated SVG logo — spinning card with 3D flip animation -->
 <a href="https://theastrobruh.github.io/CardGram/">
-  <img src="assets/data/readme/cardgram-logo.svg" alt="CardGram — eCard Studio" width="540"/>
+  <img src="assets/data/readme/cardgram-logo.svg" alt="CardGram — eCard Studio" width="420"/>
 </a>
 
 <br/>
