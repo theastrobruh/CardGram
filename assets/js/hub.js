@@ -7114,10 +7114,11 @@ async function openStudio(tab) {
   if (isMobile()) {
     setSidebar(false, { persist: false });
   } else {
-    /* El panel se abre por defecto al entrar al estudio (una vez por sesión). */
-    const openSidebar = hub.studioSidebarSeeded ? !state.sidebarCollapsed : true;
+    /* En desktop el estudio siempre arranca con el panel abierto y el FAB
+       rápido a su lado, para que todo quede accesible de inmediato. */
     hub.studioSidebarSeeded = true;
-    setSidebar(openSidebar, { persist: false });
+    setSidebar(true, { persist: false });
+    if (typeof resetFabPosition === 'function') resetFabPosition();
   }
 
   activateTab(HUB_STUDIO_TABS[tab] || 'tab-deck');

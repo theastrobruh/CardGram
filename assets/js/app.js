@@ -2678,6 +2678,12 @@ function updateFabOrientation(x, y) {
   el.flowerMenu.classList.toggle('petals-down', y < bounds.height / 2);
 }
 
+function resetFabPosition() {
+  state.fabX = null;
+  state.fabY = null;
+  applyFabPosition();
+}
+
 function applyFabPosition() {
   if (!el.flowerMenu) return;
 

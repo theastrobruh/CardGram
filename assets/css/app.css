@@ -3449,6 +3449,8 @@ body.cinematic-mode .toast-stack {
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
+  /* Acompaña el deslizamiento del panel lateral. */
+  transition: left 0.38s var(--ease);
 }
 
 .bottom-left-bg-wrap {
@@ -4163,6 +4165,25 @@ body.cinematic-mode .fx-rail {
 
   .fx-btn-value {
     font-size: 0.42rem;
+  }
+}
+
+/* Pantallas bajas: la barra se compacta para no chocar con los iconos de arriba. */
+@media (max-height: 640px) {
+  .fx-rail {
+    gap: 2px;
+    padding: 4px 3px;
+  }
+
+  .fx-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+  }
+
+  .fx-btn .icon {
+    width: 12px;
+    height: 12px;
   }
 }
 
