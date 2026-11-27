@@ -930,6 +930,191 @@ function markBoosterMission() {
   persistBooster();
 }
 
+/* --------------------------------------------------------------------------
+   Misiones diarias: tres gestos por día y un sobre extra al completarlas.
+   -------------------------------------------------------------------------- */
+const HUB_MISSIONS_KEY = 'cardgram.missions.v1';
+const HUB_MISSION_LIST = [
+  { id: 'pack', icon: 'i-booster-pack', title: 'mission_pack_title', hint: 'mission_pack_hint' },
+  { id: 'favorite', icon: 'i-star', title: 'mission_favorite_title', hint: 'mission_favorite_hint' },
+  { id: 'create', icon: 'i-wand', title: 'mission_create_title', hint: 'mission_create_hint' }
+];
+
+const hubMissions = { day: '', done: {} };
+
+function missionsCreatedToday() {
+  const today = dayKey();
+  return (
+    typeof presets !== 'undefined' &&
+    Array.isArray(presets) &&
+    presets.some((preset) => dayKey(new Date(preset.createdAt || 0)) === today)
+  );
+}
+
+function persistMissions() {
+  storage.write(HUB_MISSIONS_KEY, { day: hubMissions.day, done: hubMissions.done });
+}
+
+function ensureMissionDay() {
+  const today = dayKey();
+  if (hubMissions.day === today) return;
+  hubMissions.day = today;
+  hubMissions.done = {};
+  persistMissions();
+}
+
+function loadMissions() {
+  const raw = storage.read(HUB_MISSIONS_KEY, null);
+  hubMissions.day = raw && typeof raw.day === 'string' ? raw.day : '';
+  hubMissions.done = raw && raw.done && typeof raw.done === 'object' ? { ...raw.done } : {};
+  ensureMissionDay();
+}
+
+function missionDone(id) {
+  ensureMissionDay();
+  if (id === 'create') return missionsCreatedToday();
+  return Boolean(hubMissions.done[id]);
+}
+
+function missionsCompletedCount() {
+  return HUB_MISSION_LIST.filter((mission) => missionDone(mission.id)).length;
+}
+
+function syncMissionsBadge() {
+  const done = missionsCompletedCount();
+  const total = HUB_MISSION_LIST.length;
+  document.querySelectorAll('[data-missions-dot]').forEach((dot) => {
+    dot.hidden = done >= total;
+  });
+  const button = document.getElementById('hub-missions-btn');
+  if (button) {
+    button.setAttribute('aria-label', `${t('missions_title')} · ${done}/${total}`);
+    button.classList.toggle('is-done', done >= total);
+  }
+}
+
+function renderMissions() {
+  const list = document.getElementById('hub-missions-list');
+  if (!list) return;
+  ensureMissionDay();
+  const total = HUB_MISSION_LIST.length;
+  list.replaceChildren(
+    ...HUB_MISSION_LIST.map((mission) => {
+      const done = missionDone(mission.id);
+      const row = makeNode('div', `hub-mission${done ? ' is-done' : ''}`);
+      row.dataset.mission = mission.id;
+
+      const icon = makeNode('span', 'hub-mission-icon');
+      icon.setAttribute('aria-hidden', 'true');
+      icon.innerHTML = `<svg class="icon"><use href="#${mission.icon}"></use></svg>`;
+
+      const copy = makeNode('span', 'hub-mission-copy');
+      const title = makeNode('strong', null, t(mission.title));
+      const hint = makeNode('small', null, t(mission.hint));
+      copy.append(title, hint);
+
+      const state = makeNode('span', 'hub-mission-state');
+      if (done) state.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>';
+      else state.textContent = t('mission_pending');
+
+      row.append(icon, copy, state);
+      return row;
+    })
+  );
+
+  const done = missionsCompletedCount();
+  const count = document.getElementById('hub-missions-count');
+  if (count) count.textContent = `${done}/${total}`;
+  const fill = document.getElementById('hub-missions-fill');
+  if (fill) fill.style.width = `${Math.round((done / total) * 100)}%`;
+  const panel = document.getElementById('hub-missions');
+  if (panel) panel.classList.toggle('is-complete', done >= total);
+  syncMissionsBadge();
+  if (done >= total) {
+    const wasUnlocked = hubBooster.missionDay === hubMissions.day;
+    markBoosterMission();
+    /* El sobre extra aparece al instante en la tienda y en el botón móvil. */
+    if (!wasUnlocked && hub.ready) {
+      renderBooster();
+      syncMobileDailyButton();
+      toast(t('missions_reward'), { type: 'success' });
+    }
+  }
+}
+
+function bumpMission(id) {
+  ensureMissionDay();
+  if (id === 'create') {
+    renderMissions();
+    return;
+  }
+  if (hubMissions.done[id]) return;
+  hubMissions.done[id] = true;
+  persistMissions();
+  renderMissions();
+  const mission = HUB_MISSION_LIST.find((entry) => entry.id === id);
+  if (mission && missionsCompletedCount() < HUB_MISSION_LIST.length) {
+    toast(`${t('mission_completed_toast')} · ${t(mission.title)}`, { type: 'success' });
+  }
+}
+
+function openMissions() {
+  const panel = document.getElementById('hub-missions');
+  if (!panel) return;
+  if (typeof closeHubSheet === 'function') closeHubSheet({ restoreFocus: false, instant: true });
+  const settings = document.getElementById('hub-layout-panel');
+  const settingsToggle = document.getElementById('hub-layout-toggle');
+  if (settings) settings.hidden = true;
+  if (settingsToggle) settingsToggle.setAttribute('aria-expanded', 'false');
+  renderMissions();
+  panel.hidden = false;
+  document.querySelectorAll('[data-missions-open]').forEach((button) => {
+    button.setAttribute('aria-expanded', 'true');
+  });
+  const close = panel.querySelector('.hub-missions-close');
+  if (close) close.focus({ preventScroll: true });
+}
+
+function closeMissions() {
+  const panel = document.getElementById('hub-missions');
+  if (!panel) return;
+  panel.hidden = true;
+  document.querySelectorAll('[data-missions-open]').forEach((button) => {
+    button.setAttribute('aria-expanded', 'false');
+  });
+}
+
+function setupMissions() {
+  loadMissions();
+  renderMissions();
+  window.CardGramSyncMissions = renderMissions;
+
+  document.querySelectorAll('[data-missions-open]').forEach((button) => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      openMissions();
+    });
+  });
+
+  const panel = document.getElementById('hub-missions');
+  if (panel) {
+    panel.addEventListener('click', (event) => {
+      if (event.target.closest('[data-missions-close]')) closeMissions();
+    });
+  }
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && panel && !panel.hidden) closeMissions();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!panel || panel.hidden) return;
+    if (event.target.closest('#hub-missions')) return;
+    if (event.target.closest('[data-missions-open]')) return;
+    closeMissions();
+  });
+}
+
 function boosterCardIsNew(cardId) {
   const card = HUB_CATALOG.byId(cardId);
   if (!card) return false;
@@ -1273,9 +1458,10 @@ function selectPackFromCarousel() {
   const track = hub.els.packCarouselTrack;
   const center = track && track.querySelector('.pack-carousel-item.is-center');
   if (center) {
-    center.style.transition = 'transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.36s ease';
-    center.style.transform = 'translate3d(-50%, -50%, 360px) scale(1.14)';
-    center.style.opacity = '1';
+    center.style.transition = 'transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.42s ease';
+    /* Despegue contenido: el sobre crece y se desvanece, sin salirse del marco. */
+    center.style.transform = 'translate3d(-50%, -50%, 0) scale(1.18)';
+    center.style.opacity = '0.92';
   }
   if (hub.els.packCarouselWrap) hub.els.packCarouselWrap.classList.add('is-leaving');
   if (window.Sound) window.Sound.play('flip');
@@ -1797,6 +1983,7 @@ function openPackOverlay() {
   if (!hub.els.packOverlay) return;
   const collection = packCarouselCollection();
   if (!collection) return;
+  bumpMission('pack');
 
   const resume = hubBooster.picks.length > 0;
   packOverlayState.cards = hubBooster.picks.slice();
@@ -2167,17 +2354,18 @@ function setAzuraPose(index, options) {
   const opts = options || {};
   if (!hub.els.shopNpcA || !hub.els.shopNpcB) return false;
   const now = performance.now();
-  if (!opts.force && azuraLastSwap && now - azuraLastSwap < 4500) return false;
+  if (!opts.force && azuraLastSwap && now - azuraLastSwap < 1800) return false;
   const total = SHOP_VENDOR_SPRITES.length;
   const target = ((Number(index) % total) + total) % total;
   const ok = azuraShow(SHOP_VENDOR_SPRITES[target], { index: target });
   return ok;
 }
 
-/* Bucle autónomo de posturas: solo cuando está en estado normal. */
+/* Bucle autónomo de posturas: solo cuando está en estado normal.
+   Cada pose dura entre 2 y 8 segundos (con el ritmo del usuario aplicado). */
 function queueAzuraPose() {
   window.clearTimeout(azuraPoseTimer);
-  const delay = (6200 + Math.random() * 7600) * azuraPace;
+  const delay = Math.min(8000, Math.max(2000, (2000 + Math.random() * 6000) * azuraPace));
   azuraPoseTimer = window.setTimeout(() => {
     try {
       if (
@@ -3743,6 +3931,7 @@ function setFavoriteCard(cardId) {
   if (hub.panel === 'library') renderLibrary();
   if (hub.panel === 'collections') renderCollections();
   if (hub.panel === 'profile') renderProfileForm();
+  bumpMission('favorite');
 }
 
 /* --------------------------------------------------------------------------
@@ -8833,6 +9022,7 @@ function setupHub() {
   renderFavoriteCard();
   renderHubStats(true);
   setupMobileData();
+  setupMissions();
   renderCollectionRail();
   renderCardExplorer();
   renderHomeTable();

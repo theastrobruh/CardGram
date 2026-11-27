@@ -131,7 +131,9 @@
     }
 
     const player = document.getElementById('music-player');
-    if (player) player.hidden = state.mode !== 'chill';
+    /* El reproductor con anterior/siguiente está disponible en el eCard Studio
+       tanto en Inmersivo como en Chill. */
+    if (player) player.hidden = state.mode !== 'chill' && state.scene !== 'studio';
     const explanation = document.getElementById('music-explanation');
     if (explanation) explanation.hidden = state.mode === 'chill';
     const tracksSection = document.getElementById('music-tracks-section');
@@ -286,21 +288,34 @@
   }
 
   /* En el eCard Studio suenan solo sus 4 pistas: sin mezclar las de los menús.
-     El modo Chill sigue usando toda la secuencia y las radios. */
-  function playStudioTrack(index = 0) {
+     El modo Chill sigue usando toda la secuencia y las radios.
+     Con el aleatorio activo (por defecto) nunca repite la pista anterior. */
+  function randomStudioIndex(exclude) {
+    const total = studioTracks().length;
+    if (total <= 1) return 0;
+    let index = Number.isInteger(exclude) ? exclude : 0;
+    while (index === exclude) index = Math.floor(Math.random() * total);
+    return index;
+  }
+
+  function playStudioTrack(index) {
     const list = studioTracks();
     if (!list.length) {
       stopMusic();
       return;
     }
-    const trackIndex = ((index % list.length) + list.length) % list.length;
+    const trackIndex = Number.isInteger(index)
+      ? ((index % list.length) + list.length) % list.length
+      : state.shuffle
+        ? randomStudioIndex(state.studioIndex)
+        : ((state.studioIndex || 0) + 1) % list.length;
     state.studioIndex = trackIndex;
     startTrack(list[trackIndex], {
       scene: 'studio',
       trackIndex,
       loop: false,
       onEnded: () => {
-        if (state.scene === 'studio' && state.mode !== 'chill') playStudioTrack(trackIndex + 1);
+        if (state.scene === 'studio' && state.mode !== 'chill') playStudioTrack();
       }
     });
   }
@@ -316,7 +331,7 @@
     }
     if (scene === 'studio') {
       if (state.current && state.current.scene === 'studio' && !state.current.radio && !force) return;
-      playStudioTrack(Math.floor(Math.random() * Math.max(1, studioTracks().length)));
+      playStudioTrack();
       return;
     }
     playSceneTrack(scene, 0, force);
@@ -349,6 +364,30 @@
       : state.sequenceIndex;
     const nextIndex = (Math.max(0, currentIndex) + direction + list.length) % list.length;
     playSequenceIndex(nextIndex);
+  }
+
+  /* Anterior / siguiente para los dos modos: en Inmersivo se queda dentro de
+     la escena (o de las 4 pistas del Studio); en Chill recorre todo. */
+  function skipTrack(direction) {
+    state.armed = true;
+    if (!state.enabled) {
+      state.enabled = true;
+      save();
+      syncButtons();
+    }
+    if (state.mode === 'chill' || state.radio) {
+      if (state.radio) state.radio = null;
+      nextChill(direction);
+      renderPanel();
+      return;
+    }
+    if (state.scene === 'studio') {
+      playStudioTrack(state.shuffle && direction > 0 ? undefined : (state.studioIndex || 0) + direction);
+      renderPanel();
+      return;
+    }
+    playSceneTrack(state.scene, (state.sceneIndex || 0) + direction, true);
+    renderPanel();
   }
 
   function playSequenceIndex(index) {
@@ -544,13 +583,11 @@
       return;
     }
     if (target.closest('[data-music-prev]')) {
-      nextChill(-1);
-      renderPanel();
+      skipTrack(-1);
       return;
     }
     if (target.closest('[data-music-next]')) {
-      nextChill(1);
-      renderPanel();
+      skipTrack(1);
       return;
     }
     if (target.closest('[data-music-shuffle]')) {
@@ -601,6 +638,8 @@
     openPanel,
     closePanel,
     start,
+    next: () => skipTrack(1),
+    previous: () => skipTrack(-1),
     isEnabled: () => state.enabled,
     getVolume: () => state.volume,
     setVolume(value) {

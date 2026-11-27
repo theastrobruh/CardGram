@@ -648,6 +648,8 @@ function persistSettings() {
 function persistPresets() {
   const ok = storage.write(STORAGE.presets, presets);
   if (!ok) toast(t('quota_error'), { type: 'error', duration: 6500 });
+  /* La misión diaria "crea una carta" se calcula desde los presets guardados. */
+  if (ok && typeof window.CardGramSyncMissions === 'function') window.CardGramSyncMissions();
   return ok;
 }
 

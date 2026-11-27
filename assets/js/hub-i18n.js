@@ -2039,3 +2039,57 @@ Object.assign(I18N.de, {
   collections_detail_hint: 'Du siehst nur die Karten, die du freigeschaltet hast. Das komplette Set mit grauen gesperrten Karten findest du im User Store.',
   shop_pack_detail_hint: 'Karten des Sets: farbig, was du besitzt, grau, was du noch freischalten kannst.'
 });
+
+/* ==========================================================================
+   Misiones diarias (ES / EN / DE)
+   ========================================================================== */
+Object.assign(I18N.es, {
+  missions_title: 'Misiones diarias',
+  missions_kicker: 'Hoy',
+  missions_lede: 'Tres gestos rápidos para desbloquear tu sobre extra.',
+  missions_reward: 'Completa las 3 y gana un sobre extra.',
+  missions_reset: 'Se renuevan cada día.',
+  missions_menu_hint: 'Tu progreso de hoy',
+  mission_pending: 'Pendiente',
+  mission_completed_toast: 'Misión completada',
+  mission_pack_title: 'Abre un sobre',
+  mission_pack_hint: 'Abre cualquier sobre de la tienda o el diario.',
+  mission_favorite_title: 'Elige tu favorita',
+  mission_favorite_hint: 'Marca una carta como favorita en el inicio o el explorador.',
+  mission_create_title: 'Crea una carta',
+  mission_create_hint: 'Guarda una carta nueva desde el eCard Studio.'
+});
+
+Object.assign(I18N.en, {
+  missions_title: 'Daily missions',
+  missions_kicker: 'Today',
+  missions_lede: 'Three quick moves to unlock your extra pack.',
+  missions_reward: 'Finish all three to earn an extra pack.',
+  missions_reset: 'Resets every day.',
+  missions_menu_hint: "Today's progress",
+  mission_pending: 'Pending',
+  mission_completed_toast: 'Mission complete',
+  mission_pack_title: 'Open a pack',
+  mission_pack_hint: 'Open any pack from the store or the daily one.',
+  mission_favorite_title: 'Pick your favorite',
+  mission_favorite_hint: 'Set a card as favorite from home or the explorer.',
+  mission_create_title: 'Create a card',
+  mission_create_hint: 'Save a new card from the eCard Studio.'
+});
+
+Object.assign(I18N.de, {
+  missions_title: 'Tagesmissionen',
+  missions_kicker: 'Heute',
+  missions_lede: 'Drei schnelle Schritte für dein Extra-Pack.',
+  missions_reward: 'Alle drei erledigen und ein Extra-Pack erhalten.',
+  missions_reset: 'Wird täglich zurückgesetzt.',
+  missions_menu_hint: 'Dein Fortschritt heute',
+  mission_pending: 'Offen',
+  mission_completed_toast: 'Mission erfüllt',
+  mission_pack_title: 'Ein Pack öffnen',
+  mission_pack_hint: 'Öffne ein Pack im Shop oder das Tagespack.',
+  mission_favorite_title: 'Favorit wählen',
+  mission_favorite_hint: 'Markiere eine Karte als Favorit.',
+  mission_create_title: 'Karte erstellen',
+  mission_create_hint: 'Speichere eine neue Karte im eCard Studio.'
+});
